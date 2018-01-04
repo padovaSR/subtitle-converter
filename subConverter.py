@@ -5,9 +5,6 @@ import wx
 
 import os
 import sys
-import re
-import string
-import codecs
 from na_functions import fileOpened
 
 class MyCustomTextCtrl(wx.TextCtrl):
