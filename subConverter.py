@@ -9,6 +9,16 @@ import re
 import string
 import codecs
 
+class MyCustomTextCtrl(wx.TextCtrl):
+    def __init__(self, *args, **kwargs):
+        """
+        Initial the text control
+        """
+        wx.TextCtrl.__init__(self, *args, **kwargs)
+
+    def write(self, text):
+        self.WriteText(text)
+
 class FileDrop(wx.FileDropTarget):
     def __init__(self, window):
         wx.FileDropTarget.__init__(self)
@@ -68,6 +78,9 @@ class MyFrame(wx.Frame):
         
         # Tool Bar end
         self.frame_statusbar = self.CreateStatusBar(1, wx.STB_DEFAULT_STYLE)
+        
+        # redirect text here
+        sys.stdout = self.text_ctrl_2
 
         self.__set_properties()
         self.__do_layout()
