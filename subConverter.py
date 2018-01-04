@@ -8,6 +8,7 @@ import sys
 import re
 import string
 import codecs
+from na_functions import fileOpened
 
 class MyCustomTextCtrl(wx.TextCtrl):
     def __init__(self, *args, **kwargs):
@@ -26,6 +27,8 @@ class FileDrop(wx.FileDropTarget):
         
     def OnDropFiles(self, x, y, filenames):
         for name in filenames:
+            fzip = fileOpened()
+            fzip.isCompressed(name)
             
         return True
 
