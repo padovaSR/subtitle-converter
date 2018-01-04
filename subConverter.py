@@ -7,11 +7,9 @@ import os
 import sys
 from na_functions import fileOpened
 
-class MyCustomTextCtrl(wx.TextCtrl):
+class RedirectTextCtrl(wx.TextCtrl):
     def __init__(self, *args, **kwargs):
-        """
-        Initial the text control
-        """
+        
         wx.TextCtrl.__init__(self, *args, **kwargs)
 
     def write(self, text):
