@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-import pysrt
-import zipfile, zlib
+import zipfile
 import sys
 import os
 
@@ -12,3 +11,4 @@ class fileOpened(object):
             print("ZIP archive: {}".format(os.path.basename(infile)))
             with zipfile.ZipFile(infile, 'r') as zf:
                 print(zf.namelist())
+                
