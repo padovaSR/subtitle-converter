@@ -40,6 +40,7 @@ class MyFrame(wx.Frame):
         self.text_ctrl_1.SetDropTarget(dt)
         self.window_1_pane_2 = wx.Panel(self.window_1, wx.ID_ANY)
         self.text_ctrl_2 = wx.TextCtrl(self.window_1_pane_2, wx.ID_ANY, "", style=wx.TE_BESTWRAP | wx.TE_MULTILINE | wx.TE_READONLY)
+        self.wildcard = "SubRip (*.zip; *.srt)|*.zip; *.srt|MicroDVD (*.sub)|*.sub|Text File (*.txt)|*.txt|All Files (*.*)|*.*"
         
         # Tool Bar
         self.frame_toolbar = wx.ToolBar(self, -1, style=wx.TB_3DBUTTONS | wx.TB_HORIZONTAL)
@@ -136,7 +137,13 @@ class MyFrame(wx.Frame):
         # end wxGlade
 
     def openFile(self, event):  # wxGlade: MyFrame.<event_handler>
-        print("Event handler 'openFile' not implemented!")
+        dlgOpen = wx.FileDialog(self, "Open file to convert", style=wx.FD_OPEN, wildcard=self.wildcard) # creates the Open File dialog
+        if dlgOpen.ShowModal() == wx.ID_OK:
+            self.filepath = dlgOpen.GetPath() # Get the file location
+            path = self.filepath
+            dlgOpen.Destroy()
+        else:
+            dlgOpen.Destroy()
         event.Skip()
 
     def toCyrillic(self, event):  # wxGlade: MyFrame.<event_handler>
