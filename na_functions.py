@@ -35,4 +35,4 @@ class fileOpened(object):
                             print('I/O Error occured! ({0}): {1}'.format(errno, strerror))
                         else:
                             with open(path, 'wb') as f:
-                                f.write(zf.read(respond))
+                                f.write(data)
