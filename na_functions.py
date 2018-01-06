@@ -13,7 +13,7 @@ class fileOpened(object):
         imeFajla = os.path.split(infile)[-1]
         with zipfile.ZipFile(infile, 'r') as zf:
             datfajl = len(zf.namelist())
-            if singlefajl == 1:
+            if datfajl == 1:
                 jedanFajl = zf.namelist()[0]
                 print(jedanFajl)
                 outfile = os.path.join(basepath, jedanFajl)
