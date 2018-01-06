@@ -24,7 +24,9 @@ class FileDrop(wx.FileDropTarget):
     def OnDropFiles(self, x, y, filenames):
         for name in filenames:
             fzip = fileOpened()
-            fzip.isCompressed(name)
+            if zipfile.is_zipfile(name) == True:
+                print('ZIP archive: {}'.format(os.path.basename(name)))
+                fzip.isCompressed(infile=name)
             
         return True
 
