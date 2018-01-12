@@ -27,7 +27,7 @@ class fileOpened(object):
                     if response:
                         namepath = os.path.basename(response)
                         path = os.path.join(basepath, namepath)
-                        print(respond)
+                        print(response)
                         try:
                             data = zf.read(response)
                         except IOError as e:
