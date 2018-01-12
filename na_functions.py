@@ -23,13 +23,13 @@ class fileOpened(object):
                 izbor = [x for x in zf.namelist() if not x.endswith('/')]
                 dlg = wx.SingleChoiceDialog(None, 'Pick one:', imeFajla, izbor)
                 if dlg.ShowModal() == wx.ID_OK:
-                    respond = dlg.GetStringSelection()
-                    if respond:
-                        namepath = os.path.basename(respond)
+                    response = dlg.GetStringSelection()
+                    if response:
+                        namepath = os.path.basename(response)
                         path = os.path.join(basepath, namepath)
                         print(respond)
                         try:
-                            data = zf.read(respond)
+                            data = zf.read(response)
                         except IOError as e:
                             errno, strerror = e.args
                             print('I/O Error occured! ({0}): {1}'.format(errno, strerror))
