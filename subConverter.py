@@ -9,13 +9,12 @@ import sys
 from na_functions import fileOpened
 
 class RedirectTextCtrl(wx.TextCtrl):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, my_text_ctrl):
+        self.out = my_text_ctrl
         
-        wx.TextCtrl.__init__(self, *args, **kwargs)
-
-    def write(self, text):
-        self.WriteText(text)
-
+    def write(self,string):
+        wx.CallAfter(self.out.WriteText, string)
+        
 class FileDrop(wx.FileDropTarget):
     def __init__(self, window):
         wx.FileDropTarget.__init__(self)
@@ -82,7 +81,8 @@ class MyFrame(wx.Frame):
         self.frame_statusbar = self.CreateStatusBar(1, wx.STB_DEFAULT_STYLE)
         
         # redirect text here
-        sys.stdout = self.text_ctrl_2
+        redir = RedirectText(self.text_ctrl_2)
+        sys.stdout = redir
 
         self.__set_properties()
         self.__do_layout()
