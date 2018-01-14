@@ -36,3 +36,6 @@ class fileOpened(object):
                         else:
                             with open(path, 'wb') as f:
                                 f.write(data)
+                      
+                else:
+                    print('Canceled.')
