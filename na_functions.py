@@ -9,8 +9,8 @@ import wx
 
 class fileOpened(object):
     def isCompressed(self, infile):
-        basepath = os.path.split(infile)[0]
-        imeFajla = os.path.split(infile)[-1]
+        basepath = os.path.dirname(infile)
+        imeFajla = os.path.basename(infile)
         with zipfile.ZipFile(infile, 'r') as zf:
             datfajl = len(zf.namelist())
             if datfajl == 1:
@@ -36,6 +36,5 @@ class fileOpened(object):
                         else:
                             with open(path, 'wb') as f:
                                 f.write(data)
-                      
                 else:
                     print('Canceled.')
