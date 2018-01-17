@@ -12,14 +12,13 @@ class fileOpened(object):
         basepath = os.path.dirname(infile)
         imeFajla = os.path.basename(infile)
         with zipfile.ZipFile(infile, 'r') as zf:
-            datfajl = len(zf.namelist())
-            if datfajl == 1:
+            if len(zf.namelist()) == 1:
                 jedanFajl = zf.namelist()[0]
                 print(jedanFajl)
                 outfile = os.path.join(basepath, jedanFajl)
                 with open(outfile, 'wb') as f:
                     f.write(zf.read(jedanFajl))
-            elif datfajl > 1:
+            elif len(zf.namelist()) > 1:
                 izbor = [x for x in zf.namelist() if not x.endswith('/')]
                 dlg = wx.SingleChoiceDialog(None, 'Pick one:', imeFajla, izbor)
                 if dlg.ShowModal() == wx.ID_OK:
