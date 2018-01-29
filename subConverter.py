@@ -4,9 +4,12 @@
 
 import wx
 
+from wx.lib.pubsub import pub
 import os
 import sys
+import zipfile
 from na_functions import fileOpened
+from dictionaries import dictionary_1
 
 class RedirectTextCtrl(wx.TextCtrl):
     def __init__(self, my_text_ctrl):
@@ -26,6 +29,7 @@ class FileDrop(wx.FileDropTarget):
             if zipfile.is_zipfile(name) == True:
                 print('ZIP archive: {}'.format(os.path.basename(name)))
                 fzip.isCompressed(infile=name)
+                #pub.sendMessage('dnd', filepath=os.path.basename(outfile))
             
         return True
 
