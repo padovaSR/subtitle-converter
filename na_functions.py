@@ -7,20 +7,6 @@ import os
 
 import wx
 
-# dictionaries
-with open('dictionaries\\Dictionary-1.txt', 'r', encoding='utf-8') as dict_file:
-    dict_1 = {}
-    for line in dict_file:
-        x = line.strip().split('=>')
-        if not line:
-            continue
-        a = x[0]
-        b = x[-1]
-        dict_1[a] = b
-        
-dictionary_1 = dict((k, v) for k, v in dict_1.items() if k)
-
-###################################################################################
 
 class fileOpened(object):
     def isCompressed(self, infile):
