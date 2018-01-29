@@ -10,7 +10,7 @@ import wx
 # dictionaries
 with open('dictionaries\\Dictionary-1.txt', 'r', encoding='utf-8') as dict_file:
     dict_1 = {}
-    for line in my_file:
+    for line in dict_file:
         x = line.strip().split('=>')
         if not line:
             continue
