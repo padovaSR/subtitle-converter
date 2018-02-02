@@ -2,11 +2,11 @@
 # -*- coding: UTF-8 -*-
 
 
-def dict_fromFile(text_in):
+def dict_fromFile(text_in, delim):
     with open(text_in, 'r', encoding='utf-8') as dict_file:
         new_dict = {}
         for line in dict_file:
-            x = line.strip().split('=>')
+            x = line.strip().split(delim)
             if not line:
                 continue
             key = x[0]
@@ -18,5 +18,5 @@ def dict_fromFile(text_in):
     return new_dict
 
 # Dictionary-1
-dictionary_1 = dict_fromFile(text_in='dictionaries\\Dictionary-1.txt')
+dictionary_1 = dict_fromFile(text_in='dictionaries\\Dictionary-1.txt', delim='=>')
 
