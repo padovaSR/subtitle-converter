@@ -7,7 +7,7 @@ import os
 
 import wx
 
-from dictionaries import dictionary_0, dictionary_1, dictionary_2
+from dictionaries import dictionary_0, dictionary_1, dictionary_2, specialReplace
 
 
 class fileOpened(object):
