@@ -25,4 +25,4 @@ dictionary_0 = dict_fromFile(text_in='dictionaries\\Dictionary-0.txt', delim='=>
 dictionary_1 = dict_fromFile(text_in='dictionaries\\Dictionary-1.txt', delim='=>')
 
 # Dictionary-2
-dictionary_2 = dict_fromFile(text_in='dictionaries\\Dictionary-1.txt', delim='=>')
+dictionary_2 = dict_fromFile(text_in='dictionaries\\Dictionary-2.txt', delim='=>')
