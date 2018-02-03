@@ -9,10 +9,11 @@ def dict_fromFile(text_in, delim):
             x = line.strip().split(delim)
             if not line:
                 continue
-            if x[0]:
+            if not x[0]:
+                continue
+            else:
                 key = x[0]
-            if x[-1]:
-                value = x[-1]
+            value = x[-1]
             new_dict[key] = value
             
         return new_dict
