@@ -7,6 +7,8 @@ import os
 
 import wx
 
+from na_functions import dictionary_0, dictionary_1, dictionary_2
+
 
 class fileOpened(object):
     def isCompressed(self, infile):
