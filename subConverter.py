@@ -9,7 +9,6 @@ import os
 import sys
 import zipfile
 from na_functions import fileOpened
-from dictionaries import dictionary_1
 
 class RedirectTextCtrl(wx.TextCtrl):
     def __init__(self, my_text_ctrl):
