@@ -18,6 +18,11 @@ def dict_fromFile(text_in, delim):
             
         return new_dict
 
+# Dictionary-0
+dictionary_0 = dict_fromFile(text_in='dictionaries\\Dictionary-0.txt', delim='=>')
+
 # Dictionary-1
 dictionary_1 = dict_fromFile(text_in='dictionaries\\Dictionary-1.txt', delim='=>')
 
+# Dictionary-2
+dictionary_2 = dict_fromFile(text_in='dictionaries\\Dictionary-1.txt', delim='=>')
