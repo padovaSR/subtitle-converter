@@ -26,3 +26,7 @@ dictionary_1 = dict_fromFile(text_in='dictionaries\\Dictionary-1.txt', delim='=>
 
 # Dictionary-2
 dictionary_2 = dict_fromFile(text_in='dictionaries\\Dictionary-2.txt', delim='=>')
+
+# Special-Replace
+specialReplace = dict_fromFile(text_in='dictionaries\\Special-Replace.txt', delim='=>')
+
