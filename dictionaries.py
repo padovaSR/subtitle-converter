@@ -9,6 +9,8 @@ def dict_fromFile(text_in, delim):
             x = line.strip().split(delim)
             if not line:
                 continue
+            if line.startswith('#'):
+                continue
             if not x[0]:
                 continue
             else:
