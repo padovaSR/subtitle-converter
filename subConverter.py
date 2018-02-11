@@ -28,7 +28,8 @@ class FileDrop(wx.FileDropTarget):
             if zipfile.is_zipfile(name) == True:
                 print('ZIP archive: {}'.format(os.path.basename(name)))
                 fzip.isCompressed(infile=name)
-                #pub.sendMessage('dnd', filepath=os.path.basename(outfile))
+                outfile = fzip.isCompressed(infile=name)
+                pub.sendMessage('dnd', filepath=os.path.basename(outfile))
             
         return True
 
