@@ -146,6 +146,13 @@ class MyFrame(wx.Frame):
         if dlgOpen.ShowModal() == wx.ID_OK:
             self.filepath = dlgOpen.GetPath() # Get the file location
             path = self.filepath
+            fzip = fileOpened()
+            if zipfile.is_zipfile(path) == True:
+                print('ZIP archive: {}'.format(os.path.basename(path)))
+                outfile = fzip.isCompressed(infile=path)
+                #
+                #
+                self.SetStatusText(os.path.basename(outfile))
             dlgOpen.Destroy()
         else:
             dlgOpen.Destroy()
