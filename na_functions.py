@@ -28,7 +28,7 @@ class fileOpened(object):
                     response = dlg.GetStringSelection()
                     if response:
                         namepath = os.path.basename(response)
-                        path = os.path.join(basepath, namepath)
+                        outfile = os.path.join(basepath, namepath)
                         print(response)
                         try:
                             data = zf.read(response)
@@ -36,7 +36,10 @@ class fileOpened(object):
                             errno, strerror = e.args
                             print('I/O Error occured! ({0}): {1}'.format(errno, strerror))
                         else:
-                            with open(path, 'wb') as f:
+                            with open(outfile, 'wb') as f:
                                 f.write(data)
                     else: 
                         print('Canceled.')
+        return outfile
+    
+    
