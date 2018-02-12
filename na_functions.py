@@ -21,6 +21,7 @@ class fileOpened(object):
                 outfile = os.path.join(basepath, jedanFajl)
                 with open(outfile, 'wb') as f:
                     f.write(zf.read(jedanFajl))
+                return outfile
             elif len(zf.namelist()) > 1:
                 izbor = [x for x in zf.namelist() if not x.endswith('/')]
                 dlg = wx.SingleChoiceDialog(None, 'Pick one:', imeFajla, izbor)
@@ -38,8 +39,7 @@ class fileOpened(object):
                         else:
                             with open(outfile, 'wb') as f:
                                 f.write(data)
+                            return outfile
                     else: 
                         print('Canceled.')
-        return outfile
-    
-    
+        
