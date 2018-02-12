@@ -99,6 +99,8 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_TOOL, self.aboutProgram, id=1007)
         self.Bind(wx.EVT_TOOL, self.exitProg, id=1008)
         # end wxGlade
+        # For Status Bar
+        pub.subscribe(self.updateStatus, 'dnd')
 
     def __set_properties(self):
         # begin wxGlade: MyFrame.__set_properties
@@ -140,6 +142,10 @@ class MyFrame(wx.Frame):
         self.Layout()
         self.SetSize((702, 639))
         # end wxGlade
+    
+    # Update Status Bar  
+    def updateStatus(self, filepath):
+        self.SetStatusText(filepath)
 
     def openFile(self, event):  # wxGlade: MyFrame.<event_handler>
         dlgOpen = wx.FileDialog(self, "Open file to convert", style=wx.FD_OPEN, wildcard=self.wildcard) # creates the Open File dialog
