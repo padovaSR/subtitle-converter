@@ -28,7 +28,8 @@ class FileDrop(wx.FileDropTarget):
             if zipfile.is_zipfile(name) == True:
                 print('ZIP archive: {}'.format(os.path.basename(name)))
                 outfile = fzip.isCompressed(infile=name)
-                pub.sendMessage('dnd', filepath=os.path.basename(outfile))
+                if outfile:
+                    pub.sendMessage('dnd', filepath=os.path.basename(outfile))
             
         return True
 
@@ -156,9 +157,10 @@ class MyFrame(wx.Frame):
             if zipfile.is_zipfile(path) == True:
                 print('ZIP archive: {}'.format(os.path.basename(path)))
                 outfile = fzip.isCompressed(infile=path)
-                #
-                #
-                self.SetStatusText(os.path.basename(outfile))
+                if outfile:
+                    #
+                    #
+                    self.SetStatusText(os.path.basename(outfile))
             dlgOpen.Destroy()
         else:
             dlgOpen.Destroy()
