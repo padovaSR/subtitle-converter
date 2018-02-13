@@ -161,6 +161,10 @@ class MyFrame(wx.Frame):
                     #
                     #
                     self.SetStatusText(os.path.basename(outfile))
+            elif zipfile.is_zipfile(path) == False:
+                #
+                #
+                self.SetStatusText(os.path.basename(path))
             dlgOpen.Destroy()
         else:
             dlgOpen.Destroy()
