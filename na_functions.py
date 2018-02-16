@@ -10,7 +10,7 @@ import wx
 from dictionaries import dictionary_0, dictionary_1, dictionary_2, specialReplace
 
 
-class fileOpened(object):
+class fileOpened:
     def isCompressed(self, infile):
         basepath = os.path.dirname(infile)
         imeFajla = os.path.basename(infile)
