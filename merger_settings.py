@@ -25,7 +25,6 @@ class Settings(wx.Dialog):
         wx.Dialog.__init__(self, None, title="")
         self.SetSize((301, 282))
         
-        config = ConfigObj(infile='resources\\merger.conf', encoding='utf-8')
         lineLenght = int(config['line_Lenght'])
         maxChar = int(config['max_Char'])
         maxGap = int(config['max_Gap'])
