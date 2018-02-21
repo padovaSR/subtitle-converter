@@ -22,7 +22,6 @@ class Settings(wx.Dialog):
     def __init__(self, *args, **kwds):
         # begin wxGlade: Settings.__init__
         kwds["style"] = kwds.get("style", 0) | wx.DEFAULT_DIALOG_STYLE
-        #wx.Dialog.__init__(self, *args, **kwds)
         wx.Dialog.__init__(self, None, title="")
         self.SetSize((301, 282))
         
