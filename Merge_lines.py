@@ -9,3 +9,14 @@ import srt
 import pysrt
 from na_functions import tc2ms
 import textwrap
+
+
+def fixIndexes(infile, kode): 
+    subs_new = pysrt.open(infile, encoding=kode)
+    for i in range(len(subs_new)):
+        subs_new[i].index = i + 1
+    subs_new.save(infile, encoding=kode)
+    
+    
+    
+    
