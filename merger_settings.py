@@ -170,8 +170,5 @@ class MyApp(wx.App):
 
 if __name__ == "__main__":
     app = MyApp(False)
-    #dialog_1 = Settings(None, -1, "")
-    #dialog_1.ShowModal()
-    #dialog_1.Destroy()    
     app.MainLoop()
     
