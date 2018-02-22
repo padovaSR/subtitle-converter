@@ -9,22 +9,6 @@ import wx
 
 from dictionaries import dictionary_0, dictionary_1, dictionary_2, specialReplace
 
-def tc2ms(tc):
-    ''' convert timecode to millisecond '''
-    sign = 1
-    if tc[0] in "+-":
-        sign = -1 if tc[0] == "-" else 1
-        tc = tc[1:]
-
-    TIMECODE_RE = re.compile('(?:(?:(?:(\d?\d):)?(\d?\d):)?(\d?\d))?(?:[,.](\d?\d?\d))?')
-    match = TIMECODE_RE.match(tc)
-    try: 
-        assert match is not None
-    except AssertionError:
-        print(tc)
-    hh,mm,ss,ms = map(lambda x: 0 if x==None else int(x), match.groups())
-    return ((hh*3600 + mm*60 + ss) * 1000 + ms) * sign
-
 
 class fileOpened:
     def isCompressed(self, infile):
