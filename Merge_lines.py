@@ -7,7 +7,6 @@ import codecs
 import string
 import srt
 import pysrt
-from na_functions import tc2ms
 import textwrap
 
 
