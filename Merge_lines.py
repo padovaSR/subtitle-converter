@@ -15,7 +15,7 @@ def lineMerger(file_in, file_out, len_line, char_num, _gap, kode):
     
     subs = pysrt.open(file_in, encoding=kode)
     
-    parni = []; neparni = []                #;  treci = []
+    parni = []; neparni = []
     for i in range(1, len(subs), 2)         # Svaki drugi element počevši od drugog
         parni.append(subs[i])
     for i in range(0, len(subs), 2):        # Svaki drugi počevši od prvog
