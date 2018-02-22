@@ -37,7 +37,7 @@ def lineMerger(file_in, file_out, len_line, char_num, _gap, kode):
             # dodaj originalne linije kao string
             new_j += '{0}\n{1} --> {2}\n{3}\n\n'.format(first.index, first.start, first.end, first.text)
             new_j += '{0}\n{1} --> {2}\n{3}\n\n'.format(second.index, second.start, second.end, second.text)
-    if len(subs) % 2 != 0:
+    if not len(subs) % 2 == 0:
         new_j += '{0}\n{1} --> {2}\n{3}\n\n{4}'.format(subs[-1].index, subs[-1].start, subs[-1].end, subs[-1].text, '')    
     with open(file_out, 'w', encoding=kode) as fw:
         new_j = new_j.replace('    ', ' ').replace('   ', ' ').replace('  ', ' ')
