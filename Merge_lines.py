@@ -46,11 +46,11 @@ class mergeLines:
             new_j = new_j.replace('    ', ' ').replace('   ', ' ').replace('  ', ' ')
             fw.write(new_j)
     
-        def fixIndexes(infile, kode): 
-            subs_new = pysrt.open(infile, encoding=kode)
-            for i in range(len(subs_new)):
-                subs_new[i].index = i + 1
-            subs_new.save(infile, encoding=kode)
+    def fixIndexes(infile, kode): 
+        subs_new = pysrt.open(infile, encoding=kode)
+        for i in range(len(subs_new)):
+            subs_new[i].index = i + 1
+        subs_new.save(infile, encoding=kode)
     
     
     
