@@ -33,7 +33,7 @@ def lineMerger(file_in, file_out, len_line, char_num, _gap, kode):
             # dodaj spojene linije kao string
             first_l = round(len(first.text + second.text) / 2) + 4
             t_strw = textwrap.fill(first.text + ' ' + second.text, width=first_l)
-            new_j += '{0}\n{1} --> {2}\n{3}\n\n'.format(first.index, first.start, first.end, t_strw)
+            new_j += '{0}\n{1} --> {2}\n{3}\n\n'.format(first.index, first.start, second.end, t_strw)
         else:
             # dodaj originalne linije kao string
             new_j += '{0}\n{1} --> {2}\n{3}\n\n'.format(first.index, first.start, first.end, first.text)
