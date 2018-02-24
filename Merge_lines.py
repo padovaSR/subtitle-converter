@@ -26,7 +26,7 @@ def lineMerger(file_in, file_out, len_line, char_num, _gap, kode):
     for first, second, in zip(neparni, parni):
         gap = second.start.ordinal - first.end.ordinal
         trajanje = second.end.ordinal - first.start.ordinal     # ordinal, vreme u milisekundama
-        tekst1 = re.sub(re_pattern, '',  first.text)            # Ne računaj tagove u broju znakova
+        tekst1 = re.sub(re_pattern, '',  first.text)            # Ne računaj tagove u broj znakova
         tekst2 = re.sub(re_pattern, '',  second.text)
         text_len = len(tekst1) + len(tekst2)
         if gap <= _gap and trajanje <= len_line and text_len <= char_num:
