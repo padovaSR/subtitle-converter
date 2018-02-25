@@ -22,9 +22,9 @@ class Settings(wx.Dialog):
     def __init__(self, *args, **kwds):
         # begin wxGlade: Settings.__init__
         kwds["style"] = kwds.get("style", 0) | wx.DEFAULT_DIALOG_STYLE
-        wx.Dialog.__init__(self, None, title="")
+        wx.Dialog.__init__(self, None, title="")    # by padova
         self.SetSize((301, 282))
-        
+        # by padova
         lineLenght = int(config['line_Lenght'])
         maxChar = int(config['max_Char'])
         maxGap = int(config['max_Gap'])
@@ -68,23 +68,21 @@ class Settings(wx.Dialog):
         _icon.CopyFromBitmap(wx.Bitmap("resources\\icons\\tool.ico", wx.BITMAP_TYPE_ANY))
         self.SetIcon(_icon)
         self.SetSize((301, 282))
+        
         self.label_1.SetMinSize((123, 23))
         self.label_1.SetFont(wx.Font(9, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, "Segoe UI"))
-        
         self.spin_ctrl_1.SetMinSize((115, 23))
         self.spin_ctrl_1.SetFont(wx.Font(9, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, "Segoe UI"))
         self.spin_ctrl_1.SetToolTip("Maksimalna dužina linije")
         
         self.label_2.SetMinSize((123, 23))
         self.label_2.SetFont(wx.Font(9, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, "Segoe UI"))
-        
         self.spin_ctrl_2.SetMinSize((115, 23))
         self.spin_ctrl_2.SetFont(wx.Font(9, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, "Segoe UI"))
         self.spin_ctrl_2.SetToolTip("Maksimalni broj znakova\nspojenih linija")
+        
         self.label_3.SetMinSize((123, 23))
-        
         self.label_3.SetFont(wx.Font(9, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, "Segoe UI"))
-        
         self.spin_ctrl_3.SetMinSize((115, 23))
         self.spin_ctrl_3.SetFont(wx.Font(9, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, "Segoe UI"))
         self.spin_ctrl_3.SetToolTip("Dozvoljeni gap između linija")
