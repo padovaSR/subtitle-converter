@@ -22,9 +22,9 @@ class Settings(wx.Dialog):
     def __init__(self, *args, **kwds):
         # begin wxGlade: Settings.__init__
         kwds["style"] = kwds.get("style", 0) | wx.DEFAULT_DIALOG_STYLE
-        wx.Dialog.__init__(self, None, title="")    # by padova
+        wx.Dialog.__init__(self, None, title="")    
         self.SetSize((301, 282))
-        # by padova
+        
         lineLenght = int(config['line_Lenght'])
         maxChar = int(config['max_Char'])
         maxGap = int(config['max_Gap'])
