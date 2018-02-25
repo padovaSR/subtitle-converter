@@ -4,8 +4,6 @@
 import re
 import os
 import codecs
-import string
-import srt
 import pysrt
 import textwrap
 
