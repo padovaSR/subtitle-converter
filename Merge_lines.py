@@ -21,8 +21,9 @@ def lineMerger(file_in, file_out, len_line, char_num, _gap, kode):
     for i in range(0, len(subs), 2):        # Svaki drugi počevši od prvog
         neparni.append(subs[i])
     
-    new_j = ''''''
     re_pattern = re.compile(r'(\<[^<]*\>)')                     # tags
+    new_j = ''''''
+    subs.clean_indexes()
     for first, second, in zip(neparni, parni):
         gap = second.start.ordinal - first.end.ordinal
         trajanje = second.end.ordinal - first.start.ordinal     # ordinal, vreme u milisekundama
@@ -44,11 +45,5 @@ def lineMerger(file_in, file_out, len_line, char_num, _gap, kode):
         new_j = new_j.replace('    ', ' ').replace('   ', ' ').replace('  ', ' ')
         fw.write(new_j)
     
-def fixIndexes(infile, kode): 
-    subs_new = pysrt.open(infile, encoding=kode)
-    for i in range(len(subs_new)):
-        subs_new[i].index = i + 1
-    subs_new.save(infile, encoding=kode)
-    
-    
+
     
