@@ -134,6 +134,7 @@ class Settings(wx.Dialog):
         config['max_Gap'] = self.spin_ctrl_3.GetValue()
         config['file_suffix'] = self.tctrl_1.GetValue()
         config.write()
+        config.reload()
         sd = wx.MessageDialog(self, "Settings saved successfully", "Success", wx.OK | wx.ICON_INFORMATION)
         sd.ShowModal()
         event.Skip()
