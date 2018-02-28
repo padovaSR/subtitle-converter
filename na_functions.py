@@ -4,7 +4,7 @@
 import zipfile
 import sys
 import os
-
+import pysrt
 import wx
 
 from dictionaries import dictionary_0, dictionary_1, dictionary_2, specialReplace
