@@ -13,11 +13,13 @@ def fixGaps(filein, kode):
 
     subs = pysrt.open(filein, encoding=kode)
 
+    n_j = 0
     new_j = []
     for first, second in zip(subs, subs[1:]):  
         t1 = first.end.ordinal
         t2 = second.start.ordinal
         if t1 > t2 or t2 - t1 < 75:
+            n_j += 1
             first.shift(milliseconds=-25)
             t_fix = pysrt.SubRipTime.from_ordinal((second.start.ordinal) - 100)
             new_j.extend((first.index, format(first.start), format(t_fix), first.text))
@@ -35,6 +37,7 @@ def fixGaps(filein, kode):
     with open(filein, 'w', encoding=kode) as fw:
         new_f = new_f.replace('    ', ' ').replace('   ', ' ').replace('  ', ' ').replace('</i> <i>', ' ').replace('</i><i>', '').replace('</i>\n<i>', '\n')
         fw.write(new_f)
+    return n_j
     
 
 class fileOpened:
