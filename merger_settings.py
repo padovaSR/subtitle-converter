@@ -59,7 +59,6 @@ class Settings(wx.Dialog):
         self.Bind(wx.EVT_BUTTON, self.onCloseSettings, self.button_1)
         self.Bind(wx.EVT_BUTTON, self.onSaveSettings, self.button_2)
         self.Bind(wx.EVT_CLOSE, self.onClose, id=-1)
-        self.Bind(wx.EVT_TEXT, self.onText, id=-1, id2=wx.ID_ANY)
         
     def __set_properties(self):
         # begin wxGlade: Settings.__set_properties
@@ -138,15 +137,6 @@ class Settings(wx.Dialog):
         sd = wx.MessageDialog(self, "Settings saved successfully", "Success", wx.OK | wx.ICON_INFORMATION)
         sd.ShowModal()
         event.Skip()
-        
-    def onText(self, event):
-        config['line_Lenght'] = self.spin_ctrl_1.GetValue()
-        config['max_Char'] = self.spin_ctrl_2.GetValue()
-        config['max_Gap'] = self.spin_ctrl_3.GetValue()
-        config['file_suffix'] = self.tctrl_1.GetValue()
-        config.write()
-        event.Skip()
-        
             
     def onCloseSettings(self, event):  # wxGlade: Settings.<event_handler>
         self.Destroy()
