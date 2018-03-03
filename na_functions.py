@@ -35,7 +35,8 @@ def fixGaps(filein, kode):
         new_f += '{0}\n{1} --> {2}\n{3}\n\n{4}'.format(subs[-1].index, subs[-1].start, subs[-1].end, subs[-1].text, '')
 
     with open(filein, 'w', encoding=kode) as fw:
-        new_f = new_f.replace('    ', ' ').replace('   ', ' ').replace('  ', ' ').replace('</i> <i>', ' ').replace('</i><i>', '').replace('</i>\n<i>', '\n')
+        new_f = new_f.replace('    ', ' ').replace('   ', ' ').replace('  ', ' ')\
+        .replace('</i> <i>', ' ').replace('</i><i>', '').replace('</i>\n<i>', '\n')
         fw.write(new_f)
     return n_j
     
