@@ -98,6 +98,7 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_TOOL, self.aboutProgram, id=1007)
         self.Bind(wx.EVT_TOOL, self.exitProg, id=1008)
         # end wxGlade
+        self.Bind(wx.EVT_TEXT, self.updateStatus, id=-1)
         
     def __set_properties(self):
         # begin wxGlade: MyFrame.__set_properties
