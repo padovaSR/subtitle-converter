@@ -4,7 +4,6 @@
 
 import wx
 
-from wx.lib.pubsub import pub
 import os
 import sys
 import zipfile
@@ -29,8 +28,7 @@ class FileDrop(wx.FileDropTarget):
                 print('ZIP archive: {}'.format(os.path.basename(name)))
                 outfile = fzip.isCompressed(infile=name)
                 if outfile:
-                    pub.sendMessage('dnd', filepath=os.path.basename(outfile))
-            
+                    #
         return True
 
 class MyFrame(wx.Frame):
@@ -100,9 +98,7 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_TOOL, self.aboutProgram, id=1007)
         self.Bind(wx.EVT_TOOL, self.exitProg, id=1008)
         # end wxGlade
-        # For Status Bar
-        pub.subscribe(self.updateStatus, 'dnd')
-
+        
     def __set_properties(self):
         # begin wxGlade: MyFrame.__set_properties
         self.SetTitle("frame")
@@ -145,8 +141,9 @@ class MyFrame(wx.Frame):
         # end wxGlade
     
     # Update Status Bar  
-    def updateStatus(self, filepath):
+    def updateStatus(self, event):
         self.SetStatusText(filepath)
+        event.Skip()
 
     def openFile(self, event):  # wxGlade: MyFrame.<event_handler>
         dlgOpen = wx.FileDialog(self, "Open file to convert", style=wx.FD_OPEN, wildcard=self.wildcard) # creates the Open File dialog
