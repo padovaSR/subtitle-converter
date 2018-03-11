@@ -188,7 +188,9 @@ class MyFrame(wx.Frame):
     
     # Update Status Bar  
     def updateStatus(self, event):
-        self.SetStatusText(filepath)
+        with open('resources\\var\\path0.pickle', 'rb') as pickl_file:
+            path = pickle.load(pickl_file)
+        self.SetStatusText(os.path.basename(path))
         event.Skip()
 
     def openFile(self, event):  # wxGlade: MyFrame.<event_handler>
