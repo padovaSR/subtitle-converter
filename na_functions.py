@@ -5,6 +5,7 @@ import zipfile
 import sys
 import os
 import pysrt
+import pickle
 import wx
 
 from dictionaries import dictionary_0, dictionary_1, dictionary_2, specialReplace
@@ -48,8 +49,9 @@ class fileOpened:
         with zipfile.ZipFile(infile, 'r') as zf:
             if len(zf.namelist()) == 1:
                 jedanFajl = zf.namelist()[0]
-                print(jedanFajl)
                 outfile = os.path.join(basepath, jedanFajl)
+                with open('resources\\var\path0.pickle', 'wb') as pickl_file:
+                    pickle.dump(outfile, pickl_file)
                 with open(outfile, 'wb') as f:
                     f.write(zf.read(jedanFajl))
                 return outfile
@@ -61,7 +63,8 @@ class fileOpened:
                     if response:
                         namepath = os.path.basename(response)
                         outfile = os.path.join(basepath, namepath)
-                        print(response)
+                        with open('resources\\var\path0.pickle', 'wb') as pickl_file:
+                            pickle.dump(outfile, pickl_file)
                         try:
                             data = zf.read(response)
                         except IOError as e:
