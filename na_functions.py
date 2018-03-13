@@ -14,33 +14,33 @@ def fixGaps(filein, kode):
 
     subs = pysrt.open(filein, encoding=kode)
 
-    n_j = 0
-    new_j = []
+    new_j = pysrt.SubRipFile()
+    k = 0
+    pfp = 0
     for first, second in zip(subs, subs[1:]):  
         t1 = first.end.ordinal
         t2 = second.start.ordinal
+        if t1 > t2:
+            pfp += 1
         if t1 > t2 or t2 - t1 < 75:
-            n_j += 1
             first.shift(milliseconds=-25)
+            k += 1
             t_fix = pysrt.SubRipTime.from_ordinal((second.start.ordinal) - 100)
-            new_j.extend((first.index, format(first.start), format(t_fix), first.text))
+            sub = pysrt.SubRipItem(first.index, first.start, t_fix, first.text)
+            new_j.append(sub)
         else:
-            new_j.extend((first.index, format(first.start), format(first.end), first.text))
-    
-    new_1 = [new_j[i:i+4] for i in range(0,len(new_j), 4)]
-    
-    new_f = ''''''
-    for i in new_1:
-        new_f += '{0}\n{1} --> {2}\n{3}\n\n'.format(i[0], i[1], i[2], i[3])
-    if not (len(subs) % 2) == 0:
-        new_f += '{0}\n{1} --> {2}\n{3}\n\n{4}'.format(subs[-1].index, subs[-1].start, subs[-1].end, subs[-1].text, '')
+            sub = pysrt.SubRipItem(first.index, first.start, first.end, first.text)
+            new_j.append(sub)
 
-    with open(filein, 'w', encoding=kode) as fw:
-        new_f = new_f.replace('    ', ' ').replace('   ', ' ').replace('  ', ' ')\
-        .replace('</i> <i>', ' ').replace('</i><i>', '').replace('</i>\n<i>', '\n')
-        fw.write(new_f)
-    return n_j
-    
+    if not (len(subs) % 2) == 0:
+        sub = pysrt.SubRipItem(subs[-1].index, subs[-1].start, subs[-1].end, subs[-1].text)
+        new_j.append(sub)
+        
+    new_j.clean_indexes()
+    new_j.save(filein, encoding=kode)
+
+    return k, pfp
+     
 
 class fileOpened:
     def isCompressed(self, infile):
