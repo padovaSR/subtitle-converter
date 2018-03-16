@@ -32,9 +32,8 @@ def fixGaps(filein, kode):
             sub = pysrt.SubRipItem(first.index, first.start, first.end, first.text)
             new_j.append(sub)
 
-    if not (len(subs) % 2) == 0:
-        sub = pysrt.SubRipItem(subs[-1].index, subs[-1].start, subs[-1].end, subs[-1].text)
-        new_j.append(sub)
+    sub = pysrt.SubRipItem(subs[-1].index, subs[-1].start, subs[-1].end, subs[-1].text)
+    new_j.append(sub)
         
     new_j.clean_indexes()
     new_j.save(filein, encoding=kode)
