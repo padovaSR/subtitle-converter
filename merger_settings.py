@@ -134,9 +134,9 @@ class Settings(wx.Dialog):
         config['file_suffix'] = self.tctrl_1.GetValue()
         config.write()
         config.reload()
-        self.Destroy()
         sd = wx.MessageDialog(self, "Settings saved successfully", "Success", wx.OK | wx.ICON_INFORMATION)
-        sd.ShowModal()
+        if sd.ShowModal() == wx.ID_OK:
+            self.Destroy()
         event.Skip()
             
     def onCloseSettings(self, event):  # wxGlade: Settings.<event_handler>
