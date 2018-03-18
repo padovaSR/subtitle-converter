@@ -2,5 +2,5 @@
 
 Program za obradu srt subtitle fajlova, konvertovanje latinice u ćirilicu i obratno
 
-![Linux verzija:](resources/screen1.png?raw=true "Linux verzija")
+<img src="resources/screen1.png" width="334" height="319">
 
