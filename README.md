@@ -8,6 +8,9 @@ Program za obradu srt subtitle fajlova, konvertovanje latinice u ćirilicu i obr
 * [Last Windows build of the master branch](https://github.com/padovaSR/subtitle-converter/files/1822350/Subtitle.Converter-0.5.5.zip)
 
 ## Linux version
+<<<<<<< HEAD
+=======
 
 
 <img src="resources/screen1.png" width="414" height="399">
+>>>>>>> aec75c98ff2fb2127bda7b8338ec62405a547cdd
