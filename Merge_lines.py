@@ -19,7 +19,7 @@ def lineMerger(file_in, file_out, len_line, char_num, _gap, kode):
     for i in range(0, len(subs), 2):        # Svaki drugi počevši od prvog
         neparni.append(subs[i])
     
-    re_pattern = re.compile(r'<[^<]*>')                     # tags
+    re_pattern = re.compile(r'<[^<]*>')                     	# tags
     new_j = ''''''
     subs.clean_indexes()
     for first, second, in zip(neparni, parni):

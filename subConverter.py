@@ -237,6 +237,11 @@ class MyFrame(wx.Frame):
     def replaceSpecial(self, event):  # wxGlade: MyFrame.<event_handler>
         print("Event handler 'replaceSpecial' not implemented!")
         event.Skip()
+        
+    def onSettings(self, event):
+        settings_dialog = Settings(None, -1, "")
+        settings_dialog.ShowModal()
+        event.Skip()
 
     def aboutProgram(self, event):  # wxGlade: MyFrame.<event_handler>
         print("Event handler 'aboutProgram' not implemented!")
