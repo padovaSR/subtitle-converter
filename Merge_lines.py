@@ -43,5 +43,13 @@ def lineMerger(file_in, file_out, len_line, char_num, _gap, kode):
         new_j = new_j.replace('    ', ' ').replace('   ', ' ').replace('  ', ' ')
         fw.write(new_j)
     
+ def fixLast(infile, kode):
+    subs = pysrt.open(infile, encoding=kode)
+    s1 = (subs[-1].start, subs[-1].end, subs[-1].text)
+    s2 = (subs[-2].start, subs[-2].end, subs[-2].text)
+    if s1 == s2:
+        del subs[-1]
+    subs.clean_indexes()
+    subs.save(infile, encoding=kode)
 
     
