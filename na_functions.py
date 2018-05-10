@@ -75,4 +75,24 @@ class fileOpened:
                             return outfile
                     else: 
                         print('Canceled.')
+                        
+class fileProcessed:
+    
+    def writeTempStr(self, inFile, text, kode):
+        with tempfile.TemporaryFile() as tfile:
+            tfile.write(text.encode(kode))
+            tfile.seek(0)
+            content = tfile.read()
+            with open(inFile, 'wb') as  out: #, encoding=enc) as out:
+                out.write(content)
+                
+    def rm_dash(self, intext, kode):
+        
+        for_repls = re.compile(r'(?<=,\d\d\d\n)-+\s*')
+        
+        with open(intext, 'r', encoding=kode) as text_in:
+            s = text_in.read()
+            s1 = re.sub(for_repls, '', s)
+            
+        self.writeTempStr(intext, s1, kode) 
         
