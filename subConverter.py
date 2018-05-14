@@ -9,6 +9,8 @@ import sys
 import zipfile
 from na_functions import fileOpened
 
+VERSION = 'v0.5.5.2'
+
 class RedirectTextCtrl(wx.TextCtrl):
     def __init__(self, my_text_ctrl):
         self.out = my_text_ctrl
@@ -150,7 +152,7 @@ class MyFrame(wx.Frame):
         
     def __set_properties(self):
         # begin wxGlade: MyFrame.__set_properties
-        self.SetTitle("frame")
+        self.SetTitle('Subtitle Converter {}".format(VERSION)')
         _icon = wx.NullIcon
         _icon.CopyFromBitmap(wx.Bitmap("resources\\icons\\subConvert.ico", wx.BITMAP_TYPE_ANY))
         self.SetIcon(_icon)
