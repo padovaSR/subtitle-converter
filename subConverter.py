@@ -152,7 +152,7 @@ class MyFrame(wx.Frame):
         
     def __set_properties(self):
         # begin wxGlade: MyFrame.__set_properties
-        self.SetTitle('Subtitle Converter {}".format(VERSION)')
+        self.SetTitle('Subtitle Converter {}'.format(VERSION))
         _icon = wx.NullIcon
         _icon.CopyFromBitmap(wx.Bitmap("resources\\icons\\subConvert.ico", wx.BITMAP_TYPE_ANY))
         self.SetIcon(_icon)
