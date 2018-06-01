@@ -1,10 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
+import collections
+
 
 def dict_fromFile(text_in, delim):
+    
     with open(text_in, 'r', encoding='utf-8') as dict_file:
-        new_dict = {}
+        
+        new_dict = collections.OrderedDict()
+        
         for line in dict_file:
             x = line.strip().split(delim)
             if not line:
