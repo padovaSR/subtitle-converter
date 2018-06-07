@@ -24,7 +24,8 @@ def fixGaps(filein, kode):
             pfp += 1
         if t1 > t2 or t2 - t1 < 75:
             k += 1
-            t_fix = pysrt.SubRipTime.from_ordinal((second.start.ordinal) - 50)
+            first.shift(milliseconds=-25)
+            t_fix = pysrt.SubRipTime.from_ordinal((second.start.ordinal) - 100)
             sub = pysrt.SubRipItem(first.index, first.start, t_fix, first.text)
             new_j.append(sub)
         else:
@@ -33,24 +34,9 @@ def fixGaps(filein, kode):
 
     sub = pysrt.SubRipItem(subs[-1].index, subs[-1].start, subs[-1].end, subs[-1].text)
     new_j.append(sub)
+    
     new_j.clean_indexes()
-    
-    new_f = pysrt.SubRipFile()
-    fsub = pysrt.SubRipItem(new_j[0].index, new_j[0].start, new_j[0].end, new_j[0].text)
-    new_f.append(fsub)
-
-    for first, second in zip(new_j, new_j[1:]):
-
-        t1 = first.end.ordinal
-        t2 = second.start.ordinal
-        if t1 > t2 or t2 - t1 < 100:
-
-            t1_fix = pysrt.SubRipTime.from_ordinal((second.start.ordinal) + 25)
-            subf = pysrt.SubRipItem(second.index, t1_fix, second.end, second.text)
-            new_f.append(subf)
-    
-    new_f.clean_indexes()
-    new_f.save(filein, encoding=kode)
+    new_j.save(filein, encoding=kode)
 
     return k, pfp
      
