@@ -30,8 +30,7 @@ def lineMerger(file_in, file_out, len_line, char_num, _gap, kode):
         text_len = len(tekst1) + len(tekst2)
         if gap <= _gap and trajanje <= len_line and text_len <= char_num:
             # dodaj spojene linije kao string
-            first_l = round(len(first.text + second.text) / 2) + 4
-            t_strw = textwrap.fill(first.text + ' ' + second.text, width=first_l)
+            t_strw = first.text + ' ' + second.text
             new_j += '{0}\n{1} --> {2}\n{3}\n\n'.format(first.index, first.start, second.end, t_strw)
         else:
             # dodaj originalne linije kao string
@@ -40,7 +39,7 @@ def lineMerger(file_in, file_out, len_line, char_num, _gap, kode):
     if not len(subs) % 2 == 0:
         new_j += '{0}\n{1} --> {2}\n{3}\n\n{4}'.format(subs[-1].index, subs[-1].start, subs[-1].end, subs[-1].text, '')    
     with open(file_out, 'w', encoding=kode) as fw:
-        new_j = new_j.replace('    ', ' ').replace('   ', ' ').replace('  ', ' ')
+        new_j = new_j.replace('   ', ' ').replace('  ', ' ').replace('</i><i>', '').replace('</i>\n<i>', '\n')
         fw.write(new_j)
     
  def fixLast(infile, kode):
@@ -49,7 +48,7 @@ def lineMerger(file_in, file_out, len_line, char_num, _gap, kode):
     s2 = (subs[-2].start, subs[-2].end, subs[-2].text)
     if s1 == s2:
         del subs[-1]
-    subs.clean_indexes()
-    subs.save(infile, encoding=kode)
+        subs.clean_indexes()
+        subs.save(infile, encoding=kode)
 
     
