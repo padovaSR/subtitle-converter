@@ -7,6 +7,9 @@ import wx
 import os
 import sys
 import zipfile
+import re
+imort textwrap
+import pysrt
 from na_functions import fileOpened
 
 VERSION = 'v0.5.5.2'
@@ -232,6 +235,21 @@ class MyFrame(wx.Frame):
         print("Event handler 'toUTF' not implemented!")
         event.Skip()
 
+    def fixM(self,infile, kode):
+        subs = pysrt.open(infile, encoding=kode)
+        new_e = pysrt.SubRipFile()
+        for i in subs:
+            t = i.text
+            nw = (len(t) / 2) + 1
+            if len(t) < 24:
+                nw = 24                        
+                n = textwrap.fill(t, width=nw)                        
+                rt = re.sub(r'^((.*?\n.*?){1})\n', r'\1 ', n)
+                sub = pysrt.SubRipItem(i.index, i.start, i.end, rt)
+            new_e.append(sub)
+            new_e.clean_indexes()
+            new_e.save(infile, encoding=kode)
+    
     def transcribe(self, event):  # wxGlade: MyFrame.<event_handler>
         print("Event handler 'transcribe' not implemented!")
         event.Skip()
