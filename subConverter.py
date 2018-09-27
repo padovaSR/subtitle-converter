@@ -8,7 +8,7 @@ import os
 import sys
 import zipfile
 import re
-imort textwrap
+import textwrap
 import pysrt
 from na_functions import fileOpened
 
@@ -237,6 +237,7 @@ class MyFrame(wx.Frame):
 
     def fixM(self, infile, kode):
         subs = pysrt.open(infile, encoding=kode)
+        for_rpl = re.compile(r'^((.*?\n.*?){1})\n')
         new_e = pysrt.SubRipFile()
         for i in subs:
             t = i.text
@@ -244,7 +245,7 @@ class MyFrame(wx.Frame):
             if len(t) < 24:
                 nw = 24                        
             n = textwrap.fill(t, width=nw)                        
-            rt = re.sub(r'^((.*?\n.*?){1})\n', r'\1 ', n)
+            rt = for_rpl.sub(r'\1 ', n)
             sub = pysrt.SubRipItem(i.index, i.start, i.end, rt)
             new_e.append(sub)
         new_e.clean_indexes()
