@@ -241,7 +241,7 @@ class MyFrame(wx.Frame):
         new_e = pysrt.SubRipFile()
         for i in subs:
             t = i.text
-            nw = (len(t) / 2) + 1
+            nw = round(len(t) / 2) + 1
             if len(t) < 24:
                 nw = 24                        
             n = textwrap.fill(t, width=nw)                        
