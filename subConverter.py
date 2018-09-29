@@ -237,19 +237,20 @@ class MyFrame(wx.Frame):
 
     def fixM(self, infile, kode):
         subs = pysrt.open(infile, encoding=kode)
-        for_rpl = re.compile(r'^((.*?\n.*?){1})\n')
-        new_e = pysrt.SubRipFile()
-        for i in subs:
-            t = i.text
-            nw = round(len(t) / 2) + 1
-            if len(t) < 24:
-                nw = 24                        
-            n = textwrap.fill(t, width=nw)                        
-            rt = for_rpl.sub(r'\1 ', n)
-            sub = pysrt.SubRipItem(i.index, i.start, i.end, rt)
-            new_e.append(sub)
-        new_e.clean_indexes()
-        new_e.save(infile, encoding=kode)
+        if len(subs) > 0:
+            for_rpl = re.compile(r'^((.*?\n.*?){1})\n')
+            new_e = pysrt.SubRipFile()
+            for i in subs:
+                t = i.text
+                nw = round(len(t) / 2) + 1
+                if len(t) < 24:
+                    nw = 24                        
+                n = textwrap.fill(t, width=nw)                        
+                rt = for_rpl.sub(r'\1 ', n)
+                sub = pysrt.SubRipItem(i.index, i.start, i.end, rt)
+                new_e.append(sub)
+            new_e.clean_indexes()
+            new_e.save(infile, encoding=kode)
     
     def transcribe(self, event):  # wxGlade: MyFrame.<event_handler>
         print("Event handler 'transcribe' not implemented!")
