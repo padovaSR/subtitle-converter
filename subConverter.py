@@ -11,6 +11,8 @@ import re
 import textwrap
 import pysrt
 from na_functions import fileOpened
+from merger_settings import Settings
+from FixSettings import fixerSettings
 
 VERSION = 'v0.5.5.2'
 
@@ -128,6 +130,9 @@ class MyFrame(wx.Frame):
         self.edit.AppendSeparator()
         self.frame_menubar.utf = self.edit.Append(1012, "&BOM_UTF-8", "Default for utf-8", wx.ITEM_CHECK)
         self.Bind(wx.EVT_MENU, self.def_UTF, id=1012)
+        self.edit.AppendSeparator()
+        self.frame_menubar.fixer = self.edit.Append(wx.NewId(), "&FixSubtitle", "FixSubtitle settings", wx.ITEM_NORMAL)
+        self.Bind(wx.EVT_MENU, self.onFixerSettings, id=self.frame_menubar.fixer.GetId())
         self.edit.AppendSeparator()
         self.frame_menubar.merger = self.edit.Append(wx.NewId(), "&Merger", "Merger settings", wx.ITEM_NORMAL)
         self.Bind(wx.EVT_MENU, self.onSettings, id=self.frame_menubar.merger.GetId())
@@ -263,6 +268,11 @@ class MyFrame(wx.Frame):
     def onSettings(self, event):
         settings_dialog = Settings(None, -1, "")
         settings_dialog.ShowModal()
+        event.Skip()
+        
+    def onFixerSettings(self, event):
+        fix_dialog = fixerSettings(None)
+        fix_dialog.ShowModal()
         event.Skip()
 
     def aboutProgram(self, event):  # wxGlade: MyFrame.<event_handler>
