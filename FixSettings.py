@@ -9,6 +9,7 @@ import wx
 # end wxGlade
 
 import shelve
+import os
 
 
 class fixerSettings(wx.Dialog):
@@ -18,34 +19,32 @@ class fixerSettings(wx.Dialog):
         wx.Dialog.__init__(self, *args, **kwds)
         self.SetSize((339, 219))
         
-        with shelve.open('resources\\var\\fixer_settings.db') as  sp:
-            ex = sp['key1']
-            cb1_s = ex['state1']; cb2_s = ex['state2']; cb3_s = ex['state3']
-            cb4_s = ex['state4']; cb5_s = ex['state5']; cb6_s = ex['state6']        
-        
         self.cb1 = wx.CheckBox(self, wx.ID_ANY, "cbox_1", style=wx.CHK_2STATE)
-        self.cb1.SetValue(cb1_s)
         self.lb1 = wx.StaticText(self, wx.ID_ANY, "Popravi gapove", style=wx.ALIGN_LEFT)
         
         self.cb2 = wx.CheckBox(self, wx.ID_ANY, "cbox_2", style=wx.CHK_2STATE)
-        self.cb2.SetValue(cb2_s)
         self.lb2 = wx.StaticText(self, wx.ID_ANY, "Poravnaj linije teksta", style=wx.ALIGN_LEFT)
         
         self.cb3 = wx.CheckBox(self, wx.ID_ANY, "cbox_3", style=wx.CHK_2STATE)
-        self.cb3.SetValue(cb3_s)
         self.lb3 = wx.StaticText(self, wx.ID_ANY, u"Prika\u017ei linije sa gre\u0161kama u konvertovanom titlu", style=wx.ALIGN_LEFT)
         
         self.cb4 = wx.CheckBox(self, wx.ID_ANY, "cbox_4", style=wx.CHK_2STATE)
-        self.cb4.SetValue(cb4_s)
         self.lb4 = wx.StaticText(self, wx.ID_ANY, u"Ukloni crtice na po\u010detku prvog reda", style=wx.ALIGN_LEFT)
         
         self.cb5 = wx.CheckBox(self, wx.ID_ANY, "cbox_5", style=wx.CHK_2STATE)
-        self.cb5.SetValue(cb5_s)
         self.lb5 = wx.StaticText(self, wx.ID_ANY, u"Ukloni spejs iza crtice na po\u010detku", style=wx.ALIGN_LEFT)
         
         self.cb6 = wx.CheckBox(self, wx.ID_ANY, "cbox_6", style=wx.CHK_2STATE)
-        self.cb6.SetValue(cb6_s)
         self.lb6 = wx.StaticText(self, wx.ID_ANY, u"Vi\u0161estruke spejseve u jedan", style=wx.ALIGN_LEFT)
+        
+        if os.path.exist('resources\\var\\fixer_settings.db.dat'):
+            with shelve.open('resources\\var\\fixer_settings.db') as  sp:
+            ex = sp['key1']
+            cb1_s = ex['state1']; cb2_s = ex['state2']; cb3_s = ex['state3']
+            cb4_s = ex['state4']; cb5_s = ex['state5']; cb6_s = ex['state6']
+            
+            self.cb1.SetValue(cb1_s); self.cb2.SetValue(cb2_s); self.cb3.SetValue(cb3_s)
+            self.cb4.SetValue(cb4_s); self.cb5.SetValue(cb5_s); self.cb6.SetValue(cb6_s)
         
         self.button_2 = wx.Button(self, wx.ID_ANY, "Cancel")
         self.button_1 = wx.Button(self, wx.ID_OK, "OK")
