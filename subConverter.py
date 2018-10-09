@@ -247,13 +247,28 @@ class MyFrame(wx.Frame):
             new_e = pysrt.SubRipFile()
             for i in subs:
                 t = i.text
+                t = t.replace('\r', '').replace('\n', ' ')
                 nw = round(len(t) / 2) + 1
-                if len(t) < 24:
-                    nw = 24                        
-                n = textwrap.fill(t, width=nw)                        
-                rt = for_rpl.sub(r'\1 ', n)
-                sub = pysrt.SubRipItem(i.index, i.start, i.end, rt)
-                new_e.append(sub)
+                if re.findall(r'<[^<]*>', t):
+                    nw = nw + 4            
+                    if len(t) < 30:
+                        nw = 30
+                    if len(t) >= 30 and len(t) < 36:
+                        nw = round(len(t) / 2)
+                        n = textwrap.fill(t, width=nw)
+                        n = f_rpl.sub(r'\1 ', n)
+                    if n.count('\n') == 2:
+                        nn = round(len(t.split('\n')[-1]) / 2) + 1
+                        n = textwrap.fill(n, width=nw)
+                        n = f_rpl.sub(r'\1 ', n)
+                        sub = pysrt.SubRipItem(i.index, i.start, i.end, n)
+                        n = textwrap.fill(n, width=nw+nn)
+                        if n.count('\n') == 2:
+                            n = f_rpl.sub(r'\1 ', n)
+                            new_e.append(sub)
+                    else:
+                        sub = pysrt.SubRipItem(i.index, i.start, i.end, n)
+                        new_e.append(sub)
             new_e.clean_indexes()
             new_e.save(infile, encoding=kode)
     
