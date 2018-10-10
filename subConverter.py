@@ -265,7 +265,7 @@ class MyFrame(wx.Frame):
                         n = textwrap.fill(n, width=nw+nn)
                         if n.count('\n') == 2:
                             n = f_rpl.sub(r'\1 ', n)
-                            new_e.append(sub)
+                        new_e.append(sub)
                     else:
                         sub = pysrt.SubRipItem(i.index, i.start, i.end, n)
                         new_e.append(sub)
