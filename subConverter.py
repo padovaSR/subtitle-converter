@@ -14,7 +14,7 @@ from na_functions import fileOpened
 from merger_settings import Settings
 from FixSettings import fixerSettings
 
-VERSION = 'v0.5.5.2'
+VERSION = 'v0.5.5.4_test'
 
 class RedirectTextCtrl(wx.TextCtrl):
     def __init__(self, my_text_ctrl):
@@ -261,10 +261,11 @@ class MyFrame(wx.Frame):
                         nn = round(len(t.split('\n')[-1]) / 2) + 1
                         n = textwrap.fill(n, width=nw)
                         n = f_rpl.sub(r'\1 ', n)
-                        sub = pysrt.SubRipItem(i.index, i.start, i.end, n)
                         n = textwrap.fill(n, width=nw+nn)
+                        sub = pysrt.SubRipItem(i.index, i.start, i.end, n)
                         if n.count('\n') == 2:
                             n = f_rpl.sub(r'\1 ', n)
+                            sub = pysrt.SubRipItem(i.index, i.start, i.end, n)
                         new_e.append(sub)
                     else:
                         sub = pysrt.SubRipItem(i.index, i.start, i.end, n)
