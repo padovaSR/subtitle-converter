@@ -124,7 +124,7 @@ class fileProcessed:
             elif te.count('\n') >= 3:
                 te = f_rpl.sub(r'\1 ', te)
             elif te.count('\n') >= 4:
-                te = f_rpl.sub(r'\n ', te)
+                te = f_rpl.sub(r'\1 ', te)
             elif te.count('\n') >= 5:
                 te = f_rpl.sub(r'\1 ', te)
             elif te.count('\n') == 6:
@@ -132,7 +132,6 @@ class fileProcessed:
             return te            
         # function to move words and characters by its position
         def movPos(text, n):
-            tagf = re.compile(r'<[^<]*>')
             # where - pozicija gde se nalazi zeljeni spejs
             text = text.replace('\n', ' ')
             where = [m.start() for m in re.finditer(' ', text)][n-1]
