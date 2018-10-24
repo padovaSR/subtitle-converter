@@ -173,6 +173,7 @@ class fileProcessed:
                     fls1 = tag_rpl.sub(' ', s1)
                     fls1 = s_rpl.sub(' ', fls1)
                     lw = fls1.split('\n')[-1].split()
+                    lw = [i.replace('.', '').replace('!', '').replace(',', '').replace("'", "") for i in lw]
                     dw = [len(x) for x in lw]           # duzine reci u listi
                     c1 = s1.split('\n')[0].count(' ') + 1
                     if len(lw) >= 1:
@@ -185,6 +186,7 @@ class fileProcessed:
                             drugaS = len("".join(s1.split('\n')[-1]))
                             prvaS = len("".join(s1.split('\n')[0]))
                             lw = s1.split('\n')[-1].split()
+                            lw = [i.replace('.', '').replace('!', '').replace(',', '').replace("'", "") for i in lw]
                             dw = [len(x) for x in lw]                            
                             if len(lw) >= 2:
                                 if (dw[1] + prvaS) <= (drugaS - dw[1]) + 1:
