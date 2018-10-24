@@ -158,7 +158,6 @@ class fileProcessed:
             s1 = myWrapper(n)
             prva = s1.split('\n')[0]
             druga = s1.split('\n')[-1]
-            druga = druga.replace('i', '').replace('l', '')
             druga = tag_rpl.sub(' ', druga)
             druga = s_rpl.sub(' ', druga)                
             len_prva = len("".join(prva)); len_druga = len("".join(druga))
