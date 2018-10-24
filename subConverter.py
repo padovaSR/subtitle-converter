@@ -240,42 +240,6 @@ class MyFrame(wx.Frame):
         print("Event handler 'toUTF' not implemented!")
         event.Skip()
 
-    def fixM(self, infile, kode):
-        subs = pysrt.open(infile, encoding=kode)
-        if len(subs) > 0:
-            for_rpl = re.compile(r'^((.*?\n.*?){1})\n')
-            new_e = pysrt.SubRipFile()
-            for i in subs:
-                t = i.text
-                if t.count('\n') == 0 and t.count(' ') > 2 and len(t) >= 30:
-                    nw = round(len(t) / 2) + 1
-                    if re.findall(r'<[^<]*>', t):
-                        nw = nw + 4            
-                    if len(t) < 30:
-                        nw = 30
-                    if len(t) >= 30 and len(t) < 36:
-                        nw = round(len(t) / 2)
-                        n = textwrap.fill(t, width=nw)
-                        n = f_rpl.sub(r'\1 ', n)
-                    if n.count('\n') == 2:
-                        nn = round(len(t.split('\n')[-1]) / 2) + 1
-                        n = textwrap.fill(n, width=nw)
-                        n = f_rpl.sub(r'\1 ', n)
-                        sub = pysrt.SubRipItem(i.index, i.start, i.end, n)
-                        if n.count('\n') == 2:
-                            n = f_rpl.sub(r'\1 ', n)
-                            n = textwrap.fill(n, width=nw+nn)
-                            sub = pysrt.SubRipItem(i.index, i.start, i.end, n)
-                        new_e.append(sub)
-                    else:
-                        sub = pysrt.SubRipItem(i.index, i.start, i.end, n)
-                        new_e.append(sub)
-                else:
-                    sub = pysrt.SubRipItem(i.index, i.start, i.end, t)
-                    new_e.append(sub)
-            new_e.clean_indexes()
-            new_e.save(infile, encoding=kode)
-    
     def transcribe(self, event):  # wxGlade: MyFrame.<event_handler>
         print("Event handler 'transcribe' not implemented!")
         event.Skip()
