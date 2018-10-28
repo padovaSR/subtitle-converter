@@ -18,7 +18,11 @@ def fixGaps(filein, kode):
     new_j = pysrt.SubRipFile()
     k = 0
     pfp = 0
-    for first, second in zip(subs, subs[1:]):  
+    for first, second in zip(subs, subs[1:]):
+        
+        if not second or not first:
+            continue
+        
         t1 = first.end.ordinal
         t2 = second.start.ordinal
         if t1 > t2:
@@ -40,6 +44,9 @@ def fixGaps(filein, kode):
     new_f.append(fsub)
 
     for first, second in zip(new_j, new_j[1:]):
+        
+        if not second or not first:
+            continue
 
         t1 = first.end.ordinal
         t2 = second.start.ordinal
