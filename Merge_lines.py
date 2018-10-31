@@ -30,7 +30,7 @@ def lineMerger(file_in, file_out, len_line, char_num, _gap, kode):
             # dodaj spojene linije kao string
             sub = pysrt.SubRipItem(first.index, first.start, second.end, first.text + ' ' + second.text)
             new_j.append(sub)
-       else:
+        else:
             # dodaj originalne linije kao string
             sub1 = pysrt.SubRipItem(first.index, first.start, first.end, first.text)
             sub2 = pysrt.SubRipItem(second.index, second.start, second.end, second.text)
