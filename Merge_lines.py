@@ -6,6 +6,7 @@ import os
 import codecs
 import pysrt
 import textwrap
+from itertools import zip_longest 
 
 
     
@@ -13,16 +14,13 @@ def lineMerger(file_in, file_out, len_line, char_num, _gap, kode):
     
     subs = pysrt.open(file_in, encoding=kode)
     
-    parni = []; neparni = []
-    for i in range(1, len(subs), 2)         # Svaki drugi element počevši od drugog
-        parni.append(subs[i])
-    for i in range(0, len(subs), 2):        # Svaki drugi počevši od prvog
-        neparni.append(subs[i])
-    
+    parni = [x for x in subs[1::2]]         # Svaki drugi element počevši od drugog
+    neparni = [x for x in subs[0::2]]        # Svaki drugi počevši od prvog
+        
     re_pattern = re.compile(r'<[^<]*>')                     	# tags
-    new_j = ''''''
+    new_j = pysrt.SubRipFile()
     subs.clean_indexes()
-    for first, second, in zip(neparni, parni):
+    for first, second, in zip_longest(neparni, parni, fillvalue=subs[-1]):
         gap = second.start.ordinal - first.end.ordinal
         trajanje = second.end.ordinal - first.start.ordinal     # ordinal, vreme u milisekundama
         tekst1 = re.sub(re_pattern, '',  first.text)            # Ne računaj tagove u broj znakova
@@ -30,24 +28,25 @@ def lineMerger(file_in, file_out, len_line, char_num, _gap, kode):
         text_len = len(tekst1) + len(tekst2)
         if gap <= _gap and trajanje <= len_line and text_len <= char_num:
             # dodaj spojene linije kao string
-            t_strw = first.text + ' ' + second.text
-            new_j += '{0}\n{1} --> {2}\n{3}\n\n'.format(first.index, first.start, second.end, t_strw)
-        else:
+            sub = pysrt.SubRipItem(first.index, first.start, second.end, first.text + ' ' + second.text)
+            new_j.append(sub)
+       else:
             # dodaj originalne linije kao string
-            new_j += '{0}\n{1} --> {2}\n{3}\n\n'.format(first.index, first.start, first.end, first.text)
-            new_j += '{0}\n{1} --> {2}\n{3}\n\n'.format(second.index, second.start, second.end, second.text)
-    if not len(subs) % 2 == 0:
-        new_j += '{0}\n{1} --> {2}\n{3}\n\n{4}'.format(subs[-1].index, subs[-1].start, subs[-1].end, subs[-1].text, '')    
-    with open(file_out, 'w', encoding=kode) as fw:
-        new_j = new_j.replace('   ', ' ').replace('  ', ' ').replace('</i><i>', '').replace('</i>\n<i>', '\n')
-        fw.write(new_j)
+            sub1 = pysrt.SubRipItem(first.index, first.start, first.end, first.text)
+            sub2 = pysrt.SubRipItem(second.index, second.start, second.end, second.text)
+            new_j.append(sub1)
+            new_j.append(sub2)
+                
+        new_j.clean_indexes()
+        new_j.save(file_out, encoding=kode)
+    
     
  def fixLast(infile, kode):
     subs = pysrt.open(infile, encoding=kode)
     s1 = (subs[-1].start, subs[-1].end, subs[-1].text)
     s2 = (subs[-2].start, subs[-2].end, subs[-2].text)
     if s1 == s2:
-        del subs[-1]
+        subs.remove(subs[-1])
         subs.clean_indexes()
         subs.save(infile, encoding=kode)
 
