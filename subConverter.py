@@ -207,6 +207,10 @@ class MyFrame(wx.Frame):
         event.Skip()
 
     def openFile(self, event):  # wxGlade: MyFrame.<event_handler>
+        if len(self.text_ctrl_1.GetValue()) > 0:
+            dl1 = wx.MessageBox("Current content has not been saved! Proceed?", "Please confirm", wx.ICON_QUESTION | wx.YES_NO, self)
+            if dl1 == wx.NO:
+                return
         dlgOpen = wx.FileDialog(self, "Open file to convert", style=wx.FD_OPEN, wildcard=self.wildcard) # creates the Open File dialog
         if dlgOpen.ShowModal() == wx.ID_OK:
             self.filepath = dlgOpen.GetPath() # Get the file location
