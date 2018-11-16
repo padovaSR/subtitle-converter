@@ -24,6 +24,26 @@ def dict_fromFile(text_in, delim):
             new_dict[key] = value
             
         return new_dict
+    
+def dict_fromFile_2(text_in, delim):
+    
+    with open(indict, 'r', encoding='utf-8') as dict_file:
+        
+        newDict = collections.OrderedDict()
+    
+        for line in dict_file:
+            x = line.strip().split(delim)
+            if not line:
+                continue
+            if line.startswith('#'):
+                continue
+            if not x[0]:
+                continue            
+            if len(x[0].split(' ')) >= 2:
+                key = x[0].replace(' ', '\n', 1)
+                value = x[-1]
+                new_dict[key] = value
+        return new_dict
 
 # Dictionary-0
 dictionary_0 = dict_fromFile(text_in='dictionaries\\Dictionary-0.txt', delim='=>')
