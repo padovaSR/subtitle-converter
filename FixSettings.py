@@ -37,14 +37,21 @@ class fixerSettings(wx.Dialog):
         self.cb6 = wx.CheckBox(self, wx.ID_ANY, "cbox_6", style=wx.CHK_2STATE)
         self.lb6 = wx.StaticText(self, wx.ID_ANY, u"Vi\u0161estruke spejseve u jedan", style=wx.ALIGN_LEFT)
         
-        if os.path.exist('resources\\var\\fixer_settings.db.dat'):
-            with shelve.open('resources\\var\\fixer_settings.db') as  sp:
-            ex = sp['key1']
-            cb1_s = ex['state1']; cb2_s = ex['state2']; cb3_s = ex['state3']
-            cb4_s = ex['state4']; cb5_s = ex['state5']; cb6_s = ex['state6']
-            
-            self.cb1.SetValue(cb1_s); self.cb2.SetValue(cb2_s); self.cb3.SetValue(cb3_s)
-            self.cb4.SetValue(cb4_s); self.cb5.SetValue(cb5_s); self.cb6.SetValue(cb6_s)
+        if os.path.exist('resources\\var\\dialog_settings.db.dat'):
+            try:
+                with shelve.open('resources\\var\\dialog_settings.db', flag='writeback') as  sp:
+                ex = sp['key1']
+                cb1_s = ex['state1']; cb2_s = ex['state2']; cb3_s = ex['state3']
+                cb4_s = ex['state4']; cb5_s = ex['state5']; cb6_s = ex['state6']
+            except IOError as e:
+                print("fixerSettings, I/O error({0}): {1}".format(e.errno, e.strerror))
+            except: #handle other exceptions such as attribute errors
+                print("fixerSetting, unexpected error:", sys.exc_info()[0])
+            else:
+                with shelve.open('resources\\var\\dialog_settings.db', flag='writeback') as s:
+                    del s['key1']
+                self.cb1.SetValue(cb1_s); self.cb2.SetValue(cb2_s); self.cb3.SetValue(cb3_s)
+                self.cb4.SetValue(cb4_s); self.cb5.SetValue(cb5_s); self.cb6.SetValue(cb6_s)
         
         self.button_2 = wx.Button(self, wx.ID_ANY, "Cancel")
         self.button_1 = wx.Button(self, wx.ID_OK, "OK")
@@ -142,10 +149,9 @@ class fixerSettings(wx.Dialog):
         c4 = self.cb4.GetValue(); c5 = self.cb5.GetValue(); c6 = self.cb6.GetValue()
         konf = [c1, c2, c3, c4, c5, c6]
         a = konf[0]; b = konf[1]; c = konf[2]; d = konf[3]; e = konf[4]; f = konf[5]
-        if wx.ID_OK:
-            with shelve.open('resources\\var\\fixer_settings.db') as s:
-                s['key1'] = {'state1': a, 'state2': b, 'state3': c, 'state4': d, 'state5': e, 'state6': f,}            
-            self.Destroy()
+        with shelve.open('resources\\var\\dialog_settings.db', flag='writeback') as s:
+            s['key1'] = {'state1': a, 'state2': b, 'state3': c, 'state4': d, 'state5': e, 'state6': f,}            
+        self.Destroy()
         event.Skip()
     
     def onClose(self, event):
