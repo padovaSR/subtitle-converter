@@ -532,7 +532,7 @@ class MyFrame(wx.Frame):
         # begin wxGlade: MyFrame.__set_properties
         self.SetTitle(f"SubtitleConverter {VERSION}")
         _icon = wx.NullIcon
-        _icon.CopyFromBitmap(wx.Bitmap("C:\\Users\\darkstar\\Desktop\\WingIde_projects\\subConverter-0.6\\resources\\icons\\subConvert.png", wx.BITMAP_TYPE_ANY))
+        _icon.CopyFromBitmap(wx.Bitmap("resources\\icons\\subConvert.png", wx.BITMAP_TYPE_ANY))
         self.SetIcon(_icon)
         
         self.SetFocus()
