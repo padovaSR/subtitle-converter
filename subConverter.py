@@ -1165,6 +1165,7 @@ class MyFrame(wx.Frame):
                         logger.debug("ToANSI, text error:", sys.exc_info()[0:2])                    
                     
                     text = self.fileErrors(newF, self.newEnc, multi=True)
+                    
                     newfproc.writeToFile(text)
                     newfproc.unix2DOS()
                     self.text_1.AppendText('\n')
@@ -1172,12 +1173,6 @@ class MyFrame(wx.Frame):
                     if error_text:
                         ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
                         ErrorDlg.ShowModal()
-                        #outf = newF + '.error.log'
-                        #showMeError(newF, outfile=outf, kode=self.newEnc)
-                        #text = newfproc.getContent()
-                        #text = text.replace('¬', '?')
-                        #writeTempStr(newF, text, self.newEnc)
-                        #newfproc.unix2DOS()
                     postAnsi()
                     text = fproc.getContent()
                     text = text.replace('¬', '?')
@@ -1205,12 +1200,6 @@ class MyFrame(wx.Frame):
                     if error_text:
                         ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
                         ErrorDlg.ShowModal()
-                        #outf = newF + '.error.log'
-                        #showMeError(newF, outfile=outf, kode=self.newEnc)
-                        #text = newfproc.getContent()
-                        #text = text.replace('¬', '?')
-                        #writeTempStr(newF, text, self.newEnc)
-                        #newfproc.unix2DOS()
                     postAnsi()
                     text = fproc.getContent()
                     text = text.replace('¬', '?')
@@ -1385,29 +1374,23 @@ class MyFrame(wx.Frame):
             text = cyr_ansi.writeToFile(text)
             
             error_text = cyr_proc.checkFile(utf_path, cyr_path, multi=True)
-            #cyr_proc.unix2DOS()
-            #cyr_ansi.unix2DOS()
+            
+            text = self.fileErrors(cyr_path, self.newEnc, multi=True)
+            writeTempStr(cyr_path, text, self.newEnc)
+            cyr_ansi.unix2DOS()            
+            
             self.text_1.AppendText('\n')
             self.text_1.AppendText(os.path.basename(cyr_path))            
             if error_text:
                 ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
                 ErrorDlg.ShowModal()
                 self.Error_Text = error_text
-                outf = cyr_path + '.error.log'
-                showMeError(cyr_path, outfile=outf, kode=self.newEnc)                
-                text = cyr_ansi.getContent()
-                text = text.replace('¬', '?')
-                writeTempStr(cyr_path, text, self.newEnc)
-                cyr_ansi.unix2DOS()
             self.enc = self.newEnc
             self.reloaded = 0
             text = cyr_proc.getContent()
             text = text.replace('¬', '?')
             writeTempStr(utf_path, text, utf8_enc)
             cyr_proc.unix2DOS()
-            text = cyr_ansi.getContent()
-            text = text.replace('¬', '?')
-            writeTempStr(cyr_path, text, self.newEnc)
             self.SetStatusText('Processing multiple files')
             self.previous_action['toCYR_multiple'] = self.newEnc
             
@@ -1505,26 +1488,21 @@ class MyFrame(wx.Frame):
             writeTempStr(newF, text, self.newEnc)
             
             error_text = fproc.checkFile(path, newF, multi=True)
+            
+            text = self.fileErrors(newF, self.newEnc, multi=True)
+            writeTempStr(newF, text, self.newEnc)
+            newFproc.unix2DOS()            
+            
             self.text_1.AppendText('\n')
             self.text_1.AppendText(os.path.basename(newF))
             if error_text:
                 ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
                 ErrorDlg.ShowModal()
-                outf = newF + '.error.log'
-                showMeError(newF, outfile=outf, kode=self.newEnc)
-                text = newFproc.getContent()
-                text = text.replace('¬', '?')
-                writeTempStr(newF, text, self.newEnc)
-                newFproc.unix2DOS()
             self.SetStatusText('Processing multiple files.')
             text = fproc.getContent()
             text = text.replace('¬', '?')
             writeTempStr(path, text, entered_enc)
             fproc.unix2DOS()
-            text = newFproc.getContent()
-            text = text.replace('¬', '?')
-            writeTempStr(newF, text, self.newEnc)
-            newFproc.unix2DOS()
         self.multipleTools()
         self.reloaded = 0
         self.previous_action['toUTF_multiple'] = self.newEnc
@@ -1638,7 +1616,11 @@ class MyFrame(wx.Frame):
         writeTempStr(path, text, entered_enc)
         num = fproc.doReplace()
         text = fproc.getContent()
+        
         text = self.fileErrors(path, entered_enc, multi=False)
+        writeTempStr(path, text, entered_enc)
+        fproc.unix2DOS()
+        
         error_text = fproc.checkFile(self.orig_path, path, multi=False)
         msginfo = wx.MessageDialog(self, 'Zamenjenih objekata\nukupno [ {} ]'.format(num), 'SubConverter', wx.OK | wx.ICON_INFORMATION)
         msginfo.ShowModal()            
@@ -2067,9 +2049,7 @@ class MyFrame(wx.Frame):
             self.orig_path = path + '.orig'
             if not os.path.isfile(self.orig_path):
                 shutil.copy(path, self.orig_path)
-            #else:
-                #shutil.copy(self.orig_path, path)
-                
+            
             fproc = FileProcessed(entered_enc, path)
             
             text = fproc.getContent()
@@ -2088,11 +2068,15 @@ class MyFrame(wx.Frame):
             text = utfcyproc.getContent()
             text = utfcyproc.rplStr(text)
             writeTempStr(utf_tmpFile, text, t_enc)
-            ansi_cyproc = Preslovljavanje(self.newEnc, path)  #  Pise u path jer u SAVE se trazi path.
+            ansi_cyproc = Preslovljavanje(self.newEnc, path)  #  Pise u path jer SAVE trazi path.
             ansi_cyproc.writeToFile(text)
             text = ansi_cyproc.getContent()
             error_text = utfcyproc.checkFile(self.orig_path, path, multi=False)
+            
             text = self.fileErrors(path, self.newEnc, multi=False)  # Ovde se vrate znakovi pitanja i ponovo upisu u fajl.
+            writeTempStr(path, text, self.newEnc)
+            ansi_cyproc.unix2DOS()
+            
             if error_text:
                 ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
                 ErrorDlg.ShowModal()
@@ -2152,20 +2136,15 @@ class MyFrame(wx.Frame):
             self.text_1.AppendText('\n')
             self.text_1.AppendText(os.path.basename(newF))
             error_text = ansi_cyproc.checkFile(path, newF, multi=True)
+            
+            text = self.fileErrors(newF, self.newEnc, multi=True)
+            writeTempStr(newF, text, self.newEnc)
+            ansi_cyproc.unix2DOS()            
+            
             if error_text:
                 ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
                 ErrorDlg.ShowModal()
                 self.Error_Text = error_text
-                outf = newF + '.error.log'
-                showMeError(newF, outf, self.newEnc)
-                text = ansi_cyproc.getContent()
-                text = text.replace('¬', '?')
-                writeTempStr(newF, text, self.newEnc)
-                ansi_cyproc.unix2DOS()
-            text = ansi_cyproc.getContent()
-            text = text.replace('¬', '?')
-            writeTempStr(newF, text, self.newEnc)
-            ansi_cyproc.unix2DOS()
             self.SetStatusText('Processing multiple files')
             text = utfcyproc.getContent()
             text = text.replace('¬', '?')
@@ -2221,7 +2200,11 @@ class MyFrame(wx.Frame):
         text = cyproc.rplStr(text)
         writeTempStr(path, text, self.newEnc)
         error_text = cyproc.checkFile(self.orig_path, path, multi=False)
+        
         text = self.fileErrors(path, self.newEnc, multi=False)
+        writeTempStr(path, text, self.newEnc)
+        cyproc.unix2DOS()
+        
         if error_text:
             ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
             ErrorDlg.ShowModal()
@@ -2235,6 +2218,34 @@ class MyFrame(wx.Frame):
         self.reloaded = 0
         self.previous_action['cyrToUTF'] = self.newEnc
         event.Skip()
+        
+    def cyrToUTF_multiple(self):
+        self.text_1.SetValue("")
+        self.text_1.SetValue("Files Processed:\n")
+        if os.path.isfile('resources\\var\\droped0.pkl'):
+            with open('resources\\var\\droped0.pkl', 'rb') as d:
+                droped_files = pickle.load(d)
+            self.multiFile.clear()
+            self.multiFile.update(droped_files)        
+        
+        self.pre_suffix = 'lat_utf8'
+        
+        if self.preferences.IsChecked(1011):
+            self.newEnc = 'utf-8-sig'
+        else:
+            self.newEnc = 'utf-8'       
+        t_enc = 'utf-8'
+        
+        for key, value in self.multiFile.items():
+            path=key
+            entered_enc=value
+            
+            
+            
+        self.multipleTools()
+        self.reloaded = 0
+        self.previous_action['cyrToUTF_multiple'] = self.newEnc
+        self.SetStatusText('Multiple files done.')        
         
     def onFixSubs(self, event):
         tval = self.text_1.GetValue()

@@ -311,7 +311,7 @@ class FileProcessed:
             'ћ', 'у', 'ф', 'х', 'Ь', 'Ъ', 'ь', 'ъ', 'Э', 'э', 'ц', 'ч', 'ш', 'А', 'Б', 'В', 'Г', 'Д', 'Ђ', 'Е', 'Ж', 'З',
             'й', 'Й', 'Ь', 'Ы', 'Ъ', 'ь', 'ы', 'ъ', 'И', 'Ј', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'Ћ', 'У', 'Ф',
             'Ч', 'Ш', 'т', 'љ', 'њ', 'џ', 'Љ', 'Њ', 'Џ',  'р', 'с', 'Х', 'Ц']
-        enc = kode
+        
         try:
             with  open(path, 'r', encoding=kode) as f:
                 x = f.read()
@@ -654,9 +654,9 @@ class Preslovljavanje(FileProcessed):
         BLOCK = 1048576
         try:
             with open(Ufile, 'r', encoding= kode) as f:
-                    tNew = f.read(BLOCK)
-                    robjCyr = re.compile('(%s)' % '|'.join(map(re.escape, cir_lat.keys())))
-                    c_out = robjCyr.sub(lambda m: cir_lat[m.group(0)], tNew)
+                tNew = f.read(BLOCK)
+                robjCyr = re.compile('(%s)' % '|'.join(map(re.escape, cir_lat.keys())))
+                c_out = robjCyr.sub(lambda m: cir_lat[m.group(0)], tNew)
         except IOError as e:
             logger.debug("Preprocessing, I/O error({0}): {1}".format(e.errno, e.strerror))
         except: #handle other exceptions such as attribute errors
@@ -668,12 +668,12 @@ class Preslovljavanje(FileProcessed):
     def fontColor(self):
         inkode = self.kode
         intext = self.putanja        
-        def preFc(inword): 
-                intab = 'АБВГДЕЗИЈКЛМНОПРСТУФХЦабвгдезијклмнопрстуфхц'
-                outab = 'ABVGDEZIJKLMNOPRSTUFHCabvgdezijklmnoprstufhc'
-                transltab = str.maketrans(intab, outab)
-                ouword = inword.translate(transltab)
-                return ouword
+        def preFc(inword):
+            intab = 'АБВГДЕЗИЈКЛМНОПРСТУФХЦабвгдезијклмнопрстуфхц'
+            outab = 'ABVGDEZIJKLMNOPRSTUFHCabvgdezijklmnoprstufhc'
+            transltab = str.maketrans(intab, outab)
+            ouword = inword.translate(transltab)
+            return ouword
         try:
             with open(intext, 'r', encoding=inkode) as fin:
                 fr = fin.read()
