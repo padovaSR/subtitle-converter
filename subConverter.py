@@ -923,7 +923,7 @@ class MyFrame(wx.Frame):
         
         event.Skip()
         
-    def fileErrors(self, path, new_enc):
+    def fileErrors(self, path, new_enc, multi):
         print('REAL:', self.real_dir)
         fproc = FileProcessed(new_enc, path)
         text = fproc.getContent()
@@ -935,7 +935,8 @@ class MyFrame(wx.Frame):
         text = text.replace('¬', '?')       # Ponovo vracamo znakove pitanja na svoja mesta
         fproc.writeToFile(text)
         fproc.unix2DOS()
-        self.text_1.SetValue(text)
+        if multi == False:
+            self.text_1.SetValue(text)
         for i in nlist:
             if not len(nlist) > 500:
                 a = i[0]
@@ -1001,7 +1002,7 @@ class MyFrame(wx.Frame):
                 text = new_fproc.fixI(text)
                 text = new_fproc.writeToFile(text)
                 
-                text = self.fileErrors(inpath, self.newEnc) 
+                text = self.fileErrors(inpath, self.newEnc, multi=False) 
                 
                 self.tmpPath.append(inpath)
                 if text:
@@ -1162,17 +1163,21 @@ class MyFrame(wx.Frame):
                         text = newfproc.getContent()
                     except Exception as e:
                         logger.debug("ToANSI, text error:", sys.exc_info()[0:2])                    
+                    
+                    text = self.fileErrors(newF, self.newEnc, multi=True)
+                    newfproc.writeToFile(text)
+                    newfproc.unix2DOS()
                     self.text_1.AppendText('\n')
                     self.text_1.AppendText(os.path.basename(newF))                    
                     if error_text:
                         ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
                         ErrorDlg.ShowModal()
-                        outf = newF + '.error.log'
-                        showMeError(newF, outfile=outf, kode=self.newEnc)
-                        text = newfproc.getContent()
-                        text = text.replace('¬', '?')
-                        writeTempStr(newF, text, self.newEnc)
-                        newfproc.unix2DOS()
+                        #outf = newF + '.error.log'
+                        #showMeError(newF, outfile=outf, kode=self.newEnc)
+                        #text = newfproc.getContent()
+                        #text = text.replace('¬', '?')
+                        #writeTempStr(newF, text, self.newEnc)
+                        #newfproc.unix2DOS()
                     postAnsi()
                     text = fproc.getContent()
                     text = text.replace('¬', '?')
@@ -1194,15 +1199,18 @@ class MyFrame(wx.Frame):
                         logger.debug("ToANSI, text error:", sys.exc_info()[0:2])                        
                     self.text_1.AppendText('\n')
                     self.text_1.AppendText(os.path.basename(newF))
+                    
+                    text = self.fileErrors(newF, self.newEnc, multi=True)
+                    
                     if error_text:
                         ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
                         ErrorDlg.ShowModal()
-                        outf = newF + '.error.log'
-                        showMeError(newF, outfile=outf, kode=self.newEnc)
-                        text = newfproc.getContent()
-                        text = text.replace('¬', '?')
-                        writeTempStr(newF, text, self.newEnc)
-                        newfproc.unix2DOS()
+                        #outf = newF + '.error.log'
+                        #showMeError(newF, outfile=outf, kode=self.newEnc)
+                        #text = newfproc.getContent()
+                        #text = text.replace('¬', '?')
+                        #writeTempStr(newF, text, self.newEnc)
+                        #newfproc.unix2DOS()
                     postAnsi()
                     text = fproc.getContent()
                     text = text.replace('¬', '?')
@@ -1295,7 +1303,7 @@ class MyFrame(wx.Frame):
             text = cyr_proc.getContent()
             text = cyr_ansi.writeToFile(text)
             
-            text = self.fileErrors(cyr_path, self.newEnc)
+            text = self.fileErrors(cyr_path, self.newEnc, multi=False)
             
             error_text = cyr_proc.checkFile(self.orig_path, cyr_path, multi=False)
             
@@ -1630,7 +1638,7 @@ class MyFrame(wx.Frame):
         writeTempStr(path, text, entered_enc)
         num = fproc.doReplace()
         text = fproc.getContent()
-        text = self.fileErrors(path, entered_enc)
+        text = self.fileErrors(path, entered_enc, multi=False)
         error_text = fproc.checkFile(self.orig_path, path, multi=False)
         msginfo = wx.MessageDialog(self, 'Zamenjenih objekata\nukupno [ {} ]'.format(num), 'SubConverter', wx.OK | wx.ICON_INFORMATION)
         msginfo.ShowModal()            
@@ -2084,7 +2092,7 @@ class MyFrame(wx.Frame):
             ansi_cyproc.writeToFile(text)
             text = ansi_cyproc.getContent()
             error_text = utfcyproc.checkFile(self.orig_path, path, multi=False)
-            text = self.fileErrors(path, self.newEnc)  # Ovde se vrate znakovi pitanja i ponovo upisu u fajl.
+            text = self.fileErrors(path, self.newEnc, multi=False)  # Ovde se vrate znakovi pitanja i ponovo upisu u fajl.
             if error_text:
                 ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
                 ErrorDlg.ShowModal()
@@ -2213,7 +2221,7 @@ class MyFrame(wx.Frame):
         text = cyproc.rplStr(text)
         writeTempStr(path, text, self.newEnc)
         error_text = cyproc.checkFile(self.orig_path, path, multi=False)
-        text = self.fileErrors(path, self.newEnc)
+        text = self.fileErrors(path, self.newEnc, multi=False)
         if error_text:
             ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
             ErrorDlg.ShowModal()
