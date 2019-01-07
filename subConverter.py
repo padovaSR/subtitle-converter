@@ -1256,6 +1256,8 @@ class MyFrame(wx.Frame):
             text = fproc.getContent()
             if text:
                 text = text.replace('?', '¬')
+            writeTempStr(path, text, entered_enc)
+            
             utfText, suffix = fproc.newName(path, 'cyr_utf8', self.real_dir, multi=False)
             if self.preferences.IsChecked(1011):  
                 utf8_enc = 'utf-8-sig'
@@ -1266,6 +1268,7 @@ class MyFrame(wx.Frame):
                 nnm = fproc.nameCheck(os.path.basename(utf_path), self.real_dir, suffix)
                 utf_path = '{0}_{1}{2}'.format(utf_path, nnm, suffix)        
             new_fproc = FileProcessed(utf8_enc, utf_path)
+            text = fproc.getContent()
             text = new_fproc.writeToFile(text)
             text = new_fproc.fixI(text)  # Isto kao i kod rplStr text
             text = new_fproc.writeToFile(text)
@@ -1286,6 +1289,7 @@ class MyFrame(wx.Frame):
             text = cyr_ansi.writeToFile(text)
             
             text = self.fileErrors(text, utf_path, utf8_enc)
+            
             error_text = cyr_proc.checkFile(self.orig_path, cyr_path, multi=False)
             
             cyr_proc.writeToFile(text)
@@ -1295,12 +1299,6 @@ class MyFrame(wx.Frame):
                 ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
                 ErrorDlg.ShowModal()
                 self.Error_Text = error_text
-                outf = cyr_path + 'error.log'
-                showMeError(cyr_path, outf, self.newEnc)
-                text = cyr_ansi.getContent()
-                text = text.replace('¬', '?')
-                cyr_ansi.writeToFile(text)
-                cyr_ansi.unix2DOS()
             text = cyr_ansi.getContent()
             text = text.replace('¬', '?')
             cyr_ansi.writeToFile(text)
