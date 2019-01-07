@@ -71,7 +71,7 @@ class FileDrop(wx.FileDropTarget):
             enc = fop.findCode()
             fproc = FileProcessed(enc, infile)
             fproc.normalizeText()
-            fproc.regularFile(infile)
+            fproc.regularFile(rfile)
             logger.debug(f"FileDrop: {os.path.basename(infile)}")
             text = fproc.getContent()
             self.window.SetValue(text)
@@ -923,10 +923,15 @@ class MyFrame(wx.Frame):
         
         event.Skip()
         
-    def fileErrors(self, intext, path, new_enc):
-        text = intext   # Prethodno su u tekstu zamenjeni znakovi pitanja
+    def fileErrors(self, path, new_enc):
+        print('REAL:', self.real_dir)
         fproc = FileProcessed(new_enc, path)
+        text = fproc.getContent()
         nlist = w_position(r'\?', text)     # Lociramo novonastale znakove ako ih ima
+        epath = os.path.basename(path)
+        outf = os.path.join(self.real_dir, os.path.splitext(epath)[0] + '_error.log')
+        print(outf)
+        showMeError(path, outf, new_enc)
         text = text.replace('¬', '?')       # Ponovo vracamo znakove pitanja na svoja mesta
         fproc.writeToFile(text)
         fproc.unix2DOS()
@@ -995,7 +1000,9 @@ class MyFrame(wx.Frame):
                 text = new_fproc.writeToFile(text)
                 text = new_fproc.fixI(text)
                 text = new_fproc.writeToFile(text)
-                text = self.fileErrors(text, inpath, self.newEnc)
+                
+                text = self.fileErrors(inpath, self.newEnc) 
+                
                 self.tmpPath.append(inpath)
                 if text:
                     msginfo = wx.MessageDialog(self, f'Tekst je konvertovan u enkoding: {self.newEnc}.', 'SubConverter', wx.OK | wx.ICON_INFORMATION)
@@ -1288,7 +1295,7 @@ class MyFrame(wx.Frame):
             text = cyr_proc.getContent()
             text = cyr_ansi.writeToFile(text)
             
-            text = self.fileErrors(text, utf_path, utf8_enc)
+            text = self.fileErrors(cyr_path, self.newEnc)
             
             error_text = cyr_proc.checkFile(self.orig_path, cyr_path, multi=False)
             
@@ -1623,7 +1630,7 @@ class MyFrame(wx.Frame):
         writeTempStr(path, text, entered_enc)
         num = fproc.doReplace()
         text = fproc.getContent()
-        text = self.fileErrors(text, path, entered_enc)
+        text = self.fileErrors(path, entered_enc)
         error_text = fproc.checkFile(self.orig_path, path, multi=False)
         msginfo = wx.MessageDialog(self, 'Zamenjenih objekata\nukupno [ {} ]'.format(num), 'SubConverter', wx.OK | wx.ICON_INFORMATION)
         msginfo.ShowModal()            
@@ -2077,7 +2084,7 @@ class MyFrame(wx.Frame):
             ansi_cyproc.writeToFile(text)
             text = ansi_cyproc.getContent()
             error_text = utfcyproc.checkFile(self.orig_path, path, multi=False)
-            text = self.fileErrors(text, path, self.newEnc)  # Ovde se vrate znakovi pitanja i ponovo upisu u fajl.
+            text = self.fileErrors(path, self.newEnc)  # Ovde se vrate znakovi pitanja i ponovo upisu u fajl.
             if error_text:
                 ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
                 ErrorDlg.ShowModal()
@@ -2206,7 +2213,7 @@ class MyFrame(wx.Frame):
         text = cyproc.rplStr(text)
         writeTempStr(path, text, self.newEnc)
         error_text = cyproc.checkFile(self.orig_path, path, multi=False)
-        # text = self.fileErrors(text, path, self.newEnc)
+        text = self.fileErrors(path, self.newEnc)
         if error_text:
             ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
             ErrorDlg.ShowModal()
