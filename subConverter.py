@@ -1478,6 +1478,7 @@ class MyFrame(wx.Frame):
             if text:
                 text = text.replace('?', '¬')
                 writeTempStr(path, text, entered_enc)
+                
             nam, b = fproc.newName(path, self.pre_suffix, self.real_dir, True)
             newF = '{0}{1}'.format(os.path.join(self.real_dir, nam), b)
             
@@ -2157,66 +2158,73 @@ class MyFrame(wx.Frame):
         
     def onCyrToUTF(self, event):
         if os.path.isfile('resources\\var\\droped0.pkl'):
-            with open('resources\\var\\droped0.pkl', 'rb') as f:
-                dp = pickle.load(f)
-            if len(dp) > 1:
-                return        
-        with open('resources\\var\\path0.pkl', 'rb') as p:
-            path = pickle.load(p)
-        with open('resources\\var\\enc0.pkl', 'rb') as e:
-            entered_enc = pickle.load(e)
-        self.enchistory[path] = entered_enc        
+            with open('resources\\var\\droped0.pkl', 'rb') as d:
+                droped_files = pickle.load(d)
+            self.multiFile.clear()
+            self.multiFile.update(droped_files)
             
-        
-        entered_enc = self.encAction(path)
-        
-        self.pre_suffix = 'lat_utf8'
-        
-        if self.preferences.IsChecked(1011):
-            self.newEnc = 'utf-8-sig'
-        else:
-            self.newEnc = 'utf-8'
-        t_enc = 'utf-8'
-        
-        self.orig_path = path + '.orig'
-        if not os.path.isfile(self.orig_path):
-            shutil.copy(path, self.orig_path)
-        
-        fproc = FileProcessed(entered_enc, path)
-        
-        text = fproc.getContent()
-        if text:
-            text = text.replace('?', '¬')
-        writeTempStr(path, text, entered_enc)
-        
-        cyproc = Preslovljavanje(self.newEnc, path)
-        text = cyproc.writeToFile(text)
-        text = cyproc.fixI(text)
-        writeTempStr(path, text, self.newEnc)
-        cyproc.preProc(reversed_action=True)
-        cyproc.changeLetters(reversed_action=True)
-        text = cyproc.getContent()
-        text = cyproc.writeToFile(text)
-        text = cyproc.rplStr(text)
-        writeTempStr(path, text, self.newEnc)
-        error_text = cyproc.checkFile(self.orig_path, path, multi=False)
-        
-        text = self.fileErrors(path, self.newEnc, multi=False)
-        writeTempStr(path, text, self.newEnc)
-        cyproc.unix2DOS()
-        
-        if error_text:
-            ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
-            ErrorDlg.ShowModal()
-            self.Error_Text = error_text
-        self.SetStatusText(os.path.basename(path))
-        self.save.Enable(True)
-        self.save_as.Enable(True)
-        self.close.Enable(True)
-        self.toolBar1.EnableTool(1010, True)  # Save
-        self.reload.Enable(True)
-        self.reloaded = 0
-        self.previous_action['cyrToUTF'] = self.newEnc
+        if len(self.multiFile) >= 1:
+            self.multipleTools()
+            self.cyrToUTF_multiple()
+        else:        
+                
+            with open('resources\\var\\path0.pkl', 'rb') as p:
+                path = pickle.load(p)
+            with open('resources\\var\\enc0.pkl', 'rb') as e:
+                entered_enc = pickle.load(e)
+            self.enchistory[path] = entered_enc        
+                
+            
+            entered_enc = self.encAction(path)
+            
+            self.pre_suffix = 'lat_utf8'
+            
+            if self.preferences.IsChecked(1011):
+                self.newEnc = 'utf-8-sig'
+            else:
+                self.newEnc = 'utf-8'
+            t_enc = 'utf-8'
+            
+            self.orig_path = path + '.orig'
+            if not os.path.isfile(self.orig_path):
+                shutil.copy(path, self.orig_path)
+            
+            fproc = FileProcessed(entered_enc, path)
+            
+            text = fproc.getContent()
+            if text:
+                text = text.replace('?', '¬')
+            writeTempStr(path, text, entered_enc)
+            
+            cyproc = Preslovljavanje(self.newEnc, path)
+            text = cyproc.writeToFile(text)
+            text = cyproc.fixI(text)
+            writeTempStr(path, text, self.newEnc)
+            
+            cyproc.preProc(reversed_action=True)
+            cyproc.changeLetters(reversed_action=True)
+            text = cyproc.getContent()
+            text = cyproc.writeToFile(text)
+            text = cyproc.rplStr(text)
+            writeTempStr(path, text, self.newEnc)
+            error_text = cyproc.checkFile(self.orig_path, path, multi=False)
+            
+            text = self.fileErrors(path, self.newEnc, multi=False)
+            writeTempStr(path, text, self.newEnc)
+            cyproc.unix2DOS()
+            
+            if error_text:
+                ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
+                ErrorDlg.ShowModal()
+                self.Error_Text = error_text
+            self.SetStatusText(os.path.basename(path))
+            self.save.Enable(True)
+            self.save_as.Enable(True)
+            self.close.Enable(True)
+            self.toolBar1.EnableTool(1010, True)  # Save
+            self.reload.Enable(True)
+            self.reloaded = 0
+            self.previous_action['cyrToUTF'] = self.newEnc
         event.Skip()
         
     def cyrToUTF_multiple(self):
@@ -2240,7 +2248,37 @@ class MyFrame(wx.Frame):
             path=key
             entered_enc=value
             
+            fproc = FileProcessed(entered_enc, path)
             
+            text = fproc.getContent()
+            if text:
+                text = text.replace('?', '¬')
+            
+            nam, b = fproc.newName(path, self.pre_suffix, self.real_dir, True)
+            newF = '{0}{1}'.format(os.path.join(self.real_dir, nam), b)            
+            
+            cyproc = Preslovljavanje(self.newEnc, newF)
+            text = cyproc.writeToFile(text)
+            text = cyproc.fixI(text)
+            writeTempStr(newF, text, self.newEnc)
+            cyproc.preProc(reversed_action=True)
+            cyproc.changeLetters(reversed_action=True)
+            text = cyproc.getContent()
+            text = cyproc.writeToFile(text)
+            text = cyproc.rplStr(text)
+            writeTempStr(newF, text, self.newEnc)
+            
+            error_text = cyproc.checkFile(path, newF, multi=True)
+            
+            text = self.fileErrors(newF, self.newEnc, multi=True)
+            writeTempStr(newF, text, self.newEnc)
+            cyproc.unix2DOS()
+            
+            if error_text:
+                ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
+                ErrorDlg.ShowModal()
+                self.Error_Text = error_text
+            self.SetStatusText(os.path.basename(path))
             
         self.multipleTools()
         self.reloaded = 0
