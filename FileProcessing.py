@@ -242,6 +242,8 @@ class FileProcessed:
         
         with open('resources\\var\\path0.pkl', 'wb') as v:
             pickle.dump(self.putanja, v)
+        with open('resources\\var\\rpath0.pkl', 'wb') as f:
+            pickle.dump(realFile, f)        
             
     def checkErrors(self):
         fpaterns = ['ï»¿Å', 'Ä', 'Å½', 'Ä', 'Ä', 'Å¡', 'Ä', 'Å¾', 'Ä', 'Ä',
