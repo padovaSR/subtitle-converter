@@ -671,6 +671,8 @@ class MyFrame(wx.Frame):
         self.to_ansi.Enable(True)
         self.to_cyrillic.Enable(True)
         self.to_utf8.Enable(True)
+        self.cyr_to_ansi.Enable(True)
+        self.cyr_to_utf.Enable(True)
         self.export_zip.Enable(False)
        
     def OnContextMenu(self, event):
@@ -1229,10 +1231,8 @@ class MyFrame(wx.Frame):
                 with open('resources\\var\\enc0.pkl', 'rb') as e:
                     entered_enc = pickle.load(e)
                 self.enchistory[path] = entered_enc
-                
                 self.orig_path = path + '.orig'
-                shutil.copy(path, self.orig_path)
-                            
+                shutil.copy(path, self.orig_path)                
             else:
                 text = self.text_1.GetValue()
                 path = 'tmp\\Untitled.srt'
@@ -1269,10 +1269,7 @@ class MyFrame(wx.Frame):
             text = new_fproc.writeToFile(text)
             text = new_fproc.fixI(text)  # Isto kao i kod rplStr text
             text = new_fproc.writeToFile(text)
-            cyr_name, cyr_suffix = new_fproc.newName(path, self.pre_suffix, self.real_dir, multi=False)
-            cyr_path = os.path.join('tmp', cyr_name+cyr_suffix)
-            if not os.path.isfile(cyr_path):
-                open(cyr_path, 'a').close()
+            
             cyr_proc = Preslovljavanje(utf8_enc, utf_path)
             cyr_proc.preLatin()
             cyr_proc.preProc(reversed_action=False)
@@ -1283,22 +1280,31 @@ class MyFrame(wx.Frame):
             cyr_proc.fineTune()
             cyr_proc.fontColor()
             
+            cyr_path = path
             cyr_ansi = Preslovljavanje(self.newEnc, cyr_path)
             text = cyr_proc.getContent()
             text = cyr_ansi.writeToFile(text)
             
-            text = self.fileErrors(text, path, self.newEnc)
-            error_text = cyr_proc.checkFile(utf_path, cyr_path, multi=False)
-            text = text.replace('¬', '?')
-            text = cyr_proc.writeToFile(text)
+            text = self.fileErrors(text, utf_path, utf8_enc)
+            error_text = cyr_proc.checkFile(self.orig_path, cyr_path, multi=False)
+            
+            cyr_proc.writeToFile(text)
             cyr_proc.unix2DOS()
             cyr_ansi.writeToFile(text)
-            cyr_ansi.unix2DOS()
-            writeTempStr(path, text, self.newEnc)
             if error_text:
                 ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
                 ErrorDlg.ShowModal()
-                self.Error_Text = error_text        
+                self.Error_Text = error_text
+                outf = cyr_path + 'error.log'
+                showMeError(cyr_path, outf, self.newEnc)
+                text = cyr_ansi.getContent()
+                text = text.replace('¬', '?')
+                cyr_ansi.writeToFile(text)
+                cyr_ansi.unix2DOS()
+            text = cyr_ansi.getContent()
+            text = text.replace('¬', '?')
+            cyr_ansi.writeToFile(text)
+            cyr_ansi.unix2DOS()
             self.undoAction.append(text)
             self.enc = self.newEnc
             self.SetStatusText(os.path.basename(path))
@@ -1366,8 +1372,8 @@ class MyFrame(wx.Frame):
             text = cyr_ansi.writeToFile(text)
             
             error_text = cyr_proc.checkFile(utf_path, cyr_path, multi=True)
-            cyr_proc.unix2DOS()
-            cyr_ansi.unix2DOS()
+            #cyr_proc.unix2DOS()
+            #cyr_ansi.unix2DOS()
             self.text_1.AppendText('\n')
             self.text_1.AppendText(os.path.basename(cyr_path))            
             if error_text:
@@ -1379,7 +1385,7 @@ class MyFrame(wx.Frame):
                 text = cyr_ansi.getContent()
                 text = text.replace('¬', '?')
                 writeTempStr(cyr_path, text, self.newEnc)
-                cyr_proc.unix2DOS()
+                cyr_ansi.unix2DOS()
             self.enc = self.newEnc
             self.reloaded = 0
             text = cyr_proc.getContent()
@@ -2183,9 +2189,7 @@ class MyFrame(wx.Frame):
         self.orig_path = path + '.orig'
         if not os.path.isfile(self.orig_path):
             shutil.copy(path, self.orig_path)
-        #else:
-            #shutil.copy(self.orig_path, path)
-            
+        
         fproc = FileProcessed(entered_enc, path)
         
         text = fproc.getContent()
@@ -2204,7 +2208,7 @@ class MyFrame(wx.Frame):
         text = cyproc.rplStr(text)
         writeTempStr(path, text, self.newEnc)
         error_text = cyproc.checkFile(self.orig_path, path, multi=False)
-        text = self.fileErrors(text, path, self.newEnc)
+        # text = self.fileErrors(text, path, self.newEnc)
         if error_text:
             ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
             ErrorDlg.ShowModal()
