@@ -76,7 +76,7 @@ class FileDrop(wx.FileDropTarget):
             text = fproc.getContent()
             self.window.SetValue(text)
             tpath = infile
-            with open('resources\\var\\r_text0.pkl', 'wb') as t:
+            with open(os.path.join('resources', 'var', 'r_text0.pkl'), 'wb') as t:
                 pickle.dump(text, t)
             return enc, text
         if len(lfiles) > 1:
@@ -133,9 +133,9 @@ class FileDrop(wx.FileDropTarget):
                                 self.window.AppendText("\n")
                                 self.window.AppendText(text)                            
             logger.debug('FileDrop: Ready for multiple files.')
-            with open('resources\\var\\droped0.pkl', 'wb') as f:
+            with open(os.path.join('resources', 'var', 'droped0.pkl'), 'wb') as f:
                 pickle.dump(new_d, f)
-            with open('resources\\var\\rpath0.pkl', 'wb') as f:
+            with open(os.path.join('resources', 'var', 'rpath0.pkl'), 'wb') as f:
                 pickle.dump(rpath, f, pickle.HIGHEST_PROTOCOL)
         else:
             for name in  lfiles:
@@ -155,7 +155,7 @@ class FileDrop(wx.FileDropTarget):
                             tpath = nam
                             droped += 1
                             empty = {}
-                            with open('resources\\var\\droped0.pkl', 'wb') as d:
+                            with open(os.path.join('resources', 'var', 'droped0.pkl'), 'wb') as d:
                                 pickle.dump(empty, d)
                             self.window.SetValue(t)
                         elif len(outfile) > 1:
@@ -171,7 +171,7 @@ class FileDrop(wx.FileDropTarget):
                                 text = os.path.basename(outfile[i])
                                 self.window.AppendText("\n")
                                 self.window.AppendText(text)
-                            with open('resources\\var\\droped0.pkl', 'wb') as f:
+                            with open(os.path.join('resources', 'var', 'droped0.pkl'), 'wb') as f:
                                 pickle.dump(new_d, f)
                             logger.debug('FileDrop: Ready for multiple files.')
                 elif zipfile.is_zipfile(lfiles[0]) == False:
@@ -184,15 +184,15 @@ class FileDrop(wx.FileDropTarget):
                     tpath = tmp_path
                     droped += 1
                     empty = {}
-                    with open('resources\\var\\droped0.pkl', 'wb') as d:
+                    with open(os.path.join('resources', 'var', 'droped0.pkl'), 'wb') as d:
                         pickle.dump(empty, d)
                     self.window.SetValue(txt1)
             # print('Droped_FILE tmp: ', tpath)
-            with open('resources\\var\\rpath0.pkl', 'wb') as f:
+            with open(os.path.join('resources', 'var', 'rpath0.pkl'), 'wb') as f:
                 pickle.dump(rpath, f, pickle.HIGHEST_PROTOCOL)
-            with open('resources\\var\\obs1.pkl', 'wb') as f:
+            with open(os.path.join('resources', 'var', 'obs1.pkl'), 'wb') as f:
                 pickle.dump(droped, f, pickle.HIGHEST_PROTOCOL)
-            with shelve.open('resources\\var\\dialog_settings.db', flag='writeback') as s:
+            with shelve.open(os.path.join('resources', 'var', 'dialog_settings.db'), flag='writeback') as s:
                 s['key3'] = {'tmPath': tpath, 'realPath': rpath, 'kode': kodes, 'drop': droped}        
         return True
 
@@ -232,6 +232,9 @@ class MyFrame(wx.Frame):
         self.cyrUTF = r""
         self.reloaded = 0
         self.previous_action= {}
+        self.enc0_p = os.path.join('resources', 'var', 'enc0.pkl')
+        self.path0_p = os.path.join('resources', 'var', 'path0.pkl')
+        self.droped0_p = os.path.join('resources', 'var', 'droped0.pkl')
             
         self.__set_menuBar()
         self.__set_ToolBar()
@@ -286,7 +289,7 @@ class MyFrame(wx.Frame):
         
         self.file.AppendSeparator()
         self.reload = wx.MenuItem(self.file, wx.ID_ANY, "&Reload file\tCtrl+R", "Ponovo učitaj fajl", wx.ITEM_NORMAL)
-        self.reload.SetBitmap(wx.Bitmap(u"resources/icons/reload.png", wx.BITMAP_TYPE_ANY))
+        self.reload.SetBitmap(wx.Bitmap(os.path.join("resources", "icons", "reload.png"), wx.BITMAP_TYPE_ANY))
         self.Bind(wx.EVT_MENU, self.onReload, id=self.reload.GetId())
         self.file.Append(self.reload)
         self.reload.Enable(False)
@@ -320,7 +323,7 @@ class MyFrame(wx.Frame):
 
         self.file.AppendSeparator()
 
-        #self.recent.SetBitmap(wx.Bitmap(u"16x16/mimetypes/text-x-generic.png", wx.BITMAP_TYPE_ANY))
+        #self.recent.SetBitmap(wx.Bitmap(u"16x16/mimetypes/text-x-generic.png"), wx.BITMAP_TYPE_ANY))
         # Submenu
         self.file_sub = wx.Menu()
         self.file_sub.Append(-1, "Recent files", "")
@@ -332,7 +335,7 @@ class MyFrame(wx.Frame):
         # self.file.AppendSeparator()
         
         self.quit_program = wx.MenuItem(self.file, wx.ID_ANY, u"Quit"+ u"\t" + u"Ctrl+Q", u"Quit program", wx.ITEM_NORMAL)
-        self.quit_program.SetBitmap(wx.Bitmap(u"resources/icons/application-exit.png", wx.BITMAP_TYPE_ANY))
+        self.quit_program.SetBitmap(wx.Bitmap(os.path.join("resources", "icons", "application-exit.png"), wx.BITMAP_TYPE_ANY))
         self.Bind(wx.EVT_MENU, self.onQuit, id=self.quit_program.GetId())
         self.file.Append(self.quit_program)
         self.frame_menubar.Append(self.file, u"File")
@@ -381,19 +384,19 @@ class MyFrame(wx.Frame):
         # Actions   -----------------------------------------------------------------------------------------------------------------------
         self.action = wx.Menu()
         self.to_cyrillic = wx.MenuItem(self.action, wx.ID_ANY, u"ToCyrillic"+ u"\t" + u"Ctr+Y", u"Konvertuje u cirilicu", wx.ITEM_NORMAL)
-        self.to_cyrillic.SetBitmap(wx.Bitmap(u"resources/icons/cyr-ltr.png", wx.BITMAP_TYPE_ANY))
+        self.to_cyrillic.SetBitmap(wx.Bitmap(os.path.join("resources", "icons", "cyr-ltr.png"), wx.BITMAP_TYPE_ANY))
         self.Bind(wx.EVT_MENU, self.toCyrillic, id=self.to_cyrillic.GetId())
         self.action.Append(self.to_cyrillic)
         self.to_cyrillic.Enable(False)
 
         self.to_ansi = wx.MenuItem(self.action, wx.ID_ANY, u"ToANSI"+ u"\t" + u"Alt+S", u"Konvertuje u ANSI", wx.ITEM_NORMAL)
-        self.to_ansi.SetBitmap(wx.Bitmap(u"resources/icons/go-next.png", wx.BITMAP_TYPE_ANY))
+        self.to_ansi.SetBitmap(wx.Bitmap(os.path.join("resources", "icons", "go-next.png"), wx.BITMAP_TYPE_ANY))
         self.Bind(wx.EVT_MENU, self.toANSI, id=self.to_ansi.GetId())
         self.action.Append(self.to_ansi)
         self.to_ansi.Enable(False)
 
         self.to_utf8 = wx.MenuItem(self.action, wx.ID_ANY, u"ToUTF"+ u"\t" + u"Alt+D", u"Konvertuje u UTF", wx.ITEM_NORMAL)
-        self.to_utf8.SetBitmap(wx.Bitmap(u"resources/icons/go-next.png", wx.BITMAP_TYPE_ANY))
+        self.to_utf8.SetBitmap(wx.Bitmap(os.path.join("resources", "icons", "go-next.png"), wx.BITMAP_TYPE_ANY))
         self.Bind(wx.EVT_MENU, self.toUTF, id=self.to_utf8.GetId())
         self.action.Append(self.to_utf8)
         self.to_utf8.Enable(False)
@@ -407,13 +410,13 @@ class MyFrame(wx.Frame):
         self.transcrib.Enable(False)
 
         self.specials = wx.MenuItem(self.action, wx.ID_ANY, u"&SpecReplace\tAlt+C", u"ReplaceSpecial definicije", wx.ITEM_NORMAL)
-        self.specials.SetBitmap(wx.Bitmap(u"resources/icons/go-next.png", wx.BITMAP_TYPE_ANY))
+        self.specials.SetBitmap(wx.Bitmap(os.path.join("resources", "icons", "go-next.png"), wx.BITMAP_TYPE_ANY))
         self.Bind(wx.EVT_MENU, self.onRepSpecial, id=self.specials.GetId())
         self.action.Append(self.specials)
         self.specials.Enable(False)
        
         self.cleaner = wx.MenuItem(self.action, wx.ID_ANY, u"Cleanup"+ u"\t" + u"Alt+K", u"Clean subtitle file", wx.ITEM_NORMAL)
-        self.cleaner.SetBitmap(wx.Bitmap(u"resources/icons/edit-clear-all.png", wx.BITMAP_TYPE_ANY))
+        self.cleaner.SetBitmap(wx.Bitmap(os.path.join("resources", "icons", "edit-clear-all.png"), wx.BITMAP_TYPE_ANY))
         self.Bind(wx.EVT_MENU, self.onCleanup, id=self.cleaner.GetId())
         self.action.Append(self.cleaner)
         self.cleaner.Enable(False)
@@ -421,13 +424,13 @@ class MyFrame(wx.Frame):
         self.action.AppendSeparator()
 
         self.cyr_to_ansi = wx.MenuItem(self.action, wx.ID_ANY, u"Cyr to latin ansi"+ u"\t" + u"Ctrl+U", u"Preslovljavanje cirilice u latinicu ansi", wx.ITEM_NORMAL)
-        self.cyr_to_ansi.SetBitmap(wx.Bitmap(u"resources/icons/go-next.png", wx.BITMAP_TYPE_ANY))
+        self.cyr_to_ansi.SetBitmap(wx.Bitmap(os.path.join("resources", "icons", "go-next.png"), wx.BITMAP_TYPE_ANY))
         self.Bind(wx.EVT_MENU, self.onCyrToANSI, id=self.cyr_to_ansi.GetId())
         self.action.Append(self.cyr_to_ansi)
         self.cyr_to_ansi.Enable(False)
 
         self.cyr_to_utf = wx.MenuItem(self.action, wx.ID_ANY, u"Cyr to latin utf8"+ u"\t" + u"Ctrl+L", u"Preslovljavanje cirilice u latinicu utf8", wx.ITEM_NORMAL)
-        self.cyr_to_utf.SetBitmap(wx.Bitmap(u"resources/icons/go-next.png", wx.BITMAP_TYPE_ANY))
+        self.cyr_to_utf.SetBitmap(wx.Bitmap(os.path.join("resources", "icons", "go-next.png"), wx.BITMAP_TYPE_ANY))
         self.Bind(wx.EVT_MENU, self.onCyrToUTF, id=self.cyr_to_utf.GetId())
         self.action.Append(self.cyr_to_utf)
         self.cyr_to_utf.Enable(False)
@@ -435,7 +438,7 @@ class MyFrame(wx.Frame):
         self.action.AppendSeparator()
         
         self.fixer = wx.MenuItem(self.action, wx.ID_ANY, u"FixSubtitle"+ u"\t" + u"Alt+F", u"Fix subtitle file", wx.ITEM_NORMAL)
-        self.fixer.SetBitmap(wx.Bitmap(u"resources/icons/go-next.png", wx.BITMAP_TYPE_ANY))
+        self.fixer.SetBitmap(wx.Bitmap(os.path.join("resources", "icons", "go-next.png"), wx.BITMAP_TYPE_ANY))
         self.Bind(wx.EVT_MENU, self.onFixSubs, id=self.fixer.GetId())
         self.action.Append(self.fixer)
         self.fixer.Enable(False)
@@ -443,7 +446,7 @@ class MyFrame(wx.Frame):
         self.action.AppendSeparator()
 
         self.merger = wx.MenuItem(self.action, wx.ID_ANY, u"Merger"+ u"\t" + u"Ctrl+M", u"Merge lines", wx.ITEM_NORMAL)
-        self.merger.SetBitmap(wx.Bitmap(u"resources/icons/merge.png", wx.BITMAP_TYPE_ANY))
+        self.merger.SetBitmap(wx.Bitmap(os.path.join("resources", "icons", "merge.png"), wx.BITMAP_TYPE_ANY))
         self.Bind(wx.EVT_MENU, self.onMergeLines, id=self.merger.GetId())
         self.action.Append(self.merger)
         self.merger.Enable(False)
@@ -463,21 +466,21 @@ class MyFrame(wx.Frame):
         self.preferences.AppendSeparator()
 
         self.fonts = wx.MenuItem(self.preferences, wx.ID_ANY, u"Font settings"+ u"\t" + u"Ctrl+F", u"Font settings", wx.ITEM_NORMAL)
-        self.fonts.SetBitmap(wx.Bitmap(u"resources/icons/preferences-font.png", wx.BITMAP_TYPE_ANY))
+        self.fonts.SetBitmap(wx.Bitmap(os.path.join("resources", "icons", "preferences-font.png"), wx.BITMAP_TYPE_ANY))
         self.Bind(wx.EVT_MENU, self.onSelectFont, id=self.fonts.GetId())
         self.preferences.Append(self.fonts)
 
         self.preferences.AppendSeparator()
 
         self.fixer_settings = wx.MenuItem(self.preferences, wx.ID_ANY, u"FixerSettings", wx.EmptyString, wx.ITEM_NORMAL)
-        self.fixer_settings.SetBitmap(wx.Bitmap(u"resources/icons/dialog-settings.png", wx.BITMAP_TYPE_ANY))
+        self.fixer_settings.SetBitmap(wx.Bitmap(os.path.join("resources", "icons", "dialog-settings.png"), wx.BITMAP_TYPE_ANY))
         self.Bind(wx.EVT_MENU, self.onFixerSettings, id=self.fixer_settings.GetId())
         self.preferences.Append(self.fixer_settings)
 
         self.preferences.AppendSeparator()
 
         self.merger_pref = wx.MenuItem(self.preferences, wx.ID_ANY, u"MergerSettings", wx.EmptyString, wx.ITEM_NORMAL)
-        self.merger_pref.SetBitmap(wx.Bitmap(u"resources/icons/merge-settings.png", wx.BITMAP_TYPE_ANY))
+        self.merger_pref.SetBitmap(wx.Bitmap(os.path.join("resources", "icons", "merge-settings.png"), wx.BITMAP_TYPE_ANY))
         self.Bind(wx.EVT_MENU, self.onMergerSettings, id=self.merger_pref.GetId())
         self.preferences.Append(self.merger_pref)
 
@@ -485,7 +488,7 @@ class MyFrame(wx.Frame):
 
         self.help = wx.Menu()
         self.about = wx.MenuItem(self.help, wx.ID_ANY, u"About"+ u"\t" + u"Ctrl+I", u"O programu", wx.ITEM_NORMAL)
-        self.about.SetBitmap(wx.Bitmap(u"resources/icons/help-about.png", wx.BITMAP_TYPE_ANY))
+        self.about.SetBitmap(wx.Bitmap(os.path.join("resources", "icons", "help-about.png"), wx.BITMAP_TYPE_ANY))
         self.Bind(wx.EVT_MENU, self.onAbout, id = self.about.GetId())
         self.help.Append(self.about)
 
@@ -502,20 +505,20 @@ class MyFrame(wx.Frame):
         self.fsave = self.toolBar1.AddTool(1010, u"Save", wx.ArtProvider.GetBitmap(wx.ART_FILE_SAVE, wx.ART_TOOLBAR), wx.NullBitmap, wx.ITEM_NORMAL, u"Save file", u"Sačuvaj promene", None)
         self.undo_t = self.toolBar1.AddTool(101, "Undo", wx.ArtProvider.GetBitmap(wx.ART_UNDO, wx.ART_TOOLBAR), wx.NullBitmap, wx.ITEM_NORMAL, "Undo Action", "Undo Action", None)
         self.redo_t = self.toolBar1.AddTool(102, "Redo", wx.ArtProvider.GetBitmap(wx.ART_REDO, wx.ART_TOOLBAR), wx.NullBitmap, wx.ITEM_NORMAL, "Redo Action", "Redo Action", None)
-        self.cyrillic = self.toolBar1.AddTool(1002, u"Cirilica", wx.Bitmap(u"resources/icons/cyrillic.png", wx.BITMAP_TYPE_ANY), wx.NullBitmap, wx.ITEM_NORMAL, u"To Cyrillic", u"Konvertuje u ćirilicu", None)
-        self.ansi = self.toolBar1.AddTool(1003, u"ANSI", wx.Bitmap(u"resources/icons/ANSI.png", wx.BITMAP_TYPE_ANY), wx.NullBitmap, wx.ITEM_NORMAL, u"To ANSI", u"Konvertuje u ANSI format", None)
-        self.unicode = self.toolBar1.AddTool(1004, u"UTF", wx.Bitmap(u"resources/icons/UTF8.png", wx.BITMAP_TYPE_ANY), wx.NullBitmap, wx.ITEM_NORMAL, u"To UTF", u"Konvertuje u UTF unikode", None)
-        self.transkrib = self.toolBar1.AddTool(1005, u"Transcribe", wx.Bitmap(u"resources/icons/cyr-ltr.24.png", wx.BITMAP_TYPE_ANY), wx.NullBitmap, wx.ITEM_NORMAL, u"Transcribe", u"Transkripcija", None)
-        self.specijal = self.toolBar1.AddTool(1006, u"Specijal", wx.Bitmap(u"resources/icons/edit-find-replace.png", wx.BITMAP_TYPE_ANY), wx.NullBitmap, wx.ITEM_NORMAL, u"Replace Special", u"Spec-Replace definicije", None)
-        self.cleanup = self.toolBar1.AddTool(1007, u"Cleanup", wx.Bitmap(u"resources/icons/editclear.png", wx.BITMAP_TYPE_ANY), wx.NullBitmap, wx.ITEM_NORMAL, u"Cleanup", u"Ćišćenje HI anotacija i praznih linija", None)
-        self.quit_prog = self.toolBar1.AddTool(1008, u"Quit", wx.Bitmap(u"resources/icons/application-exit.24.png", wx.BITMAP_TYPE_ANY), wx.NullBitmap, wx.ITEM_NORMAL, u"Exit program", u"Zatvori program", None)
+        self.cyrillic = self.toolBar1.AddTool(1002, u"Cirilica", wx.Bitmap(os.path.join('resources','icons','cyrillic.png'), wx.BITMAP_TYPE_ANY), wx.NullBitmap, wx.ITEM_NORMAL, u"To Cyrillic", u"Konvertuje u ćirilicu", None)
+        self.ansi = self.toolBar1.AddTool(1003, u"ANSI", wx.Bitmap(os.path.join('resources','icons','ANSI.png'), wx.BITMAP_TYPE_ANY), wx.NullBitmap, wx.ITEM_NORMAL, u"To ANSI", u"Konvertuje u ANSI format", None)
+        self.unicode = self.toolBar1.AddTool(1004, u"UTF", wx.Bitmap(os.path.join('resources', 'icons', 'UTF8.png'), wx.BITMAP_TYPE_ANY), wx.NullBitmap, wx.ITEM_NORMAL, u"To UTF", u"Konvertuje u UTF unikode", None)
+        self.transkrib = self.toolBar1.AddTool(1005, u"Transcribe", wx.Bitmap(os.path.join('resources', 'icons', 'cyr-ltr.24.png'), wx.BITMAP_TYPE_ANY), wx.NullBitmap, wx.ITEM_NORMAL, u"Transcribe", u"Transkripcija", None)
+        self.specijal = self.toolBar1.AddTool(1006, u"Specijal", wx.Bitmap(os.path.join('resources', 'icons', 'edit-find-replace.png'), wx.BITMAP_TYPE_ANY), wx.NullBitmap, wx.ITEM_NORMAL, u"Replace Special", u"Spec-Replace definicije", None)
+        self.cleanup = self.toolBar1.AddTool(1007, u"Cleanup", wx.Bitmap(os.path.join('resources', 'icons', 'editclear.png'), wx.BITMAP_TYPE_ANY), wx.NullBitmap, wx.ITEM_NORMAL, u"Cleanup", u"Ćišćenje HI anotacija i praznih linija", None)
+        self.quit_prog = self.toolBar1.AddTool(1008, u"Quit", wx.Bitmap(os.path.join('resources', 'icons', 'application-exit.24.png'), wx.BITMAP_TYPE_ANY), wx.NullBitmap, wx.ITEM_NORMAL, u"Exit program", u"Zatvori program", None)
 
         self.toolBar1.AddSeparator()
         self.toolBar1.AddSeparator()
         self.toolBar1.AddSeparator()
         
         # Default za comboBox1
-        with open('resources\\var\\obsE.pkl', 'rb') as f:
+        with open(os.path.join('resources', 'var', 'obsE.pkl'), 'rb') as f:
             kodek = pickle.load(f)
             listChoices2 = [' auto', ' windows-1250', ' windows-1251', ' windows-1252', ' utf-8']
             if kodek in listChoices2:
@@ -547,13 +550,13 @@ class MyFrame(wx.Frame):
         # begin wxGlade: MyFrame.__set_properties
         self.SetTitle(f"SubtitleConverter {VERSION}")
         _icon = wx.NullIcon
-        _icon.CopyFromBitmap(wx.Bitmap("resources\\icons\\subConvert.png", wx.BITMAP_TYPE_ANY))
+        _icon.CopyFromBitmap(wx.Bitmap(os.path.join("resources", "icons", "subConvert.png"), wx.BITMAP_TYPE_ANY))
         self.SetIcon(_icon)
         
         self.SetFocus()
         
         # self.text_1.SetFont(wx.Font(9, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, 0, "Segoe UI"))
-        with shelve.open('resources\\var\\dialog_settings.db', flag='writeback') as s:
+        with shelve.open(os.path.join('resources', 'var', 'dialog_settings.db'), flag='writeback') as s:
             ex = s['key4']
             new_font = ex['new_font']; fontSize = int(ex['fontSize']); fC = ex['fontColour']; bl = ex['weight']
         
@@ -576,12 +579,12 @@ class MyFrame(wx.Frame):
         self.text_1.SetFocus()
         self.frame_statusbar.SetStatusWidths([-1])
         
-        with open('resources\\var\\bcf.pkl', 'rb') as bf:
+        with open(os.path.join('resources', 'var', 'bcf.pkl'), 'rb') as bf:
             item = pickle.load(bf)
         if item == 'Checked':
             self.preferences.Check(1011, check=True)
-        if os.path.exists('resources\\var\\tcf.pkl'):
-            with open('resources\\var\\tcf.pkl', 'rb') as tf:
+        if os.path.exists(os.path.join('resources', 'var', 'tcf.pkl')):
+            with open(os.path.join('resources', 'var', 'tcf.pkl'), 'rb') as tf:
                 item_txt = pickle.load(tf)
             if item_txt == 'txt':
                 self.preferences.Check(1012, check=True)        
@@ -606,7 +609,7 @@ class MyFrame(wx.Frame):
     
     def updateUI(self):
         self.curClr = wx.BLACK
-        with shelve.open('resources\\var\\dialog_settings.db', flag='writeback') as s:
+        with shelve.open(os.path.join('resources', 'var', 'dialog_settings.db'), flag='writeback') as s:
             ex = s['key4']
             new_font = ex['new_font']; fontSize = int(ex['fontSize']); fC = ex['fontColour']; bl = ex['weight']
         
@@ -622,8 +625,8 @@ class MyFrame(wx.Frame):
         self.text_1.SetForegroundColour(self.curClr)    
     
     def updateStatus(self, event):
-        if os.path.exists('resources\\var\\path0.pkl'):
-            with open('resources\\var\\path0.pkl', 'rb') as pf:
+        if os.path.exists(self.path0_p):
+            with open(self.path0_p, 'rb') as pf:
                 path = pickle.load(pf)
                 if type(path) is list:
                     self.SetStatusText('Multiple files ready for processing')
@@ -635,25 +638,25 @@ class MyFrame(wx.Frame):
         event.Skip()    
     
     def enKode(self, event):
-        with shelve.open('resources\\var\\dialog_settings.db', flag='writeback') as s:
+        with shelve.open(os.path.join('resources', 'var', 'dialog_settings.db'), flag='writeback') as s:
             ec = s['key3']; enk = ec['kode']; tpath = ec['tmPath']  # ; rlPath = ec['realPath']
-        #with open('resources\\var\\enc0.pkl', 'rb') as e:
+        #with open(os.path.join('resources', 'var', 'enc0.pkl'), 'rb') as e:
             #enk = pickle.load(e)
             
-        #with open('resources\\var\\path0.pkl', 'rb') as p:
+        #with open(os.path.join('resources', 'var', 'path0.pkl'), 'rb') as p:
             #tpath = pickle.load(p)
         def load():
-            with open('resources\\var\\obs1.pkl', 'rb') as f:
+            with open(os.path.join('resources', 'var', 'obs1.pkl'), 'rb') as f:
                 return pickle.load(f)
         
         self.enableTool()
         
         # self.resetTool()
         
-        #with open('resources\\var\path0.pkl', 'wb') as f:    # path je u tmp/ folderu
+        #with open(os.path.join('resources', 'var\path0.pkl'), 'wb') as f:    # path je u tmp/ folderu
             #pickle.dump(tpath, f)
-        if os.path.isfile('resources\\var\\rpath0.pkl'):
-            with open('resources\\var\\rpath0.pkl', 'rb') as f:
+        if os.path.isfile(os.path.join('resources', 'var', 'rpath0.pkl')):
+            with open(os.path.join('resources', 'var', 'rpath0.pkl'), 'rb') as f:
                 rlPath = pickle.load(f)
             self.real_dir = os.path.dirname(rlPath)
             # print('ON enKode rdir: ', self.real_dir)
@@ -756,7 +759,7 @@ class MyFrame(wx.Frame):
                 n_path.append(x)
                 if os.path.isfile(i):
                     shutil.copy(i, x)
-            with open('resources\\var\\rpath0.pkl', 'wb') as f:
+            with open(os.path.join('resources', 'var', 'rpath0.pkl'), 'wb') as f:
                 pickle.dump(path[-1], f, pickle.HIGHEST_PROTOCOL)            
             return path, n_path
         inpaths = [x for x in filepaths]
@@ -771,7 +774,7 @@ class MyFrame(wx.Frame):
                 shutil.copy(path, tpath)
                 file_go(self, tpath, path)    # U tmp/ folderu
             elif zipfile.is_zipfile(path):  # == True:
-                with open('resources\\var\\rpath0.pkl', 'wb') as f:
+                with open(os.path.join('resources', 'var', 'rpath0.pkl'), 'wb') as f:
                     pickle.dump(path, f, pickle.HIGHEST_PROTOCOL)
                 fop = FileOpened(path)
                 try:
@@ -793,7 +796,7 @@ class MyFrame(wx.Frame):
                             self.text_1.AppendText('\n')
                             self.text_1.AppendText(text)
                             self.multiFile[outfile[i]] = enc
-                        with open('resources\\var\\droped0.pkl', 'wb') as d:
+                        with open(self.droped0_p, 'wb') as d:
                             pickle.dump(self.multiFile, d)
                         logger.debug('FileHandler: Ready for multiple files.')
                         self.SetStatusText('Files ready for processing')
@@ -850,7 +853,7 @@ class MyFrame(wx.Frame):
                     self.multiFile[fpath] = enc
                     self.reloadText = text
                     
-            with open('resources\\var\\droped0.pkl', 'wb') as d:
+            with open(self.droped0_p, 'wb') as d:
                 pickle.dump(self.multiFile, d)
             self.multipleTools()
             logger.debug('FileHandler: Ready for multiple files')
@@ -868,13 +871,13 @@ class MyFrame(wx.Frame):
                 self.multiFile.clear()
                 self.previous_action.clear()
                 self.enchistory.clear()
-                if os.path.isfile('resources\\var\\droped0.pkl'):
-                    os.remove('resources\\var\\droped0.pkl')
+                if os.path.isfile(self.droped0_p):
+                    os.remove(self.droped0_p)
             self.filepath = dlgOpen.GetPaths() # Get the file location
             if len(self.filepath) == 1:
                 real_path = self.filepath[-1]
                 self.real_path = [real_path]
-                with open('resources\\var\\rpath0.pkl', 'wb') as f:
+                with open(os.path.join('resources', 'var', 'rpath0.pkl'), 'wb') as f:
                     pickle.dump(real_path, f, pickle.HIGHEST_PROTOCOL)                
                 # real_dir = self.real_dir
             else:
@@ -901,15 +904,15 @@ class MyFrame(wx.Frame):
             dl1 = wx.MessageBox("Current content has not been saved! Proceed?", "Please confirm", wx.ICON_QUESTION | wx.YES_NO, self)
             if dl1 == wx.NO:
                 return        
-        with open('resources\\var\\path0.pkl', 'rb') as p:
+        with open(self.path0_p, 'rb') as p:
             path = pickle.load(p)
-        with open('resources\\var\\enc0.pkl', 'rb') as p:
+        with open(self.enc0_p, 'rb') as p:
             enc = pickle.load(p)
         
-        if os.path.isfile('resources\\var\\r_text0.pkl'):
-            with open('resources\\var\\r_text0.pkl', 'rb') as f:
+        if os.path.isfile(os.path.join('resources', 'var', 'r_text0.pkl')):
+            with open(os.path.join('resources', 'var', 'r_text0.pkl'), 'rb') as f:
                 text=pickle.load(f)
-            os.remove('resources\\var\\r_text0.pkl')
+            os.remove(os.path.join('resources', 'var', 'r_text0.pkl'))
             self.reloadText = text
             self.text_1.SetValue(text)
             writeTempStr(path, text, enc)
@@ -951,8 +954,8 @@ class MyFrame(wx.Frame):
             dl = self.ShowDialog()
             if dl == False:
                 return        
-        if os.path.isfile('resources\\var\\droped0.pkl'):
-            with open('resources\\var\\droped0.pkl', 'rb') as d:
+        if os.path.isfile(self.droped0_p):
+            with open(self.droped0_p, 'rb') as d:
                 droped_files = pickle.load(d)
             self.multiFile.clear()
             self.multiFile.update(droped_files)
@@ -961,17 +964,17 @@ class MyFrame(wx.Frame):
             self.multipleTools()
             self.toANSI_multiple()
         else:        
-            if os.path.isfile('resources\\var\\path0.pkl'):
-                with open('resources\\var\\path0.pkl', 'rb') as p:
+            if os.path.isfile(self.path0_p):
+                with open(self.path0_p, 'rb') as p:
                     path = pickle.load(p)          # path je u tmp/ folderu
-                with open('resources\\var\\enc0.pkl', 'rb') as e:
+                with open(self.enc0_p, 'rb') as e:
                     entered_enc = pickle.load(e)
                 self.enchistory[path] = entered_enc            
                 self.orig_path = path + '.orig'
                 shutil.copy(path, self.orig_path)            
             else:
                 text = self.text_1.GetValue()
-                path = 'tmp\\Untitled.srt'
+                path = path.join('tmp', 'Untitled.srt')
                 if not os.path.isfile(path):
                     open(path, 'a').close()
                 fp = FileProcessed('windows-1250', path)
@@ -1085,8 +1088,8 @@ class MyFrame(wx.Frame):
     def toANSI_multiple(self):
         self.text_1.SetValue("")
         self.text_1.SetValue("Files Processed:\n")
-        if os.path.isfile('resources\\var\\droped0.pkl'):
-            with open('resources\\var\\droped0.pkl', 'rb') as d:
+        if os.path.isfile(self.droped0_p):
+            with open(self.droped0_p, 'rb') as d:
                 droped_files = pickle.load(d)
             self.multiFile.clear()
             self.multiFile.update(droped_files)
@@ -1205,8 +1208,8 @@ class MyFrame(wx.Frame):
         self.multipleTools()
         
     def toCyrillic(self, event):
-        if os.path.isfile('resources\\var\\rpath0.pkl'):
-            with open('resources\\var\\rpath0.pkl', 'rb') as f:
+        if os.path.isfile(os.path.join('resources', 'var', 'rpath0.pkl')):
+            with open(os.path.join('resources', 'var', 'rpath0.pkl'), 'rb') as f:
                 rlPath = pickle.load(f)
             self.real_dir = os.path.dirname(rlPath)
             self.real_path= [rlPath]        
@@ -1215,8 +1218,8 @@ class MyFrame(wx.Frame):
             dl = self.ShowDialog()
             if dl == False:
                 return
-        if os.path.isfile('resources\\var\\droped0.pkl'):
-            with open('resources\\var\\droped0.pkl', 'rb') as d:
+        if os.path.isfile(self.droped0_p):
+            with open(self.droped0_p, 'rb') as d:
                 droped_files = pickle.load(d)
             self.multiFile.clear()
             self.multiFile.update(droped_files)
@@ -1225,17 +1228,17 @@ class MyFrame(wx.Frame):
             self.multipleTools()
             self.toCyrillic_multiple()
         else:        
-            if os.path.isfile('resources\\var\\path0.pkl'):
-                with open('resources\\var\\path0.pkl', 'rb') as p:
+            if os.path.isfile(self.path0_p):
+                with open(self.path0_p, 'rb') as p:
                     path = pickle.load(p)          # path je u tmp/ folderu
-                with open('resources\\var\\enc0.pkl', 'rb') as e:
+                with open(self.enc0_p, 'rb') as e:
                     entered_enc = pickle.load(e)
                 self.enchistory[path] = entered_enc
                 self.orig_path = path + '.orig'
                 shutil.copy(path, self.orig_path)                
             else:
                 text = self.text_1.GetValue()
-                path = 'tmp\\Untitled.srt'
+                path = path.join('tmp', 'Untitled.srt')
                 if not os.path.isfile(path):
                     open(path, 'a').close()
                 fp = FileProcessed('utf-8', path)
@@ -1321,8 +1324,8 @@ class MyFrame(wx.Frame):
     def toCyrillic_multiple(self):
         self.text_1.SetValue("")
         self.text_1.SetValue("Files Processed:\n")
-        if os.path.isfile('resources\\var\\droped0.pkl'):
-            with open('resources\\var\\droped0.pkl', 'rb') as d:
+        if os.path.isfile(self.droped0_p):
+            with open(self.droped0_p, 'rb') as d:
                 droped_files = pickle.load(d)
             self.multiFile.clear()
             self.multiFile.update(droped_files)
@@ -1399,8 +1402,8 @@ class MyFrame(wx.Frame):
             dl = self.ShowDialog()
             if dl == False:
                 return
-        if os.path.isfile('resources\\var\\droped0.pkl'):
-            with open('resources\\var\\droped0.pkl', 'rb') as d:
+        if os.path.isfile(self.droped0_p):
+            with open(self.droped0_p, 'rb') as d:
                 droped_files = pickle.load(d)
             self.multiFile.clear()
             self.multiFile.update(droped_files)        
@@ -1408,15 +1411,15 @@ class MyFrame(wx.Frame):
             self.multipleTools()
             self.toUTF_multiple()
         else:
-            if os.path.isfile('resources\\var\\path0.pkl'):
-                with open('resources\\var\\path0.pkl', 'rb') as p:
+            if os.path.isfile(self.path0_p):
+                with open(self.path0_p, 'rb') as p:
                     path = pickle.load(p)          # path je u tmp/ folderu
-                with open('resources\\var\\enc0.pkl', 'rb') as e:
+                with open(self.enc0_p, 'rb') as e:
                     entered_enc = pickle.load(e)
                 self.enchistory[path] = entered_enc
             else:
                 text = self.text_1.GetValue()
-                path = 'tmp\\Untitled.srt'
+                path = path.join('tmp', 'Untitled.srt')
                 if not os.path.isfile(path):
                     open(path, 'a').close()
                 writeTempStr(path, text, 'utf-8')
@@ -1457,8 +1460,8 @@ class MyFrame(wx.Frame):
     def toUTF_multiple(self):
         self.text_1.SetValue("")
         self.text_1.SetValue("Files Processed:\n")
-        if os.path.isfile('resources\\var\\droped0.pkl'):
-            with open('resources\\var\\droped0.pkl', 'rb') as d:
+        if os.path.isfile(self.droped0_p):
+            with open(self.droped0_p, 'rb') as d:
                 droped_files = pickle.load(d)
             self.multiFile.clear()
             self.multiFile.update(droped_files)
@@ -1513,23 +1516,23 @@ class MyFrame(wx.Frame):
             dl = self.ShowDialog()
             if dl == False:
                 return
-        if os.path.isfile('resources\\var\\droped0.pkl'):
-            with open('resources\\var\\droped0.pkl', 'rb') as d:
+        if os.path.isfile(self.droped0_p):
+            with open(self.droped0_p, 'rb') as d:
                 droped_files = pickle.load(d)
             self.multiFile.clear()
             self.multiFile.update(droped_files)        
         if len(self.multiFile) >= 1:
             return
     
-        if os.path.isfile('resources\\var\\path0.pkl'):
-            with open('resources\\var\\path0.pkl', 'rb') as p:
+        if os.path.isfile(self.path0_p):
+            with open(self.path0_p, 'rb') as p:
                 path = pickle.load(p)          # path je u tmp/ folderu
-            with open('resources\\var\\enc0.pkl', 'rb') as e:
+            with open(self.enc0_p, 'rb') as e:
                 entered_enc = pickle.load(e)
             self.enchistory[path] = entered_enc
         else:
             text = self.text_1.GetValue()
-            path = 'tmp\\Untitled.srt'
+            path = path.join('tmp', 'Untitled.srt')
             if not os.path.isfile(path):
                 open(path, 'a').close()
             writeTempStr(path, text, 'utf-8')
@@ -1581,23 +1584,23 @@ class MyFrame(wx.Frame):
             dl = self.ShowDialog()
             if dl == False:
                 return
-        if os.path.isfile('resources\\var\\droped0.pkl'):
-            with open('resources\\var\\droped0.pkl', 'rb') as d:
+        if os.path.isfile(self.droped0_p):
+            with open(self.droped0_p, 'rb') as d:
                 droped_files = pickle.load(d)
             self.multiFile.clear()
             self.multiFile.update(droped_files)        
         if len(self.multiFile) >= 1:
             return
     
-        if os.path.isfile('resources\\var\\path0.pkl'):
-            with open('resources\\var\\path0.pkl', 'rb') as p:
+        if os.path.isfile(self.path0_p):
+            with open(self.path0_p, 'rb') as p:
                 path = pickle.load(p)          # path je u tmp/ folderu
-            with open('resources\\var\\enc0.pkl', 'rb') as e:
+            with open(self.enc0_p, 'rb') as e:
                 entered_enc = pickle.load(e)
             self.enchistory[path] = entered_enc
         else:
             text = self.text_1.GetValue()
-            path = 'tmp\\Untitled.srt'
+            path = path.join('tmp', 'Untitled.srt')
             if not os.path.isfile(path):
                 open(path, 'a').close()
             writeTempStr(path, text, 'utf-8')
@@ -1650,24 +1653,24 @@ class MyFrame(wx.Frame):
             dl = self.ShowDialog()
             if dl == False:
                 return
-        if os.path.isfile('resources\\var\\droped0.pkl'):
-            with open('resources\\var\\droped0.pkl', 'rb') as d:
+        if os.path.isfile(self.droped0_p):
+            with open(self.droped0_p, 'rb') as d:
                 droped_files = pickle.load(d)
             self.multiFile.clear()
             self.multiFile.update(droped_files)        
         if len(self.multiFile) >= 1:
             return
     
-        if os.path.isfile('resources\\var\\path0.pkl'):
-            with open('resources\\var\\path0.pkl', 'rb') as p:
+        if os.path.isfile(self.path0_p):
+            with open(self.path0_p, 'rb') as p:
                 path = pickle.load(p)          # path je u tmp/ folderu
-            with open('resources\\var\\enc0.pkl', 'rb') as e:
+            with open(self.enc0_p, 'rb') as e:
                 entered_enc = pickle.load(e)
             self.enchistory[path] = entered_enc
             self.newEnc = entered_enc
         else:
             text = self.text_1.GetValue()
-            path = 'tmp\\Untitled.srt'
+            path = path.join('tmp', 'Untitled.srt')
             if not os.path.isfile(path):
                 open(path, 'a').close()
             writeTempStr(path, text, 'utf-8')
@@ -1718,18 +1721,18 @@ class MyFrame(wx.Frame):
             dl = self.ShowDialog()
             if dl == False:
                 return
-        if os.path.isfile('resources\\var\\droped0.pkl'):
-            with open('resources\\var\\droped0.pkl', 'rb') as d:
+        if os.path.isfile(self.droped0_p):
+            with open(self.droped0_p, 'rb') as d:
                 droped_files = pickle.load(d)
             self.multiFile.clear()
             self.multiFile.update(droped_files)        
         if len(self.multiFile) >= 1:
             return
     
-        if os.path.isfile('resources\\var\\path0.pkl'):
-            with open('resources\\var\\path0.pkl', 'rb') as p:
+        if os.path.isfile(self.path0_p):
+            with open(self.path0_p, 'rb') as p:
                 path = pickle.load(p)          # path je u tmp/ folderu
-            with open('resources\\var\\enc0.pkl', 'rb') as e:
+            with open(self.enc0_p, 'rb') as e:
                 entered_enc = pickle.load(e)
             self.enchistory[path] = entered_enc
             self.newEnc = entered_enc
@@ -1737,7 +1740,7 @@ class MyFrame(wx.Frame):
             shutil.copy(path, self.orig_path)            
         else:
             text = self.text_1.GetValue()
-            path = 'tmp\\Untitled.srt'
+            path = path.join('tmp', 'Untitled.srt')
             if not os.path.isfile(path):
                 open(path, 'a').close()
             writeTempStr(path, text, 'utf-8')
@@ -1746,7 +1749,7 @@ class MyFrame(wx.Frame):
         self.newEnc = entered_enc                           # path je u tmp/ folderu
         
         try:
-            with shelve.open('resources\\var\\dialog_settings.db', flag='writeback') as  sp:
+            with shelve.open(os.path.join('resources', 'var', 'dialog_settings.db'), flag='writeback') as  sp:
                 ex = sp['key2']
                 lineLenght = ex['l_lenght']; maxChar = ex['m_char']; maxGap = ex['m_gap']; file_suffix = ex['f_suffix']
         except IOError as e:
@@ -1803,8 +1806,8 @@ class MyFrame(wx.Frame):
         event.Skip()
     
     def onSave(self, event):
-        if os.path.isfile('resources\\var\\path0.pkl') and self.modify == False:
-            with open('resources\\var\\path0.pkl', 'rb') as p:
+        if os.path.isfile(self.path0_p) and self.modify == False:
+            with open(self.path0_p, 'rb') as p:
                 tpath = pickle.load(p)
             enc = self.enchistory[tpath]
             fproc = FileProcessed(enc, tpath)
@@ -1824,8 +1827,8 @@ class MyFrame(wx.Frame):
                     self.toolBar1.EnableTool(1010, False)
                     self.open_next.Enable(True)
                     self.reload.Enable(True)
-        elif os.path.isfile('resources\\var\\path0.pkl') and self.modify == True:
-            with open('resources\\var\\path0.pkl', 'rb') as p:
+        elif os.path.isfile(self.path0_p) and self.modify == True:
+            with open(self.path0_p, 'rb') as p:
                 tpath = pickle.load(p)            
             self.pre_suffix = 'new'
             entered_enc = self.encAction(tpath)
@@ -1848,7 +1851,7 @@ class MyFrame(wx.Frame):
                     self.open_next.Enable(True)
                     self.reload.Enable(True)
         else:
-            tpath = 'tmp\\Untitled.srt'
+            tpath = path.join('tmp', 'Untitled.srt')
             self.newEnc = 'utf-8'
             self.pre_suffix = 'new'
             self.real_dir = os.getcwd()
@@ -1874,11 +1877,11 @@ class MyFrame(wx.Frame):
         event.Skip()
     
     def onSaveAs(self, event):
-        if os.path.isfile('resources\\var\\path0.pkl'):
-            with open('resources\\var\\path0.pkl', 'rb') as p:
+        if os.path.isfile(self.path0_p):
+            with open(self.path0_p, 'rb') as p:
                 tpath = pickle.load(p)
         else:
-            tpath = 'tmp\\Untitled.srt'
+            tpath = path.join('tmp', 'Untitled.srt')
             fproc = FileProcessed('utf-8', tpath)
             text = self.text_1.GetValue()
             fproc.writeToFile(text)
@@ -1930,19 +1933,19 @@ class MyFrame(wx.Frame):
         if self.multiFile:
             if len(self.multiFile) > 1:
                 return
-        if os.path.isfile('resources\\var\\droped0.pkl'):
-            with open('resources\\var\\droped0.pkl', 'rb') as f:
+        if os.path.isfile(self.droped0_p):
+            with open(self.droped0_p, 'rb') as f:
                 dp = pickle.load(f)
             if len(dp) > 1:
                 return        
-        if os.path.isfile('resources\\var\\path0.pkl'):
-            with open('resources\\var\\path0.pkl', 'rb') as p:
+        if os.path.isfile(self.path0_p):
+            with open(self.path0_p, 'rb') as p:
                 fpath = pickle.load(p)
             tpath = os.path.basename(fpath)
                 
         else:
             text = self.text_1.GetValue()
-            fpath = 'tmp\\Untitled.srt'
+            fpath = path.join('tmp', 'Untitled.srt')
             fp = FileProcessed(self.newEnc, fpath)
             fp.writeToFile(text)
             tpath = fpath
@@ -2024,7 +2027,7 @@ class MyFrame(wx.Frame):
         with open(path, 'r', encoding=enc, errors='replace') as f:
             text = f.read()
         self.text_1.SetValue(text)
-        with open('resources\\var\\path0.pkl', 'wb') as v:
+        with open(self.path0_p, 'wb') as v:
             pickle.dump(path, v)        
         self.enableTool()
         logger.debug(f'From fileHistory: {os.path.basename(path)} encoding: {enc}')
@@ -2032,8 +2035,8 @@ class MyFrame(wx.Frame):
         event.Skip()
         
     def onCyrToANSI(self, event):
-        if os.path.isfile('resources\\var\\droped0.pkl'):
-            with open('resources\\var\\droped0.pkl', 'rb') as d:
+        if os.path.isfile(self.droped0_p):
+            with open(self.droped0_p, 'rb') as d:
                 droped_files = pickle.load(d)
             self.multiFile.clear()
             self.multiFile.update(droped_files)
@@ -2043,14 +2046,14 @@ class MyFrame(wx.Frame):
             self.cyrToANSI_multiple()
         else:        
         
-            if os.path.isfile('resources\\var\\droped0.pkl'):
-                with open('resources\\var\\droped0.pkl', 'rb') as f:
+            if os.path.isfile(self.droped0_p):
+                with open(self.droped0_p, 'rb') as f:
                     dp = pickle.load(f)
                 if len(dp) > 1:
                     return        
-            with open('resources\\var\\path0.pkl', 'rb') as p:
+            with open(self.path0_p, 'rb') as p:
                 path = pickle.load(p)
-            with open('resources\\var\\enc0.pkl', 'rb') as e:
+            with open(self.enc0_p, 'rb') as e:
                 entered_enc = pickle.load(e)
             self.enchistory[path] = entered_enc            
     
@@ -2106,8 +2109,8 @@ class MyFrame(wx.Frame):
     def cyrToANSI_multiple(self):
         self.text_1.SetValue("")
         self.text_1.SetValue("Files Processed:\n")
-        if os.path.isfile('resources\\var\\droped0.pkl'):
-            with open('resources\\var\\droped0.pkl', 'rb') as d:
+        if os.path.isfile(self.droped0_p):
+            with open(self.droped0_p, 'rb') as d:
                 droped_files = pickle.load(d)
             self.multiFile.clear()
             self.multiFile.update(droped_files)        
@@ -2166,8 +2169,8 @@ class MyFrame(wx.Frame):
         self.SetStatusText('Multiple files done.')
         
     def onCyrToUTF(self, event):
-        if os.path.isfile('resources\\var\\droped0.pkl'):
-            with open('resources\\var\\droped0.pkl', 'rb') as d:
+        if os.path.isfile(self.droped0_p):
+            with open(self.droped0_p, 'rb') as d:
                 droped_files = pickle.load(d)
             self.multiFile.clear()
             self.multiFile.update(droped_files)
@@ -2177,9 +2180,9 @@ class MyFrame(wx.Frame):
             self.cyrToUTF_multiple()
         else:        
                 
-            with open('resources\\var\\path0.pkl', 'rb') as p:
+            with open(self.path0_p, 'rb') as p:
                 path = pickle.load(p)
-            with open('resources\\var\\enc0.pkl', 'rb') as e:
+            with open(self.enc0_p, 'rb') as e:
                 entered_enc = pickle.load(e)
             self.enchistory[path] = entered_enc        
                 
@@ -2237,8 +2240,8 @@ class MyFrame(wx.Frame):
     def cyrToUTF_multiple(self):
         self.text_1.SetValue("")
         self.text_1.SetValue("Files Processed:\n")
-        if os.path.isfile('resources\\var\\droped0.pkl'):
-            with open('resources\\var\\droped0.pkl', 'rb') as d:
+        if os.path.isfile(self.droped0_p):
+            with open(self.droped0_p, 'rb') as d:
                 droped_files = pickle.load(d)
             self.multiFile.clear()
             self.multiFile.update(droped_files)        
@@ -2296,13 +2299,13 @@ class MyFrame(wx.Frame):
             dl = self.ShowDialog()
             if dl == False:
                 return
-        if os.path.isfile('resources\\var\\droped0.pkl'):
-            with open('resources\\var\\droped0.pkl', 'rb') as f:
+        if os.path.isfile(self.droped0_p):
+            with open(self.droped0_p, 'rb') as f:
                 dp = pickle.load(f)
             if len(dp) > 1:
                 return        
-        if os.path.isfile('resources\\var\\droped0.pkl'):
-            with open('resources\\var\\droped0.pkl', 'rb') as d:
+        if os.path.isfile(self.droped0_p):
+            with open(self.droped0_p, 'rb') as d:
                 droped_files = pickle.load(d)
             self.multiFile.clear()
             self.multiFile.update(droped_files)        
@@ -2310,25 +2313,25 @@ class MyFrame(wx.Frame):
             self.multipleTools()
             # self.toUTF_multiple()
         else:
-            if os.path.isfile('resources\\var\\path0.pkl'):
-                with open('resources\\var\\path0.pkl', 'rb') as p:
+            if os.path.isfile(self.path0_p):
+                with open(self.path0_p, 'rb') as p:
                     path = pickle.load(p)          # path je u tmp/ folderu
-                with open('resources\\var\\enc0.pkl', 'rb') as e:
+                with open(self.enc0_p, 'rb') as e:
                     entered_enc = pickle.load(e)
                 self.enchistory[path] = entered_enc
             else:
                 text = self.text_1.GetValue()
-                path = 'tmp\\Untitled.srt'
+                path = path.join('tmp', 'Untitled.srt')
                 if not os.path.isfile(path):
                     open(path, 'a').close()
                 writeTempStr(path, text, 'utf-8')
                 self.pre_suffix = 'utf8'                           # path je u tmp/ folderu
         
-        with open('resources\\var\\rpath0.pkl', 'rb') as r:
+        with open(os.path.join('resources', 'var', 'rpath0.pkl'), 'rb') as r:
             rpath = pickle.load(r)
             
         try:
-            with shelve.open('resources\\var\\dialog_settings.db', flag='writeback') as  sp:
+            with shelve.open(os.path.join('resources', 'var', 'dialog_settings.db'), flag='writeback') as  sp:
                 ex = sp['key1']
                 cb1_s = ex['state1']; cb2_s = ex['state2']; cb3_s = ex['state3']
                 cb4_s = ex['state4']; cb5_s = ex['state5']; cb6_s = ex['state6']; cb7_s = ex['state7']; cb8_s = ex['state8']
@@ -2439,9 +2442,9 @@ class MyFrame(wx.Frame):
             return entered_enc
     
     def undo_Action(self, event):
-        with open('resources\\var\\path0.pkl', 'rb') as f:
+        with open(self.path0_p, 'rb') as f:
             path = pickle.load(f)
-        with open('resources\\var\\enc0.pkl', 'rb') as e:
+        with open(self.enc0_p, 'rb') as e:
             enc = pickle.load(e)
         self.enchistory[path] = enc
         print(enc)
@@ -2462,7 +2465,7 @@ class MyFrame(wx.Frame):
         event.Skip()
     
     def redo_Action(self, event):
-        with open('resources\\var\\path0.pkl', 'rb') as f:
+        with open(self.path0_p, 'rb') as f:
             path = pickle.load(f)
         enc = self.newEnc
         print('redo ', enc)
@@ -2593,7 +2596,7 @@ class MyFrame(wx.Frame):
         ctrl = event.GetEventObject()
         value = ctrl.GetValue()
         uEnkode = value
-        with open('resources\\var\\obsE.pkl', 'wb') as f:
+        with open(os.path.join('resources', 'var', 'obsE.pkl'), 'wb') as f:
             pickle.dump(uEnkode, f)        
         event.Skip()
     
@@ -2602,14 +2605,14 @@ class MyFrame(wx.Frame):
             item_txt = 'txt'
         else:
             item_txt = 'srt'
-        with open('resources\\var\\tcf.pkl', 'wb') as tf:
+        with open(os.path.join('resources', 'var', 'tcf.pkl'), 'wb') as tf:
             pickle.dump(item_txt, tf)
             
         if self.preferences.IsChecked(1011):
             item = 'Checked'
         else:
             item = 'NotChecked'
-        with open('resources\\var\\bcf.pkl', 'wb') as fb:
+        with open(os.path.join('resources', 'var', 'bcf.pkl'), 'wb') as fb:
             pickle.dump(item, fb)        
 
         event.Skip()
@@ -2628,7 +2631,7 @@ class MyFrame(wx.Frame):
             colour = data.GetColour()
             bld = font.GetWeight()
             logger.debug('Selected font: "%s", %d points, color %s' % (font.GetFaceName(), font.GetPointSize(), colour.Get()))
-            with shelve.open('resources\\var\\dialog_settings.db', flag='writeback') as s:
+            with shelve.open(os.path.join('resources', 'var', 'dialog_settings.db'), flag='writeback') as s:
                 s['key4'] = {'new_font': font.GetFaceName(), 'fontSize': font.GetPointSize(), 'fontColour': colour.Get(), 'weight': bld}
             self.curFont = font
             self.curClr = colour
@@ -2681,16 +2684,17 @@ class MyApp(wx.App):
         self.frame = MyFrame(None, wx.ID_ANY, "")
         self.SetTopWindow(self.frame)
         self.frame.Show()
-        if os.path.isfile('resources\\var\\r_text0.pkl'):
-            os.remove('resources\\var\\r_text0.pkl')
-        if os.path.isfile('resources\\var\\droped0.pkl'):
-            os.remove('resources\\var\\droped0.pkl')
-        if os.path.exists('resources\\LatCyr.map.cfg'):
-            os.remove('resources\\LatCyr.map.cfg')
-        if os.path.exists('resources\\var\\path0.pkl'):
-            os.remove('resources\\var\\path0.pkl')
-        if os.path.isfile('resources\\var\\rpath0.pkl'):
-            os.remove('resources\\var\\rpath0.pkl')
+        if os.path.isfile(os.path.join('resources', 'var', 'r_text0.pkl')):
+            os.remove(os.path.join('resources', 'var', 'r_text0.pkl'))
+        
+        if os.path.isfile(os.path.join('resources', 'var', 'droped0.pkl')):
+            os.remove(os.path.join('resources', 'var', 'droped0.pkl'))
+        if os.path.exists(os.path.join('resources', 'LatCyr.map.cfg')):
+            os.remove(os.path.join('resources', 'LatCyr.map.cfg'))
+        if os.path.exists(os.path.join('resources', 'var', 'path0.pkl')):
+            os.remove(os.path.join('resources', 'var', 'path0.pkl'))
+        if os.path.isfile(os.path.join('resources', 'var', 'rpath0.pkl')):
+            os.remove(os.path.join('resources', 'var', 'rpath0.pkl'))
         if not os.path.isdir('tmp'):
             os.mkdir('tmp')        
         return True
