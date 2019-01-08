@@ -34,7 +34,7 @@ from logging.handlers import RotatingFileHandler
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
-handler = RotatingFileHandler('resources\\var\\FileProcessing.logging.log', mode='a', maxBytes=4000)
+handler = RotatingFileHandler(os.path.join('resources', 'var', 'FileProcessing.logging.log'), mode='a', maxBytes=4000)
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
