@@ -12,6 +12,15 @@ import shelve
 import pickle
 import os
 import sys
+import logging
+from logging.handlers import RotatingFileHandler
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
+handler = RotatingFileHandler(os.path.join('resources', 'var', 'FileProcessing.logging.log'), mode='a', maxBytes=4000)
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
 class FixerSettings(wx.Dialog):
     def __init__(self, *args, **kwds):
@@ -20,8 +29,8 @@ class FixerSettings(wx.Dialog):
         wx.Dialog.__init__(self, *args, **kwds)
         self.SetSize((339, 219))
         
-        t1 = 'resources\\var\\dialog_settings.db.dat'
-        cb3s = 'resources\\var\\fixer_cb3.data'
+        t1 = os.path.join('resources', 'var', 'dialog_settings.db.dat')
+        cb3s = os.path.join('resources', 'var', 'fixer_cb3.data')
         
         self.cb1 = wx.CheckBox(self, wx.ID_ANY, "cbox_1", style=wx.CHK_2STATE)
         self.lb1 = wx.StaticText(self, wx.ID_ANY, "Popravi gapove", style=wx.ALIGN_LEFT)
@@ -54,12 +63,12 @@ class FixerSettings(wx.Dialog):
                     cb1_s = ex['state1']; cb2_s = ex['state2']; cb3_s = ex['state3']
                     cb4_s = ex['state4']; cb5_s = ex['state5']; cb6_s = ex['state6']; cb7_s = ex['state7']; cb8_s = ex['state8']
             except IOError as e:
-                print("fixerSettings, I/O error({0}): {1}".format(e.errno, e.strerror))
-            except: #handle other exceptions such as attribute errors
-                print("fixerSetting, unexpected error:", sys.exc_info()[0])
+                logger.debug("fixerSettings, I/O error({0}): {1}".format(e.errno, e.strerror))
+            except Exception as e: #handle other exceptions such as attribute errors
+                logger.debug("fixerSetting, unexpected error:", sys.exc_info()[0:2])
             else:
                               
-                with shelve.open('resources\\var\\dialog_settings.db', flag='writeback') as s:
+                with shelve.open(os.path.join('resources','var','dialog_settings.db'), flag='writeback') as s:
                     del s['key1']  # = {'state1': a, 'state2': b, 'state3': c, 'state4': d, 'state5': e, 'state6': f, 'state7': g, 'state8': h}
             
                 self.cb1.SetValue(cb1_s); self.cb2.SetValue(cb2_s); self.cb3.SetValue(cb3_s)
@@ -81,7 +90,7 @@ class FixerSettings(wx.Dialog):
         # begin wxGlade: fixerSettings.__set_properties
         self.SetTitle("FixSubtitle settings")
         _icon = wx.NullIcon
-        _icon.CopyFromBitmap(wx.Bitmap("resources\\icons\\tool.ico", wx.BITMAP_TYPE_ANY))
+        _icon.CopyFromBitmap(wx.Bitmap(os.path.join("resources", "icons", "tool.ico"), wx.BITMAP_TYPE_ANY))
         self.SetIcon(_icon)
         self.SetSize((350, 259))
         self.SetFocus()
@@ -182,9 +191,9 @@ class FixerSettings(wx.Dialog):
         c7 = self.cb7.GetValue(); c8 = self.cb8.GetValue()
         konf = [c1, c2, c3, c4, c5, c6, c7, c8]
         a = konf[0]; b = konf[1]; c = konf[2]; d = konf[3]; e = konf[4]; f = konf[5]; g = konf[6]; h = konf[7]
-        with shelve.open('resources\\var\\dialog_settings.db', flag='writeback') as s:
+        with shelve.open(os.path.join('resources', 'var', 'dialog_settings.db'), flag='writeback') as s:
             s['key1'] = {'state1': a, 'state2': b, 'state3': c, 'state4': d, 'state5': e, 'state6': f, 'state7': g, 'state8': h, }
-        cb3s = 'resources\\var\\fixer_cb3.data'
+        cb3s = os.path.join('resources', 'var', 'fixer_cb3.data')
         with open(cb3s, 'wb') as p:
             pickle.dump(c3, p)
         self.Destroy()
