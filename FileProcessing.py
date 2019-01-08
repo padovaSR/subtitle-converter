@@ -173,11 +173,10 @@ class FileProcessed:
     def __init__(self, enc, path):
         self.kode = enc
         self.putanja = path
-    
+        
     def nameCheck(self, name_pattern, where, suffix):
         pattern = name_pattern + "*" + suffix
         files = os.listdir(where)
-        # print(files)
         n_names = len(fnmatch.filter(files, pattern))  # + 1
         return n_names    
     
