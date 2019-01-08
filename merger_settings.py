@@ -7,11 +7,15 @@ import wx
 import os
 # import codecs
 import shelve
-# begin wxGlade: dependencies
-# end wxGlade
+import logging
+from logging.handlers import RotatingFileHandler
 
-# begin wxGlade: extracode
-# end wxGlade
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
+handler = RotatingFileHandler(os.path.join('resources', 'var', 'FileProcessing.logging.log'), mode='a', maxBytes=4000)
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
 class Settings(wx.Dialog):
     def __init__(self, *args, **kwds):
@@ -20,11 +24,6 @@ class Settings(wx.Dialog):
         #wx.Dialog.__init__(self, *args, **kwds)
         wx.Dialog.__init__(self, None, title="")
         self.SetSize((306, 286))
-        
-        #konf = [6500, 80, 1000, 'merged']
-        #a = konf[0]; b = konf[1]; c = konf[2]; d = konf[3]  # ; e = konf[4]; f = konf[5]; g = konf[6]; h = konf[7]
-        #with shelve.open('resources\\var\\dialog_settings.db', flag='writeback') as s:
-            #s['key2'] = {'l_lenght': a, 'm_char': b, 'm_gap': c, 'f_suffix': d}        
         
         self.label_1 = wx.StaticText(self, wx.ID_ANY, "Dužina trajanja spojenih linija (ms):", style=wx.ALIGN_LEFT)
         self.spin_ctrl_1 = wx.SpinCtrl(self, wx.ID_ANY, style=wx.SP_ARROW_KEYS | wx.TE_PROCESS_ENTER)
@@ -49,7 +48,7 @@ class Settings(wx.Dialog):
         self.button_1 = wx.Button(self, wx.ID_CLOSE, "")
         self.button_2 = wx.Button(self, wx.ID_SAVE, "")
 
-        with shelve.open('resources\\var\\dialog_settings.db', flag='writeback') as  sp:
+        with shelve.open(os.path.join('resources', 'var', 'dialog_settings.db'), flag='writeback') as  sp:
             ex = sp['key2']
             try:
                 lineLenght = ex['l_lenght']; maxChar = ex['m_char']; maxGap = ex['m_gap']; file_suffix = ex['f_suffix']
@@ -57,8 +56,8 @@ class Settings(wx.Dialog):
                 self.spin_ctrl_3.SetValue(maxGap)
                 self.spin_ctrl_2.SetValue(maxChar)
                 self.spin_ctrl_1.SetValue(lineLenght)
-            except Exception:
-                print("MergerSettings: key error.")
+            except Exception as e:
+                logger.debug("MergerSettings: key error.")
         
         self.__set_properties()
         self.__do_layout()
@@ -74,7 +73,7 @@ class Settings(wx.Dialog):
         # begin wxGlade: Settings.__set_properties
         self.SetTitle("Merger settings")
         _icon = wx.NullIcon
-        _icon.CopyFromBitmap(wx.Bitmap("resources\\icons\\tool.ico", wx.BITMAP_TYPE_ANY))
+        _icon.CopyFromBitmap(wx.Bitmap(os.path.join("resources", "icons", "tool.ico"), wx.BITMAP_TYPE_ANY))
         self.SetIcon(_icon)
         self.SetSize((301, 282))
         self.label_1.SetMinSize((123, 23))
@@ -149,7 +148,7 @@ class Settings(wx.Dialog):
         # sd = wx.MessageDialog(self, "Settings saved successfully", "Success", wx.OK | wx.ICON_INFORMATION)
         konf = [line_Lenght, max_Char, max_Gap, file_suffix]
         a = konf[0]; b = konf[1]; c = konf[2]; d = konf[3]  # ; e = konf[4]; f = konf[5]; g = konf[6]; h = konf[7]
-        with shelve.open('resources\\var\\dialog_settings.db', flag='writeback') as s:
+        with shelve.open(os.path.join('resources', 'var', 'dialog_settings.db'), flag='writeback') as s:
             s['key2'] = {'l_lenght': a, 'm_char': b, 'm_gap': c, 'f_suffix': d}       
         # if sd.ShowModal() == wx.ID_OK:
             self.Destroy()
