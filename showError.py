@@ -29,7 +29,7 @@ from logging.handlers import RotatingFileHandler
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
-handler = RotatingFileHandler('resources\\var\\FileProcessing.logging.log', mode='a', maxBytes=4000)
+handler = RotatingFileHandler(os.path.join('resources', 'var', 'FileProcessing.logging.log'), mode='a', maxBytes=4000)
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
@@ -57,7 +57,7 @@ def w_position(_pattern, intext):
 
 def showMeError(infile, outfile, kode):
     
-    with open('resources\\var\\fixer_cb3.data', 'rb') as f:
+    with open(os.path.join('resources', 'var', 'fixer_cb3.data'), 'rb') as f:
         cb3_s = pickle.load(f)
     
     subs = pysrt.open(infile, encoding=kode)
