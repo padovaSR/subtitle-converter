@@ -23,12 +23,12 @@ import collections
 import re
 
 
-fDict = 'dictionaries\\Dictionary-1.txt'
-fDict1 = 'dictionaries\\Dictionary-2.txt'
-fDict0 = 'dictionaries\\Dictionary-0.txt'
-fDict_special = 'dictionaries\\Special-Replace.txt'
+fDict = os.path.join('dictionaries', 'Dictionary-1.txt')
+fDict1 = os.path.join('dictionaries', 'Dictionary-2.txt')
+fDict0 = os.path.join('dictionaries', 'Dictionary-0.txt')
+fDict_special = os.path.join('dictionaries', 'Special-Replace.txt')
     
-if not os.path.exists('dictionaries\\Dictionary-0.txt'):
+if not os.path.exists(fDict0):
     with open(fDict0, 'w', encoding='utf-8', newline="\r\n") as text_file:
         t = 'Alpha=>Alfa\n'
         text_file.write(t)
@@ -141,8 +141,9 @@ dict1_n2 = new_dict2(fDict)
 dict0_n2 = new_dict2(fDict0)
 # print(dict2_n2)
 
-rplS = 'resources\\LATIN_chars.cfg'
+rplS = os.path.join('resources', 'LATIN_chars.cfg')
 remBom(rplS)
+
 with open(rplS, 'r', encoding='utf-8') as rplS_fyle:
     drep = { }
     for line in rplS_fyle:
@@ -170,9 +171,9 @@ lat_cir_mapa = {'đ': 'ђ', 'Đ': 'Ђ', 'e': 'е', 'r': 'р', 't': 'т', 'z': '�
              'N': 'Н', 'M': 'М', 'Š': 'Ш', 'Ž': 'Ж', 'Č': 'Ч', 'Ć': 'Ћ'}
 
 #------------------------------------------------------
-prelatCyr = 'resources\\preLatCyr.map.cfg'
+prelatCyr = os.path.join('resources', 'preLatCyr.map.cfg')
 remBom(prelatCyr)
-LatFile = 'resources\\cp1250.replace.cfg'
+LatFile = os.path.join('resources', 'cp1250.replace.cfg')
 remBom(LatFile)
 with open(LatFile, 'r', encoding='utf-8') as inLat:
     ln = { }
@@ -185,19 +186,7 @@ with open(LatFile, 'r', encoding='utf-8') as inLat:
         a = x[0]
         b = x[-1]
         ln[a] = b
+
 pLatin_rpl = dict((k, v) for k, v in ln.items() if k)
-# print(pLatin_rpl)
-#---------------------------------------------------
-#with open(prelatCyr, 'r', encoding='utf-8') as C_fyle:
-    #c = { }
-    #for line in C_fyle:
-        #x = line.strip().split('=')
-        #if not line:
-            #continue        
-        #a = x[0]
-        #b = x[-1]
-        #c[a] = b
-        ##print(c)
-#pre_cyr = collections.OrderedDict((k, v) for k, v in c.items() if k)
+
 pre_cyr = dict_fromFile(prelatCyr, delim='=')
-# print(pre_cyr)
