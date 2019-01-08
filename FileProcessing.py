@@ -47,7 +47,7 @@ import wx
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
-handler = RotatingFileHandler('resources\\var\\FileProcessing.logging.log', mode='a', maxBytes=4000)
+handler = RotatingFileHandler(os.path.join('resources', 'var', 'FileProcessing.logging.log'), mode='a', maxBytes=4000)
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
@@ -111,7 +111,7 @@ class FileOpened:
             if singlefajl == 1:
                 jedanFajl = zf.namelist()[0]
                 outfile = [os.path.join(basepath, jedanFajl)]
-                with open('resources\\var\path0.pkl', 'wb') as f:    # path je u tmp/ folderu
+                with open(os.path.join('resources', 'var', 'path0.pkl'), 'wb') as f:    # path je u tmp/ folderu
                     pickle.dump(outfile, f)
                 with open(outfile[0], 'wb') as f:
                     f.write(zf.read(jedanFajl))
@@ -126,12 +126,12 @@ class FileOpened:
                     names = [os.path.basename(i) for i in files]
                     outfiles = [os.path.join(basepath, x) for x in names]
                     single = os.path.join(os.path.dirname(self.putanja), os.path.basename(files[-1]))
-                    with open('resources\\var\path0.pkl', 'wb') as f:    # path je u tmp/ folderu
+                    with open(os.path.join('resources', 'var', 'path0.pkl'), 'wb') as f:    # path je u tmp/ folderu
                         pickle.dump(single, f)                    
                     for i, x in zip(files, outfiles):
                         with open(x, 'wb') as f:
                             f.write(zf.read(i))
-                    with open('resources\\var\path0.pkl', 'wb') as f:    # path je u tmp/ folderu
+                    with open(os.path.join('resources', 'var', 'path0.pkl'), 'wb') as f:    # path je u tmp/ folderu
                         pickle.dump(outfiles, f)
                     return outfiles, single
                 
@@ -140,7 +140,7 @@ class FileOpened:
                     
     def findCode(self):
         
-        with open('resources\\var\\obsE.pkl', 'rb') as f:
+        with open(os.path.join('resources', 'var', 'obsE.pkl'), 'rb') as f:
             kodek = pickle.load(f).strip()
         if kodek != 'auto':
             ukode = kodek
@@ -160,12 +160,15 @@ class FileOpened:
             else:
                 logger.debug(f'Opening the file with encoding: {enc}')
                 break
-        with open('resources\\var\\enc0.pkl', 'wb') as f:      
+        with open(os.path.join('resources', 'var', 'enc0.pkl'), 'wb') as f:      
             pickle.dump(enc, f)
         return enc
         
 
 class FileProcessed:
+    
+    path0_p = os.path.join('resources', 'var', 'path0.pkl')
+    enc0_p = os.path.join('resources', 'var', 'enc0.pkl')
     
     def __init__(self, enc, path):
         self.kode = enc
@@ -237,12 +240,12 @@ class FileProcessed:
             logger.debug(''.join('!' + line for line in lines))
     
     def regularFile(self, realFile):
-        with shelve.open('resources\\var\\dialog_settings.db', flag='writeback') as s:
+        with shelve.open(os.path.join('resources', 'var', 'dialog_settings.db'), flag='writeback') as s:
             s['key3'] = {'tmPath': self.putanja, 'kode': self.kode, 'realPath': realFile}
         
-        with open('resources\\var\\path0.pkl', 'wb') as v:
+        with open(self.path0_p, 'wb') as v:
             pickle.dump(self.putanja, v)
-        with open('resources\\var\\rpath0.pkl', 'wb') as f:
+        with open(os.path.join('resources', 'var', 'rpath0.pkl'), 'wb') as f:
             pickle.dump(realFile, f)        
             
     def checkErrors(self):
@@ -334,16 +337,16 @@ class FileProcessed:
         return all_values, procenat
             
     def newName(self, path_in, pre_suffix, real_dir, multi):
-        with open('resources\\var\\tcf.pkl', 'rb') as tf:
+        with open(os.path.join('resources', 'var', 'tcf.pkl'), 'rb') as tf:
             oformat = pickle.load(tf)  # TXT suffix
-        if os.path.exists('resources\\var\\path0.pkl'):
-            with open('resources\\var\\path0.pkl', 'rb') as f:
+        if os.path.exists(self.path0_p):
+            with open(self.path0_p, 'rb') as f:
                 path = pickle.load(f)
         else:
             path = path_in
         if multi == True:
             path = path_in
-        with shelve.open('resources\\var\\dialog_settings.db', flag='writeback') as  sp:
+        with shelve.open(os.path.join('resources', 'var', 'dialog_settings.db'), flag='writeback') as  sp:
             ex = sp['key2']
             suffix = ex['f_suffix']  # Merger suffiks
         suffix1 = '.' + suffix
@@ -574,11 +577,6 @@ class FileProcessed:
 
 class Preslovljavanje(FileProcessed):
     
-    #def __init__(self, in_encoding, out_encoding, in_file):
-        #self.inEnc = in_encoding
-        #self.filein = in_file
-        #self.outEnc = out_encoding
-        
     def changeLetters(self, reversed_action):
         inkode = self.kode
         infile = self.putanja
@@ -953,7 +951,7 @@ class TextProcessing(FileProcessed):
         intext = self.putanja
         # fix settings ------------------------------------------------------------------------------   
         try:
-            with shelve.open('resources\\var\\dialog_settings.db', flag='writeback') as  sp:
+            with shelve.open(os.path.join('resources', 'var', 'dialog_settings.db'), flag='writeback') as  sp:
                 ex = sp['key1']
                 cb1_s = ex['state1']; cb2_s = ex['state2']; cb3_s = ex['state3']
                 cb4_s = ex['state4']; cb5_s = ex['state5']; cb6_s = ex['state6']; cb7_s = ex['state7']; cb8_s = ex['state8']
