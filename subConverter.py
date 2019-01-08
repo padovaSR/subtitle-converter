@@ -2,7 +2,7 @@
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
-#   the Free Software Foundation, either version 3 of the License, or
+#   the Free Software Foundation, either version 2 of the License, or
 #   (at your option) any later version.
 #
 #   This program is distributed in the hope that it will be useful,
@@ -2441,17 +2441,20 @@ class MyFrame(wx.Frame):
     def undo_Action(self, event):
         with open('resources\\var\\path0.pkl', 'rb') as f:
             path = pickle.load(f)
-        enc = self.encAction(path)
+        with open('resources\\var\\enc0.pkl', 'rb') as e:
+            enc = pickle.load(e)
+        self.enchistory[path] = enc
+        print(enc)
         fproc = TextProcessing(enc, path)
         if len(self.undoAction) >= 1:
-            text = self.undoAction.pop()
+            text = self.undoAction[-2]
         else:
+            self.toolBar1.EnableTool(101, False)
             return
-        self.redoAction.append(text)
         fproc.writeToFile(text)
-        text = self.undoAction[-1]
         self.text_1.SetValue(text)
-        
+        text2 = self.undoAction[-1]
+        self.redoAction.append(text2)
         if self.redoAction:
             self.toolBar1.EnableTool(102, True)
         else:
@@ -2461,9 +2464,10 @@ class MyFrame(wx.Frame):
     def redo_Action(self, event):
         with open('resources\\var\\path0.pkl', 'rb') as f:
             path = pickle.load(f)
-        enc = self.enchistory[path]
+        enc = self.newEnc
+        print('redo ', enc)
         fproc = TextProcessing(enc, path)
-        text = self.redoAction.pop()
+        text = self.redoAction[-1]
         self.text_1.SetValue(text)
         fproc.writeToFile(text)
         
