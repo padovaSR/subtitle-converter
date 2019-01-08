@@ -254,8 +254,8 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_TOOL, self.onTranscribe, id = 1005)
         self.Bind(wx.EVT_TOOL, self.onRepSpecial, id = 1006)
         self.Bind(wx.EVT_TOOL, self.onCleanup, id = 1007)
-        self.Bind(wx.EVT_TOOL, self.OnUndo, id=101)
-        self.Bind(wx.EVT_TOOL, self.OnRedo, id=102)
+        self.Bind(wx.EVT_TOOL, self.undo_Action, id=101)
+        self.Bind(wx.EVT_TOOL, self.redo_Action, id=102)
         self.Bind(wx.EVT_TOOL, self.onQuit, id = 1008)
         self.Bind(wx.EVT_MENU_RANGE, self.onFileHistory, id=wx.ID_FILE1, id2=wx.ID_FILE9)
         self.comboBox1.Bind(wx.EVT_COMBOBOX, self.onChoice, id=-1, id2=wx.ID_ANY)
@@ -500,8 +500,8 @@ class MyFrame(wx.Frame):
         self.toolBar1.SetToolBitmapSize(wx.Size(24,24))
         self.fopen = self.toolBar1.AddTool(1001, u"Open", wx.ArtProvider.GetBitmap(wx.ART_FILE_OPEN, wx.ART_TOOLBAR), wx.NullBitmap, wx.ITEM_NORMAL, u"Open File", u"Otvori fajl", None)
         self.fsave = self.toolBar1.AddTool(1010, u"Save", wx.ArtProvider.GetBitmap(wx.ART_FILE_SAVE, wx.ART_TOOLBAR), wx.NullBitmap, wx.ITEM_NORMAL, u"Save file", u"Sačuvaj promene", None)
-        self.undo_t = self.toolBar1.AddTool(101, "Undo", wx.ArtProvider.GetBitmap(wx.ART_UNDO, wx.ART_TOOLBAR), wx.NullBitmap, wx.ITEM_NORMAL, "Undo", "Undo change", None)
-        self.redo_t = self.toolBar1.AddTool(102, "Redo", wx.ArtProvider.GetBitmap(wx.ART_REDO, wx.ART_TOOLBAR), wx.NullBitmap, wx.ITEM_NORMAL, "Redo", "Redo change", None)
+        self.undo_t = self.toolBar1.AddTool(101, "Undo", wx.ArtProvider.GetBitmap(wx.ART_UNDO, wx.ART_TOOLBAR), wx.NullBitmap, wx.ITEM_NORMAL, "Undo Action", "Undo Action", None)
+        self.redo_t = self.toolBar1.AddTool(102, "Redo", wx.ArtProvider.GetBitmap(wx.ART_REDO, wx.ART_TOOLBAR), wx.NullBitmap, wx.ITEM_NORMAL, "Redo Action", "Redo Action", None)
         self.cyrillic = self.toolBar1.AddTool(1002, u"Cirilica", wx.Bitmap(u"resources/icons/cyrillic.png", wx.BITMAP_TYPE_ANY), wx.NullBitmap, wx.ITEM_NORMAL, u"To Cyrillic", u"Konvertuje u ćirilicu", None)
         self.ansi = self.toolBar1.AddTool(1003, u"ANSI", wx.Bitmap(u"resources/icons/ANSI.png", wx.BITMAP_TYPE_ANY), wx.NullBitmap, wx.ITEM_NORMAL, u"To ANSI", u"Konvertuje u ANSI format", None)
         self.unicode = self.toolBar1.AddTool(1004, u"UTF", wx.Bitmap(u"resources/icons/UTF8.png", wx.BITMAP_TYPE_ANY), wx.NullBitmap, wx.ITEM_NORMAL, u"To UTF", u"Konvertuje u UTF unikode", None)
@@ -991,8 +991,9 @@ class MyFrame(wx.Frame):
                 fproc = FileProcessed(entered_enc, inpath)
                 if not entered_enc == 'windows-1251':
                     logger.debug(f'toANSI: {inpath}, {entered_enc}')
-                fproc.normalizeText()
                 text = fproc.getContent()
+                if not self.previous_action:
+                    self.undoAction.append(text)
                 text = fproc.rplStr(text)
                 text = fproc.writeToFile(text)
                 if text:
@@ -1015,6 +1016,7 @@ class MyFrame(wx.Frame):
                 self.MenuBar.Enable(wx.ID_SAVEAS, True)
                 self.MenuBar.Enable(wx.ID_CLOSE, True)
                 self.toolBar1.EnableTool(1010, True)  # Save
+                self.toolBar1.EnableTool(101, True)
                 self.previous_action['toANSI'] = self.newEnc
                 self.reloaded = 0
             
@@ -1032,10 +1034,11 @@ class MyFrame(wx.Frame):
                 if error_text:
                     ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
                     ErrorDlg.ShowModal()
-                    self.Error_Text = error_text            
-                self.undoAction.append(text)
-                self.enc = self.newEnc
+                    self.Error_Text = error_text
                 postAnsi()
+                if self.previous_action:
+                    self.undoAction.append(text)                
+                self.enc = self.newEnc
             #----------------------------------------------------------------------------------------------------------
             elif procent > 0:
                 self.SetStatusText(u'Greška u ulaznom fajlu.')
@@ -1054,10 +1057,11 @@ class MyFrame(wx.Frame):
                     if error_text:
                         ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
                         ErrorDlg.ShowModal()
-                        self.Error_Text = error_text            
-                    self.undoAction.append(text)
-                    self.enc = self.newEnc
+                        self.Error_Text = error_text
                     postAnsi()
+                    if self.previous_action:
+                        self.undoAction.append(text)                    
+                    self.enc = self.newEnc
             #----------------------------------------------------------------------------------------------------------
             elif zbir_slova > 0:
                 f_zbir = 'Najmanje [ {} ] znakova.'.format(zbir_slova)
@@ -1072,9 +1076,10 @@ class MyFrame(wx.Frame):
                         ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
                         ErrorDlg.ShowModal()
                         self.Error_Text = error_text            
-                    self.undoAction.append(text)
+                    postAnsi()
+                    if self.previous_action:
+                        self.undoAction.append(text)                
                     self.enc = self.newEnc                        
-                    postAnsi()  
         event.Skip()
         
     def toANSI_multiple(self):
@@ -1249,6 +1254,8 @@ class MyFrame(wx.Frame):
             new_enc = self.newEnc
             fproc = FileProcessed(entered_enc, path)
             text = fproc.getContent()
+            if not self.previous_action:
+                self.undoAction.append(text)
             if text:
                 text = text.replace('?', '¬')
             writeTempStr(path, text, entered_enc)
@@ -1287,13 +1294,13 @@ class MyFrame(wx.Frame):
             
             error_text = cyr_proc.checkFile(self.orig_path, cyr_path, multi=False)
             
-            cyr_proc.writeToFile(text)
+            cyr_proc.writeToFile(text)  # Write corrected text to file
             cyr_proc.unix2DOS()
             if error_text:
                 ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
                 ErrorDlg.ShowModal()
                 self.Error_Text = error_text
-            self.undoAction.append(text)
+            
             self.enc = self.newEnc
             self.SetStatusText(os.path.basename(path))
             self.MenuBar.Enable(wx.ID_SAVE, True)
@@ -1301,9 +1308,14 @@ class MyFrame(wx.Frame):
             self.MenuBar.Enable(wx.ID_CLOSE, True)
             self.toolBar1.EnableTool(1010, True)  # Save
             self.toolBar1.EnableTool(1003, False)
+            self.toolBar1.EnableTool(101, True)
             self.enchistory[path] = self.newEnc
             self.previous_action['toCYR'] = self.newEnc
             self.reloaded = 0
+            if self.previous_action:
+                text = cyr_ansi.getContent()
+                self.undoAction.append(text)
+                
         event.Skip()
     
     def toCyrillic_multiple(self):
@@ -1420,6 +1432,8 @@ class MyFrame(wx.Frame):
                 
             fproc = FileProcessed(entered_enc, path)
             text = fproc.getContent()
+            if not self.previous_action:
+                self.undoAction.append(text)
             utfproc = FileProcessed(self.newEnc, path)
             text = utfproc.writeToFile(text)
             text = utfproc.fixI(text)
@@ -1427,15 +1441,17 @@ class MyFrame(wx.Frame):
             utfproc.unix2DOS()
             text = utfproc.getContent()
             self.text_1.SetValue(text)
-            self.undoAction.append(text)
             self.enc = self.newEnc
             self.SetStatusText(os.path.basename(path))
             self.MenuBar.Enable(wx.ID_SAVE, True)
             self.MenuBar.Enable(wx.ID_SAVEAS, True)
             self.MenuBar.Enable(wx.ID_CLOSE, True)
             self.toolBar1.EnableTool(1010, True)  # Save
+            self.toolBar1.EnableTool(101, True)
             self.previous_action['toUTF'] = self.newEnc            
             self.reloaded = 0
+            if self.previous_action:
+                self.undoAction.append(text)            
         event.Skip()
     
     def toUTF_multiple(self):
@@ -1529,6 +1545,8 @@ class MyFrame(wx.Frame):
             
         fproc = FileProcessed(entered_enc, path)
         text = fproc.getContent()
+        if not self.previous_action:
+            self.undoAction.append(text)
         utf_proc = FileProcessed(self.newEnc, path)
         text = utf_proc.writeToFile(text)
         text = utf_proc.fixI(text)
@@ -1543,16 +1561,18 @@ class MyFrame(wx.Frame):
         writeTempStr(path, text, self.newEnc)
         newfproc.unix2DOS()
         self.text_1.SetValue(text)
-        self.undoAction.append(text)
         self.enc = self.newEnc
         self.SetStatusText(os.path.basename(path))
         self.MenuBar.Enable(wx.ID_SAVE, True)
         self.MenuBar.Enable(wx.ID_SAVEAS, True)
         self.MenuBar.Enable(wx.ID_CLOSE, True)
         self.reload.Enable(True)
-        self.toolBar1.EnableTool(1010, True)  # Save        
+        self.toolBar1.EnableTool(1010, True)  # Save
+        self.toolBar1.EnableTool(101, True)
         self.previous_action['Transcribe'] = self.newEnc
         self.reloaded = 0
+        if self.previous_action:
+            self.undoAction.append(text)        
         event.Skip()
         
     def onRepSpecial(self, event):
@@ -1595,6 +1615,8 @@ class MyFrame(wx.Frame):
         
         fproc = TextProcessing(entered_enc, path)
         text = fproc.getContent()
+        if not self.previous_action:
+            self.undoAction.append(text)
         text = text.replace('?', '¬')
         writeTempStr(path, text, entered_enc)
         num = fproc.doReplace()
@@ -1609,15 +1631,17 @@ class MyFrame(wx.Frame):
             ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
             ErrorDlg.ShowModal()
             self.Error_Text = error_text
-        self.undoAction.append(text)
         # self.enc = self.newEnc
         self.SetStatusText(os.path.basename(path))
         self.MenuBar.Enable(wx.ID_SAVE, True)
         self.MenuBar.Enable(wx.ID_SAVEAS, True)
         self.MenuBar.Enable(wx.ID_CLOSE, True)
-        self.toolBar1.EnableTool(1010, True)  # Save        
+        self.toolBar1.EnableTool(1010, True)  # Save
+        self.toolBar1.EnableTool(101, True)
         self.previous_action['repSpec'] = self.newEnc
         self.reloaded = 0
+        if self.previous_action:
+            self.undoAction.append(text)        
         event.Skip()
         
     def onCleanup(self, event):
@@ -1655,7 +1679,8 @@ class MyFrame(wx.Frame):
         
         subs = pysrt.open(path, encoding=entered_enc)
         if len(subs) > 0:
-                
+            if not self.previous_action:
+                self.undoAction.append(subs)
             fproc = TextProcessing(entered_enc, path)
             fproc.cleanUp()
             try:
@@ -1670,15 +1695,17 @@ class MyFrame(wx.Frame):
             fproc.unix2DOS()
             text = fproc.getContent()
             self.text_1.SetValue(text)
-            self.undoAction.append(text)
             # self.enc = self.newEnc
             self.SetStatusText(os.path.basename(path))
             self.MenuBar.Enable(wx.ID_SAVE, True)
             self.MenuBar.Enable(wx.ID_SAVEAS, True)
             self.MenuBar.Enable(wx.ID_CLOSE, True)
-            self.toolBar1.EnableTool(1010, True)  # Save            
+            self.toolBar1.EnableTool(1010, True)  # Save
+            self.toolBar1.EnableTool(101, True)
             self.previous_action['Cleanup'] = self.newEnc
             self.reloaded = 0
+            if self.previous_action:
+                self.undoAction.append(text)            
         else:
             logger.debug(f"Cleanup: No subtitles found!")
             self.previous_action['Cleanup'] = self.newEnc
@@ -1728,6 +1755,9 @@ class MyFrame(wx.Frame):
             logger.debug("Merger, unexpected error:", sys.exc_info())        
         
         fproc = FileProcessed(entered_enc, path)
+        if not self.previous_action:
+            text = fproc.getContent()
+            self.undoAction.append(text)
         name, b = fproc.newName(path, file_suffix, self.real_dir, multi=False)
         fproc.remove_bom_inplace()
         
@@ -1757,19 +1787,22 @@ class MyFrame(wx.Frame):
         logger.debug('Merger: Spojenih linija ukupno: {}, ili {} %'.format(a1 - b1, prf))
         sDlg = wx.MessageDialog(self, 'Merged file:\n\nSpojenih linija ukupno: {0}, ili {1} %'.format(a1 - b1, prf), 'SubConverter', wx.OK | wx.ICON_INFORMATION)
         sDlg.ShowModal()
-        self.undoAction.append(text)
+        
         # self.enc = self.newEnc
         self.SetStatusText(os.path.basename(path))
         self.MenuBar.Enable(wx.ID_SAVE, True)
         self.MenuBar.Enable(wx.ID_SAVEAS, True)
         self.MenuBar.Enable(wx.ID_CLOSE, True)
         self.reload.Enable(True)
-        self.toolBar1.EnableTool(1010, True)  # Save            
+        self.toolBar1.EnableTool(1010, True)  # Save
+        self.toolBar1.EnableTool(101, True)
         self.reloaded = 0
         self.previous_action['Merger'] = self.newEnc
+        if self.previous_action:
+            self.undoAction.append(text)        
         event.Skip()
     
-    def onSave(self, event):  # wxGlade: MyFrame.<event_handler>
+    def onSave(self, event):
         if os.path.isfile('resources\\var\\path0.pkl') and self.modify == False:
             with open('resources\\var\\path0.pkl', 'rb') as p:
                 tpath = pickle.load(p)
@@ -2055,8 +2088,6 @@ class MyFrame(wx.Frame):
             error_text = utfcyproc.checkFile(self.orig_path, path, multi=False)
             
             text = self.fileErrors(path, self.newEnc, multi=False)  # Ovde se vrate znakovi pitanja i ponovo upisu u fajl.
-            #writeTempStr(path, text, self.newEnc)
-            #ansi_cyproc.unix2DOS()
             
             if error_text:
                 ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
@@ -2119,8 +2150,6 @@ class MyFrame(wx.Frame):
             error_text = ansi_cyproc.checkFile(path, newF, multi=True)
             
             text = self.fileErrors(newF, self.newEnc, multi=True)
-            #writeTempStr(newF, text, self.newEnc)
-            #ansi_cyproc.unix2DOS()            
             
             if error_text:
                 ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
@@ -2190,8 +2219,6 @@ class MyFrame(wx.Frame):
             error_text = cyproc.checkFile(self.orig_path, path, multi=False)
             
             text = self.fileErrors(path, self.newEnc, multi=False)
-            #writeTempStr(path, text, self.newEnc)
-            #cyproc.unix2DOS()
             
             if error_text:
                 ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
@@ -2251,8 +2278,6 @@ class MyFrame(wx.Frame):
             error_text = cyproc.checkFile(path, newF, multi=True)
             
             text = self.fileErrors(newF, self.newEnc, multi=True)
-            #writeTempStr(newF, text, self.newEnc)
-            #cyproc.unix2DOS()
             
             if error_text:
                 ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
@@ -2412,6 +2437,37 @@ class MyFrame(wx.Frame):
         else:
             entered_enc = self.enchistory[path]
             return entered_enc
+    
+    def undo_Action(self, event):
+        with open('resources\\var\\path0.pkl', 'rb') as f:
+            path = pickle.load(f)
+        enc = self.encAction(path)
+        fproc = TextProcessing(enc, path)
+        if len(self.undoAction) >= 1:
+            text = self.undoAction.pop()
+        else:
+            return
+        self.redoAction.append(text)
+        fproc.writeToFile(text)
+        text = self.undoAction[-1]
+        self.text_1.SetValue(text)
+        
+        if self.redoAction:
+            self.toolBar1.EnableTool(102, True)
+        else:
+            self.toolBar1.EnableTool(102, False)
+        event.Skip()
+    
+    def redo_Action(self, event):
+        with open('resources\\var\\path0.pkl', 'rb') as f:
+            path = pickle.load(f)
+        enc = self.enchistory[path]
+        fproc = TextProcessing(enc, path)
+        text = self.redoAction.pop()
+        self.text_1.SetValue(text)
+        fproc.writeToFile(text)
+        
+        event.Skip()
       
     def OnKeyDown(self, event):
         keycode = event.GetKeyCode()
