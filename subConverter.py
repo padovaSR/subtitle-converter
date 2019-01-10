@@ -1,4 +1,4 @@
-#  Copyright (C) 2018  padovaSR
+#  Copyright (C) 2019  padovaSR
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -216,8 +216,10 @@ class MyFrame(wx.Frame):
         self.redohist=[]
         self.real_path = []
         self.tmpPath = []
-        self.undoAction = []
-        self.redoAction = []
+        self.undo = r""
+        self.undo1 = r""
+        self.undoAction = OrderedDict()
+        self.redoAction = OrderedDict()
         self.enchistory = OrderedDict()
         self.multiFile = OrderedDict()
         self.saved_file = OrderedDict()
@@ -974,14 +976,14 @@ class MyFrame(wx.Frame):
                 shutil.copy(path, self.orig_path)            
             else:
                 text = self.text_1.GetValue()
-                path = path.join('tmp', 'Untitled.srt')
+                path = os.path.join('tmp', 'Untitled.srt')
                 if not os.path.isfile(path):
                     open(path, 'a').close()
                 fp = FileProcessed('windows-1250', path)
                 fp.writeToFile(text)
                 entered_enc = 'windows-1250'
                 self.newEnc = entered_enc
-            
+                
             entered_enc = self.encAction(path)
                 
             self.newEnc = 'windows-1250'
@@ -996,7 +998,7 @@ class MyFrame(wx.Frame):
                     logger.debug(f'toANSI: {inpath}, {entered_enc}')
                 text = fproc.getContent()
                 if not self.previous_action:
-                    self.undoAction.append(text)
+                    self.undoAction[entered_enc] = self.undo
                 text = fproc.rplStr(text)
                 text = fproc.writeToFile(text)
                 if text:
@@ -1040,7 +1042,9 @@ class MyFrame(wx.Frame):
                     self.Error_Text = error_text
                 postAnsi()
                 if self.previous_action:
-                    self.undoAction.append(text)                
+                    self.undo1 = text
+                    self.undoAction[self.newEnc] = self.undo1
+                    self.previous_action['toANSI'] = entered_enc                
                 self.enc = self.newEnc
             #----------------------------------------------------------------------------------------------------------
             elif procent > 0:
@@ -1063,7 +1067,9 @@ class MyFrame(wx.Frame):
                         self.Error_Text = error_text
                     postAnsi()
                     if self.previous_action:
-                        self.undoAction.append(text)                    
+                        self.undo1 = text
+                        self.undoAction[self.newEnc] = self.undo1
+                        self.previous_action['toANSI'] = entered_enc
                     self.enc = self.newEnc
             #----------------------------------------------------------------------------------------------------------
             elif zbir_slova > 0:
@@ -1081,7 +1087,9 @@ class MyFrame(wx.Frame):
                         self.Error_Text = error_text            
                     postAnsi()
                     if self.previous_action:
-                        self.undoAction.append(text)                
+                        self.undo1 = text
+                        self.undoAction[self.newEnc] = self.undo1
+                        self.previous_action['toANSI'] = entered_enc
                     self.enc = self.newEnc                        
         event.Skip()
         
@@ -1238,7 +1246,7 @@ class MyFrame(wx.Frame):
                 shutil.copy(path, self.orig_path)                
             else:
                 text = self.text_1.GetValue()
-                path = path.join('tmp', 'Untitled.srt')
+                path = os.path.join('tmp', 'Untitled.srt')
                 if not os.path.isfile(path):
                     open(path, 'a').close()
                 fp = FileProcessed('utf-8', path)
@@ -1247,7 +1255,6 @@ class MyFrame(wx.Frame):
                 self.newEnc = entered_enc
             
             entered_enc = self.encAction(path)
-                
             self.newEnc = 'windows-1251'
             
             if entered_enc == self.newEnc:
@@ -1258,7 +1265,8 @@ class MyFrame(wx.Frame):
             fproc = FileProcessed(entered_enc, path)
             text = fproc.getContent()
             if not self.previous_action:
-                self.undoAction.append(text)
+                self.undo = text
+                self.undoAction[entered_enc] = self.undo
             if text:
                 text = text.replace('?', '¬')
             writeTempStr(path, text, entered_enc)
@@ -1316,8 +1324,9 @@ class MyFrame(wx.Frame):
             self.previous_action['toCYR'] = self.newEnc
             self.reloaded = 0
             if self.previous_action:
-                text = cyr_ansi.getContent()
-                self.undoAction.append(text)
+                self.undo1 = cyr_ansi.getContent()
+                self.undoAction[self.newEnc] = self.undo1
+                self.previous_action['toCYR'] = entered_enc
                 
         event.Skip()
     
@@ -1419,7 +1428,7 @@ class MyFrame(wx.Frame):
                 self.enchistory[path] = entered_enc
             else:
                 text = self.text_1.GetValue()
-                path = path.join('tmp', 'Untitled.srt')
+                path = os.path.join('tmp', 'Untitled.srt')
                 if not os.path.isfile(path):
                     open(path, 'a').close()
                 writeTempStr(path, text, 'utf-8')
@@ -1532,7 +1541,7 @@ class MyFrame(wx.Frame):
             self.enchistory[path] = entered_enc
         else:
             text = self.text_1.GetValue()
-            path = path.join('tmp', 'Untitled.srt')
+            path = os.path.join('tmp', 'Untitled.srt')
             if not os.path.isfile(path):
                 open(path, 'a').close()
             writeTempStr(path, text, 'utf-8')
@@ -1600,7 +1609,7 @@ class MyFrame(wx.Frame):
             self.enchistory[path] = entered_enc
         else:
             text = self.text_1.GetValue()
-            path = path.join('tmp', 'Untitled.srt')
+            path = os.path.join('tmp', 'Untitled.srt')
             if not os.path.isfile(path):
                 open(path, 'a').close()
             writeTempStr(path, text, 'utf-8')
@@ -1670,7 +1679,7 @@ class MyFrame(wx.Frame):
             self.newEnc = entered_enc
         else:
             text = self.text_1.GetValue()
-            path = path.join('tmp', 'Untitled.srt')
+            path = os.path.join('tmp', 'Untitled.srt')
             if not os.path.isfile(path):
                 open(path, 'a').close()
             writeTempStr(path, text, 'utf-8')
@@ -1740,7 +1749,7 @@ class MyFrame(wx.Frame):
             shutil.copy(path, self.orig_path)            
         else:
             text = self.text_1.GetValue()
-            path = path.join('tmp', 'Untitled.srt')
+            path = os.path.join('tmp', 'Untitled.srt')
             if not os.path.isfile(path):
                 open(path, 'a').close()
             writeTempStr(path, text, 'utf-8')
@@ -1851,7 +1860,7 @@ class MyFrame(wx.Frame):
                     self.open_next.Enable(True)
                     self.reload.Enable(True)
         else:
-            tpath = path.join('tmp', 'Untitled.srt')
+            tpath = os.path.join('tmp', 'Untitled.srt')
             self.newEnc = 'utf-8'
             self.pre_suffix = 'new'
             self.real_dir = os.getcwd()
@@ -1881,7 +1890,7 @@ class MyFrame(wx.Frame):
             with open(self.path0_p, 'rb') as p:
                 tpath = pickle.load(p)
         else:
-            tpath = path.join('tmp', 'Untitled.srt')
+            tpath = os.path.join('tmp', 'Untitled.srt')
             fproc = FileProcessed('utf-8', tpath)
             text = self.text_1.GetValue()
             fproc.writeToFile(text)
@@ -1945,7 +1954,7 @@ class MyFrame(wx.Frame):
                 
         else:
             text = self.text_1.GetValue()
-            fpath = path.join('tmp', 'Untitled.srt')
+            fpath = os.path.join('tmp', 'Untitled.srt')
             fp = FileProcessed(self.newEnc, fpath)
             fp.writeToFile(text)
             tpath = fpath
@@ -2321,7 +2330,7 @@ class MyFrame(wx.Frame):
                 self.enchistory[path] = entered_enc
             else:
                 text = self.text_1.GetValue()
-                path = path.join('tmp', 'Untitled.srt')
+                path = os.path.join('tmp', 'Untitled.srt')
                 if not os.path.isfile(path):
                     open(path, 'a').close()
                 writeTempStr(path, text, 'utf-8')
@@ -2445,19 +2454,19 @@ class MyFrame(wx.Frame):
         with open(self.path0_p, 'rb') as f:
             path = pickle.load(f)
         with open(self.enc0_p, 'rb') as e:
-            enc = pickle.load(e)
-        self.enchistory[path] = enc
-        print(enc)
-        fproc = TextProcessing(enc, path)
+            entered_enc = pickle.load(e)
+            print("Undo entered_enc: ", entered_enc)
+        fproc = TextProcessing(entered_enc, path)
+        self.enchistory[path] = entered_enc
         if len(self.undoAction) >= 1:
-            text = self.undoAction[-2]
+            text = self.undoAction[entered_enc]
         else:
             self.toolBar1.EnableTool(101, False)
             return
         fproc.writeToFile(text)
         self.text_1.SetValue(text)
-        text2 = self.undoAction[-1]
-        self.redoAction.append(text2)
+        self.redo = self.undoAction[self.newEnc]
+        self.redoAction[self.redo] = self.newEnc
         if self.redoAction:
             self.toolBar1.EnableTool(102, True)
         else:
@@ -2470,7 +2479,7 @@ class MyFrame(wx.Frame):
         enc = self.newEnc
         print('redo ', enc)
         fproc = TextProcessing(enc, path)
-        text = self.redoAction[-1]
+        text = self.redo
         self.text_1.SetValue(text)
         fproc.writeToFile(text)
         
