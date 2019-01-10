@@ -4,7 +4,7 @@ Program za obradu srt subtitle fajlova, konvertovanje latinice u ćirilicu i obr
 
 ## Requirements:
 
-Za pokretanje programa potrebno je imati nstalirane:
+Za pokretanje programa potrebno je imati instalirane:
 
 * [Python](http://www.python.org/) version 3.6 or newer 
 * [wxPython](https://wxpython.org/) version 4.0.3 or newer
