@@ -2451,13 +2451,14 @@ class MyFrame(wx.Frame):
             return entered_enc
     
     def undo_Action(self, event):
-        with open(self.path0_p, 'rb') as f:
-            path = pickle.load(f)
-        with open(self.enc0_p, 'rb') as e:
-            entered_enc = pickle.load(e)
-            print("Undo entered_enc: ", entered_enc)
-        fproc = TextProcessing(entered_enc, path)
-        self.enchistory[path] = entered_enc
+        if os.path.isfile(self.path0_p):
+            with open(self.path0_p, 'rb') as f:
+                path = pickle.load(f)
+            with open(self.enc0_p, 'rb') as e:
+                entered_enc = pickle.load(e)
+                print("Undo entered_enc: ", entered_enc)
+            fproc = TextProcessing(entered_enc, path)
+            self.enchistory[path] = entered_enc
         if len(self.undoAction) >= 1:
             text = self.undoAction[entered_enc]
         else:
@@ -2472,7 +2473,7 @@ class MyFrame(wx.Frame):
         else:
             self.toolBar1.EnableTool(102, False)
         event.Skip()
-    
+            
     def redo_Action(self, event):
         with open(self.path0_p, 'rb') as f:
             path = pickle.load(f)
