@@ -2,6 +2,9 @@
 
 Program za obradu srt subtitle fajlova, konvertovanje latinice u ćirilicu i obratno
 
+Trenutna verzija programa je nedovršena i dostupna je samo za testiranje izvornog koda,
+nije dostupna u binarnom formatu.
+
 ## Requirements:
 
 Za pokretanje programa potrebno je imati instalirane:
