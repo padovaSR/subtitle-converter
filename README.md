@@ -17,4 +17,4 @@ Za pokretanje programa potrebno je imati instalirane:
 Nije potrebna nikakva prethodna instalacija za pokretanje EXE fajla.
 
 * [GitHub Releases](https://github.com/padovaSR/subtitle-converter/releases)
-* [Last Windows build of the master branch](https://github.com/padovaSR/subtitle-converter/releases/download/v0.5.6.1/Subtitle.Converter-0.5.6.zip)
+* [Last Windows build of the master branch](https://github.com/padovaSR/subtitle-converter/releases/download/v0.5.6.2/Subtitle.Converter-0.5.6.2.zip)
