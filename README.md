@@ -12,6 +12,9 @@ Za pokretanje programa potrebno je imati instalirane:
 * [Python](http://www.python.org/) version 3.6 or newer 
 * [wxPython](https://wxpython.org/) version 4.0.3 or newer
 
+Libraries included:
+[pysrt](https://github.com/byroot/pysrt/tree/master/pysrt), [srt](https://github.com/cdown/srt)
+
 ## Download Binaries
 
 Nije potrebna nikakva prethodna instalacija za pokretanje EXE fajla.
