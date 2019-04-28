@@ -13,7 +13,7 @@ Za pokretanje programa potrebno je imati instalirane:
 * [wxPython](https://wxpython.org/) version 4.0.3 or newer
 
 Libraries included:
-[pysrt](https://github.com/byroot/pysrt/tree/master/pysrt), [srt](https://github.com/cdown/srt)
+[pysrt](https://github.com/byroot/pysrt), [srt](https://github.com/cdown/srt)
 
 ## Download Binaries
 
