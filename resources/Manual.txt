@@ -1,0 +1,9 @@
+	
+   MANUAL
+		
+   Neke važnije prečice na tastaturi:
+		
+    Ctrl+Shift+Y	Latinica u ćirilicu UTF-8 SRT, "Bulk" Latinica u ćirilicu UTF-8 SRT
+		
+    Ctrl+Shift+F	FileSettings dijalog, predefinisani "pre presufiks" novih fajlova(lat,cyr,utf8...) 
+
