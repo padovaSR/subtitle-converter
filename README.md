@@ -1,4 +1,4 @@
-# Novi_SubConverter
+# Subtitle Converter
 
 Program za obradu srt i txt fajlova.
 
