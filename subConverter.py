@@ -1189,131 +1189,6 @@ class MyFrame(wx.Frame):
                     fproc.unix2DOS()
         self.SetStatusText('Multiple files done.')            
         self.multipleTools()
-    def dumy():
-        pass
-        #def toCyrillic(self, event):
-            #if os.path.isfile(os.path.join('resources', 'var', 'rpath0.pkl')):
-                #with open(os.path.join('resources', 'var', 'rpath0.pkl'), 'rb') as f:
-                    #rlPath = pickle.load(f)
-                #self.real_dir = os.path.dirname(rlPath)
-                #self.real_path= [rlPath]        
-            #tval = self.text_1.GetValue()
-            #if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled() and len(self.undoAction) > 0:
-                #dl = self.ShowDialog()
-                #if dl == False:
-                    #return
-            #if os.path.isfile(self.droped0_p):
-                #with open(self.droped0_p, 'rb') as d:
-                    #droped_files = pickle.load(d)
-                #self.multiFile.clear()
-                #self.multiFile.update(droped_files)
-                
-            #if len(self.multiFile) >= 1:
-                #self.multipleTools()
-                #self.toCyrillic_multiple()
-            #else:        
-                #if os.path.isfile(self.path0_p):
-                    #with open(self.path0_p, 'rb') as p:
-                        #path = pickle.load(p)          # path je u tmp/ folderu
-                    #with open(self.enc0_p, 'rb') as e:
-                        #entered_enc = pickle.load(e)
-                    #self.enchistory[path] = entered_enc
-                    #self.orig_path = path + '.orig'
-                    #shutil.copy(path, self.orig_path)
-                    #self.previous_action.clear()
-                #else:
-                    #text = self.text_1.GetValue()
-                    #path = os.path.join('tmp', 'Untitled.srt')
-                    #if not os.path.isfile(path):
-                        #open(path, 'a').close()
-                    #fp = FileProcessed('utf-8', path)
-                    #fp.writeToFile(text)
-                    #entered_enc = 'utf-8'
-                    #self.newEnc = entered_enc
-                #if self.undo_count >= 1:
-                    #entered_enc = self.encAction(path)
-                #print("entered_enc undo:", entered_enc)
-                #self.newEnc = 'windows-1251'
-                
-                #if entered_enc == self.newEnc:
-                    #logger.debug(f"Nothing to do, encoding is: {entered_enc}")
-                    #return
-                #self.pre_suffix = 'cyr'
-                #new_enc = self.newEnc
-                #fproc = FileProcessed(entered_enc, path)
-                #text = fproc.getContent()
-                #if not self.previous_action:
-                    #self.undo = text
-                    #self.undoAction[entered_enc] = self.undo
-                #if text:
-                    #text = text.replace('?', '¬')
-                #writeTempStr(path, text, entered_enc)
-                
-                #utfText, suffix = fproc.newName(path, 'cyr_utf8', self.real_dir, multi=False)
-                #if self.preferences.IsChecked(1011):  
-                    #utf8_enc = 'utf-8-sig'
-                #else:
-                    #utf8_enc = 'utf-8'        
-                #utf_path = os.path.join(self.real_dir, utfText+suffix)
-                #if os.path.exists(utf_path):
-                    #nnm = fproc.nameCheck(os.path.basename(utf_path), self.real_dir, suffix)
-                    #utf_path = '{0}_{1}{2}'.format(utf_path, nnm, suffix)        
-                #new_fproc = FileProcessed(utf8_enc, utf_path)
-                #text = fproc.getContent()
-                #text = new_fproc.writeToFile(text)
-                #text = new_fproc.fixI(text)  # Isto kao i kod rplStr text
-                #text = new_fproc.writeToFile(text)
-                
-                #cyr_proc = Preslovljavanje(utf8_enc, utf_path)
-                #cyr_proc.preLatin()
-                #cyr_proc.preProc(reversed_action=False)
-                #cyr_proc.changeLetters(reversed_action=False)
-                #text = cyr_proc.getContent()
-                #text = cyr_proc.rplStr(text)    # Ovde ide tekst ne putanja
-                #cyr_proc.writeToFile(text)      # izlaz is rplStr mora da se pise u fajl
-                #cyr_proc.fineTune()
-                #cyr_proc.fontColor()
-                
-                #cyr_path = path
-                #cyr_ansi = Preslovljavanje(self.newEnc, cyr_path)
-                #text = cyr_proc.getContent()
-                #text = cyr_ansi.writeToFile(text)
-                
-                #text = self.fileErrors(cyr_path, self.newEnc, multi=False)
-                
-                #error_text = cyr_proc.checkFile(self.orig_path, cyr_path, multi=False)
-                
-                #cyr_proc.writeToFile(text)  # Write corrected text to file
-                #cyr_proc.unix2DOS()
-                #if error_text:
-                    #ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
-                    #ErrorDlg.ShowModal()
-                    #self.Error_Text = error_text
-                
-                #self.enc = self.newEnc
-                #self.SetStatusText(os.path.basename(path))
-                #self.MenuBar.Enable(wx.ID_SAVE, True)
-                #self.MenuBar.Enable(wx.ID_SAVEAS, True)
-                #self.MenuBar.Enable(wx.ID_CLOSE, True)
-                #self.toolBar1.EnableTool(1010, True)  # Save
-                #self.toolBar1.EnableTool(1003, False)
-                #self.toolBar1.EnableTool(101, True)
-                #self.enchistory[path] = self.newEnc
-                #self.previous_action['toCYR'] = self.newEnc
-                #self.reloaded = 0
-                #if len(self.previous_action) == 1:
-                    #self.undo = cyr_ansi.getContent()
-                    #self.undoAction[self.newEnc] = self.undo
-                    #self.previous_action['toCYR'] = self.newEnc
-                #elif len(self.previous_action) > 1:
-                    #self.undo1 = cyr_ansi.getContent()
-                    #self.undoAction[self.newEnc] = self.undo1
-                    #self.previous_action['toCYR'] = entered_enc
-                    #self.enchistory[path] = entered_enc
-                    #with open(self.enc0_p, 'wb') as f:
-                        #pickle.dump(entered_enc, f)
-                    
-            #event.Skip()
     def toCyrillic(self, event):
         if os.path.isfile(os.path.join('resources', 'var', 'rpath0.pkl')):
             with open(os.path.join('resources', 'var', 'rpath0.pkl'), 'rb') as f:
@@ -1344,7 +1219,8 @@ class MyFrame(wx.Frame):
                 self.orig_path = path + '.orig'
                 shutil.copy(path, self.orig_path)
                 self.previous_action.clear()
-            
+                fpr = FileProcessed(entered_enc, self.orig_path)
+                fpr.unix2DOS()
             self.newEnc = 'windows-1251'
             
             if entered_enc == self.newEnc:
@@ -1406,7 +1282,6 @@ class MyFrame(wx.Frame):
                 self.Error_Text = error_text
             
             self.enc = self.newEnc
-            
             
             self.SetStatusText(os.path.basename(path))
             self.MenuBar.Enable(wx.ID_SAVE, True)
@@ -2231,7 +2106,7 @@ class MyFrame(wx.Frame):
                 with open(self.path0_p, 'rb') as p:
                     fpath = pickle.load(p)
                 tpath = os.path.basename(fpath)
-                    
+                
             enc = self.newEnc
             sas_wildcard =  "ZipArchive (*.zip)|*.zip|All Files (*.*)|*.*"
             
@@ -2254,6 +2129,12 @@ class MyFrame(wx.Frame):
                 dirname = os.path.dirname(path)
                 name = path
                 
+                def data_out(filein):
+                    f = open(filein, 'rb')
+                    _data = f.read()
+                    f.close()
+                    return _data                
+                
                 if list(self.previous_action.keys())[0] == "toCYR":
                 
                     tUTF = os.path.join("tmp", os.path.basename(self.cyrUTF))
@@ -2264,7 +2145,10 @@ class MyFrame(wx.Frame):
                     info2 = os.path.basename(tUTF)
                     lat_file = os.path.splitext(os.path.split(self.orig_path)[1])[0]
                     izbor = [info1, info2, lat_file]
-                    # r_files = [tUTF, fpath, self.orig_path]
+                    
+                    fpr = FileProcessed(entered_enc, path)
+                    fpr.unix2DOS()
+                    
                     dlg = wx.MultiChoiceDialog(self, 'Pick files:', os.path.basename(name), izbor)
                     if dlg.ShowModal() == wx.ID_OK:
                         response = dlg.GetSelections()
@@ -2276,23 +2160,17 @@ class MyFrame(wx.Frame):
                             try:
                                 if info2 in files:
                                     info1 = None; lat_file = None
-                                    f = open(tUTF, 'rb')
-                                    tzdata = f.read()
-                                    f.close()
+                                    tzdata = data_out(tUTF)
                                     logger.debug(f"Remove {self.cyrUTF}")
                                     os.remove(self.cyrUTF)
                                 elif info1 in files:
                                     info2 = None; lat_file = None
-                                    f = open(fpath, 'rb')
-                                    zdata = f.read()
-                                    f.close()
+                                    zdata = data_out(fpath)
                                     logger.debug(f"Remove {self.cyrUTF}")
                                     os.remove(self.cyrUTF)
                                 elif lat_file in files:
                                     info1 = None; info2 = None
-                                    f = open(self.orig_path, 'rb')
-                                    ldata = f.read()
-                                    f.close()
+                                    ldata = data_out(self.orig_path)
                             except IOError as e:
                                 logger.debug("Export ZIP, IOError({0}{1}):".format(fpath, e))
                             except:
@@ -2304,44 +2182,26 @@ class MyFrame(wx.Frame):
                             try:
                                 if not lat_file in files:
                                     lat_file = None
-                                    f =open(fpath, 'rb')
-                                    zdata = f.read()
-                                    f.close()
-                                    f1 = open(tUTF, 'rb')
-                                    tzdata = f1.read()
-                                    f1.close()
+                                    zdata = data_out(fpath)
+                                    tzdata = data_out(tUTF)
                                     logger.debug(f"Remove {self.cyrUTF}")
                                     os.remove(self.cyrUTF)
                                 elif not info2 in files:
                                     info2 = None
-                                    f1 = open(fpath, 'rb')
-                                    zdata = f1.read()
-                                    f1.close()
-                                    f2 = open(self.orig_path, 'rb')
-                                    ldata = f2.read()
-                                    f2.close()
+                                    zdata = data_out(fpath)
+                                    ldata = data_out(self.orig_path)
                                 elif not info1 in files:
                                     info1 = None
-                                    f1 = open(tUTF, 'rb')
-                                    tzdata = f1.read()
-                                    f1.close()
+                                    tzdata = data_out(tUTF)
                                     logger.debug(f"Remove {self.cyrUTF}")
                                     os.remove(self.cyrUTF)
-                                    f2 = open(self.orig_path, 'rb')
-                                    ldata = f2.read()
-                                    f2.close()
+                                    ldata = data_out(self.orig_path)
                                 elif len(files) == 3:
-                                    f =open(fpath, 'rb')
-                                    zdata = f.read()
-                                    f.close()
-                                    f1 = open(tUTF, 'rb')
-                                    tzdata = f1.read()
-                                    f1.close()
+                                    zdata = data_out(fpath)
+                                    tzdata = data_out(tUTF)
                                     logger.debug(f"Remove {self.cyrUTF}")
                                     os.remove(self.cyrUTF)
-                                    f2 = open(self.orig_path, 'rb')
-                                    ldata = f2.read()
-                                    f2.close()                                                                
+                                    ldata = data_out(self.orig_path)
                             except IOError as e:
                                 logger.debug("Export ZIP_2, IOError({0}):".format(e))
                                 self.text_1.SetValue("Error!\nTry again.")
@@ -2364,17 +2224,13 @@ class MyFrame(wx.Frame):
                     if list(self.previous_action.keys())[0] == 'toCYRsrt':
                         tzdata = ""
                         ldata = ""
-                        f = open(self.cyrUTF, 'rb')
-                        zdata = f.read()
-                        f.close()
+                        zdata = data_out(self.cyrUTF)
                         info1 = os.path.basename(self.cyrUTF).strip('/')
                         info2 = None
                         lat_file = None
                         os.remove(self.cyrUTF)
                     else:
-                        f = open(fpath, 'rb')    # Otvori u 'rb' modu da se sacuva CRLF u ZIP fajlu.
-                        zdata = f.read()
-                        f.close()
+                        zdata = data_out(fpath)
                         tzdata = ""
                         ldata = ""
                         info1 = fname + os.path.splitext(tpath)[-1]
@@ -2850,147 +2706,6 @@ class MyFrame(wx.Frame):
             entered_enc = self.enchistory[path]
             return entered_enc
     
-    def dm(self):
-        pass
-    #def undo_Action(self, event):
-        #if os.path.isfile(self.path0_p):
-            #with open(self.path0_p, 'rb') as f:
-                #path = pickle.load(f)
-            #with open(self.enc0_p, 'rb') as e:
-                #entered_enc = pickle.load(e)
-                #print("Undo entered_enc: ", entered_enc)
-            #fproc = TextProcessing(entered_enc, path)
-            #if self.undo_count == 0:
-                #self.enchistory[path] = entered_enc
-            
-        #if len(self.undoAction) >= 1:
-            #text = self.undoAction[entered_enc]
-            #entered_enc = next(reversed(self.undoAction.values()))
-        #else:
-            #self.toolBar1.EnableTool(101, False)
-            #return
-        ## fproc = TextProcessing(entered_enc, path)
-        #fproc.writeToFile(text)
-        #self.text_1.SetValue(text)
-        #self.redo = self.undoAction[self.newEnc]
-        #self.redoAction[self.redo] = self.newEnc
-        #if self.redoAction:
-            #self.toolBar1.EnableTool(102, True)
-        #else:
-            #self.toolBar1.EnableTool(102, False)
-        #event.Skip()
-    
-    #def redo_Action(self, event):
-        #with open(self.path0_p, 'rb') as f:
-            #path = pickle.load(f)
-        #if self.undo_count >= 1:
-            #enc = self.encAction()
-        #else:
-            #enc = self.newEnc
-            #print('redo ', enc)
-        #fproc = TextProcessing(enc, path)
-        #text = self.redo
-        #self.text_1.SetValue(text)
-        #fproc.writeToFile(text)
-        
-        #event.Skip()
-      
-    #def OnKeyDown(self, event):
-        #keycode = event.GetKeyCode()
-        ## print(keycode)
-        #if keycode <= 98 and not keycode == 88 and not keycode == 13:
-            #self.undohist.append(self.text_1.GetValue())
-            #self.modify = True
-            #self.toolBar1.EnableTool(1010, True)
-            #self.save.Enable(True)
-            #self.save_as.Enable(True)
-            #self.export_zip.Enable(True)            
-        #else:
-            #pass
-        #if len(self.undohist) >= 30: self.undohist=self.undohist[1:]
-        ## print(self.undohist)
-        ## print(self.modify)
-        #self.undo.Enable(True)
-        #self.toolBar1.EnableTool(101, True)
-        ## self.redo.Enable(True)
-        ## self.clear.Enable(True)
-        #event.Skip()
-        
-    #def OnTextGetSelection(self, event):
-        #self.text_1.FindFocus()
-        #if self.text_1.GetStringSelection():
-            #start, end = self.text_1.GetSelection()
-            
-        #event.Skip()
-    
-    #def OnUpdateEditMenu(self, event):
-        #event_id = event.GetId()
-        #sel = self.text_1.GetSelection()
-        #has_sel = sel[0] != sel[1]
-        #if event_id in (wx.ID_COPY, wx.ID_CUT):
-            #event.Enable(has_sel)
-        #else:
-            
-            #event.Skip()
-        
-    
-    #def OnUndo(self, event):
-        #self.redohist.append(self.text_1.GetValue())
-        #self.text_1.Undo()
-        #self.redo.Enable(True)
-        ##try:
-            ## self.text_1.ShowNativeCaret(False)
-            #self.redohist.append(self.text_1.GetValue())
-            #place=self.text_1.GetInsertionPoint() - 1
-            #p1 = self.text_1.GetInsertionPoint() + 1
-            #self.text_1.SetInsertionPoint(p1)
-            #self.text_1.SetValue(self.undohist[len(self.undohist)-1])
-            #self.text_1.SetInsertionPoint(place)
-        #except:
-            #logger.debug('List undohist out of range.')
-        
-        #self.undohist=self.undohist[:-1] # minus poslednj element
-        #if len(self.redohist) >= 30: self.redohist=self.redohist[1:]  # kada se doda sledeci umanji se za 1 ako je vise od limita
-        #if len(self.undohist) == 0:
-            #self.paste.Enable(False)
-            #self.undo.Enable(False)
-            #self.toolBar1.EnableTool(101, False)
-       # event.Skip()
-        
-    #def OnRedo(self, event):
-        #place=self.text_1.GetInsertionPoint()
-        #try:
-            #self.text_1.SetValue(self.redohist[len(self.redohist)-1])
-        #except:
-            #logger.debug('List redohist out of range')
-        #self.text_1.SetInsertionPoint(place)
-        #self.redohist=self.redohist[:-1]
-        #if len(self.redohist) == 0:
-            #self.redo.Enable(False)
-        #event.Skip()
-    
-    #def OnClear(self, event):
-        #if self.text_1.GetStringSelection():
-            #start, end = self.text_1.GetSelection()        
-            #self.text_1.Replace(start, end, "")
-        #event.Skip()
-    
-    #def OnCut(self, event):
-        #self.text_1.Cut()
-        #self.paste.Enable(True)
-        #event.Skip()
-
-    #def OnPaste(self, event):
-        #self.text_1.FindFocus()
-        #self.text_1.Paste()
-        #event.Skip()
-        
-    #def OnCopy(self, event):
-        #self.text_1.FindFocus()
-        #self.text_1.Copy()
-        #self.paste.Enable(True)
-        #event.Skip()
-        
     def onAbout(self, event):
         text = u"SubConverter\n\nJednostavna wxPython aplikacija \nza konvertovanje srt i txt fajlova\ni transkripciju engleskih imena i pojmova.\n\nProgram ima ove opcije:\n-Preslovljavanje latinice u ćirilicu i promena kodnog rasporeda.\n-Konvertovanje unikode u ANSI format.\n-Konvertovanje ANSI u unikode.\n-Default izlazni kodeci su cp1250, 1251 i utf-8.\n-Zamena engleskih imena u titlu odgovarajućim iz rečnika.\n Default izlazni kodek je UTF-8.\n-Mogućnost dodavanja novih definicija za transkripciju u rečnicima.\n-Program konvertuje titlove sa ćiriličnim pismom u latinicu.\n\nAutor: padovaSR\nhttps://github.com/padovaSR\nLicense: GNU GPL v2"
         AboutDlg = wx.MessageDialog(self, text, "SubConverter {}".format(VERSION), wx.OK | wx.ICON_INFORMATION)

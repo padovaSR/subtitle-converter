@@ -486,7 +486,7 @@ class FileProcessed:
             f.write(fileContents)
             f.close()
         except IOError as e:
-            logger.debug(f"Unix2DOS, I/O error({e.errno}): {e.strerror}")
+            logger.debug(f"Unix2DOS, IOerror: {e}")
         except: #handle other exceptions such as attribute errors
             logger.debug("Unix2DOS, unexpected error:", sys.exc_info()[0])    
             
