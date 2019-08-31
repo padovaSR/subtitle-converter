@@ -269,7 +269,6 @@ class MyFrame(wx.Frame):
         self.text_1.Bind(wx.EVT_TEXT, self.updateStatus, id=-1)
         self.text_1.Bind(wx.EVT_TEXT, self.enKode, id=-1)
         self.text_1.Bind(wx.EVT_TEXT, self.removeFiles, id=-1, id2=wx.ID_ANY)
-        # self.text_1.Bind(wx.EVT_MIDDLE_UP, self.OnContextMenu, id=-1)
         # self.Bind(wx.EVT_MENU, self.toCyrSRT_utf8, id=82)
         self.Bind(wx.EVT_MENU, self.onFileSettings, id=83)
         
@@ -654,14 +653,6 @@ class MyFrame(wx.Frame):
         self.cyr_to_utf.Enable(True)
         self.export_zip.Enable(True)
        
-    def OnContextMenu(self, event):
-        menu_c = wx.Menu()
-        menu_c.Append(1001, "Open")
-        menu_c.Append(self.cut.GetId(), "Cut")
-        self.PopupMenu(menu_c)
-        menu_c.Destroy()
-        event.Skip()
-    
     def enableTool(self):
         self.toolBar1.EnableTool(wx.ID_CLOSE, True)
         self.toolBar1.EnableTool(1002, True)   # toCyrillic
@@ -926,7 +917,7 @@ class MyFrame(wx.Frame):
         
     def toANSI(self, event):
         tval = self.text_1.GetValue()
-        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled() and len(self.undoAction) > 0:
+        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
             dl = self.ShowDialog()
             if dl == False:
                 return        
@@ -972,8 +963,6 @@ class MyFrame(wx.Frame):
                 if not entered_enc == 'windows-1251':
                     logger.debug(f'toANSI: {inpath}, {entered_enc}')
                 text = fproc.getContent()
-                if not self.previous_action:
-                    self.undoAction[entered_enc] = self.undo
                 text = fproc.rplStr(text)
                 text = fproc.writeToFile(text)
                 if text:
@@ -1016,10 +1005,7 @@ class MyFrame(wx.Frame):
                     ErrorDlg.ShowModal()
                     self.Error_Text = error_text
                 postAnsi()
-                if self.previous_action:
-                    self.undo1 = text
-                    self.undoAction[self.newEnc] = self.undo1
-                    self.previous_action['toANSI'] = entered_enc                
+                self.previous_action['toANSI'] = entered_enc                
                 self.enc = self.newEnc
             #----------------------------------------------------------------------------------------------------------
             elif procent > 0:
@@ -1041,10 +1027,8 @@ class MyFrame(wx.Frame):
                         ErrorDlg.ShowModal()
                         self.Error_Text = error_text
                     postAnsi()
-                    if self.previous_action:
-                        self.undo1 = text
-                        self.undoAction[self.newEnc] = self.undo1
-                        self.previous_action['toANSI'] = entered_enc
+                    
+                    self.previous_action['toANSI'] = entered_enc
                     self.enc = self.newEnc
             #----------------------------------------------------------------------------------------------------------
             elif zbir_slova > 0:
@@ -1061,10 +1045,7 @@ class MyFrame(wx.Frame):
                         ErrorDlg.ShowModal()
                         self.Error_Text = error_text            
                     postAnsi()
-                    if self.previous_action:
-                        self.undo1 = text
-                        self.undoAction[self.newEnc] = self.undo1
-                        self.previous_action['toANSI'] = entered_enc
+                    self.previous_action['toANSI'] = entered_enc
                     self.enc = self.newEnc                        
         event.Skip()
         
@@ -1667,7 +1648,7 @@ class MyFrame(wx.Frame):
         
     def onTranscribe(self, event):
         tval = self.text_1.GetValue()
-        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled() and len(self.undoAction) > 0 and self.reloaded == 0:
+        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled() and self.reloaded == 0:
             dl = self.ShowDialog()
             if dl == False:
                 return
@@ -1703,8 +1684,7 @@ class MyFrame(wx.Frame):
             
         fproc = FileProcessed(entered_enc, path)
         text = fproc.getContent()
-        if not self.previous_action:
-            self.undoAction['Transcribe'] = text
+        
         utf_proc = FileProcessed(self.newEnc, path)
         text = utf_proc.writeToFile(text)
         text = utf_proc.fixI(text)
@@ -1729,13 +1709,12 @@ class MyFrame(wx.Frame):
         self.toolBar1.EnableTool(101, True)
         self.previous_action['Transcribe'] = self.newEnc
         self.reloaded = 0
-        if self.previous_action:
-            self.undoAction['Transcribe']=text        
+        
         event.Skip()
         
     def onRepSpecial(self, event):
         tval = self.text_1.GetValue()
-        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled() and len(self.undoAction) > 0 and self.reloaded == 0:
+        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled() and self.reloaded == 0:
             dl = self.ShowDialog()
             if dl == False:
                 return
@@ -1773,8 +1752,6 @@ class MyFrame(wx.Frame):
         
         fproc = TextProcessing(entered_enc, path)
         text = fproc.getContent()
-        if not self.previous_action:
-            self.undoAction.append(text)
         text = text.replace('?', '¬')
         writeTempStr(path, text, entered_enc)
         num = fproc.doReplace()
@@ -1798,13 +1775,12 @@ class MyFrame(wx.Frame):
         self.toolBar1.EnableTool(101, True)
         self.previous_action['repSpec'] = self.newEnc
         self.reloaded = 0
-        if self.previous_action:
-            self.undoAction['repSpec'] = text        
+        
         event.Skip()
         
     def onCleanup(self, event):
         tval = self.text_1.GetValue()
-        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled() and len(self.undoAction) > 0 and self.reloaded == 0:
+        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled() and self.reloaded == 0:
             dl = self.ShowDialog()
             if dl == False:
                 return
@@ -1837,8 +1813,7 @@ class MyFrame(wx.Frame):
         
         subs = pysrt.open(path, encoding=entered_enc)
         if len(subs) > 0:
-            if not self.previous_action:
-                self.undoAction.append(subs)
+            
             fproc = TextProcessing(entered_enc, path)
             fproc.cleanUp()
             try:
@@ -1862,8 +1837,6 @@ class MyFrame(wx.Frame):
             self.toolBar1.EnableTool(101, True)
             self.previous_action['Cleanup'] = self.newEnc
             self.reloaded = 0
-            if self.previous_action:
-                self.undoAction['Cleanup'] = text            
         else:
             logger.debug(f"Cleanup: No subtitles found!")
             self.previous_action['Cleanup'] = self.newEnc
@@ -1872,7 +1845,7 @@ class MyFrame(wx.Frame):
     
     def onMergeLines(self, event):
         tval = self.text_1.GetValue()
-        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled() and len(self.undoAction) > 0 and self.reloaded == 0:
+        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled() and self.reloaded == 0:
             dl = self.ShowDialog()
             if dl == False:
                 return
@@ -1913,9 +1886,7 @@ class MyFrame(wx.Frame):
             logger.debug("Merger, unexpected error:", sys.exc_info())        
         
         fproc = FileProcessed(entered_enc, path)
-        if not self.previous_action:
-            text = fproc.getContent()
-            self.undoAction.append(text)
+        
         name, b = fproc.newName(path, file_suffix, self.real_dir, multi=False)
         fproc.remove_bom_inplace()
         
@@ -1956,12 +1927,11 @@ class MyFrame(wx.Frame):
         self.toolBar1.EnableTool(101, True)
         self.reloaded = 0
         self.previous_action['Merger'] = self.newEnc
-        if self.previous_action:
-            self.undoAction['Merger'] = text       
+        
         event.Skip()
     
     def onSave(self, event):
-        if os.path.isfile(self.path0_p) and self.modify == False:
+        if os.path.isfile(self.path0_p):
             with open(self.path0_p, 'rb') as p:
                 tpath = pickle.load(p)
             enc = self.enchistory[tpath]
@@ -1982,7 +1952,7 @@ class MyFrame(wx.Frame):
                     self.toolBar1.EnableTool(1010, False)
                     self.open_next.Enable(True)
                     self.reload.Enable(True)
-        elif os.path.isfile(self.path0_p) and self.modify == True:
+        elif os.path.isfile(self.path0_p):
             with open(self.path0_p, 'rb') as p:
                 tpath = pickle.load(p)            
             self.pre_suffix = 'new'
@@ -2560,7 +2530,7 @@ class MyFrame(wx.Frame):
         
     def onFixSubs(self, event):
         tval = self.text_1.GetValue()
-        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled() and len(self.undoAction) > 0 and self.reloaded == 0:
+        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled() and self.reloaded == 0:
             dl = self.ShowDialog()
             if dl == False:
                 return
