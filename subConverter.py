@@ -1952,53 +1952,6 @@ class MyFrame(wx.Frame):
                     self.toolBar1.EnableTool(1010, False)
                     self.open_next.Enable(True)
                     self.reload.Enable(True)
-        elif os.path.isfile(self.path0_p):
-            with open(self.path0_p, 'rb') as p:
-                tpath = pickle.load(p)            
-            self.pre_suffix = 'new'
-            entered_enc = self.encAction(tpath)
-            fproc = FileProcessed(entered_enc, tpath)
-            fname, nsuffix = fproc.newName(tpath, self.pre_suffix, self.real_dir, multi=False)
-            outpath = fproc.nameDialog(fname, nsuffix, self.real_dir)
-            if outpath:
-                new_fproc = FileProcessed(entered_enc, outpath)
-                text = self.text_1.GetValue()
-                text = new_fproc.writeToFile(text)
-                self.text_1.SetValue(text)
-                if os.path.isfile(outpath):
-                    logger.debug(f"File saved sucessfully. {outpath}")
-                    sDlg = wx.MessageDialog(self, 'Fajl je uspešno sačuvan\n{}'.format(os.path.basename(outpath)), 'SubConverter', wx.OK | wx.ICON_INFORMATION)
-                    sDlg.ShowModal()
-                    self.saved_file[outpath] = entered_enc                
-                    self.MenuBar.Enable(wx.ID_SAVE, False)
-                    self.MenuBar.Enable(wx.ID_SAVEAS, False)
-                    self.toolBar1.EnableTool(1010, False)
-                    self.open_next.Enable(True)
-                    self.reload.Enable(True)
-        else:
-            tpath = os.path.join('tmp', 'Untitled.srt')
-            self.newEnc = 'utf-8'
-            self.pre_suffix = 'new'
-            self.real_dir = os.getcwd()
-            text = self.text_1.GetValue()
-            fproc = FileProcessed(self.newEnc, tpath)
-            fname, nsuffix = fproc.newName(tpath, self.pre_suffix, self.real_dir, multi=False)
-            outpath = fproc.nameDialog(fname, nsuffix, self.real_dir)  # Puna putanja sa imenom novog fajla
-            new_fproc = FileProcessed(self.newEnc, outpath)
-            text = new_fproc.writeToFile(text)
-            new_fproc.unix2DOS()
-            if os.path.isfile(outpath):
-                logger.debug(f"File saved sucessfully. {outpath}")
-                sDlg = wx.MessageDialog(self, 'Fajl je uspešno sačuvan\n{}'.format(os.path.basename(outpath)), 'SubConverter', wx.OK | wx.ICON_INFORMATION)
-                sDlg.ShowModal()
-                # Dodaje putanju i enkoding u recnik
-                self.saved_file[outpath] = self.newEnc                
-                self.MenuBar.Enable(wx.ID_SAVE, False)
-                self.MenuBar.Enable(wx.ID_SAVEAS, False)
-                self.toolBar1.EnableTool(1010, False)
-                self.open_next.Enable(True)
-                self.reload.Enable(True)
-        
         event.Skip()
     
     def onSaveAs(self, event):
