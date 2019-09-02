@@ -87,11 +87,13 @@ class FileDrop(wx.FileDropTarget):
             new_d = OrderedDict()
             rpath = lfiles[-1]
             self.window.SetValue('Files List:\n')
+            with open(os.path.join('resources', 'var', 'path0.pkl'), 'wb') as f:
+                pickle.dump(lfiles, f)            
             for i in range(len(lfiles)):
                 if not zipfile.is_zipfile(lfiles[i]):
                     try:
                         tmp_path = os.path.join('tmp', os.path.basename(lfiles[i]))
-                        if lfiles[i].endswith(('zip', 'srt', 'txt')):
+                        if lfiles[i].endswith(('zip', 'srt', 'txt', 'ZIP', 'SRT', 'TXT')):
                             shutil.copy(lfiles[i], tmp_path)
                     except:
                         logger.debug('FileDrop: Unexpected file type.')
@@ -564,7 +566,7 @@ class MyFrame(wx.Frame):
                 self.preferences.Check(1012, check=True)        
         
         # statusbar fields
-        frame_statusbar_fields = ["frame_statusbar"]
+        frame_statusbar_fields = [f"Subtitle Converter {VERSION}"]
         for i in range(len(frame_statusbar_fields)):
             self.frame_statusbar.SetStatusText(frame_statusbar_fields[i], i)
         # end wxGlade
@@ -1186,6 +1188,11 @@ class MyFrame(wx.Frame):
         self.SetStatusText('Multiple files done.')            
         self.multipleTools()
     def toCyrillic(self, event):
+        
+        with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
+            ex = sp['key5']
+            value1_s = ex['cyr_ansi_srt']        
+        
         if os.path.isfile(os.path.join('resources', 'var', 'rpath0.pkl')):
             with open(os.path.join('resources', 'var', 'rpath0.pkl'), 'rb') as f:
                 rlPath = pickle.load(f)
@@ -1222,7 +1229,7 @@ class MyFrame(wx.Frame):
             if entered_enc == self.newEnc:
                 logger.debug(f"Nothing to do, encoding is: {entered_enc}")
                 return
-            self.pre_suffix = 'cyr'
+            self.pre_suffix = value1_s
             # new_enc = self.newEnc
             fproc = FileProcessed(entered_enc, path)
             text = fproc.getContent()
@@ -1295,6 +1302,10 @@ class MyFrame(wx.Frame):
         
     def toCyrillic_multiple(self):
         
+        with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
+            ex = sp['key5']
+            value1_s = ex['cyr_ansi_srt']        
+        
         self.text_1.SetValue("")
         self.text_1.SetValue("Files Processed:\n")
         if os.path.isfile(self.droped0_p):
@@ -1304,7 +1315,7 @@ class MyFrame(wx.Frame):
             self.multiFile.update(droped_files)
             
         self.newEnc = 'windows-1251'
-        self.pre_suffix = 'cyr'
+        self.pre_suffix = value1_s
         
         self.tmpPath.clear()
         self.cyrUTFmulti.clear()
@@ -1384,6 +1395,11 @@ class MyFrame(wx.Frame):
         self.multipleTools()
     
     def toUTF(self, event):
+        
+        with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
+            ex = sp['key5']
+            value1_s = ex['lat_utf8_srt']        
+        
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled() and self.reloaded == 0:
             dl = self.ShowDialog()
@@ -1412,7 +1428,7 @@ class MyFrame(wx.Frame):
                     open(path, 'a').close()
                 writeTempStr(path, text, 'utf-8')
                 
-            self.pre_suffix = 'utf8'
+            self.pre_suffix = value1_s
             
             entered_enc = self.encAction(path)
             print('utf_entered_enc: ', entered_enc)
@@ -1609,6 +1625,11 @@ class MyFrame(wx.Frame):
             dlg.Destroy()
     
     def toUTF_multiple(self):
+        
+        with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
+            ex = sp['key5']
+            value1_s = ex['lat_utf8_srt']        
+        
         self.text_1.SetValue("")
         self.text_1.SetValue("Files Processed:\n")
         if os.path.isfile(self.droped0_p):
@@ -1616,7 +1637,9 @@ class MyFrame(wx.Frame):
                 droped_files = pickle.load(d)
             self.multiFile.clear()
             self.multiFile.update(droped_files)
-        self.pre_suffix = 'utf8'
+        
+        self.pre_suffix = value1_s
+        
         if self.preferences.IsChecked(1011):
             self.newEnc = 'utf-8-sig'
         else:
@@ -1662,6 +1685,11 @@ class MyFrame(wx.Frame):
         self.SetStatusText('Multiple files done.')
         
     def onTranscribe(self, event):
+        
+        with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
+            ex = sp['key5']
+            value1_s = ex['transcribe']        
+        
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled() and self.reloaded == 0:
             dl = self.ShowDialog()
@@ -1688,7 +1716,7 @@ class MyFrame(wx.Frame):
                 open(path, 'a').close()
             writeTempStr(path, text, 'utf-8')
             
-        self.pre_suffix = 'utf8'
+        self.pre_suffix = value1_s
         
         entered_enc = self.encAction(path)
         
@@ -1794,6 +1822,11 @@ class MyFrame(wx.Frame):
         event.Skip()
         
     def onCleanup(self, event):
+        
+        with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
+            ex = sp['key5']
+            value1_s = ex['cleanup']        
+        
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled() and self.reloaded == 0:
             dl = self.ShowDialog()
@@ -1824,7 +1857,7 @@ class MyFrame(wx.Frame):
         entered_enc = self.encAction(path)
         self.newEnc = entered_enc
             
-        self.pre_suffix = 'cln'
+        self.pre_suffix = value1_s
         
         subs = pysrt.open(path, encoding=entered_enc)
         if len(subs) > 0:
@@ -1859,6 +1892,7 @@ class MyFrame(wx.Frame):
         event.Skip()
     
     def onMergeLines(self, event):
+        
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled() and self.reloaded == 0:
             dl = self.ShowDialog()
@@ -1881,12 +1915,6 @@ class MyFrame(wx.Frame):
             self.newEnc = entered_enc
             self.orig_path = path + '.orig'
             shutil.copy(path, self.orig_path)            
-        else:
-            text = self.text_1.GetValue()
-            path = os.path.join('tmp', 'Untitled.srt')
-            if not os.path.isfile(path):
-                open(path, 'a').close()
-            writeTempStr(path, text, 'utf-8')
         
         entered_enc = self.encAction(path)
         self.newEnc = entered_enc                           # path je u tmp/ folderu
@@ -1946,12 +1974,13 @@ class MyFrame(wx.Frame):
         event.Skip()
     
     def onSave(self, event):
+        
         if os.path.isfile(self.path0_p):
             with open(self.path0_p, 'rb') as p:
                 tpath = pickle.load(p)
             enc = self.enchistory[tpath]
             fproc = FileProcessed(enc, tpath)
-            # text = fproc.getContent()
+            print(self.pre_suffix)
             fname, nsuffix = fproc.newName(tpath, self.pre_suffix, self.real_dir, multi=False)
             outpath = fproc.nameDialog(fname, nsuffix, self.real_dir)  # Puna putanja sa imenom novog fajla
             if outpath:
@@ -2211,11 +2240,14 @@ class MyFrame(wx.Frame):
                 return
         event.Skip()
     
-    def OnTextChanged(self, event):
-        pass
-        event.Skip()
-        
     def onCloseFile(self, event):
+        self.text_1.SetValue('')
+        self.disableTool
+        if os.path.exists(self.path0_p):
+            os.remove(self.path0_p)
+        if os.path.exists(self.enc0_p):
+            os.remove(self.enc0_p)        
+        self.SetStatusText('Subtitle Converter is ready')        
         self.reload.Enable(True)
         event.Skip()
         
@@ -2238,6 +2270,11 @@ class MyFrame(wx.Frame):
         event.Skip()
         
     def onCyrToANSI(self, event):
+        
+        with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
+            ex = sp['key5']
+            value1_s = ex['lat_ansi_srt']        
+        
         if os.path.isfile(self.droped0_p):
             with open(self.droped0_p, 'rb') as d:
                 droped_files = pickle.load(d)
@@ -2261,7 +2298,7 @@ class MyFrame(wx.Frame):
             self.enchistory[path] = entered_enc            
     
             entered_enc = self.encAction(path)
-            self.pre_suffix = 'lat_ansi'
+            self.pre_suffix = value1_s
             self.newEnc = 'windows-1250'
             t_enc = 'utf-8'
             utf_tmpFile = path+'.TEMP_UTF'
@@ -2310,6 +2347,11 @@ class MyFrame(wx.Frame):
         event.Skip()
     
     def cyrToANSI_multiple(self):
+        
+        with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
+            ex = sp['key5']
+            value1_s = ex['lat_ansi_srt']        
+        
         self.text_1.SetValue("")
         self.text_1.SetValue("Files Processed:\n")
         if os.path.isfile(self.droped0_p):
@@ -2318,7 +2360,7 @@ class MyFrame(wx.Frame):
             self.multiFile.clear()
             self.multiFile.update(droped_files)        
         
-        self.pre_suffix = 'lat_ansi'
+        self.pre_suffix = value1_s
         self.newEnc = 'windows-1250'
         t_enc = 'utf-8'
         
@@ -2372,6 +2414,11 @@ class MyFrame(wx.Frame):
         self.SetStatusText('Multiple files done.')
         
     def onCyrToUTF(self, event):
+        
+        with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
+            ex = sp['key5']
+            value1_s = ex['lat_utf8_srt']        
+        
         if os.path.isfile(self.droped0_p):
             with open(self.droped0_p, 'rb') as d:
                 droped_files = pickle.load(d)
@@ -2392,7 +2439,7 @@ class MyFrame(wx.Frame):
             
             entered_enc = self.encAction(path)
             
-            self.pre_suffix = 'lat_utf8'
+            self.pre_suffix = value1_s
             
             if self.preferences.IsChecked(1011):
                 self.newEnc = 'utf-8-sig'
@@ -2441,6 +2488,11 @@ class MyFrame(wx.Frame):
         event.Skip()
         
     def cyrToUTF_multiple(self):
+        
+        with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
+            ex = sp['key5']
+            value1_s = ex['lat_utf8_srt']        
+        
         self.text_1.SetValue("")
         self.text_1.SetValue("Files Processed:\n")
         if os.path.isfile(self.droped0_p):
@@ -2449,7 +2501,7 @@ class MyFrame(wx.Frame):
             self.multiFile.clear()
             self.multiFile.update(droped_files)        
         
-        self.pre_suffix = 'lat_utf8'
+        self.pre_suffix = value1_s
         
         if self.preferences.IsChecked(1011):
             self.newEnc = 'utf-8-sig'
@@ -2497,6 +2549,11 @@ class MyFrame(wx.Frame):
         self.SetStatusText('Multiple files done.')        
         
     def onFixSubs(self, event):
+        
+        with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
+            ex = sp['key5']
+            value1_s = ex['fixed_subs']        
+        
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled() and self.reloaded == 0:
             dl = self.ShowDialog()
@@ -2528,7 +2585,7 @@ class MyFrame(wx.Frame):
                 if not os.path.isfile(path):
                     open(path, 'a').close()
                 writeTempStr(path, text, 'utf-8')
-                self.pre_suffix = 'utf8'                           # path je u tmp/ folderu
+                self.pre_suffix = value1_s                           # path je u tmp/ folderu
         
         with open(os.path.join('resources', 'var', 'rpath0.pkl'), 'rb') as r:
             rpath = pickle.load(r)
