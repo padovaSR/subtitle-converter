@@ -862,7 +862,21 @@ class MyFrame(wx.Frame):
         event.Skip()
 
     def onOpenNext(self, event):
-        print("Event handler 'onOpenNext' not implemented!")
+        
+        open_next, enc = self.saved_file.popitem()
+        
+        ask = 'Open this file:\n{}'.format(os.path.basename(open_next))
+        askDlg = wx.MessageDialog(self, ask, caption="SubConverter", style= wx.OK_DEFAULT | wx.CANCEL | wx.ICON_QUESTION)
+        if askDlg.ShowModal() == wx.ID_OK:
+            self.text_1.SetValue("")
+            fop = FileProcessed(enc, open_next)
+            logger.debug(f"Open_next: {os.path.basename(open_next)}, encoding: {enc}")
+            text = fop.getContent()
+            self.text_1.SetValue(text)
+            self.SetStatusText(os.path.basename(open_next))
+            self.open_next.Enable(False)
+        else:
+            askDlg.Destroy()
         event.Skip()
     
     def onReload(self, event):
@@ -879,10 +893,11 @@ class MyFrame(wx.Frame):
         if os.path.isfile(os.path.join('resources', 'var', 'r_text0.pkl')):
             with open(os.path.join('resources', 'var', 'r_text0.pkl'), 'rb') as f:
                 text=pickle.load(f)
-            os.remove(os.path.join('resources', 'var', 'r_text0.pkl'))
+            
             self.reloadText = text
             self.text_1.SetValue(text)
             writeTempStr(path, text, enc)
+            os.remove(os.path.join('resources', 'var', 'r_text0.pkl'))
             self.reloaded += 1
         else:
             text = self.reloadText
