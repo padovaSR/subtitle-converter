@@ -369,7 +369,7 @@ class FileProcessed:
         with open(presuffix_l, 'r', encoding='utf-8') as l_file:
             added = [line.strip("\n") for line in l_file if line]
             
-        suffix_list = ["."+x for x in ex.values()] + added
+        suffix_list = ["."+x for x in ex.values() if not x.startswith("_")] + added
         
         if psufix in suffix_list:
             name1 = '{0}.{1}'.format(os.path.splitext(n)[0], pre_suffix)  # fajl u tmp/ folderu
@@ -398,7 +398,12 @@ class FileProcessed:
                 nameO = '{0}_{1}{2}'.format(tmpnameO, nnm, sufix)
             dlg.Destroy()
             with open(presuffix_l, 'a', encoding='utf-8') as f:
-                f.write(os.path.splitext(os.path.splitext(nameO)[0])[-1]+"\n")
+                presuffix_x = os.path.splitext(nameO)[0].strip(".")
+                if "_" in presuffix_x:
+                    presuffix_ = "_"+presuffix_x.split("_")[-1]+"\n"
+                else:
+                    presuffix_ = os.path.splitext(os.path.splitext(nameO)[0])[-1]+"\n" 
+                f.write(presuffix_)
             return nameO
         else:
             dlg.Destroy()
