@@ -337,7 +337,9 @@ class FileProcessed:
         return all_values, procenat
             
     def newName(self, path_in, pre_suffix, real_dir, multi):
+        
         presuffix_l = os.path.join("resources", "var", "presuffix_list.bak")
+        
         with open(os.path.join('resources', 'var', 'tcf.pkl'), 'rb') as tf:
             oformat = pickle.load(tf)  # TXT suffix
         if os.path.exists(self.path0_p):
@@ -347,19 +349,15 @@ class FileProcessed:
             path = path_in
         if multi == True:
             path = path_in
-        with shelve.open(os.path.join('resources', 'var', 'dialog_settings.db'), flag='writeback') as  sp:
-            ex = sp['key2']
-            suffix = ex['f_suffix']  # Merger suffiks
-        # suffix1 = '.' + suffix
         
         fprint = os.path.basename(path)
         n = os.path.splitext(fprint)[0]
         psufix = os.path.splitext(n)[-1]  # presufix ispred sufixa
         
-        if oformat == 'txt' and pre_suffix == 'utf8':  # pre_suffix je ispred sufiksa.
+        if oformat == 'cyr_txt': 
             sufix = '.txt'
-        elif oformat == 'txt' and pre_suffix == 'cyr_utf8':
-            sufix = '.txt'
+        elif oformat == "txt" and pre_suffix == "utf8":
+            sufix = ".txt"
         else:
             sufix = os.path.splitext(path)[-1]  # srt,txt ili neki drugi koji je otvoren
 
@@ -369,12 +367,16 @@ class FileProcessed:
         with open(presuffix_l, 'r', encoding='utf-8') as l_file:
             added = [line.strip("\n") for line in l_file if line]
             
-        suffix_list = ["."+x for x in ex.values() if not x.startswith("_")] + added
+        suffix_list = ["."+x if not x.startswith("_") else x for x in ex.values()] + added
         
-        if psufix in suffix_list:
-            name1 = '{0}.{1}'.format(os.path.splitext(n)[0], pre_suffix)  # fajl u tmp/ folderu
+        if pre_suffix.startswith("_"):
+            _d = pre_suffix
         else:
-            name1 = '{0}.{1}'.format(n, pre_suffix)
+            _d = "."+pre_suffix
+        if psufix in suffix_list:
+            name1 = '{0}{1}'.format(os.path.splitext(n)[0], _d)  # fajl u tmp/ folderu
+        else:
+            name1 = '{0}{1}'.format(n, _d)
         
         return name1, sufix  # Vraca samo ime fajla bez putanje
     
