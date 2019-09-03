@@ -337,6 +337,7 @@ class FileProcessed:
         return all_values, procenat
             
     def newName(self, path_in, pre_suffix, real_dir, multi):
+        presuffix_l = os.path.join("resources", "var", "presuffix_list.bak")
         with open(os.path.join('resources', 'var', 'tcf.pkl'), 'rb') as tf:
             oformat = pickle.load(tf)  # TXT suffix
         if os.path.exists(self.path0_p):
@@ -349,7 +350,7 @@ class FileProcessed:
         with shelve.open(os.path.join('resources', 'var', 'dialog_settings.db'), flag='writeback') as  sp:
             ex = sp['key2']
             suffix = ex['f_suffix']  # Merger suffiks
-        suffix1 = '.' + suffix
+        # suffix1 = '.' + suffix
         
         fprint = os.path.basename(path)
         n = os.path.splitext(fprint)[0]
@@ -361,10 +362,15 @@ class FileProcessed:
             sufix = '.txt'
         else:
             sufix = os.path.splitext(path)[-1]  # srt,txt ili neki drugi koji je otvoren
-        suffix_list = [
-            '.utf8', '.utf-8', '.lat', '.transkrib', '.transkrib_1', '.transkrib_2', '.cyr', 'cyr', '.CYR', '.fixed', 
-            '.cyr_utf8', '.txt', '.merged', '._merged', '.rpl', '', '.cln', '.lat_ansi', '.lat_utf8', '.cln', '.cln_1',
-            '.rpl', '.cln_2', '.cln_3', '.rpl_1', '.rpl_2', '.rpl_3', '.merged_1', '.merged_2', suffix1, suffix1+'_1', suffix1+'_2']
+
+        with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
+            ex = sp['key5']
+        
+        with open(presuffix_l, 'r', encoding='utf-8') as l_file:
+            added = [line.strip("\n") for line in l_file if line]
+            
+        suffix_list = ["."+x for x in ex.values()] + added
+        
         if psufix in suffix_list:
             name1 = '{0}.{1}'.format(os.path.splitext(n)[0], pre_suffix)  # fajl u tmp/ folderu
         else:
@@ -373,24 +379,26 @@ class FileProcessed:
         return name1, sufix  # Vraca samo ime fajla bez putanje
     
     def nameDialog(self, name_entry, sufix_entry, dir_entry):
+        
+        presuffix_l = os.path.join("resources", "var", "presuffix_list.bak")
         real_dir = dir_entry
         name1 = name_entry
         sufix = sufix_entry
-        caption_str = '{}\\'.format(real_dir)
+        
+        caption_str = '{}'.format(real_dir)
         dlg = wx.TextEntryDialog(None, 'Ime fajla:', caption= caption_str, value="", style=wx.OK | wx.CANCEL | wx.CENTER, pos=wx.DefaultPosition)
         dlg.SetValue(name1)
-        # dlg.SetSize((550, 24))
+        
         if dlg.ShowModal() == wx.ID_OK:
             name = dlg.GetValue() # Get the file name
             tmpnameO = os.path.join(real_dir, name)
             nameO = '{0}{1}'.format(os.path.join(real_dir, name), sufix)
             if os.path.exists(nameO):
-                # print(os.path.dirname(path))
                 nnm = self.nameCheck(name, real_dir, sufix)
                 nameO = '{0}_{1}{2}'.format(tmpnameO, nnm, sufix)
-            #with open('resources\\var\\obs1.pkl', 'wb') as f:
-                #pickle.dump(nameO, f)
             dlg.Destroy()
+            with open(presuffix_l, 'a', encoding='utf-8') as f:
+                f.write(os.path.splitext(os.path.splitext(nameO)[0])[-1]+"\n")
             return nameO
         else:
             dlg.Destroy()

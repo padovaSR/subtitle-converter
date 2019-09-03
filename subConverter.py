@@ -180,7 +180,7 @@ class FileDrop(wx.FileDropTarget):
                             with open(os.path.join('resources', 'var', 'droped0.pkl'), 'wb') as f:
                                 pickle.dump(new_d, f)
                             logger.debug('FileDrop: Ready for multiple files.')
-                elif zipfile.is_zipfile(lfiles[0]) == False:
+                elif zipfile.is_zipfile(name) == False:
                     name = lfiles[0]
                     tmp_path = os.path.join('tmp', os.path.basename(name))
                     shutil.copy(name, tmp_path)
@@ -1979,14 +1979,16 @@ class MyFrame(wx.Frame):
             with open(self.path0_p, 'rb') as p:
                 tpath = pickle.load(p)
             enc = self.enchistory[tpath]
+            
             fproc = FileProcessed(enc, tpath)
-            print(self.pre_suffix)
             fname, nsuffix = fproc.newName(tpath, self.pre_suffix, self.real_dir, multi=False)
+            
             outpath = fproc.nameDialog(fname, nsuffix, self.real_dir)  # Puna putanja sa imenom novog fajla
+            
             if outpath:
                 shutil.copy(tpath, outpath)
                 if os.path.isfile(outpath):
-                    logger.debug(f"File saved sucessfully. {outpath}")
+                    logger.debug(f"File saved: {outpath}")
                     sDlg = wx.MessageDialog(self, 'Fajl je uspešno sačuvan\n{}'.format(os.path.basename(outpath)), 'SubConverter', wx.OK | wx.ICON_INFORMATION)
                     sDlg.ShowModal()
                     # Dodaje putanju i enkoding u recnik
