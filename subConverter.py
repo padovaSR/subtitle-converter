@@ -1189,6 +1189,8 @@ class MyFrame(wx.Frame):
         self.multipleTools()
     def toCyrillic(self, event):
         
+        with open(os.path.join('resources', 'var', 'tcf.pkl'), 'wb') as tf:
+            pickle.dump("cyr_txt", tf)        
         with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
             ex = sp['key5']
             value1_s = ex['cyr_ansi_srt']        
@@ -1420,7 +1422,7 @@ class MyFrame(wx.Frame):
                 with open(self.enc0_p, 'rb') as e:
                     entered_enc = pickle.load(e)
                 self.enchistory[path] = entered_enc
-                # self.previous_action.clear()
+                self.previous_action.clear()
             else:
                 text = self.text_1.GetValue()
                 path = os.path.join('tmp', 'Untitled.srt')
@@ -1450,6 +1452,13 @@ class MyFrame(wx.Frame):
             utfproc.unix2DOS()
             text = utfproc.getContent()
             self.text_1.SetValue(text)
+            
+            if text:
+                if self.newEnc == "utf-8-sig":
+                    code = "BOM_UTF-8"
+                msginfo = wx.MessageDialog(self, f'Tekst je konvertovan u enkoding: {code}.', 'SubConverter', wx.OK | wx.ICON_INFORMATION)
+                msginfo.ShowModal()
+                
             self.enc = self.newEnc
             self.SetStatusText(os.path.basename(path))
             self.MenuBar.Enable(wx.ID_SAVE, True)
@@ -2738,6 +2747,7 @@ class MyFrame(wx.Frame):
         event.Skip()
     
     def utfSetting(self, event):
+        
         if self.preferences.IsChecked(1012):
             item_txt = 'txt'
         else:
