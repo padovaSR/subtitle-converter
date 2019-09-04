@@ -933,6 +933,11 @@ class MyFrame(wx.Frame):
         return text
         
     def toANSI(self, event):
+        
+        with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
+            ex = sp['key5']
+            value4_s = ex['lat_ansi_srt']
+        
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
             dl = self.ShowDialog()
@@ -957,28 +962,19 @@ class MyFrame(wx.Frame):
                 self.orig_path = path + '.orig'
                 shutil.copy(path, self.orig_path)
                 self.previous_action.clear()
-            else:
-                text = self.text_1.GetValue()
-                path = os.path.join('tmp', 'Untitled.srt')
-                if not os.path.isfile(path):
-                    open(path, 'a').close()
-                fp = FileProcessed('windows-1250', path)
-                fp.writeToFile(text)
-                entered_enc = 'windows-1250'
-                self.newEnc = entered_enc
                 
             entered_enc = self.encAction(path)
-                
             self.newEnc = 'windows-1250'
+            self.pre_suffix = value4_s
+            
             if entered_enc == self.newEnc:
                 logger.debug(f"Nothing to do, encoding is: {entered_enc}")
                 return
-            self.pre_suffix = 'lat'
             
             def ansiAction(inpath):
                 fproc = FileProcessed(entered_enc, inpath)
                 if not entered_enc == 'windows-1251':
-                    logger.debug(f'toANSI: {inpath}, {entered_enc}')
+                    logger.debug(f'toANSI: {os.path.basename(inpath)}, {entered_enc}')
                 text = fproc.getContent()
                 text = fproc.rplStr(text)
                 text = fproc.writeToFile(text)
@@ -993,6 +989,8 @@ class MyFrame(wx.Frame):
                 
                 self.tmpPath.append(inpath)
                 if text:
+                    with open(self.enc0_p, 'wb') as f:      
+                        pickle.dump(self.newEnc, f)                    
                     msginfo = wx.MessageDialog(self, f'Tekst je konvertovan u enkoding: {self.newEnc}.', 'SubConverter', wx.OK | wx.ICON_INFORMATION)
                     msginfo.ShowModal()                
                 return text
@@ -1067,6 +1065,11 @@ class MyFrame(wx.Frame):
         event.Skip()
         
     def toANSI_multiple(self):
+        
+        with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
+            ex = sp['key5']
+            value4_s = ex['lat_ansi_srt']        
+        
         self.text_1.SetValue("")
         self.text_1.SetValue("Files Processed:\n")
         if os.path.isfile(self.droped0_p):
@@ -1075,17 +1078,20 @@ class MyFrame(wx.Frame):
             self.multiFile.clear()
             self.multiFile.update(droped_files)
         self.newEnc = 'windows-1250'
-        self.pre_suffix = 'lat'
+        self.pre_suffix = value4_s
                 
         for key, value in self.multiFile.items():
             path=key
             entered_enc=value
             fproc = FileProcessed(entered_enc, path)
+            
             if entered_enc == 'windows-1251':
-                logger.debug(f"------------------------------------------------------\nOperation not permitted when encoding windows-1251! {os.path.basename(path)}")
+                logger.debug(f"------------------------------------------------------\n\
+                Operation not permitted when encoding windows-1251! {os.path.basename(path)}")
                 continue
             
             zbir_slova, procent = fproc.checkChars()
+            
             def ansiAction(path):
                 if not entered_enc == 'windows-1251':
                     logger.debug('ToANSI, next input encoding: {}'.format(entered_enc))                    
@@ -1093,7 +1099,7 @@ class MyFrame(wx.Frame):
                 text = fproc.rplStr(text)
                 text = text.replace('?', '¬')
                 writeTempStr(path, text, entered_enc)
-                nam, b = fproc.newName(path, self.pre_suffix, self.real_dir, True)
+                nam, b = fproc.newName(self.pre_suffix, self.real_dir, True)
                 newF = '{0}{1}'.format(os.path.join(self.real_dir, nam), b)                
                 new_fproc = FileProcessed(self.newEnc, newF)
                 text = fproc.getContent()
@@ -1191,7 +1197,8 @@ class MyFrame(wx.Frame):
         
         with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
             ex = sp['key5']
-            value1_s = ex['cyr_ansi_srt']        
+            value1_s = ex['cyr_ansi_srt']
+            value2_s = ex['cyr_utf8_txt']
         
         if os.path.isfile(os.path.join('resources', 'var', 'rpath0.pkl')):
             with open(os.path.join('resources', 'var', 'rpath0.pkl'), 'rb') as f:
@@ -1240,7 +1247,7 @@ class MyFrame(wx.Frame):
                 text = text.replace('?', '¬')
             writeTempStr(path, text, entered_enc)
             
-            utfText, suffix = fproc.newName(path, 'cyr_utf8', self.real_dir, multi=False)
+            utfText, suffix = fproc.newName(path, value2_s, self.real_dir, multi=False)
             
             if self.preferences.IsChecked(1011):  
                 utf8_enc = 'utf-8-sig'
@@ -1279,6 +1286,10 @@ class MyFrame(wx.Frame):
             
             error_text = cyr_proc.checkFile(self.orig_path, cyr_path, multi=False)
             
+            if text:
+                with open(self.enc0_p, 'wb') as f:      
+                    pickle.dump(self.newEnc, f)
+                    
             cyr_proc.writeToFile(text)  # Write corrected text to file
             cyr_proc.unix2DOS()
             if error_text:
@@ -1337,7 +1348,7 @@ class MyFrame(wx.Frame):
             text = fproc.getContent()
             if text:
                 text = text.replace('?', '¬')
-            utfText, suffix = fproc.newName(path, value2_s, self.real_dir, multi=True)   # 'cyr_utf8'
+            utfText, suffix = fproc.newName(value2_s, self.real_dir, multi=True)   # 'cyr_utf8'
             if self.preferences.IsChecked(1011):  
                 utf8_enc = 'utf-8-sig'
             else:
@@ -1355,7 +1366,7 @@ class MyFrame(wx.Frame):
             text = new_fproc.fixI(text)  # Isto kao i kod rplStr text
             text = new_fproc.writeToFile(text)
             
-            cyr_name, cyr_suffix = new_fproc.newName(path, self.pre_suffix, self.real_dir, multi=True)
+            cyr_name, cyr_suffix = new_fproc.newName(self.pre_suffix, self.real_dir, multi=True)
             cyr_path = os.path.join(self.real_dir, cyr_name+file_suffix)
             if not os.path.isfile(cyr_path):
                 open(cyr_path, 'a').close()
@@ -1429,27 +1440,22 @@ class MyFrame(wx.Frame):
                     entered_enc = pickle.load(e)
                 self.enchistory[path] = entered_enc
                 self.previous_action.clear()
-            else:
-                text = self.text_1.GetValue()
-                path = os.path.join('tmp', 'Untitled.srt')
-                if not os.path.isfile(path):
-                    open(path, 'a').close()
-                writeTempStr(path, text, 'utf-8')
-                
+            
             self.pre_suffix = value1_s
             
-            entered_enc = self.encAction(path)
-            print('utf_entered_enc: ', entered_enc)
-            
+            # entered_enc = self.encAction(path)
+            print(entered_enc)
             if self.preferences.IsChecked(1011):
                 self.newEnc = 'utf-8-sig'
             else:
                 self.newEnc = 'utf-8'
-                
+            
+            if entered_enc == "utf-8" or entered_enc == "utf-8-sig":
+                logger.debug(f"toUTF: Encoding is {entered_enc}, nothing to do.")
+                return
+                    
             fproc = FileProcessed(entered_enc, path)
             text = fproc.getContent()
-            if not self.previous_action:
-                self.undo = text
                 
             utfproc = FileProcessed(self.newEnc, path)
             text = utfproc.writeToFile(text)
@@ -1460,6 +1466,8 @@ class MyFrame(wx.Frame):
             self.text_1.SetValue(text)
             
             if text:
+                with open(self.enc0_p, 'wb') as f:      
+                    pickle.dump(self.newEnc, f)                
                 if self.newEnc == "utf-8-sig":
                     code = "BOM_UTF-8"
                 msginfo = wx.MessageDialog(self, f'Tekst je konvertovan u enkoding: {code}.', 'SubConverter', wx.OK | wx.ICON_INFORMATION)
@@ -1671,7 +1679,7 @@ class MyFrame(wx.Frame):
                 text = text.replace('?', '¬')
                 writeTempStr(path, text, entered_enc)
                 
-            nam, b = fproc.newName(path, self.pre_suffix, self.real_dir, True)
+            nam, b = fproc.newName(self.pre_suffix, self.real_dir, True)
             newF = '{0}{1}'.format(os.path.join(self.real_dir, nam), b)
             
             newFproc = FileProcessed(self.newEnc, newF)
@@ -1724,12 +1732,6 @@ class MyFrame(wx.Frame):
             with open(self.enc0_p, 'rb') as e:
                 entered_enc = pickle.load(e)
             self.enchistory[path] = entered_enc
-        else:
-            text = self.text_1.GetValue()
-            path = os.path.join('tmp', 'Untitled.srt')
-            if not os.path.isfile(path):
-                open(path, 'a').close()
-            writeTempStr(path, text, 'utf-8')
             
         self.pre_suffix = value1_s
         
@@ -1749,6 +1751,10 @@ class MyFrame(wx.Frame):
         writeTempStr(path, text, self.newEnc)
         newfproc = TextProcessing(self.newEnc, path)
         num = newfproc.zameniImena()
+        
+        with open(self.enc0_p, 'wb') as f:      
+            pickle.dump(self.newEnc, f)        
+        
         if num > 28 or num < 28 and num > 2:
             msginfo = wx.MessageDialog(self, 'Zamenjenih objekata\nukupno [ {} ]'.format(num), 'SubConverter', wx.OK | wx.ICON_INFORMATION)
             msginfo.ShowModal()
@@ -1771,6 +1777,7 @@ class MyFrame(wx.Frame):
         event.Skip()
         
     def onRepSpecial(self, event):
+        
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled() and self.reloaded == 0:
             dl = self.ShowDialog()
@@ -1790,12 +1797,6 @@ class MyFrame(wx.Frame):
             with open(self.enc0_p, 'rb') as e:
                 entered_enc = pickle.load(e)
             self.enchistory[path] = entered_enc
-        else:
-            text = self.text_1.GetValue()
-            path = os.path.join('tmp', 'Untitled.srt')
-            if not os.path.isfile(path):
-                open(path, 'a').close()
-            writeTempStr(path, text, 'utf-8')
         
         entered_enc = self.encAction(path)
         self.newEnc = entered_enc    
@@ -1806,7 +1807,7 @@ class MyFrame(wx.Frame):
         
         self.pre_suffix = 'rpl'
         
-        prethodna = self.previous_action   # Poslednji element i kada je lista prazna
+        # prethodna = self.previous_action   # Poslednji element i kada je lista prazna
         
         fproc = TextProcessing(entered_enc, path)
         text = fproc.getContent()
@@ -1862,12 +1863,6 @@ class MyFrame(wx.Frame):
                 entered_enc = pickle.load(e)
             self.enchistory[path] = entered_enc
             self.newEnc = entered_enc
-        else:
-            text = self.text_1.GetValue()
-            path = os.path.join('tmp', 'Untitled.srt')
-            if not os.path.isfile(path):
-                open(path, 'a').close()
-            writeTempStr(path, text, 'utf-8')
         
         entered_enc = self.encAction(path)
         self.newEnc = entered_enc
@@ -1945,7 +1940,7 @@ class MyFrame(wx.Frame):
         
         fproc = FileProcessed(entered_enc, path)
         
-        name, b = fproc.newName(path, file_suffix, self.real_dir, multi=False)
+        name, b = fproc.newName(file_suffix, self.real_dir, multi=False)
         fproc.remove_bom_inplace()
         
         try:
@@ -1996,7 +1991,7 @@ class MyFrame(wx.Frame):
             enc = self.enchistory[tpath]
             
             fproc = FileProcessed(enc, tpath)
-            fname, nsuffix = fproc.newName(tpath, self.pre_suffix, self.real_dir, multi=False)
+            fname, nsuffix = fproc.newName(self.pre_suffix, self.real_dir, multi=False)
             
             outpath = fproc.nameDialog(fname, nsuffix, self.real_dir)  # Puna putanja sa imenom novog fajla
             
@@ -2016,14 +2011,10 @@ class MyFrame(wx.Frame):
         event.Skip()
     
     def onSaveAs(self, event):
+        
         if os.path.isfile(self.path0_p):
             with open(self.path0_p, 'rb') as p:
                 tpath = pickle.load(p)
-        else:
-            tpath = os.path.join('tmp', 'Untitled.srt')
-            fproc = FileProcessed('utf-8', tpath)
-            text = self.text_1.GetValue()
-            fproc.writeToFile(text)
             
         sas_wildcard =  "SubRip (*.srt)|*.srt|MicroDVD (*.sub)|*.sub|Text File (*.txt)|*.txt|All Files (*.*)|*.*"
         
@@ -2329,6 +2320,10 @@ class MyFrame(wx.Frame):
             text = fproc.getContent()
             if text:
                 text = text.replace('?', '¬')
+                
+                with open(self.enc0_p, 'wb') as f:      
+                    pickle.dump(self.newEnc, f)                
+            
             writeTempStr(utf_tmpFile, text, entered_enc)
             
             utfcyproc = Preslovljavanje(enc=t_enc, path=utf_tmpFile)
@@ -2405,7 +2400,7 @@ class MyFrame(wx.Frame):
             text = utfcyproc.rplStr(text)
             writeTempStr(utf_tmpFile, text, t_enc)
             
-            nam, b = fproc.newName(path, self.pre_suffix, self.real_dir, True)
+            nam, b = fproc.newName(self.pre_suffix, self.real_dir, True)
             newF = '{0}{1}'.format(os.path.join(self.real_dir, nam), b)            
             
             ansi_cyproc = Preslovljavanje(self.newEnc, newF)  #  Pise u path jer u SAVE se trazi path.
@@ -2462,7 +2457,6 @@ class MyFrame(wx.Frame):
                 self.newEnc = 'utf-8-sig'
             else:
                 self.newEnc = 'utf-8'
-            t_enc = 'utf-8'
             
             self.orig_path = path + '.orig'
             if not os.path.isfile(self.orig_path):
@@ -2473,6 +2467,10 @@ class MyFrame(wx.Frame):
             text = fproc.getContent()
             if text:
                 text = text.replace('?', '¬')
+                
+                with open(self.enc0_p, 'wb') as f:      
+                    pickle.dump(self.newEnc, f)
+                    
             writeTempStr(path, text, entered_enc)
             
             cyproc = Preslovljavanje(self.newEnc, path)
@@ -2524,7 +2522,6 @@ class MyFrame(wx.Frame):
             self.newEnc = 'utf-8-sig'
         else:
             self.newEnc = 'utf-8'       
-        t_enc = 'utf-8'
         
         for key, value in self.multiFile.items():
             path=key
@@ -2536,7 +2533,7 @@ class MyFrame(wx.Frame):
             if text:
                 text = text.replace('?', '¬')
             
-            nam, b = fproc.newName(path, self.pre_suffix, self.real_dir, True)
+            nam, b = fproc.newName(self.pre_suffix, self.real_dir, True)
             newF = '{0}{1}'.format(os.path.join(self.real_dir, nam), b)            
             
             cyproc = Preslovljavanje(self.newEnc, newF)
@@ -2567,10 +2564,6 @@ class MyFrame(wx.Frame):
         
     def onFixSubs(self, event):
         
-        with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
-            ex = sp['key5']
-            value1_s = ex['fixed_subs']        
-        
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled() and self.reloaded == 0:
             dl = self.ShowDialog()
@@ -2588,7 +2581,7 @@ class MyFrame(wx.Frame):
             self.multiFile.update(droped_files)        
         if len(self.multiFile) >= 1:
             self.multipleTools()
-            # self.toUTF_multiple()
+            
         else:
             if os.path.isfile(self.path0_p):
                 with open(self.path0_p, 'rb') as p:
@@ -2596,31 +2589,22 @@ class MyFrame(wx.Frame):
                 with open(self.enc0_p, 'rb') as e:
                     entered_enc = pickle.load(e)
                 self.enchistory[path] = entered_enc
-            else:
-                text = self.text_1.GetValue()
-                path = os.path.join('tmp', 'Untitled.srt')
-                if not os.path.isfile(path):
-                    open(path, 'a').close()
-                writeTempStr(path, text, 'utf-8')
-                self.pre_suffix = value1_s                           # path je u tmp/ folderu
-        
-        with open(os.path.join('resources', 'var', 'rpath0.pkl'), 'rb') as r:
-            rpath = pickle.load(r)
             
         try:
             with shelve.open(os.path.join('resources', 'var', 'dialog_settings.db'), flag='writeback') as  sp:
                 ex = sp['key1']
                 cb1_s = ex['state1']; cb2_s = ex['state2']; cb3_s = ex['state3']
                 cb4_s = ex['state4']; cb5_s = ex['state5']; cb6_s = ex['state6']; cb7_s = ex['state7']; cb8_s = ex['state8']
+                fx = sp['key5']
+                value1_s = fx['fixed_subs']                
         except IOError as e:
             logger.debug("FixSubtitle, I/O error({0}): {1}".format(e.errno, e.strerror))
         except Exception as e: #handle other exceptions such as attribute errors
             logger.debug("FixSubtitle, unexpected error:", sys.exc_info()[0:2])
             
         entered_enc = self.encAction(path)
-        self.pre_suffix = 'fixed'
+        self.pre_suffix = value1_s
         self.newEnc = entered_enc   # VAZNO za Save funkciju
-        
         
         subs = pysrt.open(path, encoding=entered_enc)
         if len(subs) == 0:
@@ -2666,7 +2650,7 @@ class MyFrame(wx.Frame):
                     outf = srt.compose(textis)
             except IOError as e:
                 logger.debug("FixSubtitle, I/O error({0}): {1}".format(e.errno, e.strerror))
-            except: #handle other exceptions such as attribute errors
+            except: 
                 logger.debug("FixSubtitle, unexpected error: {}".format(sys.exc_info()[0:2]))
             if format(sys.exc_info()[0]) == "<class 'srt.SRTParseError'>":
                 logger.debug('SRTParseError, error is harmless.')           
@@ -2678,8 +2662,7 @@ class MyFrame(wx.Frame):
             fproc.unix2DOS()
             text = fproc.getContent()
             self.text_1.SetValue(text)
-            # writeTempStr(path, text, entered_enc)
-        
+            
             if cb1_s == True:
                 if not cb8_s == True:
                     if s1 > 1:
