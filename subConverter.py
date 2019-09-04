@@ -1189,8 +1189,6 @@ class MyFrame(wx.Frame):
         self.multipleTools()
     def toCyrillic(self, event):
         
-        with open(os.path.join('resources', 'var', 'tcf.pkl'), 'wb') as tf:
-            pickle.dump("cyr_txt", tf)        
         with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
             ex = sp['key5']
             value1_s = ex['cyr_ansi_srt']        
@@ -1216,6 +1214,8 @@ class MyFrame(wx.Frame):
             self.toCyrillic_multiple()
         else:        
             if os.path.isfile(self.path0_p):
+                with open(os.path.join('resources', 'var', 'tcf.pkl'), 'wb') as tf:
+                    pickle.dump("cyr_txt", tf)                
                 with open(self.path0_p, 'rb') as p:
                     path = pickle.load(p)          # path je u tmp/ folderu
                 with open(self.enc0_p, 'rb') as e:
@@ -1304,9 +1304,13 @@ class MyFrame(wx.Frame):
         
     def toCyrillic_multiple(self):
         
+        with open(os.path.join('resources', 'var', 'tcf.pkl'), 'wb') as tf:
+            pickle.dump("cyr_txt", tf)        
+        
         with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
             ex = sp['key5']
-            value1_s = ex['cyr_ansi_srt']        
+            value1_s = ex['cyr_ansi_srt']
+            value2_s = ex['cyr_utf8_txt']
         
         self.text_1.SetValue("")
         self.text_1.SetValue("Files Processed:\n")
@@ -1328,10 +1332,12 @@ class MyFrame(wx.Frame):
             entered_enc=value
             fproc = FileProcessed(entered_enc, path)
             
+            file_suffix = os.path.splitext(path)[-1]
+            
             text = fproc.getContent()
             if text:
                 text = text.replace('?', '¬')
-            utfText, suffix = fproc.newName(path, 'cyr_utf8', self.real_dir, multi=True)
+            utfText, suffix = fproc.newName(path, value2_s, self.real_dir, multi=True)   # 'cyr_utf8'
             if self.preferences.IsChecked(1011):  
                 utf8_enc = 'utf-8-sig'
             else:
@@ -1350,7 +1356,7 @@ class MyFrame(wx.Frame):
             text = new_fproc.writeToFile(text)
             
             cyr_name, cyr_suffix = new_fproc.newName(path, self.pre_suffix, self.real_dir, multi=True)
-            cyr_path = os.path.join(self.real_dir, cyr_name+cyr_suffix)
+            cyr_path = os.path.join(self.real_dir, cyr_name+file_suffix)
             if not os.path.isfile(cyr_path):
                 open(cyr_path, 'a').close()
             
