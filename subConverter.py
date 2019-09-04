@@ -44,7 +44,7 @@ import traceback
 
 import wx
 
-VERSION = "v0.5.7.0"
+VERSION = "v0.5.7.0_test"
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -2819,11 +2819,13 @@ class MyApp(wx.App):
         
         b_file = os.path.join("resources", "var", "presuffix_list.bak")
         if os.path.exists(b_file):
-            lines = open(b_file, "r", encoding="utf-8").readlines()
+            with open(b_file, "r", encoding="utf-8") as f:
+                lines = f.readlines()
             line_set = set(lines)
             out = open(b_file, "w", encoding="utf-8")
             for line in line_set:
                 out.write(line)
+            out.close()
             
     def OnInit(self):
         self.frame = MyFrame(None, wx.ID_ANY, "")
