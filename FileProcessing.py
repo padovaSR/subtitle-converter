@@ -348,25 +348,26 @@ class FileProcessed:
         n = os.path.splitext(fprint)[0]
         psufix = os.path.splitext(n)[-1]  # presufix ispred sufixa
         
-        if oformat == 'cyr_txt': 
-            sufix = '.txt'
-        elif oformat == "txt" and pre_suffix == "utf8":
-            sufix = ".txt"
-        else:
-            sufix = os.path.splitext(path)[-1]  # srt,txt ili neki drugi koji je otvoren
-
         with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
             ex = sp['key5']
+            value5_s = ex['lat_utf8_srt']
+        
+        if oformat == 'cyr_txt': 
+            sufix = '.txt'
+        elif oformat == "txt" and pre_suffix == value5_s:
+            sufix = ".txt"
+        else:
+            sufix = os.path.splitext(path)[-1]  # srt,txt ili neki drugi koji je otvoren        
         
         with open(presuffix_l, 'r', encoding='utf-8') as l_file:
             added = [line.strip("\n") for line in l_file if line]
             
         suffix_list = ["."+x if not x.startswith("_") else x for x in ex.values()] + added
         
+        _d = "."+pre_suffix
         if pre_suffix.startswith("_"):
             _d = pre_suffix
-        else:
-            _d = "."+pre_suffix
+        
         if psufix in suffix_list:
             name1 = '{0}{1}'.format(os.path.splitext(n)[0], _d)  # fajl u tmp/ folderu
         else:

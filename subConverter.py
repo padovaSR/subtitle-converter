@@ -193,7 +193,6 @@ class FileDrop(wx.FileDropTarget):
                     with open(os.path.join('resources', 'var', 'droped0.pkl'), 'wb') as d:
                         pickle.dump(empty, d)
                     self.window.SetValue(txt1)
-            # print('Droped_FILE tmp: ', tpath)
             with open(os.path.join('resources', 'var', 'rpath0.pkl'), 'wb') as f:
                 pickle.dump(rpath, f, pickle.HIGHEST_PROTOCOL)
             with open(os.path.join('resources', 'var', 'obs1.pkl'), 'wb') as f:
@@ -541,8 +540,6 @@ class MyFrame(wx.Frame):
         else:
             weight = wx.FONTWEIGHT_NORMAL
             
-        
-            
         self.text_1.SetFont(wx.Font(fontSize, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, weight, 0, new_font))    
         self.curFont = self.text_1.GetFont()
         self.curClr = wx.Colour((fC[0], fC[1], fC[2], fC[3]))
@@ -611,35 +608,24 @@ class MyFrame(wx.Frame):
                     self.SetStatusText(os.path.basename(path))
         #p = FileDrop(self.text_1)
         #e = p.file_name
-        #print(e)
         event.Skip()    
     
     def enKode(self, event):
         with shelve.open(os.path.join('resources', 'var', 'dialog_settings.db'), flag='writeback') as s:
             ec = s['key3']; enk = ec['kode']; tpath = ec['tmPath']  # ; rlPath = ec['realPath']
-        #with open(os.path.join('resources', 'var', 'enc0.pkl'), 'rb') as e:
-            #enk = pickle.load(e)
-            
-        #with open(os.path.join('resources', 'var', 'path0.pkl'), 'rb') as p:
-            #tpath = pickle.load(p)
-        def load():
-            with open(os.path.join('resources', 'var', 'obs1.pkl'), 'rb') as f:
-                return pickle.load(f)
+        
+        #def load():
+            #with open(os.path.join('resources', 'var', 'obs1.pkl'), 'rb') as f:
+                #return pickle.load(f)
         
         self.enableTool()
         
-        # self.resetTool()
-        
-        #with open(os.path.join('resources', 'var\path0.pkl'), 'wb') as f:    # path je u tmp/ folderu
-            #pickle.dump(tpath, f)
         if os.path.isfile(os.path.join('resources', 'var', 'rpath0.pkl')):
             with open(os.path.join('resources', 'var', 'rpath0.pkl'), 'rb') as f:
                 rlPath = pickle.load(f)
             self.real_dir = os.path.dirname(rlPath)
-            # print('ON enKode rdir: ', self.real_dir)
             self.enchistory[tpath] = enk
             self.real_path= [rlPath]
-        # print('OnEnKode enchist, rpath: ', self.enchistory, rlPath)
         event.Skip()
         
     def multipleTools(self):
@@ -718,7 +704,6 @@ class MyFrame(wx.Frame):
             self.filehistory.AddFileToHistory(infile)
             self.enchistory[infile] = enc
             self.reloadText = text
-            # print('RELOAD: ', self.reloadText)
             
         def multiple(self, inpath, tmppath):
             path = []
@@ -778,7 +763,7 @@ class MyFrame(wx.Frame):
             for i in range(len(paths_in)):
                 fpath = paths_out[i]
                 fop = FileOpened(fpath)
-                # print(fpath)
+                
                 if zipfile.is_zipfile(fpath):
                     try:
                         outfile, rfile = fop.isCompressed()
@@ -911,13 +896,12 @@ class MyFrame(wx.Frame):
         event.Skip()
         
     def fileErrors(self, path, new_enc, multi):
-        print('REAL:', self.real_dir)
+        
         fproc = FileProcessed(new_enc, path)
         text = fproc.getContent()
         nlist = w_position(r'\?', text)     # Lociramo novonastale znakove ako ih ima
         epath = os.path.basename(path)
         outf = os.path.join(self.real_dir, os.path.splitext(epath)[0] + '_error.log')
-        print(outf)
         showMeError(path, outf, new_enc)
         text = text.replace('¬', '?')       # Ponovo vracamo znakove pitanja na svoja mesta
         fproc.writeToFile(text)
@@ -1193,6 +1177,7 @@ class MyFrame(wx.Frame):
                     fproc.unix2DOS()
         self.SetStatusText('Multiple files done.')            
         self.multipleTools()
+        
     def toCyrillic(self, event):
         
         with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
@@ -1247,7 +1232,7 @@ class MyFrame(wx.Frame):
                 text = text.replace('?', '¬')
             writeTempStr(path, text, entered_enc)
             
-            utfText, suffix = fproc.newName(path, value2_s, self.real_dir, multi=False)
+            utfText, suffix = fproc.newName(value2_s, self.real_dir, multi=False)
             
             if self.preferences.IsChecked(1011):  
                 utf8_enc = 'utf-8-sig'
@@ -1258,7 +1243,7 @@ class MyFrame(wx.Frame):
             self.cyrUTF = utf_path
             
             if os.path.exists(utf_path):
-                nnm = fproc.nameCheck(os.path.basename(utf_path), self.real_dir, suffix)
+                nnm = fproc.nameCheck(os.path.basename(utf_path), self.real_dir, suffix)+1
                 utf_path = '{0}_{1}{2}'.format(utf_path, nnm, suffix)
                 
             new_fproc = FileProcessed(utf8_enc, utf_path)
@@ -1443,8 +1428,6 @@ class MyFrame(wx.Frame):
             
             self.pre_suffix = value1_s
             
-            # entered_enc = self.encAction(path)
-            print(entered_enc)
             if self.preferences.IsChecked(1011):
                 self.newEnc = 'utf-8-sig'
             else:
@@ -1494,7 +1477,6 @@ class MyFrame(wx.Frame):
             self.multiFile.clear()
             self.multiFile.update(droped_files)        
         
-        # print(self.multiFile)
         tpath = os.path.basename(list(self.multiFile)[0][:-4])
         tpath = tpath.replace("E01", "").replace("e01", "").replace(r"episode 1", "").replace(r"episode 01", "").replace(r"episode1", "").replace(r"episode01", "")
     
@@ -2092,7 +2074,6 @@ class MyFrame(wx.Frame):
                 if self.real_path:
                     fproc = FileProcessed(enc, tpath)
                     fname, nsufix = fproc.newName(self.real_path[-1], self.pre_suffix, self.real_dir, False)
-                    # print("FNAME:", fname)                
             except IOError as e:
                 logger.debug("On ZIP IOError({0}):".format(e))
             except IndexError as e:
@@ -2835,6 +2816,14 @@ class MyApp(wx.App):
             os.remove(os.path.join('resources', 'var', 'rpath0.pkl'))
         if not os.path.isdir('tmp'):
             os.mkdir('tmp')
+        
+        b_file = os.path.join("resources", "var", "presuffix_list.bak")
+        if os.path.exists(b_file):
+            lines = open(b_file, "r", encoding="utf-8").readlines()
+            line_set = set(lines)
+            out = open(b_file, "w", encoding="utf-8")
+            for line in line_set:
+                out.write(line)
             
     def OnInit(self):
         self.frame = MyFrame(None, wx.ID_ANY, "")
