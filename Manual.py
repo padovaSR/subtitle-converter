@@ -13,19 +13,25 @@ page = 'resources\\uputstvo.htm'
 if not os.path.exists(page):
     # HTML String
     html = """
-    <table border=1>
-         <tr>
-           <th>Number</th>
-           <th>Square</th>
-         </tr>
-         <indent>
-         <% for i in range(10): %>
-           <tr>
-             <td><%= i %></td>
-             <td><%= i**2 %></td>
-           </tr>
-         </indent>
-    </table>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+   <META NAME="GENERATOR" CONTENT="Mozilla/4.06 [en] (X11; I; Linux
+   2.0.35 i686) [Netscape]">
+
+</HEAD>
+<BODY TEXT="#808080" BGCOLOR="#ebf5fb" LINK="#0000FF" VLINK="#FF0000" ALINK="#000088">
+
+<H1><FONT COLOR="#000080">Subtitle Converter v - 0.5.7</FONT></H1>
+<H2>
+<FONT COLOR="#1a5276">Prečice:</FONT></H2>
+
+<P><B><FONT COLOR="#000000">Ctrl+Shift+Y</B></FONT>
+: Latinica u ćirilicu UTF-8 SRT, "Bulk" Latinica u ćirilicu UTF-8 SRT</P>
+
+<P><B><FONT COLOR="#000000">Ctrl+Shift+F</B></FONT>
+: FileSettings dijalog, predefinisani "pre presufiks" novih fajlova(lat,cyr,utf8...)</P>
     """
     
     # Write HTML String to file.html
