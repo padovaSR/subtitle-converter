@@ -342,13 +342,15 @@ class FileProcessed:
         
         with open(os.path.join('resources', 'var', 'tcf.pkl'), 'rb') as tf:
             oformat = pickle.load(tf)  # TXT suffix
-        if os.path.exists(self.path0_p):
-            with open(self.path0_p, 'rb') as f:
-                path = pickle.load(f)
-        else:
-            path = path_in
+
         if multi == True:
             path = path_in
+        else:
+            if os.path.exists(self.path0_p):
+                with open(self.path0_p, 'rb') as f:
+                    path = pickle.load(f)
+            else:
+                path = path_in
         
         fprint = os.path.basename(path)
         n = os.path.splitext(fprint)[0]
