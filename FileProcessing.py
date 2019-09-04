@@ -336,22 +336,14 @@ class FileProcessed:
         procenat = percentage(all_values, len(rx))
         return all_values, procenat
             
-    def newName(self, path_in, pre_suffix, real_dir, multi):
+    def newName(self, pre_suffix, real_dir, multi):
         
+        path = self.putanja
         presuffix_l = os.path.join("resources", "var", "presuffix_list.bak")
         
         with open(os.path.join('resources', 'var', 'tcf.pkl'), 'rb') as tf:
             oformat = pickle.load(tf)  # TXT suffix
 
-        if multi == True:
-            path = path_in
-        else:
-            if os.path.exists(self.path0_p):
-                with open(self.path0_p, 'rb') as f:
-                    path = pickle.load(f)
-            else:
-                path = path_in
-        
         fprint = os.path.basename(path)
         n = os.path.splitext(fprint)[0]
         psufix = os.path.splitext(n)[-1]  # presufix ispred sufixa
