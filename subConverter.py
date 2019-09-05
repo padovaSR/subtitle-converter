@@ -1063,6 +1063,7 @@ class MyFrame(wx.Frame):
             self.multiFile.update(droped_files)
         self.newEnc = 'windows-1250'
         self.pre_suffix = value4_s
+        self.tmpPath.clear()
                 
         for key, value in self.multiFile.items():
             path=key
@@ -1767,7 +1768,7 @@ class MyFrame(wx.Frame):
             else:
                 zlist = []
                 try:
-                    izbor = [os.path.join("tmp", x) for x in self.tmpPath if not x.endswith(".zip")]
+                    izbor = [os.path.join("tmp", x) if not x.startswith("tmp") else x for x in self.tmpPath if not x.endswith(".zip")]
                     info = [os.path.basename(x) for x in self.tmpPath if not x.endswith(".zip")]
                     for i,x in zip(self.tmpPath, izbor):
                         if not os.path.exists(x) and not i.endswith(".zip"):
@@ -1781,7 +1782,6 @@ class MyFrame(wx.Frame):
                     
             if list(self.previous_action.keys())[0] == 'toCyrSRTutf8_multiple':
                 files = izbor
-                print(files)
                 zlist = [data_out(x) for x in files]
                 info = [os.path.basename(x) for x in files]
             #else:
@@ -1844,6 +1844,7 @@ class MyFrame(wx.Frame):
             self.multiFile.clear()
             self.multiFile.update(droped_files)
         
+        self.tmpPath.clear()
         self.pre_suffix = value1_s
         
         if self.preferences.IsChecked(1011):
