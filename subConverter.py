@@ -1508,6 +1508,7 @@ class MyFrame(wx.Frame):
             
             self.enchistory[path] = self.newEnc
             self.previous_action['toCyrSRTutf8'] = self.newEnc
+            self.cyrUTF = utf_path
             self.reloaded = 0
                 
         event.Skip()
@@ -1520,7 +1521,7 @@ class MyFrame(wx.Frame):
         with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
             ex = sp['key5']
             value1_s = ex['cyr_ansi_srt']
-            value2_s = ex['cyr_utf8_txt']
+            value3_s = ex['cyr_utf8_srt']
         
         self.text_1.SetValue("")
         self.text_1.SetValue("Files Processed:\n")
@@ -1552,7 +1553,7 @@ class MyFrame(wx.Frame):
             text = fproc.getContent()
             if text:
                 text = text.replace('?', '¬')
-            utfText, suffix = fproc.newName(value2_s, self.real_dir, multi=True)   # 'cyr_utf8'
+            utfText, suffix = fproc.newName(value3_s, self.real_dir, multi=True)   # 'cyr_utf8'
             suffix = ".srt"
                 
             utf_path = os.path.join(self.real_dir, utfText+suffix)
@@ -1577,6 +1578,7 @@ class MyFrame(wx.Frame):
             cyr_proc.fineTune()
             cyr_proc.fontColor()
             
+            self.tmpPath.append(utf_path)
             self.newEnc = utf8_enc
             error_text = cyr_proc.checkFile(path, utf_path, multi=True)
             
@@ -1777,8 +1779,9 @@ class MyFrame(wx.Frame):
                 except Exception:
                     logger.debug("ExportZIP_A error, {}".format(sys.exc_info()))                
                     
-            if list(self.previous_action.keys())[0] == 'toCYRsrt':
+            if list(self.previous_action.keys())[0] == 'toCyrSRTutf8_multiple':
                 files = izbor
+                print(files)
                 zlist = [data_out(x) for x in files]
                 info = [os.path.basename(x) for x in files]
             #else:
@@ -2375,7 +2378,7 @@ class MyFrame(wx.Frame):
                         return
                             
                 else:
-                    if list(self.previous_action.keys())[0] == 'toCYRsrt':
+                    if list(self.previous_action.keys())[0] == 'toCyrSRTutf8':
                         tzdata = ""
                         ldata = ""
                         zdata = data_out(self.cyrUTF)
