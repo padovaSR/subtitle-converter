@@ -2555,6 +2555,7 @@ class MyFrame(wx.Frame):
             self.multiFile.clear()
             self.multiFile.update(droped_files)        
         
+        self.tmpPath.clear()
         self.pre_suffix = value1_s
         self.newEnc = 'windows-1250'
         t_enc = 'utf-8'
@@ -2590,6 +2591,7 @@ class MyFrame(wx.Frame):
             ansi_cyproc.writeToFile(text)
             self.text_1.AppendText('\n')
             self.text_1.AppendText(os.path.basename(newF))
+            self.tmpPath.append(newF)
             error_text = ansi_cyproc.checkFile(path, newF, multi=True)
             
             text = self.fileErrors(newF, self.newEnc, multi=True)
@@ -2700,6 +2702,7 @@ class MyFrame(wx.Frame):
             self.multiFile.update(droped_files)        
         
         self.pre_suffix = value1_s
+        self.tmpPath.clear()
         
         if self.preferences.IsChecked(1011):
             self.newEnc = 'utf-8-sig'
@@ -2733,6 +2736,10 @@ class MyFrame(wx.Frame):
             error_text = cyproc.checkFile(path, newF, multi=True)
             
             text = self.fileErrors(newF, self.newEnc, multi=True)
+            
+            self.text_1.AppendText('\n')
+            self.text_1.AppendText(os.path.basename(newF))
+            self.tmpPath.append(newF)
             
             if error_text:
                 ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
