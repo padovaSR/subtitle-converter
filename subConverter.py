@@ -270,7 +270,7 @@ class MyFrame(wx.Frame):
         self.text_1.Bind(wx.EVT_TEXT, self.updateStatus, id=-1)
         self.text_1.Bind(wx.EVT_TEXT, self.enKode, id=-1)
         self.text_1.Bind(wx.EVT_TEXT, self.removeFiles, id=-1, id2=wx.ID_ANY)
-        # self.Bind(wx.EVT_MENU, self.toCyrSRT_utf8, id=82)
+        self.Bind(wx.EVT_MENU, self.toCyrSRT_utf8, id=82)
         self.Bind(wx.EVT_MENU, self.onFileSettings, id=83)
         
         entries = [wx.AcceleratorEntry() for i in range(2)]
@@ -563,7 +563,7 @@ class MyFrame(wx.Frame):
                 self.preferences.Check(1012, check=True)        
         
         # statusbar fields
-        frame_statusbar_fields = [f"Subtitle Converter {VERSION}"]
+        frame_statusbar_fields = [f"Subtitle Converter is ready"]
         for i in range(len(frame_statusbar_fields)):
             self.frame_statusbar.SetStatusText(frame_statusbar_fields[i], i)
         # end wxGlade
@@ -1383,7 +1383,7 @@ class MyFrame(wx.Frame):
                 ErrorDlg.ShowModal()
                 self.Error_Text = error_text
             self.enc = self.newEnc
-            self.reloaded = 0
+            
             text = cyr_proc.getContent()
             text = text.replace('¬', '?')
             writeTempStr(utf_path, text, utf8_enc)
@@ -1394,10 +1394,208 @@ class MyFrame(wx.Frame):
             text_lat = fproc.getContent()
             writeTempStr(path, text_lat, entered_enc)
             fproc.unix2DOS()
-            
+        self.reloaded = 0   
         self.SetStatusText('Multiple files done.')
         self.multipleTools()
-    
+        
+    def toCyrSRT_utf8(self, event):
+        
+        with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
+            ex = sp['key5']
+            value1_s = ex['cyr_ansi_srt']
+            value2_s = ex['cyr_utf8_txt']
+        
+        if os.path.isfile(os.path.join('resources', 'var', 'rpath0.pkl')):
+            with open(os.path.join('resources', 'var', 'rpath0.pkl'), 'rb') as f:
+                rlPath = pickle.load(f)
+            self.real_dir = os.path.dirname(rlPath)
+            self.real_path= [rlPath]        
+        tval = self.text_1.GetValue()
+        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
+            dl = self.ShowDialog()
+            if dl == False:
+                return
+        if os.path.isfile(self.droped0_p):
+            with open(self.droped0_p, 'rb') as d:
+                droped_files = pickle.load(d)
+            self.multiFile.clear()
+            self.multiFile.update(droped_files)
+            
+        if len(self.multiFile) >= 1:
+            self.multipleTools()
+            self.toCyrSRTutf8_multiple()
+        else:        
+            if os.path.isfile(self.path0_p):
+                with open(os.path.join('resources', 'var', 'tcf.pkl'), 'wb') as tf:
+                    pickle.dump("cyr_txt", tf)                
+                with open(self.path0_p, 'rb') as p:
+                    path = pickle.load(p)          # path je u tmp/ folderu
+                with open(self.enc0_p, 'rb') as e:
+                    entered_enc = pickle.load(e)
+                self.enchistory[path] = entered_enc
+                self.orig_path = path + '.orig'
+                shutil.copy(path, self.orig_path)
+                self.previous_action.clear()
+                fpr = FileProcessed(entered_enc, self.orig_path)
+                fpr.unix2DOS()
+            
+            if entered_enc == self.newEnc:
+                logger.debug(f"Nothing to do, encoding is: {entered_enc}")
+                return
+            self.pre_suffix = value1_s
+            # new_enc = self.newEnc
+            fproc = FileProcessed(entered_enc, path)
+            text = fproc.getContent()
+            
+            if text:
+                text = text.replace('?', '¬')
+            writeTempStr(path, text, entered_enc)
+            
+            utfText, suffix = fproc.newName(value2_s, self.real_dir, multi=False)
+            suffix = ".srt"
+            
+            if self.preferences.IsChecked(1011):  
+                utf8_enc = 'utf-8-sig'
+            else:
+                utf8_enc = 'utf-8'
+                
+            utf_path = os.path.join(self.real_dir, utfText+suffix)
+            self.cyrUTF = utf_path
+            
+            if os.path.exists(utf_path):
+                nnm = fproc.nameCheck(os.path.basename(utf_path), self.real_dir, suffix)+1
+                utf_path = '{0}_{1}{2}'.format(utf_path, nnm, suffix)
+                
+            new_fproc = FileProcessed(utf8_enc, utf_path)
+            text = fproc.getContent()
+            text = new_fproc.writeToFile(text)
+            text = new_fproc.fixI(text)  # Isto kao i kod rplStr text
+            text = new_fproc.writeToFile(text)
+            
+            cyr_proc = Preslovljavanje(utf8_enc, utf_path)
+            cyr_proc.preLatin()
+            cyr_proc.preProc(reversed_action=False)
+            cyr_proc.changeLetters(reversed_action=False)
+            text = cyr_proc.getContent()
+            text = cyr_proc.rplStr(text)    # Ovde ide tekst ne putanja
+            cyr_proc.writeToFile(text)      # izlaz is rplStr mora da se pise u fajl
+            cyr_proc.fineTune()
+            cyr_proc.fontColor()
+            
+            text = self.fileErrors(utf_path, utf8_enc, multi=False)
+            
+            error_text = cyr_proc.checkFile(self.orig_path, utf_path, multi=False)
+
+            with open(self.enc0_p, 'wb') as f:      
+                pickle.dump(utf8_enc, f)
+                    
+            cyr_proc.writeToFile(text)  # Write corrected text to file
+            cyr_proc.unix2DOS()
+            if error_text:
+                ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
+                ErrorDlg.ShowModal()
+                self.Error_Text = error_text
+            
+            self.newEnc = utf8_enc
+            
+            self.SetStatusText(os.path.basename(path))
+            self.MenuBar.Enable(wx.ID_SAVE, True)
+            self.MenuBar.Enable(wx.ID_SAVEAS, True)
+            self.MenuBar.Enable(wx.ID_CLOSE, True)
+            self.toolBar1.EnableTool(1010, True)  # Save
+            self.toolBar1.EnableTool(1003, False)
+            self.toolBar1.EnableTool(101, True)
+            
+            self.enchistory[path] = self.newEnc
+            self.previous_action['toCYRsrt'] = self.newEnc
+            self.reloaded = 0
+                
+        event.Skip()
+        
+    def toCyrSRTutf8_multiple(self):
+        
+        with open(os.path.join('resources', 'var', 'tcf.pkl'), 'wb') as tf:
+            pickle.dump("cyr_txt", tf)        
+        
+        with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
+            ex = sp['key5']
+            value1_s = ex['cyr_ansi_srt']
+            value2_s = ex['cyr_utf8_txt']
+        
+        self.text_1.SetValue("")
+        self.text_1.SetValue("Files Processed:\n")
+        if os.path.isfile(self.droped0_p):
+            with open(self.droped0_p, 'rb') as d:
+                droped_files = pickle.load(d)
+            self.multiFile.clear()
+            self.multiFile.update(droped_files)
+            
+        self.pre_suffix = value1_s
+        
+        self.tmpPath.clear()
+        self.cyrUTFmulti.clear()
+        
+        if self.preferences.IsChecked(1011):  
+            utf8_enc = 'utf-8-sig'
+        else:
+            utf8_enc = 'utf-8'        
+        
+        with open(self.enc0_p, 'wb') as f:      
+            pickle.dump(utf8_enc, f)        
+        
+        for key, value in self.multiFile.items():
+            
+            path=key
+            entered_enc=value
+            fproc = FileProcessed(entered_enc, path)
+            
+            text = fproc.getContent()
+            if text:
+                text = text.replace('?', '¬')
+            utfText, suffix = fproc.newName(value2_s, self.real_dir, multi=True)   # 'cyr_utf8'
+            suffix = ".srt"
+                
+            utf_path = os.path.join(self.real_dir, utfText+suffix)
+            self.cyrUTFmulti.append(utf_path)
+            
+            if os.path.exists(utf_path):
+                nnm = fproc.nameCheck(os.path.basename(utf_path), self.real_dir, suffix)+1
+                utf_path = '{0}_{1}{2}'.format(utf_path, nnm, suffix)
+            
+            new_fproc = FileProcessed(utf8_enc, utf_path)
+            text = new_fproc.writeToFile(text)
+            text = new_fproc.fixI(text)  # Isto kao i kod rplStr text
+            text = new_fproc.writeToFile(text)
+            
+            cyr_proc = Preslovljavanje(utf8_enc, utf_path)
+            cyr_proc.preLatin()
+            cyr_proc.preProc(reversed_action=False)
+            cyr_proc.changeLetters(reversed_action=False)
+            text = cyr_proc.getContent()
+            text = cyr_proc.rplStr(text)    # Ovde ide tekst ne putanja
+            cyr_proc.writeToFile(text)      # izlaz is rplStr mora da se pise u fajl
+            cyr_proc.fineTune()
+            cyr_proc.fontColor()
+            
+            self.newEnc = utf8_enc
+            error_text = cyr_proc.checkFile(self.orig_path, utf_path, multi=True)
+            
+            text = self.fileErrors(utf_path, self.newEnc, multi=True)
+            
+            self.text_1.AppendText('\n')
+            self.text_1.AppendText(os.path.basename(utf_path))            
+            if error_text:
+                ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
+                ErrorDlg.ShowModal()
+                self.Error_Text = error_text
+            
+            self.SetStatusText('Processing multiple files')
+            
+        self.reloaded = 0
+        self.previous_action['toCyrSRTutf8_multiple'] = self.newEnc
+        self.SetStatusText('Multiple files done.')
+        self.multipleTools()
+                
     def toUTF(self, event):
         
         with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
