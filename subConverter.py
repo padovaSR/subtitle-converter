@@ -1507,7 +1507,7 @@ class MyFrame(wx.Frame):
             self.toolBar1.EnableTool(101, True)
             
             self.enchistory[path] = self.newEnc
-            self.previous_action['toCYRsrt'] = self.newEnc
+            self.previous_action['toCyrSRTutf8'] = self.newEnc
             self.reloaded = 0
                 
         event.Skip()
@@ -1578,7 +1578,7 @@ class MyFrame(wx.Frame):
             cyr_proc.fontColor()
             
             self.newEnc = utf8_enc
-            error_text = cyr_proc.checkFile(self.orig_path, utf_path, multi=True)
+            error_text = cyr_proc.checkFile(path, utf_path, multi=True)
             
             text = self.fileErrors(utf_path, self.newEnc, multi=True)
             
@@ -2271,7 +2271,7 @@ class MyFrame(wx.Frame):
             try:
                 if self.real_path:
                     fproc = FileProcessed(enc, tpath)
-                    fname, nsufix = fproc.newName(self.real_path[-1], self.pre_suffix, self.real_dir, False)
+                    fname, nsufix = fproc.newName(self.pre_suffix, self.real_dir, False)
             except IOError as e:
                 logger.debug("On ZIP IOError({0}):".format(e))
             except IndexError as e:
@@ -2300,7 +2300,7 @@ class MyFrame(wx.Frame):
                     lat_file = os.path.splitext(os.path.split(self.orig_path)[1])[0]
                     izbor = [info1, info2, lat_file]
                     
-                    fpr = FileProcessed(entered_enc, path)
+                    fpr = FileProcessed(enc, path)
                     fpr.unix2DOS()
                     
                     dlg = wx.MultiChoiceDialog(self, 'Pick files:', os.path.basename(name), izbor)
@@ -2972,7 +2972,8 @@ class MyFrame(wx.Frame):
     
     def onQuit(self, event):
         tval = self.text_1.GetValue()
-        if not tval.startswith('Files List:') and len(tval) > 0 and self.save.IsEnabled():
+        prev = list(self.previous_action.keys())[0]
+        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled() and not prev == 'toCyrSRTutf8':
             dl1 = wx.MessageBox("Current content has not been saved! Proceed?", "Please confirm", wx.ICON_QUESTION | wx.YES_NO, self)
             if dl1 == wx.NO:
                 return
