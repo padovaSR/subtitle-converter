@@ -953,6 +953,8 @@ class MyFrame(wx.Frame):
             
             if entered_enc == self.newEnc:
                 logger.debug(f"Nothing to do, encoding is: {entered_enc}")
+                msginfo = wx.MessageDialog(self, f'Tekst je već enkoding: {entered_enc}.', 'SubConverter', wx.OK | wx.ICON_INFORMATION)
+                msginfo.ShowModal()                
                 return
             
             def ansiAction(inpath):
@@ -1635,7 +1637,12 @@ class MyFrame(wx.Frame):
                 self.newEnc = 'utf-8'
             
             if entered_enc == "utf-8" or entered_enc == "utf-8-sig":
+                code = "UTF-8"
+                if entered_enc == "utf-8-sig":
+                    code = "BOM_UTF-8"                
                 logger.debug(f"toUTF: Encoding is {entered_enc}, nothing to do.")
+                msginfo = wx.MessageDialog(self, f'Tekst je već enkoding: {code}.\n', 'SubConverter', wx.OK | wx.ICON_INFORMATION)
+                msginfo.ShowModal()                
                 return
                     
             fproc = FileProcessed(entered_enc, path)
@@ -2601,10 +2608,9 @@ class MyFrame(wx.Frame):
                 ErrorDlg.ShowModal()
                 self.Error_Text = error_text
             self.SetStatusText('Processing multiple files')
-            text = utfcyproc.getContent()
-            text = text.replace('¬', '?')
-            writeTempStr(utf_tmpFile, text, t_enc)
-            utfcyproc.unix2DOS()
+            os.remove(utf_tmpFile)
+            logger.debug(f"Removed: {utf_tmpFile}")
+            
         self.multipleTools()
         self.reloaded = 0
         self.previous_action['cyrToANSI_multiple'] = self.newEnc
@@ -2983,7 +2989,7 @@ class MyFrame(wx.Frame):
     
     def onQuit(self, event):
         tval = self.text_1.GetValue()
-        prev = list(self.previous_action.keys())[0]
+        prev = [self.previous_action.keys() if self.previous_action else 0]
         if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled() and not prev == 'toCyrSRTutf8':
             dl1 = wx.MessageBox("Current content has not been saved! Proceed?", "Please confirm", wx.ICON_QUESTION | wx.YES_NO, self)
             if dl1 == wx.NO:
