@@ -24,6 +24,9 @@ if not os.path.exists(page):
 <BODY TEXT="#808080" BGCOLOR="#ebf5fb" LINK="#0000FF" VLINK="#FF0000" ALINK="#000088">
 
 <H1><FONT COLOR="#000080">Subtitle Converter v - 0.5.7</FONT></H1>
+
+<BR>&nbsp;
+
 <H2>
 <FONT COLOR="#1a5276">Prečice:</FONT></H2>
 
@@ -32,6 +35,20 @@ if not os.path.exists(page):
 
 <P><B><FONT COLOR="#000000">Ctrl+Shift+F</B></FONT>
 : FileSettings dijalog, predefinisani "pre presufiks" novih fajlova(lat,cyr,utf8...)</P>
+
+<BR>&nbsp;
+
+<H2>
+<FONT COLOR="#1a5276">Ativirus alarm:</FONT></H2>
+<P>Ako Avast ili neki drugi AV program prepoznaje subConverter.exe kao pretnju<br>
+ili neku vrstu virusa, to je takozvani "False Positive" ili lažni alarm.</br>
+</P>
+<p><b><FONT COLOR="#000000">Reference:</font></b>
+<p>https://malware.wikia.org/wiki/False_positive<br>
+https://support.avast.com/en-ww/article/168/</br>
+<br>https://www.windowscentral.com/how-exclude-files-and-folders-windows-defender-antivirus-scans</br></p>
+</BODY>
+</HTML>
     """
     
     # Write HTML String to file.html
@@ -49,12 +66,11 @@ class MyHtmlWindow(html.HtmlWindow):
 class MyManual(wx.Frame):
     def __init__(self, *args, **kwargs):
         wx.Frame.__init__(self, *args, **kwargs)
-        self.SetSize((574, 495))
         self.SetTitle("Subtitle Converter - Uputstvo")
         _icon = wx.NullIcon
         _icon.CopyFromBitmap(wx.Bitmap("resources\\icons\\tool.ico", wx.BITMAP_TYPE_ANY))
         self.SetIcon(_icon)
-        self.SetSize((574, 495))
+        self.SetSize((674, 520))
         
         htmlwin = MyHtmlWindow(self, -1)
         htmlwin.LoadPage(page)        
