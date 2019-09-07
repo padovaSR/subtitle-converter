@@ -48,7 +48,7 @@ import wx
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
-handler = RotatingFileHandler(os.path.join('resources', 'var', 'FileProcessing.log.log'), mode='a', maxBytes=40*1024)
+handler = RotatingFileHandler(os.path.join('resources', 'var', 'FileProcessing.log'), mode='a', maxBytes=40*1024)
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
@@ -358,6 +358,9 @@ class FileProcessed:
             sufix = ".txt"
         else:
             sufix = os.path.splitext(path)[-1]  # srt,txt ili neki drugi koji je otvoren        
+        
+        if not os.path.exists(presuffix_l):
+            open(presuffix_l, "a").close()
         
         with open(presuffix_l, 'r', encoding='utf-8') as l_file:
             added = [line.strip("\n") for line in l_file if line]
