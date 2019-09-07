@@ -19,6 +19,7 @@
 import os
 import sys
 # import codecs
+import re
 import shutil
 import zipfile
 import pickle
@@ -1686,8 +1687,10 @@ class MyFrame(wx.Frame):
             self.multiFile.update(droped_files)        
         
         tpath = os.path.basename(list(self.multiFile)[0][:-4])
-        tpath = tpath.replace("E01", "").replace("e01", "").replace(r"episode 1", "").replace(r"episode 01", "").replace(r"episode1", "").replace(r"episode01", "")
-    
+        epattern = re.compile(r"episode\s*\d*", re.I)
+        tpath = epattern.sub("", tpath)
+        tpath = tpath.replace("E01", "").replace("e01", "")
+        
         sas_wildcard =  "ZipArchive (*.zip)|*.zip|All Files (*.*)|*.*"
     
         dlg = wx.FileDialog(self, message="Export file as ZIP",\
