@@ -479,8 +479,6 @@ class MyFrame(wx.Frame):
         self.toolBar1.SetToolBitmapSize(wx.Size(24,24))
         self.fopen = self.toolBar1.AddTool(1001, u"Open", wx.ArtProvider.GetBitmap(wx.ART_FILE_OPEN, wx.ART_TOOLBAR), wx.NullBitmap, wx.ITEM_NORMAL, u"Open File", u"Otvori fajl", None)
         self.fsave = self.toolBar1.AddTool(1010, u"Save", wx.ArtProvider.GetBitmap(wx.ART_FILE_SAVE, wx.ART_TOOLBAR), wx.NullBitmap, wx.ITEM_NORMAL, u"Save file", u"Sačuvaj promene", None)
-        # self.undo_t = self.toolBar1.AddTool(101, "Undo", wx.ArtProvider.GetBitmap(wx.ART_UNDO, wx.ART_TOOLBAR), wx.NullBitmap, wx.ITEM_NORMAL, "Undo Action", "Undo Action", None)
-        # self.redo_t = self.toolBar1.AddTool(102, "Redo", wx.ArtProvider.GetBitmap(wx.ART_REDO, wx.ART_TOOLBAR), wx.NullBitmap, wx.ITEM_NORMAL, "Redo Action", "Redo Action", None)
         self.cyrillic = self.toolBar1.AddTool(1002, u"Cirilica", wx.Bitmap(os.path.join('resources','icons','cyrillic.png'), wx.BITMAP_TYPE_ANY), wx.NullBitmap, wx.ITEM_NORMAL, u"To Cyrillic", u"Konvertuje u ćirilicu", None)
         self.ansi = self.toolBar1.AddTool(1003, u"ANSI", wx.Bitmap(os.path.join('resources','icons','ANSI.png'), wx.BITMAP_TYPE_ANY), wx.NullBitmap, wx.ITEM_NORMAL, u"To ANSI", u"Konvertuje u ANSI format", None)
         self.unicode = self.toolBar1.AddTool(1004, u"UTF", wx.Bitmap(os.path.join('resources', 'icons', 'UTF8.png'), wx.BITMAP_TYPE_ANY), wx.NullBitmap, wx.ITEM_NORMAL, u"To UTF", u"Konvertuje u UTF unikode", None)
@@ -1224,11 +1222,8 @@ class MyFrame(wx.Frame):
                 fpr.unix2DOS()
             self.newEnc = 'windows-1251'
             
-            if entered_enc == self.newEnc:
-                logger.debug(f"Nothing to do, encoding is: {entered_enc}")
-                return
             self.pre_suffix = value1_s
-            # new_enc = self.newEnc
+            
             fproc = FileProcessed(entered_enc, path)
             text = fproc.getContent()
             
@@ -1443,11 +1438,8 @@ class MyFrame(wx.Frame):
                 fpr = FileProcessed(entered_enc, self.orig_path)
                 fpr.unix2DOS()
             
-            if entered_enc == self.newEnc:
-                logger.debug(f"Nothing to do, encoding is: {entered_enc}")
-                return
             self.pre_suffix = value1_s
-            # new_enc = self.newEnc
+            
             fproc = FileProcessed(entered_enc, path)
             text = fproc.getContent()
             
@@ -1506,9 +1498,8 @@ class MyFrame(wx.Frame):
             self.MenuBar.Enable(wx.ID_SAVE, True)
             self.MenuBar.Enable(wx.ID_SAVEAS, True)
             self.MenuBar.Enable(wx.ID_CLOSE, True)
-            self.toolBar1.EnableTool(1010, True)  # Save
+            self.toolBar1.EnableTool(1010, False)  # Save
             self.toolBar1.EnableTool(1003, False)
-            self.toolBar1.EnableTool(101, True)
             
             self.enchistory[path] = self.newEnc
             self.previous_action['toCyrSRTutf8'] = self.newEnc
@@ -2196,7 +2187,7 @@ class MyFrame(wx.Frame):
                     sDlg = wx.MessageDialog(self, 'Fajl je uspešno sačuvan\n{}'.format(os.path.basename(outpath)), 'SubConverter', wx.OK | wx.ICON_INFORMATION)
                     sDlg.ShowModal()
                     # Dodaje putanju i enkoding u recnik
-                    self.saved_file[outpath] = self.newEnc                
+                    self.saved_file[outpath] = self.newEnc
                     self.MenuBar.Enable(wx.ID_SAVE, False)
                     self.MenuBar.Enable(wx.ID_SAVEAS, False)
                     self.toolBar1.EnableTool(1010, False)
@@ -2994,7 +2985,7 @@ class MyFrame(wx.Frame):
     def onQuit(self, event):
         tval = self.text_1.GetValue()
         prev = [self.previous_action.keys() if self.previous_action else 0]
-        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled() and not prev == 'toCyrSRTutf8':
+        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled() and not prev == 'toCyrSRT_utf8':
             dl1 = wx.MessageBox("Current content has not been saved! Proceed?", "Please confirm", wx.ICON_QUESTION | wx.YES_NO, self)
             if dl1 == wx.NO:
                 return
