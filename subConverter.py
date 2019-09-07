@@ -1680,8 +1680,8 @@ class MyFrame(wx.Frame):
         
     def exportZIPmultiple(self):
         
-        if os.path.isfile('resources\\var\\droped0.pkl'):
-            with open('resources\\var\\droped0.pkl', 'rb') as d:
+        if os.path.isfile(self.droped0_p):
+            with open(self.droped0_p, 'rb') as d:
                 droped_files = pickle.load(d)
             self.multiFile.clear()
             self.multiFile.update(droped_files)        
@@ -2922,8 +2922,9 @@ class MyFrame(wx.Frame):
             sortedFiles = sorted(fileData.items(), key=itemgetter(1))
             
             delete = len(sortedFiles) - 34
-            for x in range(0, delete):
-                os.remove(sortedFiles[x][0])
+            if not len(self.multiFile) > 10:
+                for x in range(0, delete):
+                    os.remove(sortedFiles[x][0])
         event.Skip()    
 
     def onChoice(self, event):
