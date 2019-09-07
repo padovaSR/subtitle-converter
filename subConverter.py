@@ -50,7 +50,7 @@ VERSION = "v0.5.7.0_test"
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
-handler = RotatingFileHandler('resources\\var\\subtitle_converter.log.log', mode='a', maxBytes=4000)
+handler = RotatingFileHandler('resources\\var\\subtitle_converter.log', mode='a', maxBytes=4000)
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
@@ -1633,7 +1633,8 @@ class MyFrame(wx.Frame):
                 self.newEnc = 'utf-8-sig'
             else:
                 self.newEnc = 'utf-8'
-            if entered_enc == "utf-8" or entered_enc == "utf-8-sig" and not cyr_utf == "toCyrSRTutf8":
+            action_l = ["toCyrSRTutf8", "toCYR"]
+            if entered_enc == "utf-8" or entered_enc == "utf-8-sig" and not cyr_utf in action_l:
                 code = "UTF-8"
                 if entered_enc == "utf-8-sig":
                     code = "BOM_UTF-8"                
