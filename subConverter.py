@@ -1216,6 +1216,12 @@ class MyFrame(wx.Frame):
                     entered_enc = pickle.load(e)
                 self.enchistory[path] = entered_enc
                 self.orig_path = path + '.orig'
+                
+                cyr_utf = [x for x in self.previous_action.keys() if self.previous_action]
+                
+                if cyr_utf and cyr_utf[0] == "toCyrSRTutf8":
+                    self.orig_path = os.path.join("tmp", os.path.basename(path))
+                
                 shutil.copy(path, self.orig_path)
                 self.previous_action.clear()
                 fpr = FileProcessed(entered_enc, self.orig_path)
@@ -1294,7 +1300,8 @@ class MyFrame(wx.Frame):
             self.enchistory[path] = self.newEnc
             self.previous_action['toCYR'] = self.newEnc
             self.reloaded = 0
-                
+            if self.orig_path:
+                os.remove(self.orig_path)    
         event.Skip()
         
     def toCyrillic_multiple(self):
@@ -2071,7 +2078,7 @@ class MyFrame(wx.Frame):
                 msginfo = wx.MessageDialog(self, f'Subtitles deleted:   [ {deleted} ]\nSubtitles trimmed: [ {trimmed} ]', 'SubConverter', wx.OK | wx.ICON_INFORMATION)
                 msginfo.ShowModal()                
             except TypeError as e:
-                logger.debug(f"CleanUp _2: {sys.exc_info()}")
+                logger.debug(f"CleanUp _2: {e}")
                 msginfo = wx.MessageDialog(self, 'Subtitle clean\nno changes made.', 'SubConverter', wx.OK | wx.ICON_INFORMATION)
                 msginfo.ShowModal()                
             fproc.unix2DOS()
