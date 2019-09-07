@@ -1622,7 +1622,9 @@ class MyFrame(wx.Frame):
                 with open(self.enc0_p, 'rb') as e:
                     entered_enc = pickle.load(e)
                 self.enchistory[path] = entered_enc
-                cyr_utf = list(self.previous_action.keys())[0]
+                cyr_utf = ""
+                if self.previous_action:
+                    cyr_utf = list(self.previous_action.keys())[0]
                 self.previous_action.clear()
             
             self.pre_suffix = value1_s
