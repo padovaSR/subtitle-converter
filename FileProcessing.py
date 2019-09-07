@@ -428,6 +428,9 @@ class FileProcessed:
         nf = [x for x in rplsList if x in ml]
         
         logger.debug('Specijalnih znakova u fajlu: [{0}]'.format(len(nf)))
+        if len(nf) > 0:
+            msginfo = wx.MessageDialog(None, f'Specijalni znakovi u tekstu:\n\n {", ".join(nf)}.\n', 'SubConverter', wx.OK | wx.ICON_INFORMATION)
+            msginfo.ShowModal()
         
         for key, value in rplSmap.items():
             p = p.replace(key, value)   # !!! Svuda treba da bude p "p=p.replace"!!!
