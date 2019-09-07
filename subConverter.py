@@ -1484,6 +1484,9 @@ class MyFrame(wx.Frame):
 
             with open(self.enc0_p, 'wb') as f:      
                 pickle.dump(utf8_enc, f)
+            
+            with open(self.path0_p, "wb") as f:
+                pickle.dump(utf_path, f)
                     
             cyr_proc.writeToFile(text)  # Write corrected text to file
             cyr_proc.unix2DOS()
@@ -1619,6 +1622,7 @@ class MyFrame(wx.Frame):
                 with open(self.enc0_p, 'rb') as e:
                     entered_enc = pickle.load(e)
                 self.enchistory[path] = entered_enc
+                cyr_utf = list(self.previous_action.keys())[0]
                 self.previous_action.clear()
             
             self.pre_suffix = value1_s
@@ -1627,8 +1631,7 @@ class MyFrame(wx.Frame):
                 self.newEnc = 'utf-8-sig'
             else:
                 self.newEnc = 'utf-8'
-            
-            if entered_enc == "utf-8" or entered_enc == "utf-8-sig":
+            if entered_enc == "utf-8" or entered_enc == "utf-8-sig" and not cyr_utf == "toCyrSRTutf8":
                 code = "UTF-8"
                 if entered_enc == "utf-8-sig":
                     code = "BOM_UTF-8"                
@@ -2984,8 +2987,10 @@ class MyFrame(wx.Frame):
     
     def onQuit(self, event):
         tval = self.text_1.GetValue()
-        prev = [self.previous_action.keys() if self.previous_action else 0]
-        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled() and not prev == 'toCyrSRT_utf8':
+        prev = ""
+        if self.previous_action:
+            prev = list(self.previous_action.keys())[0]
+        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled() and not prev == 'toCyrSRTutf8':
             dl1 = wx.MessageBox("Current content has not been saved! Proceed?", "Please confirm", wx.ICON_QUESTION | wx.YES_NO, self)
             if dl1 == wx.NO:
                 return
