@@ -50,7 +50,7 @@ VERSION = "v0.5.7.0_test"
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
-handler = RotatingFileHandler('resources\\var\\subtitle_converter.log', mode='a', maxBytes=4000)
+handler = RotatingFileHandler(filename=os.path.join("resources", "var", "subtitle_converter.log"), mode="a", maxBytes=4000, encoding="utf-8")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
@@ -1279,6 +1279,8 @@ class MyFrame(wx.Frame):
             if text:
                 with open(self.enc0_p, 'wb') as f:      
                     pickle.dump(self.newEnc, f)
+                with open(self.path0_p, "wb") as f:
+                    pickle.dump(cyr_path, f)
                     
             cyr_proc.writeToFile(text)  # Write corrected text to file
             cyr_proc.unix2DOS()
@@ -1663,7 +1665,9 @@ class MyFrame(wx.Frame):
             
             if text:
                 with open(self.enc0_p, 'wb') as f:      
-                    pickle.dump(self.newEnc, f)                
+                    pickle.dump(self.newEnc, f)
+                with open(self.path0_p, "wb") as f:
+                    pickle.dump(path, f)
                 if self.newEnc == "utf-8-sig":
                     code = "BOM_UTF-8"
                 msginfo = wx.MessageDialog(self, f'Tekst je konvertovan u enkoding: {code}.', 'SubConverter', wx.OK | wx.ICON_INFORMATION)
