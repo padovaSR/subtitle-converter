@@ -41,14 +41,14 @@ from zamenaImena import dictionary_0, dictionary_1, dictionary_2, rplSmap,\
      searchReplc, dict0_n, dict0_n2, dict1_n, dict1_n2, dict2_n, dict2_n2,\
      lat_cir_mapa, pLatin_rpl, pre_cyr
 
-from showError import w_position
+# from showError import w_position
 
 import wx
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
-handler = RotatingFileHandler(os.path.join('resources', 'var', 'FileProcessing.log'), mode='a', maxBytes=40*1024)
+handler = RotatingFileHandler(filename=os.path.join("resources", "var", "FileProcessing.log"), mode="a", maxBytes=4000, encoding="utf-8")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
@@ -427,9 +427,10 @@ class FileProcessed:
         ml = re.sub(r'[(\d+):(\d+):(\d+)\,(\d+)\s\-\-><\/\.]', '', p)  # Uklanja brojeve i crtice i spejseve, newline, ostaje samo jedan string.
         nf = [x for x in rplsList if x in ml]
         
-        logger.debug('Specijalnih znakova u fajlu: [{0}]'.format(len(nf)))
+        logger.debug('Specijalnih znakova ukupno: [{0}]'.format(len(nf)))
         if len(nf) > 0:
-            msginfo = wx.MessageDialog(None, f'Specijalni znakovi u tekstu:\n\n {", ".join(nf)}.\n', 'SubConverter', wx.OK | wx.ICON_INFORMATION)
+            logger.debug(f'SpecChars: {" ".join(nf)}')
+            msginfo = wx.MessageDialog(None, f'Specijalni znakovi u tekstu:\n\n{", ".join(nf)}.', 'SubConverter', wx.OK | wx.ICON_INFORMATION)
             msginfo.ShowModal()
         
         for key, value in rplSmap.items():
