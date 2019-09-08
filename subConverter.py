@@ -514,12 +514,8 @@ class MyFrame(wx.Frame):
         self.toolBar1.EnableTool(1005, False)
         self.toolBar1.EnableTool(1006, False)
         self.toolBar1.EnableTool(1007, False)
-        #self.toolBar1.EnableTool(101, False)
-        #self.toolBar1.EnableTool(102, False)
         # Tool Bar end
         
-        # end wxGlade
-
     def __set_properties(self):
         # begin wxGlade: MyFrame.__set_properties
         self.SetTitle(f"SubtitleConverter {VERSION}")
@@ -851,12 +847,16 @@ class MyFrame(wx.Frame):
         
         open_next, enc = self.saved_file.popitem()
         
+        _path = os.path.join("tmp", os.path.basename(open_next))
+        shutil.copy(open_next, _path)
+        
         ask = 'Open this file:\n{}'.format(os.path.basename(open_next))
         askDlg = wx.MessageDialog(self, ask, caption="SubConverter", style= wx.OK_DEFAULT | wx.CANCEL | wx.ICON_QUESTION)
         if askDlg.ShowModal() == wx.ID_OK:
             self.text_1.SetValue("")
-            fop = FileProcessed(enc, open_next)
+            fop = FileProcessed(enc, _path)
             logger.debug(f"Open_next: {os.path.basename(open_next)}, encoding: {enc}")
+            fop.regularFile(open_next)
             text = fop.getContent()
             self.text_1.SetValue(text)
             self.SetStatusText(os.path.basename(open_next))
