@@ -358,7 +358,9 @@ class FileProcessed:
         
         with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
             ex = sp['key5']
+            em = sp['key2']
             value5_s = ex['lat_utf8_srt']
+            value_m = em['f_suffix']
         
         if oformat == "txt" and pre_suffix == value5_s:
             sufix = ".txt"
@@ -372,6 +374,7 @@ class FileProcessed:
             added = [line.strip("\n") for line in l_file if line]
             
         suffix_list = ["."+x if not x.startswith("_") else x for x in ex.values()] + added
+        suffix_list.append(value_m)
         
         _d = "."+pre_suffix             # pre_suffix je unet u funkciji koja poziva newName
         if pre_suffix.startswith("_"):
