@@ -1208,8 +1208,6 @@ class MyFrame(wx.Frame):
             self.toCyrillic_multiple()
         else:        
             if os.path.isfile(self.path0_p):
-                with open(os.path.join('resources', 'var', 'tcf.pkl'), 'wb') as tf:
-                    pickle.dump("cyr_txt", tf)                
                 with open(self.path0_p, 'rb') as p:
                     path = pickle.load(p)          # path je u tmp/ folderu
                 with open(self.enc0_p, 'rb') as e:
@@ -2234,8 +2232,6 @@ class MyFrame(wx.Frame):
         dlg.SetFilename(fname)
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
-            if not self.newEnc:
-                self.newEnc = 'utf-8'
             if os.path.isfile(tpath):
                 fproc = FileProcessed(self.newEnc, tpath)
                 text = fproc.getContent()
