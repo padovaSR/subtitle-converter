@@ -52,7 +52,7 @@ class FileSettings(wx.Dialog):
                     ex = sp['key5']
                     value1_s = ex['cyr_ansi_srt']; value2_s = ex['cyr_utf8_txt']; value3_s = ex['cyr_utf8_srt']; value4_s = ex['lat_ansi_srt']
                     value5_s = ex['lat_utf8_srt']; value6_s = ex['fixed_subs']; value7_s = ex['transcribe']; value8_s = ex['cleanup']
-                    
+                    # print(list(ex.values()))
                     self.text_1.SetValue(value1_s); self.text_2.SetValue(value2_s); self.text_3.SetValue(value3_s); self.text_4.SetValue(value4_s)
                     self.text_5.SetValue(value5_s); self.text_6.SetValue(value6_s); self.text_7.SetValue(value7_s); self.text_8.SetValue(value8_s)
                     

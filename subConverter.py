@@ -848,11 +848,11 @@ class MyFrame(wx.Frame):
         open_next, enc = self.saved_file.popitem()
         
         _path = os.path.join("tmp", os.path.basename(open_next))
-        shutil.copy(open_next, _path)
         
         ask = 'Open this file:\n{}'.format(os.path.basename(open_next))
         askDlg = wx.MessageDialog(self, ask, caption="SubConverter", style= wx.OK_DEFAULT | wx.CANCEL | wx.ICON_QUESTION)
         if askDlg.ShowModal() == wx.ID_OK:
+            shutil.copy(open_next, _path)
             self.text_1.SetValue("")
             fop = FileProcessed(enc, _path)
             logger.debug(f"Open_next: {os.path.basename(open_next)}, encoding: {enc}")
