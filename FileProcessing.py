@@ -344,6 +344,14 @@ class FileProcessed:
         with open(os.path.join('resources', 'var', 'tcf.pkl'), 'rb') as tf:
             oformat = pickle.load(tf)  # TXT suffix
 
+        spattern = re.compile(r"\.srt\.srt", re.I)
+        tpattern = re.compile(r"\.txt\.txt", re.I)
+        
+        if re.findall(spattern, path):
+            path = spattern.sub(".srt", path)
+        elif re.findall(tpattern, path):
+            path = tpattern.sub(".txt", path)
+        
         fprint = os.path.basename(path)
         n = os.path.splitext(fprint)[0]
         psufix = os.path.splitext(n)[-1]  # presufix ispred sufixa
@@ -352,9 +360,7 @@ class FileProcessed:
             ex = sp['key5']
             value5_s = ex['lat_utf8_srt']
         
-        if oformat == 'cyr_txt': 
-            sufix = '.txt'
-        elif oformat == "txt" and pre_suffix == value5_s:
+        if oformat == "txt" and pre_suffix == value5_s:
             sufix = ".txt"
         else:
             sufix = os.path.splitext(path)[-1]  # srt,txt ili neki drugi koji je otvoren        
@@ -367,14 +373,18 @@ class FileProcessed:
             
         suffix_list = ["."+x if not x.startswith("_") else x for x in ex.values()] + added
         
-        _d = "."+pre_suffix
+        _d = "."+pre_suffix             # pre_suffix je unet u funkciji koja poziva newName
         if pre_suffix.startswith("_"):
             _d = pre_suffix
         
         if psufix in suffix_list:
             name1 = '{0}{1}'.format(os.path.splitext(n)[0], _d)  # fajl u tmp/ folderu
+            if name1.endswith("."):
+                name1 = name1.strip(".")
         else:
             name1 = '{0}{1}'.format(n, _d)
+            if name1.endswith("."):
+                name1 = name1.strip(".")            
         
         return name1, sufix  # Vraca samo ime fajla bez putanje
     
