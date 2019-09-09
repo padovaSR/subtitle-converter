@@ -379,12 +379,16 @@ class FileProcessed:
         
         if psufix in suffix_list:
             name1 = '{0}{1}'.format(os.path.splitext(n)[0], _d)  # fajl u tmp/ folderu
-            if name1.endswith("."):
-                name1 = name1.strip(".")
         else:
             name1 = '{0}{1}'.format(n, _d)
-            if name1.endswith("."):
-                name1 = name1.strip(".")            
+        
+        if name1.endswith("."):
+            name1 = name1.strip(".")        
+        
+        for i in suffix_list:
+            fpattern = r"\w*" + i + r"\w*"
+            if len(re.findall(fpattern, name1, re.I)) >= 2:
+                name1 = name1.replace(i, "", 1)
         
         return name1, sufix  # Vraca samo ime fajla bez putanje
     
