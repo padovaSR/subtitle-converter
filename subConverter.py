@@ -1300,7 +1300,7 @@ class MyFrame(wx.Frame):
             self.enchistory[path] = self.newEnc
             self.previous_action['toCYR'] = self.newEnc
             self.reloaded = 0
-            if self.orig_path:
+            if not self.orig_path.startswith("tmp"):
                 os.remove(self.orig_path)    
         event.Skip()
         
@@ -2317,7 +2317,7 @@ class MyFrame(wx.Frame):
                     info1 = fname + os.path.splitext(tpath)[-1] # info1 dodaje cyr pre_suffix i file se pise u ZIP pod tim imenom
                     info1 = info1.strip('/')
                     info2 = os.path.basename(tUTF)
-                    lat_file = os.path.splitext(os.path.split(self.orig_path)[1])[0]
+                    lat_file = os.path.basename(self.orig_path)[:-5]
                     izbor = [info1, info2, lat_file]
                     
                     fpr = FileProcessed(enc, path)
