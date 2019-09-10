@@ -987,6 +987,7 @@ class MyFrame(wx.Frame):
                 self.toolBar1.EnableTool(1010, True)  # Save
                 self.toolBar1.EnableTool(101, True)
                 self.previous_action['toANSI'] = self.newEnc
+                self.enchistory[path] = self.newEnc
                 self.reloaded = 0
             
             def dialog1(text_1):
@@ -1222,8 +1223,10 @@ class MyFrame(wx.Frame):
                 
                 shutil.copy(path, self.orig_path)
                 self.previous_action.clear()
+                
                 fpr = FileProcessed(entered_enc, self.orig_path)
                 fpr.unix2DOS()
+            
             self.newEnc = 'windows-1251'
             
             self.pre_suffix = value1_s
@@ -1243,12 +1246,13 @@ class MyFrame(wx.Frame):
                 utf8_enc = 'utf-8'
                 
             utf_path = os.path.join(self.real_dir, utfText+suffix)
-            self.cyrUTF = utf_path
             
             if os.path.exists(utf_path):
                 nnm = fproc.nameCheck(os.path.basename(utf_path), self.real_dir, suffix)+1
                 utf_path = '{0}_{1}{2}'.format(utf_path, nnm, suffix)
                 
+            self.cyrUTF = utf_path
+                   
             new_fproc = FileProcessed(utf8_enc, utf_path)
             text = fproc.getContent()
             text = new_fproc.writeToFile(text)
@@ -1953,6 +1957,11 @@ class MyFrame(wx.Frame):
         newfproc.writeToFile(text)
         num = newfproc.zameniImena()
         
+        with open(self.enc0_p, 'wb') as f:      
+            pickle.dump(self.newEnc, f)
+        with open(self.path0_p, "wb") as f:
+            pickle.dump(path, f)        
+        
         if num > 28 or num < 28 and num > 2:
             msginfo = wx.MessageDialog(self, 'Zamenjenih objekata\nukupno [ {} ]'.format(num), 'SubConverter', wx.OK | wx.ICON_INFORMATION)
             msginfo.ShowModal()
@@ -1969,6 +1978,7 @@ class MyFrame(wx.Frame):
         self.reload.Enable(True)
         self.toolBar1.EnableTool(1010, True)  # Save
         self.previous_action['Transcribe'] = self.newEnc
+        self.enchistory[path] = self.newEnc
         self.reloaded = 0
         
         event.Skip()
@@ -2560,6 +2570,7 @@ class MyFrame(wx.Frame):
             self.reload.Enable(True)
             self.reloaded = 0
             self.previous_action['cyrToANSI'] = self.newEnc
+            self.enchistory[path] = self.newEnc
         event.Skip()
     
     def cyrToANSI_multiple(self):
@@ -2708,6 +2719,7 @@ class MyFrame(wx.Frame):
             self.reload.Enable(True)
             self.reloaded = 0
             self.previous_action['cyrToUTF'] = self.newEnc
+            self.enchistory[path] = self.newEnc
         event.Skip()
         
     def cyrToUTF_multiple(self):
