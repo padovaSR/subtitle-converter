@@ -2515,15 +2515,25 @@ class MyFrame(wx.Frame):
             self.enchistory[path] = entered_enc            
     
             entered_enc = self.encAction(path)
-            self.previous_action.clear()
+            # self.previous_action.clear()
             
             self.pre_suffix = value1_s
             
             self.newEnc = 'windows-1250'
             t_enc = 'utf-8'
-            utf_tmpFile = path+'.TEMP_UTF'
             
-            self.orig_path = path + '.orig'
+            cyr_utf = [x for x in self.previous_action.keys() if self.previous_action]
+            
+            utf_tmpFile = path+'.TEMP_UTF'
+            self.orig_path = path + '.orig'            
+            
+            if cyr_utf and cyr_utf[0] == "toCyrSRTutf8":
+                self.orig_path = os.path.join("tmp", os.path.basename(path))
+                utf_tmpFile = os.path.join("tmp", os.path.basename(path)) + ".TEMP_UTF"
+                tpath = os.path.join("tmp", os.path.basename(path))
+                shutil.copy(path, tpath)
+                path = tpath
+                
             if not os.path.isfile(self.orig_path):
                 shutil.copy(path, self.orig_path)
             
@@ -2666,7 +2676,7 @@ class MyFrame(wx.Frame):
                 
             
             entered_enc = self.encAction(path)
-            self.previous_action.clear()
+            # self.previous_action.clear()
             
             self.pre_suffix = value1_s
             
@@ -2675,7 +2685,17 @@ class MyFrame(wx.Frame):
             else:
                 self.newEnc = 'utf-8'
             
-            self.orig_path = path + '.orig'
+            cyr_utf = [x for x in self.previous_action.keys() if self.previous_action]
+                
+            self.orig_path = path + '.orig'            
+            
+            if cyr_utf and cyr_utf[0] == "toCyrSRTutf8":
+                self.orig_path = os.path.join("tmp", os.path.basename(path))
+                shutil.copy(path, self.orig_path)
+                tpath = os.path.join("tmp", os.path.basename(path))
+                shutil.copy(path, tpath)
+                path = tpath
+                
             if not os.path.isfile(self.orig_path):
                 shutil.copy(path, self.orig_path)
             
@@ -2913,7 +2933,7 @@ class MyFrame(wx.Frame):
     
     def encAction(self, path):
         if self.previous_action:
-            actions = ['toCYR', 'toUTF', 'toANSI', 'Transcribe', 'repSpec', 'Cleanup', 'cyrToANSI', 'cyrToUTF', 'FixSubtitle', 'Merger']
+            actions = ['toCYR', 'toUTF', 'toANSI', 'Transcribe', 'repSpec', 'Cleanup', 'cyrToANSI', 'cyrToUTF', 'FixSubtitle', 'Merger', "toCyrSRTutf8"]
             for a in actions:
                 try:
                     entered_enc = self.previous_action[a]
