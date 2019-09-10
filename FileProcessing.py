@@ -359,10 +359,13 @@ class FileProcessed:
         with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
             ex = sp['key5']
             em = sp['key2']
+            value2_s = ex['cyr_utf8_txt']
             value5_s = ex['lat_utf8_srt']
             value_m = em['f_suffix']
         
         if oformat == "txt" and pre_suffix == value5_s:
+            sufix = ".txt"
+        elif oformat == "txt" and pre_suffix == value2_s:
             sufix = ".txt"
         else:
             sufix = os.path.splitext(path)[-1]  # srt,txt ili neki drugi koji je otvoren        
@@ -831,10 +834,10 @@ class TextProcessing(FileProcessed):
         else:
             if t_out:
                 writeTempStr(self.putanja, t_out[0], self.kode)
-        much = t_out[1]
-        logger.debug(f'DoReplace, zamenjeno [{much}] objekata ')
+            much = t_out[1]
+            logger.debug(f'DoReplace, zamenjeno [{much}] objekata ')
         
-        return much
+            return much
         
     def cleanUp(self):
         
