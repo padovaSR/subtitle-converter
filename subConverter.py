@@ -1306,9 +1306,6 @@ class MyFrame(wx.Frame):
         
     def toCyrillic_multiple(self):
         
-        with open(os.path.join('resources', 'var', 'tcf.pkl'), 'wb') as tf:
-            pickle.dump("cyr_txt", tf)        
-        
         with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
             ex = sp['key5']
             value1_s = ex['cyr_ansi_srt']
@@ -1936,6 +1933,7 @@ class MyFrame(wx.Frame):
         self.pre_suffix = value1_s
         
         entered_enc = self.encAction(path)
+        self.previous_action.clear()
         
         if self.preferences.IsChecked(1011):
             self.newEnc = 'utf-8-sig'
@@ -1944,16 +1942,16 @@ class MyFrame(wx.Frame):
             
         fproc = FileProcessed(entered_enc, path)
         text = fproc.getContent()
+        #fproc.writeToFile(text)
         
         utf_proc = FileProcessed(self.newEnc, path)
         text = utf_proc.writeToFile(text)
         text = utf_proc.fixI(text)
         writeTempStr(path, text, self.newEnc)
         newfproc = TextProcessing(self.newEnc, path)
+        text = newfproc.getContent()
+        newfproc.writeToFile(text)
         num = newfproc.zameniImena()
-        
-        with open(self.enc0_p, 'wb') as f:      
-            pickle.dump(self.newEnc, f)        
         
         if num > 28 or num < 28 and num > 2:
             msginfo = wx.MessageDialog(self, 'Zamenjenih objekata\nukupno [ {} ]'.format(num), 'SubConverter', wx.OK | wx.ICON_INFORMATION)
@@ -1970,7 +1968,6 @@ class MyFrame(wx.Frame):
         self.MenuBar.Enable(wx.ID_CLOSE, True)
         self.reload.Enable(True)
         self.toolBar1.EnableTool(1010, True)  # Save
-        self.toolBar1.EnableTool(101, True)
         self.previous_action['Transcribe'] = self.newEnc
         self.reloaded = 0
         
@@ -1999,7 +1996,8 @@ class MyFrame(wx.Frame):
             self.enchistory[path] = entered_enc
         
         entered_enc = self.encAction(path)
-        self.newEnc = entered_enc    
+        self.newEnc = entered_enc
+        self.previous_action.clear()
         
         self.orig_path = path + '.orig'
         if not os.path.isfile(self.orig_path):
@@ -2010,8 +2008,11 @@ class MyFrame(wx.Frame):
         # prethodna = self.previous_action   # Poslednji element i kada je lista prazna
         
         fproc = TextProcessing(entered_enc, path)
-        text = fproc.getContent()
-        text = text.replace('?', '¬')
+        try:
+            text = fproc.getContent()
+            text = text.replace('?', '¬')
+        except Exception as e:
+            logger.debug(f"repSpec getContent: {e}")        
         writeTempStr(path, text, entered_enc)
         num = fproc.doReplace()
         text = fproc.getContent()
@@ -2066,6 +2067,7 @@ class MyFrame(wx.Frame):
         
         entered_enc = self.encAction(path)
         self.newEnc = entered_enc
+        self.previous_action.clear()
             
         self.pre_suffix = value1_s
         
@@ -2086,13 +2088,13 @@ class MyFrame(wx.Frame):
             fproc.unix2DOS()
             text = fproc.getContent()
             self.text_1.SetValue(text)
+            
             # self.enc = self.newEnc
             self.SetStatusText(os.path.basename(path))
             self.MenuBar.Enable(wx.ID_SAVE, True)
             self.MenuBar.Enable(wx.ID_SAVEAS, True)
             self.MenuBar.Enable(wx.ID_CLOSE, True)
             self.toolBar1.EnableTool(1010, True)  # Save
-            self.toolBar1.EnableTool(101, True)
             self.previous_action['Cleanup'] = self.newEnc
             self.reloaded = 0
         else:
@@ -2503,7 +2505,10 @@ class MyFrame(wx.Frame):
             self.enchistory[path] = entered_enc            
     
             entered_enc = self.encAction(path)
+            self.previous_action.clear()
+            
             self.pre_suffix = value1_s
+            
             self.newEnc = 'windows-1250'
             t_enc = 'utf-8'
             utf_tmpFile = path+'.TEMP_UTF'
@@ -2519,7 +2524,9 @@ class MyFrame(wx.Frame):
                 text = text.replace('?', '¬')
                 
                 with open(self.enc0_p, 'wb') as f:      
-                    pickle.dump(self.newEnc, f)                
+                    pickle.dump(self.newEnc, f)
+                with open(self.path0_p, "wb") as f:
+                    pickle.dump(path, f)                
             
             writeTempStr(utf_tmpFile, text, entered_enc)
             
@@ -2648,6 +2655,7 @@ class MyFrame(wx.Frame):
                 
             
             entered_enc = self.encAction(path)
+            self.previous_action.clear()
             
             self.pre_suffix = value1_s
             
@@ -2668,6 +2676,8 @@ class MyFrame(wx.Frame):
                 
                 with open(self.enc0_p, 'wb') as f:      
                     pickle.dump(self.newEnc, f)
+                with open(self.path0_p, "wb") as f:
+                    pickle.dump(path, f)                
                     
             writeTempStr(path, text, entered_enc)
             
