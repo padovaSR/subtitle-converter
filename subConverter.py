@@ -333,7 +333,6 @@ class MyFrame(wx.Frame):
 
         self.file.AppendSeparator()
 
-        #self.recent.SetBitmap(wx.Bitmap(u"16x16/mimetypes/text-x-generic.png"), wx.BITMAP_TYPE_ANY))
         # Submenu
         self.file_sub = wx.Menu()
         self.file_sub.Append(-1, "Recent files", "")
@@ -342,8 +341,6 @@ class MyFrame(wx.Frame):
         self.file.AppendSeparator()
         # Submenu end        
 
-        # self.file.AppendSeparator()
-        
         self.quit_program = wx.MenuItem(self.file, wx.ID_ANY, u"Quit"+ u"\t" + u"Ctrl+Q", u"Quit program", wx.ITEM_NORMAL)
         self.quit_program.SetBitmap(wx.Bitmap(os.path.join("resources", "icons", "application-exit.png"), wx.BITMAP_TYPE_ANY))
         self.Bind(wx.EVT_MENU, self.onQuit, id=self.quit_program.GetId())
@@ -1831,14 +1828,10 @@ class MyFrame(wx.Frame):
                 lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
                 logger.debug(''.join('!' + line for line in lines))
     
-            # shutil.move(name, os.path.join(dirname, name))
-    
             if os.path.isfile(path):
                 logger.debug("ZIP file saved sucessfully: {}".format(path))
                 sDlg = wx.MessageDialog(self, 'Fajl je uspešno sačuvan\n{}'.format(os.path.basename(path)), 'SubConverter', wx.OK | wx.ICON_INFORMATION)
                 sDlg.ShowModal()
-                #self.tmpPath.clear()
-                #self.cyrUTFmulti.clear()
                 # Dodaje putanju i enkoding u recnik
                 self.saved_file[path] = self.newEnc                
                 self.open_next.Enable(True)
@@ -1946,7 +1939,6 @@ class MyFrame(wx.Frame):
             
         fproc = FileProcessed(entered_enc, path)
         text = fproc.getContent()
-        #fproc.writeToFile(text)
         
         utf_proc = FileProcessed(self.newEnc, path)
         text = utf_proc.writeToFile(text)
@@ -2015,8 +2007,6 @@ class MyFrame(wx.Frame):
         
         self.pre_suffix = 'rpl'
         
-        # prethodna = self.previous_action   # Poslednji element i kada je lista prazna
-        
         fproc = TextProcessing(entered_enc, path)
         try:
             text = fproc.getContent()
@@ -2036,7 +2026,6 @@ class MyFrame(wx.Frame):
             ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
             ErrorDlg.ShowModal()
             self.Error_Text = error_text
-        # self.enc = self.newEnc
         self.SetStatusText(os.path.basename(path))
         self.MenuBar.Enable(wx.ID_SAVE, True)
         self.MenuBar.Enable(wx.ID_SAVEAS, True)
@@ -2099,7 +2088,6 @@ class MyFrame(wx.Frame):
             text = fproc.getContent()
             self.text_1.SetValue(text)
             
-            # self.enc = self.newEnc
             self.SetStatusText(os.path.basename(path))
             self.MenuBar.Enable(wx.ID_SAVE, True)
             self.MenuBar.Enable(wx.ID_SAVEAS, True)
@@ -2319,7 +2307,7 @@ class MyFrame(wx.Frame):
                     f.close()
                     return _data                
                 
-                if list(self.previous_action.keys())[0] == "toCYR":
+                if list(self.previous_action.keys())[-1] == "toCYR":
                 
                     tUTF = os.path.join("tmp", os.path.basename(self.cyrUTF))
                     shutil.copy(self.cyrUTF, tUTF)
@@ -2405,7 +2393,7 @@ class MyFrame(wx.Frame):
                         return
                             
                 else:
-                    if list(self.previous_action.keys())[0] == 'toCyrSRTutf8':
+                    if list(self.previous_action.keys())[-1] == 'toCyrSRTutf8':
                         tzdata = ""
                         ldata = ""
                         zdata = data_out(self.cyrUTF)
@@ -2418,7 +2406,7 @@ class MyFrame(wx.Frame):
                         tzdata = ""
                         ldata = ""
                         info1 = fname + os.path.splitext(tpath)[-1]
-                        if self.preferences.IsChecked(1012) and list(self.previous_action.keys())[0] == "toUTF":
+                        if self.preferences.IsChecked(1012) and list(self.previous_action.keys())[-1] == "toUTF":
                             info1 = os.path.splitext(info1)[0]+'.txt'                        
                         info1 = info1.strip('/')
                         info2 = None
@@ -2515,7 +2503,6 @@ class MyFrame(wx.Frame):
             self.enchistory[path] = entered_enc            
     
             entered_enc = self.encAction(path)
-            # self.previous_action.clear()
             
             self.pre_suffix = value1_s
             
@@ -2528,7 +2515,7 @@ class MyFrame(wx.Frame):
             self.orig_path = path + '.orig'            
             
             if cyr_utf and cyr_utf[0] == "toCyrSRTutf8":
-                self.orig_path = os.path.join("tmp", os.path.basename(path))
+                self.orig_path = os.path.join("tmp", os.path.basename(path)) + ".orig"
                 utf_tmpFile = os.path.join("tmp", os.path.basename(path)) + ".TEMP_UTF"
                 tpath = os.path.join("tmp", os.path.basename(path))
                 shutil.copy(path, tpath)
@@ -2676,7 +2663,6 @@ class MyFrame(wx.Frame):
                 
             
             entered_enc = self.encAction(path)
-            # self.previous_action.clear()
             
             self.pre_suffix = value1_s
             
@@ -2690,7 +2676,7 @@ class MyFrame(wx.Frame):
             self.orig_path = path + '.orig'            
             
             if cyr_utf and cyr_utf[0] == "toCyrSRTutf8":
-                self.orig_path = os.path.join("tmp", os.path.basename(path))
+                self.orig_path = os.path.join("tmp", os.path.basename(path)) + ".orig"
                 shutil.copy(path, self.orig_path)
                 tpath = os.path.join("tmp", os.path.basename(path))
                 shutil.copy(path, tpath)
