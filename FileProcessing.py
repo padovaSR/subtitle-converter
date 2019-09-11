@@ -377,8 +377,8 @@ class FileProcessed:
             added = [line.strip("\n") for line in l_file if line]
             
         suffix_list = ["."+x if not x.startswith("_") else x for x in ex.values()] + added
-        suffix_list = [x.strip(".") if x.startswith(r".(") else x for x in suffix_list]
         suffix_list.append(value_m)
+        suffix_list = [x.strip(".") if x.startswith(r".(") else x for x in suffix_list]
         
         _d = "."+pre_suffix                                                         # pre_suffix je unet u funkciji koja poziva newName
         if pre_suffix.startswith("_") or pre_suffix.startswith(r"("):
