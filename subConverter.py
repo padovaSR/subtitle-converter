@@ -45,7 +45,7 @@ import traceback
 
 import wx
 
-VERSION = "v0.5.7.0_test"
+VERSION = "v0.5.7.0"
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
