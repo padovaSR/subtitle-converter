@@ -336,7 +336,7 @@ class FileProcessed:
         procenat = percentage(all_values, len(rx))
         return all_values, procenat
             
-    def newName(self, pre_suffix, real_dir, multi):
+    def newName(self, pre_suffix, multi):
         
         path = self.putanja
         presuffix_l = os.path.join("resources", "var", "presuffix_list.bak")
