@@ -210,6 +210,7 @@ class MyFrame(wx.Frame):
         self.SetSize((637, 582))
         self.panel_1 = wx.Panel(self, wx.ID_ANY)
         self.text_1 = wx.TextCtrl(self.panel_1, wx.ID_ANY, "", style=wx.TE_MULTILINE|wx.TE_READONLY|wx.TE_RICH|wx.TE_WORDWRAP)
+        
         # drop target
         dt = FileDrop(self.text_1)
         self.text_1.SetDropTarget(dt)        
@@ -942,8 +943,7 @@ class MyFrame(wx.Frame):
                 self.orig_path = path + '.orig'
                 shutil.copy(path, self.orig_path)
                 self.previous_action.clear()
-                
-            entered_enc = self.encAction(path)
+            
             self.newEnc = 'windows-1250'
             self.pre_suffix = value4_s
             
@@ -1083,7 +1083,7 @@ class MyFrame(wx.Frame):
                 text = fproc.rplStr(text)
                 text = text.replace('?', '¬')
                 writeTempStr(path, text, entered_enc)
-                nam, b = fproc.newName(self.pre_suffix, self.real_dir, True)
+                nam, b = fproc.newName(self.pre_suffix, True)
                 newF = '{0}{1}'.format(os.path.join(self.real_dir, nam), b)                
                 new_fproc = FileProcessed(self.newEnc, newF)
                 text = fproc.getContent()
@@ -1235,7 +1235,7 @@ class MyFrame(wx.Frame):
                 text = text.replace('?', '¬')
             writeTempStr(path, text, entered_enc)
             
-            utfText, suffix = fproc.newName(value2_s, self.real_dir, multi=False)
+            utfText, suffix = fproc.newName(value2_s, multi=False)
             
             if self.preferences.IsChecked(1011):  
                 utf8_enc = 'utf-8-sig'
@@ -1295,7 +1295,7 @@ class MyFrame(wx.Frame):
             self.MenuBar.Enable(wx.ID_SAVEAS, True)
             self.MenuBar.Enable(wx.ID_CLOSE, True)
             self.toolBar1.EnableTool(1010, True)  # Save
-            self.toolBar1.EnableTool(1003, False)
+            self.toolBar1.EnableTool(1003, False)   # toANSI
             self.toolBar1.EnableTool(101, True)
             
             self.enchistory[path] = self.newEnc
@@ -1337,7 +1337,7 @@ class MyFrame(wx.Frame):
             text = fproc.getContent()
             if text:
                 text = text.replace('?', '¬')
-            utfText, suffix = fproc.newName(value2_s, self.real_dir, multi=True)   # 'cyr_utf8'
+            utfText, suffix = fproc.newName(value2_s, multi=True)   # 'cyr_utf8'
             if self.preferences.IsChecked(1011):  
                 utf8_enc = 'utf-8-sig'
             else:
@@ -1355,7 +1355,7 @@ class MyFrame(wx.Frame):
             text = new_fproc.fixI(text)  # Isto kao i kod rplStr text
             text = new_fproc.writeToFile(text)
             
-            cyr_name, cyr_suffix = new_fproc.newName(self.pre_suffix, self.real_dir, multi=True)
+            cyr_name, cyr_suffix = new_fproc.newName(self.pre_suffix, multi=True)
             cyr_path = os.path.join(self.real_dir, cyr_name+file_suffix)
             if not os.path.isfile(cyr_path):
                 open(cyr_path, 'a').close()
@@ -1452,7 +1452,7 @@ class MyFrame(wx.Frame):
                 text = text.replace('?', '¬')
             writeTempStr(path, text, entered_enc)
             
-            utfText, suffix = fproc.newName(value2_s, self.real_dir, multi=False)
+            utfText, suffix = fproc.newName(value2_s, multi=False)
             suffix = ".srt"
             
             if self.preferences.IsChecked(1011):  
@@ -1556,7 +1556,7 @@ class MyFrame(wx.Frame):
             text = fproc.getContent()
             if text:
                 text = text.replace('?', '¬')
-            utfText, suffix = fproc.newName(value3_s, self.real_dir, multi=True)   # 'cyr_utf8'
+            utfText, suffix = fproc.newName(value3_s, multi=True)   # 'cyr_utf8'
             suffix = ".srt"
                 
             utf_path = os.path.join(self.real_dir, utfText+suffix)
@@ -1873,7 +1873,7 @@ class MyFrame(wx.Frame):
                 text = text.replace('?', '¬')
                 writeTempStr(path, text, entered_enc)
                 
-            nam, b = fproc.newName(self.pre_suffix, self.real_dir, True)
+            nam, b = fproc.newName(self.pre_suffix, True)
             newF = '{0}{1}'.format(os.path.join(self.real_dir, nam), b)
             
             newFproc = FileProcessed(self.newEnc, newF)
@@ -1929,7 +1929,6 @@ class MyFrame(wx.Frame):
             
         self.pre_suffix = value1_s
         
-        entered_enc = self.encAction(path)
         self.previous_action.clear()
         
         if self.preferences.IsChecked(1011):
@@ -1997,7 +1996,6 @@ class MyFrame(wx.Frame):
                 entered_enc = pickle.load(e)
             self.enchistory[path] = entered_enc
         
-        entered_enc = self.encAction(path)
         self.newEnc = entered_enc
         self.previous_action.clear()
         
@@ -2064,7 +2062,6 @@ class MyFrame(wx.Frame):
             self.enchistory[path] = entered_enc
             self.newEnc = entered_enc
         
-        entered_enc = self.encAction(path)
         self.newEnc = entered_enc
         self.previous_action.clear()
             
@@ -2126,7 +2123,6 @@ class MyFrame(wx.Frame):
             self.orig_path = path + '.orig'
             shutil.copy(path, self.orig_path)            
         
-        entered_enc = self.encAction(path)
         self.newEnc = entered_enc                           # path je u tmp/ folderu
         
         try:
@@ -2140,7 +2136,7 @@ class MyFrame(wx.Frame):
         
         fproc = FileProcessed(entered_enc, path)
         
-        name, b = fproc.newName(file_suffix, self.real_dir, multi=False)
+        name, b = fproc.newName(file_suffix, multi=False)
         fproc.remove_bom_inplace()
         
         try:
@@ -2191,7 +2187,7 @@ class MyFrame(wx.Frame):
             enc = self.enchistory[tpath]
             
             fproc = FileProcessed(enc, tpath)
-            fname, nsuffix = fproc.newName(self.pre_suffix, self.real_dir, multi=False)
+            fname, nsuffix = fproc.newName(self.pre_suffix, multi=False)
             
             outpath = fproc.nameDialog(fname, nsuffix, self.real_dir)  # Puna putanja sa imenom novog fajla
             
@@ -2289,7 +2285,7 @@ class MyFrame(wx.Frame):
             try:
                 if self.real_path:
                     fproc = FileProcessed(enc, tpath)
-                    fname, nsufix = fproc.newName(self.pre_suffix, self.real_dir, False)
+                    fname, nsufix = fproc.newName(self.pre_suffix, False)
             except IOError as e:
                 logger.debug("On ZIP IOError({0}):".format(e))
             except IndexError as e:
@@ -2317,9 +2313,6 @@ class MyFrame(wx.Frame):
                     info2 = os.path.basename(tUTF)
                     lat_file = os.path.basename(self.orig_path)[:-5]
                     izbor = [info1, info2, lat_file]
-                    
-                    fpr = FileProcessed(enc, path)
-                    fpr.unix2DOS()
                     
                     dlg = wx.MultiChoiceDialog(self, 'Pick files:', os.path.basename(name), izbor)
                     if dlg.ShowModal() == wx.ID_OK:
@@ -2502,8 +2495,6 @@ class MyFrame(wx.Frame):
                 entered_enc = pickle.load(e)
             self.enchistory[path] = entered_enc            
     
-            entered_enc = self.encAction(path)
-            
             self.pre_suffix = value1_s
             
             self.newEnc = 'windows-1250'
@@ -2613,7 +2604,7 @@ class MyFrame(wx.Frame):
             text = utfcyproc.rplStr(text)
             writeTempStr(utf_tmpFile, text, t_enc)
             
-            nam, b = fproc.newName(self.pre_suffix, self.real_dir, True)
+            nam, b = fproc.newName(self.pre_suffix, True)
             newF = '{0}{1}'.format(os.path.join(self.real_dir, nam), b)            
             
             ansi_cyproc = Preslovljavanje(self.newEnc, newF)  #  Pise u path jer u SAVE se trazi path.
@@ -2661,9 +2652,6 @@ class MyFrame(wx.Frame):
                 entered_enc = pickle.load(e)
             self.enchistory[path] = entered_enc        
                 
-            
-            entered_enc = self.encAction(path)
-            
             self.pre_suffix = value1_s
             
             if self.preferences.IsChecked(1011):
@@ -2760,7 +2748,7 @@ class MyFrame(wx.Frame):
             if text:
                 text = text.replace('?', '¬')
             
-            nam, b = fproc.newName(self.pre_suffix, self.real_dir, True)
+            nam, b = fproc.newName(self.pre_suffix, True)
             newF = '{0}{1}'.format(os.path.join(self.real_dir, nam), b)            
             
             cyproc = Preslovljavanje(self.newEnc, newF)
@@ -2833,7 +2821,6 @@ class MyFrame(wx.Frame):
         except Exception as e: #handle other exceptions such as attribute errors
             logger.debug("FixSubtitle, unexpected error:", sys.exc_info()[0:2])
             
-        entered_enc = self.encAction(path)
         self.pre_suffix = value1_s
         self.newEnc = entered_enc   # VAZNO za Save funkciju
         
