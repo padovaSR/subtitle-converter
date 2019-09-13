@@ -346,7 +346,12 @@ class FileProcessed:
 
         spattern = re.compile(r"\.srt\.srt", re.I)
         tpattern = re.compile(r"\.txt\.txt", re.I)
+        upattern = re.compile(r"_merged", re.I)
         
+        if len(re.findall(upattern, path)) == 2:
+            path = upattern.sub("", path, count=1)
+        elif len(re.findall(upattern, path)) == 3:
+            path = upattern.sub("", path, count=2)
         if re.findall(spattern, path):
             path = spattern.sub(".srt", path)
         elif re.findall(tpattern, path):
@@ -380,7 +385,7 @@ class FileProcessed:
         suffix_list.append(value_m)
         suffix_list = [x.strip(".") if x.startswith(r".(") else x for x in suffix_list]
         
-        _d = "."+pre_suffix                                                         # pre_suffix je unet u funkciji koja poziva newName
+        _d = "."+pre_suffix           # pre_suffix je unet u funkciji koja poziva newName
         if pre_suffix.startswith("_") or pre_suffix.startswith(r"("):
             _d = pre_suffix
         
@@ -390,14 +395,15 @@ class FileProcessed:
             name1 = '{0}{1}'.format(n, _d)
         
         if name1.endswith("."):
-            name1 = name1.strip(".")        
-        
+            name1 = name1.strip(".")
+            
+        name1 = re.sub("_merged_merged", "_merged", name1)
+            
         for i in suffix_list:
             fpattern = r"\w*" + i + r"\w*"
             if len(re.findall(fpattern, name1, re.I)) >= 2:
                 name1 = name1.replace(i, "", 1)
-        
-        return name1, sufix  # Vraca samo ime fajla bez putanje
+        return name1, sufix     # Vraca samo ime fajla bez putanje
     
     def nameDialog(self, name_entry, sufix_entry, dir_entry):
         
