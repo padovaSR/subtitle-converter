@@ -341,17 +341,24 @@ class FileProcessed:
         path = self.putanja
         presuffix_l = os.path.join("resources", "var", "presuffix_list.bak")
         
+        with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
+            ex = sp['key5']
+            em = sp['key2']
+            value2_s = ex['cyr_utf8_txt']
+            value5_s = ex['lat_utf8_srt']
+            value_m = em['f_suffix']        #  Merger suffix        
+        
         with open(os.path.join('resources', 'var', 'tcf.pkl'), 'rb') as tf:
             oformat = pickle.load(tf)  # TXT suffix
 
         spattern = re.compile(r"\.srt\.srt", re.I)
         tpattern = re.compile(r"\.txt\.txt", re.I)
-        upattern = re.compile(r"_merged", re.I)
+        upattern = re.compile(r"\s*"+value_m+r"\d*", re.I)
         
         if len(re.findall(upattern, path)) == 2:
-            path = upattern.sub("", path, count=1)
-        elif len(re.findall(upattern, path)) == 3:
             path = upattern.sub("", path, count=2)
+        elif len(re.findall(upattern, path)) == 3:
+            path = upattern.sub("", path, count=3)        
         if re.findall(spattern, path):
             path = spattern.sub(".srt", path)
         elif re.findall(tpattern, path):
@@ -360,13 +367,6 @@ class FileProcessed:
         fprint = os.path.basename(path)
         n = os.path.splitext(fprint)[0]
         psufix = os.path.splitext(n)[-1]  # presufix ispred sufixa
-        
-        with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
-            ex = sp['key5']
-            em = sp['key2']
-            value2_s = ex['cyr_utf8_txt']
-            value5_s = ex['lat_utf8_srt']
-            value_m = em['f_suffix']        #  Merger suffix
         
         if oformat == "txt" and pre_suffix == value5_s:
             sufix = ".txt"
@@ -397,12 +397,11 @@ class FileProcessed:
         if name1.endswith("."):
             name1 = name1.strip(".")
             
-        name1 = re.sub("_merged_merged", "_merged", name1)
-            
         for i in suffix_list:
             fpattern = r"\w*" + i + r"\w*"
             if len(re.findall(fpattern, name1, re.I)) >= 2:
                 name1 = name1.replace(i, "", 1)
+                
         return name1, sufix     # Vraca samo ime fajla bez putanje
     
     def nameDialog(self, name_entry, sufix_entry, dir_entry):
