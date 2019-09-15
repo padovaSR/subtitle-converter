@@ -992,7 +992,7 @@ class MyFrame(wx.Frame):
                 if ErrorDlg.ShowModal() == wx.ID_OK:
                     return True
             fproc_a = FileProcessed(entered_enc, self.orig_path)
-            zbir_slova, procent = fproc_a.checkChars()
+            zbir_slova, procent, chars = fproc_a.checkChars()
             #----------------------------------------------------------------------------------------------------------
             if zbir_slova == 0 and procent == 0:
                 text = ansiAction(path)
@@ -1009,7 +1009,7 @@ class MyFrame(wx.Frame):
             elif procent > 0:
                 self.SetStatusText(u'Greška u ulaznom fajlu.')
                 f_procent = 'Najmanje {} % teksta.\nIli najmanje [ {} ] znakova.'.format(procent, zbir_slova)
-                ErrorText = "Greška:\n\nUlazni fajl sadrži ćiriliči alfabet.\n{}\n\nNastavljate?\n".format(f_procent)
+                ErrorText = "Greška:\n\nUlazni fajl sadrži ćiriliči alfabet.\n\n{}\n{}\n\nNastavljate?\n".format(f_procent, ",".join(chars))
                 dlg = dialog1(ErrorText)
                 if dlg == True:
                     if procent >= 50:
@@ -1031,7 +1031,7 @@ class MyFrame(wx.Frame):
             #----------------------------------------------------------------------------------------------------------
             elif zbir_slova > 0:
                 f_zbir = 'Najmanje [ {} ] znakova.'.format(zbir_slova)
-                ErrorText = "Greška:\n\nUlazni fajl sadrži ćiriliči alfabet.\n{}\n\nNastavljate?\n".format(f_zbir)
+                ErrorText = "Greška:\n\nUlazni fajl sadrži ćiriliči alfabet.\n{}\n{}\n\nNastavljate?\n".format(f_zbir, ",".join(chars))
                 self.SetStatusText(u'Greška u ulaznom fajlu.')
                 dlg = dialog1(ErrorText)
                 if dlg == True:
@@ -1074,7 +1074,7 @@ class MyFrame(wx.Frame):
                 Operation not permitted when encoding windows-1251! {os.path.basename(path)}")
                 continue
             
-            zbir_slova, procent = fproc.checkChars()
+            zbir_slova, procent, chars = fproc.checkChars()
             
             def ansiAction(path):
                 if not entered_enc == 'windows-1251':
@@ -1120,7 +1120,7 @@ class MyFrame(wx.Frame):
                 logger.debug(f'ToANSI: Cyrillic alfabet u tekstu: {entered_enc} cyrillic')
                 self.SetStatusText(u'Greška u ulaznom fajlu.')
                 f_procent = 'Najmanje {} % teksta.\nIli najmanje [ {} ] znakova.'.format(procent, zbir_slova)
-                ErrorText = "Greška:\n\n{}\nsadrži ćiriliči alfabet.\n{}\n\nNastavljate?\n".format(os.path.basename(path), f_procent)
+                ErrorText = "Greška:\n\n{0}\nsadrži ćiriliči alfabet.\n{1}\n{2}\n\nNastavljate?\n".format(os.path.basename(path), ",".join(f_procent, chars))
                 dlg = dialog1(ErrorText)
                 if dlg == True:
                     if procent >= 50:
@@ -1152,7 +1152,7 @@ class MyFrame(wx.Frame):
             elif zbir_slova > 0:
                 logger.debug(f'ToANSI: Cyrillic alfabet u tekstu: {entered_enc} cyrillic')
                 f_zbir = 'Najmanje [ {} ] znakova.'.format(zbir_slova)
-                ErrorText = "Greška:\n\n{}\nsadrži ćiriliči alfabet.\n{}\n\nNastavljate?\n".format(os.path.basename(path), f_zbir)
+                ErrorText = "Greška:\n\n{0}\nsadrži ćiriliči alfabet.\n{1}\n{2}\n\nNastavljate?\n".format(os.path.basename(path),f_zbir, ",".join(chars))
                 dlg = dialog1(ErrorText)
                 if dlg == True:
                     newF = ansiAction(path)
@@ -1693,7 +1693,7 @@ class MyFrame(wx.Frame):
         tpath = os.path.basename(list(self.multiFile)[0][:-4])
         epattern = re.compile(r"episode\s*-*\d*", re.I)
         tpath = epattern.sub("", tpath)
-        tpath = tpath.replace("E01", "").replace("e01", "").replace(" 1 ", "")
+        tpath = tpath.replace("E01", "").replace("e01", "").replace(" 1 ", "").replace("x01", "")
         
         sas_wildcard =  "ZipArchive (*.zip)|*.zip|All Files (*.*)|*.*"
     
@@ -2136,7 +2136,6 @@ class MyFrame(wx.Frame):
         
         fproc = FileProcessed(entered_enc, path)
         
-        name, b = fproc.newName(file_suffix, multi=False)
         fproc.remove_bom_inplace()
         
         try:
@@ -2173,7 +2172,6 @@ class MyFrame(wx.Frame):
         self.MenuBar.Enable(wx.ID_CLOSE, True)
         self.reload.Enable(True)
         self.toolBar1.EnableTool(1010, True)  # Save
-        self.toolBar1.EnableTool(101, True)
         self.reloaded = 0
         self.previous_action['Merger'] = self.newEnc
         
