@@ -36,6 +36,7 @@ from io import StringIO, BytesIO
 from textwrap import TextWrapper
 import pysrt
 import srt
+from alphabet_detector import AlphabetDetector
 
 from zamenaImena import dictionary_0, dictionary_1, dictionary_2, rplSmap,\
      searchReplc, dict0_n, dict0_n2, dict1_n, dict1_n2, dict2_n, dict2_n2,\
@@ -301,6 +302,9 @@ class FileProcessed:
             logger.debug("File_Check, unexpected error:", sys.exc_info()[0])
             
     def checkChars(self):
+        
+        de = AlphabetDetector()
+        
         path = self.putanja
         kode = self.kode
         def percentage(part, whole):
@@ -309,12 +313,6 @@ class FileProcessed:
             except ZeroDivisionError:
                 logger.debug('FileCheck Error, file is empty')
                 return 0
-        
-        slova = ['а', 'б', 'в', 'г', 'д', 'ђ', 'е', 'ж', 'з', 'и', 'ј', 'к', 'ю', 'я', 'Ю', 'Я', 'л', 'м', 'н', 'о', 'п',
-            'ћ', 'у', 'ф', 'х', 'Ь', 'Ъ', 'ь', 'ъ', 'Э', 'э', 'ц', 'ч', 'ш', 'А', 'Б', 'В', 'Г', 'Д', 'Ђ', 'Е', 'Ж', 'З',
-            'й', 'Й', 'Ь', 'Ы', 'Ъ', 'ь', 'ы', 'ъ', 'И', 'Ј', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'Ћ', 'У', 'Ф',
-            'Ч', 'Ш', 'т', 'љ', 'њ', 'џ', 'Љ', 'Њ', 'Џ',  'р', 'с', 'Х', 'Ц']
-        
         try:
             with  open(path, 'r', encoding=kode) as f:
                 x = f.read()
@@ -326,7 +324,11 @@ class FileProcessed:
             rx = re.sub(r'[(\d+):(\d+):(\d+)\,(\d+)\s\-\-><\/\.]', '', x)
         except IOError as e:
             logger.debug(f"CheckChar, I/O error ({e.errno}): {e.strerror}")
-        im = [x for x in slova if x in rx]
+        # im = [x for x in slova if x in rx]
+        im = []
+        for i in rx:
+            if de.is_in_alphabet(i, "CYRILLIC"):
+                im.append(i)
         statistic = OrderedDict()
         for x, y in zip(im, rx):
             if x in rx:
@@ -334,7 +336,8 @@ class FileProcessed:
                 statistic[x] = num
         all_values = sum(statistic.values())
         procenat = percentage(all_values, len(rx))
-        return all_values, procenat
+        
+        return all_values, procenat, list(set(im))
             
     def newName(self, pre_suffix, multi):
         
