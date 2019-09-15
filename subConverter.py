@@ -1719,7 +1719,7 @@ class MyFrame(wx.Frame):
             # dirname = os.path.dirname(path)
             name = path
             
-            if list(self.previous_action.keys())[0] == 'toCYR_multiple':
+            if list(self.previous_action.keys())[-1] == 'toCYR_multiple':
                 
                 izbor_ansi = []
                 izbor_txt = []
@@ -1794,7 +1794,7 @@ class MyFrame(wx.Frame):
                 except Exception:
                     logger.debug("ExportZIP_A error, {}".format(sys.exc_info()))                
                     
-            if list(self.previous_action.keys())[0] == 'toCyrSRTutf8_multiple':
+            if list(self.previous_action.keys())[-1] == 'toCyrSRTutf8_multiple':
                 files = izbor
                 zlist = [data_out(x) for x in files]
                 info = [os.path.basename(x) for x in files]
