@@ -307,6 +307,7 @@ class FileProcessed:
         
         path = self.putanja
         kode = self.kode
+        
         def percentage(part, whole):
             try:
                 return int(100 * part/whole)
@@ -318,22 +319,24 @@ class FileProcessed:
                 x = f.read()
         except IOError as e:
             logger.debug(f"CheckChar, I/O error({e.errno}): {e.strerror}")
-        except: #handle other exceptions such as attribute errors
+        except:
             logger.debug(f"CheckChar, unexpected error: {sys.exc_info()[0]}")
         try:
             rx = re.sub(r'[(\d+):(\d+):(\d+)\,(\d+)\s\-\-><\/\.]', '', x)
         except IOError as e:
             logger.debug(f"CheckChar, I/O error ({e.errno}): {e.strerror}")
-        # im = [x for x in slova if x in rx]
+        
         im = []
         for i in rx:
             if de.is_in_alphabet(i, "CYRILLIC"):
                 im.append(i)
+        
         statistic = OrderedDict()
         for x, y in zip(im, rx):
             if x in rx:
                 num = rx.count(x)
                 statistic[x] = num
+        
         all_values = sum(statistic.values())
         procenat = percentage(all_values, len(rx))
         
