@@ -1693,7 +1693,8 @@ class MyFrame(wx.Frame):
         tpath = os.path.basename(list(self.multiFile)[0][:-4])
         epattern = re.compile(r"episode\s*-*\d*", re.I)
         tpath = epattern.sub("", tpath)
-        tpath = tpath.replace("E01", "").replace("e01", "").replace(" 1 ", "").replace("x01", "")
+        tpath = re.sub(r"e01", "", tpath, count=1, flags=re.I)
+        tpath = tpath.replace(" 1 ", "").replace("x01", "").replace("  ", " ")
         
         sas_wildcard =  "ZipArchive (*.zip)|*.zip|All Files (*.*)|*.*"
     
