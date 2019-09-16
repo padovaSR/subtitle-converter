@@ -386,6 +386,7 @@ class FileProcessed:
         
         with open(presuffix_l, 'r', encoding='utf-8') as l_file:
             added = [line.strip("\n") for line in l_file if line]
+            added = [re.sub(r"\.x\d+-*_*\w+", "", x, count=1, flags=re.I) for x in added]
             
         suffix_list = ["."+x if not x.startswith("_") else x for x in ex.values()] + added
         suffix_list.append(value_m)
@@ -397,6 +398,7 @@ class FileProcessed:
         
         if psufix in suffix_list:
             name1 = '{0}{1}'.format(os.path.splitext(n)[0], _d)  # fajl u tmp/ folderu
+            print(name1)
         else:
             name1 = '{0}{1}'.format(n, _d)
         
@@ -434,7 +436,8 @@ class FileProcessed:
                 if "_" in presuffix_x:
                     presuffix_ = "_"+presuffix_x.split("_")[-1]+"\n"
                 else:
-                    presuffix_ = os.path.splitext(os.path.splitext(nameO)[0])[-1]+"\n" 
+                    presuffix_ = os.path.splitext(os.path.splitext(nameO)[0])[-1]+"\n"
+                presuffix_ = re.sub(r"\.x\d+-*_*\w+", "", presuffix_, count=1, flags=re.I)
                 f.write(presuffix_)
             return nameO
         else:
