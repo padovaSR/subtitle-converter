@@ -18,7 +18,6 @@
 
 import os
 import sys
-# import codecs
 import re
 import shutil
 import zipfile
@@ -28,7 +27,6 @@ import pysrt
 import srt
 from collections import OrderedDict
 from operator import itemgetter
-# from itertools import zip_longest
 import glob
 from FileProcessing import FileProcessed, FileOpened, Preslovljavanje, writeTempStr, TextProcessing
 from showError import w_position, showMeError
@@ -1133,7 +1131,7 @@ class MyFrame(wx.Frame):
                     newfproc = FileProcessed(self.newEnc, newF)
                     try:
                         text = newfproc.getContent()
-                    except Exception as e:
+                    except Exception:
                         logger.debug("ToANSI, text error:", sys.exc_info()[0:2])                    
                     
                     text = self.fileErrors(newF, self.newEnc, multi=True)
@@ -1160,7 +1158,7 @@ class MyFrame(wx.Frame):
                     newfproc = FileProcessed(self.newEnc, newF)
                     try:
                         text = newfproc.getContent()
-                    except Exception as e:
+                    except Exception:
                         logger.debug("ToANSI, text error:", sys.exc_info()[0:2])                        
                     self.text_1.AppendText('\n')
                     self.text_1.AppendText(os.path.basename(newF))
@@ -1666,6 +1664,8 @@ class MyFrame(wx.Frame):
                     pickle.dump(path, f)
                 if self.newEnc == "utf-8-sig":
                     code = "BOM_UTF-8"
+                else:
+                    code = self.newEnc
                 msginfo = wx.MessageDialog(self, f'Tekst je konvertovan u enkoding: {code}.', 'SubConverter', wx.OK | wx.ICON_INFORMATION)
                 msginfo.ShowModal()
                 
@@ -2909,7 +2909,7 @@ class MyFrame(wx.Frame):
             for a in actions:
                 try:
                     entered_enc = self.previous_action[a]
-                except Exception as e:
+                except Exception:
                     logger.debug(f"Searching for key: {sys.exc_info()[1]}")
                 else:
                     logger.debug(f"New entered_enc: {entered_enc}.")
