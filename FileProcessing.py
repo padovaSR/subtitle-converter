@@ -63,8 +63,8 @@ def writeTempStr(inFile, text, kode):
             tfile.write(text.encode(encoding=kode, errors=_error))
             tfile.seek(0)
             content = tfile.read()
-            with open(inFile, 'wb') as  out: #, encoding=enc) as out:
-                    out.write(content)
+            with open(inFile, 'wb') as  out:
+                out.write(content)
     except IOError as e:
         logger.debug("WriteTempStr, I/O error({0}): {1}".format(e.errno, e.strerror))
     except AttributeError as e:
@@ -73,7 +73,7 @@ def writeTempStr(inFile, text, kode):
         logger.debug(f"WriteTempStr, UnicodeEncodeError: {e}")
     except UnicodeDecodeError as e:
         logger.debug(f"WriteTempStr, UnicodeDecodeError: {e}")
-    except Exception as e: #handle other exceptions such as attribute errors
+    except Exception:
         logger.debug(f"WriteTempStr, unexpected error: {traceback.format_exc}")
 
 def convert_bytes(num):
@@ -149,11 +149,11 @@ class FileOpened:
             ukode = 'utf-8-sig'
         
         kodiranja = [ukode, 'utf-8', 'windows-1250', 'windows-1251', 'windows-1252',
-                 'UTF-16LE', 'utf-8_sig', 'iso-8859-1', 'iso-8859-2', 'utf-16', 'ascii']
+                 'UTF-16LE', "UTF-16BE", 'utf-8-sig', 'iso-8859-1', 'iso-8859-2', 'utf-16', 'ascii']
             
         for enc in kodiranja:              
             try:
-                with codecs.open(self.putanja, 'r', encoding=enc) as fh: #, errors='surrogatepass')
+                with codecs.open(self.putanja, 'r', encoding=enc) as fh:
                     fh.readlines()
                     fh.seek(0)
             except:
@@ -250,10 +250,10 @@ class FileProcessed:
         
             
     def checkErrors(self):
-        fpaterns = ['ï»¿Å', 'Ä', 'Å½', 'Ä', 'Ä', 'Å¡', 'Ä', 'Å¾', 'Ä', 'Ä',
-                    'Ĺ ', 'Ĺ˝', 'ĹĄ', 'Ĺž', 'Ä', 'Å ', 'Ä‡', 'Ä¿', 'Ä²', 'Ä³', 'Å¿', 'Ã¢â']
+        fpaterns = ['ï»¿Å', 'Ä', 'Å½', 'Ä', 'Ä', 'Å¡', 'Ä', 'Å¾', 'Ä', 'Ä',\
+                    "Ĺ˝", 'Ĺ ', 'ĹĄ', 'Ĺž', 'Ä', 'Å ', 'Ä‡', 'Ä¿', 'Ä²', 'Ä³', 'Å¿', 'Ã¢â', "�", "Д†", "Д‡"]
         fpaterns = list(set(fpaterns))
-        # print(fpaterns)
+        
         text = self.getContent()
         l1 = []; l2 = []
         try:
@@ -386,7 +386,7 @@ class FileProcessed:
         
         with open(presuffix_l, 'r', encoding='utf-8') as l_file:
             added = [line.strip("\n") for line in l_file if line]
-            added = [re.sub(r"\.x\d+-*_*\w+", "", x, count=1, flags=re.I) for x in added]
+            added = [re.sub(r"\.x2\d+-*_*\w+", "", x, count=1, flags=re.I) for x in added]
             
         suffix_list = ["."+x if not x.startswith("_") else x for x in ex.values()] + added
         suffix_list.append(value_m)
@@ -398,7 +398,6 @@ class FileProcessed:
         
         if psufix in suffix_list:
             name1 = '{0}{1}'.format(os.path.splitext(n)[0], _d)  # fajl u tmp/ folderu
-            print(name1)
         else:
             name1 = '{0}{1}'.format(n, _d)
         
@@ -437,7 +436,7 @@ class FileProcessed:
                     presuffix_ = "_"+presuffix_x.split("_")[-1]+"\n"
                 else:
                     presuffix_ = os.path.splitext(os.path.splitext(nameO)[0])[-1]+"\n"
-                presuffix_ = re.sub(r"\.x\d+-*_*\w+", "", presuffix_, count=1, flags=re.I)
+                presuffix_ = re.sub(r"\.x2\d+-*_*\w+", "", presuffix_, count=1, flags=re.I)
                 f.write(presuffix_)
             return nameO
         else:
@@ -624,30 +623,32 @@ class FileProcessed:
 class Preslovljavanje(FileProcessed):
     
     def changeLetters(self, reversed_action):
+        
         inkode = self.kode
         infile = self.putanja
         
-        def lat_to_cir(txt):
-            MAPA = lat_cir_mapa
-            if reversed_action == True:
-                cyr_lat_mapa = dict(map(reversed, lat_cir_mapa.items()))
-                MAPA = cyr_lat_mapa
-            ntxt = ""
-            for c in txt:
-                if c in MAPA:
-                    ntxt += MAPA[c]
-                else:
-                    ntxt += c
-            return ntxt
+        MAPA = lat_cir_mapa
+        if reversed_action == True:
+            cyr_lat_mapa = dict(map(reversed, lat_cir_mapa.items()))
+            MAPA = cyr_lat_mapa        
+        
         # preslovljavanje, prepise se utfFile:
         try:
             with open(infile, 'r', encoding=inkode) as f:
-                text_lat = f.read()
-                text_changed = lat_to_cir(text_lat)
-                self.writeToFile(text_changed)
+                text_read = f.read()
+                
+                text_changed = ""
+                
+                for c in text_read:
+                    if c in MAPA:
+                        text_changed += MAPA[c]
+                    else:
+                        text_changed += c
+            self.writeToFile(text_changed)
+        
         except IOError as e:
             logger.debug("Preslovljavanje, I/O error({0}): {1}".format(e.errno, e.strerror))
-        except: #handle other exceptions such as attribute errors
+        except:
             logger.debug("Preslovljavanje, unexpected error:", sys.exc_info()[0])
         
     def preLatin(self):
@@ -660,7 +661,7 @@ class Preslovljavanje(FileProcessed):
                 fp = robjLatin.sub(lambda m: pLatin_rpl[m.group(0)], p)
         except IOError as e:
             logger.debug("PreLatin, I/O error({0}): {1}".format(e.errno, e.strerror))
-        except: #handle other exceptions such as attribute errors
+        except:
             logger.debug("PreLatin, unexpected error:", sys.exc_info()[0])
         else:
             if fp:
@@ -669,18 +670,20 @@ class Preslovljavanje(FileProcessed):
     def preProc(self, reversed_action):
         kode = self.kode
         infile = self.putanja        
-        pre_lat = dict(map(reversed, pre_cyr.items()))
+        
         try:
             with open(infile, 'r', encoding=kode) as f:
                 tNew = f.read()
-                robjCyr = re.compile('(%s)' % '|'.join(map(re.escape, pre_cyr.keys())))
-                robjLat = re.compile('(%s)' % '|'.join(map(re.escape, pre_lat.keys())))
-                t_out = robjCyr.sub(lambda m: pre_cyr[m.group(0)], tNew)
-                if reversed_action == True:
+                if reversed_action == False:
+                    robjCyr = re.compile('(%s)' % '|'.join(map(re.escape, pre_cyr.keys())))
+                    t_out = robjCyr.sub(lambda m: pre_cyr[m.group(0)], tNew)
+                elif reversed_action == True:
+                    pre_lat = dict(map(reversed, pre_cyr.items()))
+                    robjLat = re.compile('(%s)' % '|'.join(map(re.escape, pre_lat.keys())))
                     t_out = robjLat.sub(lambda m: pre_lat[m.group(0)], tNew)
         except IOError as e:
             logger.debug("Preprocessing, I/O error({0}): {1}".format(e.errno, e.strerror))
-        except: #handle other exceptions such as attribute errors
+        except:
             logger.debug("Preprocessing, unexpected error:", sys.exc_info()[0])
         else:
             if t_out:
@@ -694,7 +697,7 @@ class Preslovljavanje(FileProcessed):
             'НЈ': 'Њ',
             'ДЖ': 'Џ',
         }
-        # lat_cir = dict(map(reversed, cir_lat.items()))        
+                
         BLOCK = 1048576
         try:
             with open(Ufile, 'r', encoding= kode) as f:
@@ -703,7 +706,7 @@ class Preslovljavanje(FileProcessed):
                 c_out = robjCyr.sub(lambda m: cir_lat[m.group(0)], tNew)
         except IOError as e:
             logger.debug("Preprocessing, I/O error({0}): {1}".format(e.errno, e.strerror))
-        except: #handle other exceptions such as attribute errors
+        except:
             logger.debug("Preprocessing, unexpected error:", sys.exc_info()[0])
         else:
             if c_out:
@@ -722,9 +725,8 @@ class Preslovljavanje(FileProcessed):
             with open(intext, 'r', encoding=inkode) as fin:
                 fr = fin.read()
                 freg = re.compile(r'<.*?>')
-                # wreg = re.compile(r"титлови.цом")
                 wreg = re.compile(r'www\.\w+\.\w+\s*')
-                cf = freg.findall(fr)  #; print(cf)
+                cf = freg.findall(fr)
                 wf = wreg.findall(fr)
                 lj = []
                 wj = []
@@ -742,7 +744,7 @@ class Preslovljavanje(FileProcessed):
                     fr = fr.replace(key, value)                
         except IOError as e:
             logger.debug("Tag translate, I/O error({0}): {1}".format(e.errno, e.strerror))
-        except: #handle other exceptions such as attribute errors
+        except:
             logger.debug("Tag translate, unexpected error:", sys.exc_info()[0])
         else:
             if fr:
