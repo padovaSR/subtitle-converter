@@ -371,8 +371,13 @@ class FileProcessed:
             path = tpattern.sub(".txt", path)
         
         fprint = os.path.basename(path)
+        
         n = os.path.splitext(fprint)[0]
-        psufix = os.path.splitext(n)[-1]  # presufix ispred sufixa
+        
+        if not "" in list(ex.values()):
+            psufix = os.path.splitext(n)[-1]  # presufix ispred sufixa
+        else:
+            psufix = n
         
         if oformat == "txt" and pre_suffix == value5_s:
             sufix = ".txt"
@@ -386,7 +391,6 @@ class FileProcessed:
         
         with open(presuffix_l, 'r', encoding='utf-8') as l_file:
             added = [line.strip("\n") for line in l_file if line]
-            added = [re.sub(r"\.x2\d+-*_*\w+", "", x, count=1, flags=re.I) for x in added]
             
         suffix_list = ["."+x if not x.startswith("_") else x for x in ex.values()] + added
         suffix_list.append(value_m)
@@ -402,9 +406,11 @@ class FileProcessed:
             name1 = '{0}{1}'.format(n, _d)
         
         if name1.endswith("."):
-            name1 = name1.strip(".")
+            name1 = name1[:-1]
             
         for i in suffix_list:
+            if i == ".":
+                continue
             fpattern = r"\w*" + i + r"\w*"
             if len(re.findall(fpattern, name1, re.I)) >= 2:
                 name1 = name1.replace(i, "", 1)
@@ -426,17 +432,22 @@ class FileProcessed:
             name = dlg.GetValue() # Get the file name
             tmpnameO = os.path.join(real_dir, name)
             nameO = '{0}{1}'.format(os.path.join(real_dir, name), sufix)
+            if nameO.endswith("."):
+                nameO = nameO[:-1]
             if os.path.exists(nameO):
                 nnm = self.nameCheck(name, real_dir, sufix)
                 nameO = '{0}_{1}{2}'.format(tmpnameO, nnm, sufix)
             dlg.Destroy()
             with open(presuffix_l, 'a', encoding='utf-8') as f:
-                presuffix_x = os.path.splitext(nameO)[0].strip(".")
-                if "_" in presuffix_x:
-                    presuffix_ = "_"+presuffix_x.split("_")[-1]+"\n"
+                if not sufix == "":
+                    presuffix_x = os.path.splitext(nameO)[0]
                 else:
-                    presuffix_ = os.path.splitext(os.path.splitext(nameO)[0])[-1]+"\n"
-                presuffix_ = re.sub(r"\.x2\d+-*_*\w+", "", presuffix_, count=1, flags=re.I)
+                    presuffix_x = nameO
+                if not sufix == "":
+                    if "_" in presuffix_x:
+                        presuffix_ = "_"+presuffix_x.split("_")[-1]+"\n"
+                    else:
+                        presuffix_ = os.path.splitext(os.path.splitext(nameO)[0])[-1]+"\n"
                 f.write(presuffix_)
             return nameO
         else:
