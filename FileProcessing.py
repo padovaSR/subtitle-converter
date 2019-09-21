@@ -415,10 +415,13 @@ class FileProcessed:
             if len(re.findall(fpattern, name1, re.I)) >= 2:
                 name1 = name1.replace(i, "", 1)
                 
-        return name1, sufix     # Vraca samo ime fajla bez putanje
+        return name1, sufix    # Vraca samo ime fajla bez putanje
     
     def nameDialog(self, name_entry, sufix_entry, dir_entry):
         
+        with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
+            ex = sp['key5']
+            
         presuffix_l = os.path.join("resources", "var", "presuffix_list.bak")
         real_dir = dir_entry
         name1 = name_entry
@@ -439,16 +442,16 @@ class FileProcessed:
                 nameO = '{0}_{1}{2}'.format(tmpnameO, nnm, sufix)
             dlg.Destroy()
             with open(presuffix_l, 'a', encoding='utf-8') as f:
-                if not sufix == "":
-                    presuffix_x = os.path.splitext(nameO)[0]
+                if not '' in list(ex.values()):
+                    presuffix_x = os.path.splitext(nameO)[0][-1]
                 else:
-                    presuffix_x = nameO
-                if not sufix == "":
+                    presuffix_x = ""
+                    presuffix_ = os.path.splitext(os.path.splitext(nameO)[0])[-1]+"\n"
                     if "_" in presuffix_x:
                         presuffix_ = "_"+presuffix_x.split("_")[-1]+"\n"
                     else:
-                        presuffix_ = os.path.splitext(os.path.splitext(nameO)[0])[-1]+"\n"
-                f.write(presuffix_)
+                        presuffix_ = ""
+                    f.write(presuffix_)
             return nameO
         else:
             dlg.Destroy()
