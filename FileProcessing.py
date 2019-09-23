@@ -366,9 +366,9 @@ class FileProcessed:
         elif len(re.findall(upattern, path)) == 3:
             path = upattern.sub("", path, count=3)        
         if re.findall(spattern, path):
-            path = spattern.sub(".srt", path)
+            path = spattern.sub(r".srt", path)
         elif re.findall(tpattern, path):
-            path = tpattern.sub(".txt", path)
+            path = tpattern.sub(r".txt", path)
         
         fprint = os.path.basename(path)
         
@@ -411,9 +411,10 @@ class FileProcessed:
         for i in suffix_list:
             if i == ".":
                 continue
-            fpattern = r"\w*" + i + r"\w*"
-            if len(re.findall(fpattern, name1, re.I)) >= 2:
-                name1 = name1.replace(i, "", 1)
+            fpattern = re.compile(i , re.I)
+            count_s = len(re.findall(fpattern, name1))
+            if count_s >= 2:
+                name1 = fpattern.sub("", name1, count_s-1)
                 
         return name1, sufix    # Vraca samo ime fajla bez putanje
     
@@ -443,15 +444,15 @@ class FileProcessed:
             dlg.Destroy()
             with open(presuffix_l, 'a', encoding='utf-8') as f:
                 if not '' in list(ex.values()):
-                    presuffix_x = os.path.splitext(nameO)[0][-1]
-                else:
-                    presuffix_x = ""
-                    presuffix_ = os.path.splitext(os.path.splitext(nameO)[0])[-1]+"\n"
+                    presuffix_x = os.path.splitext(os.path.splitext(nameO)[0])[-1]+"\n"
                     if "_" in presuffix_x:
                         presuffix_ = "_"+presuffix_x.split("_")[-1]+"\n"
                     else:
                         presuffix_ = ""
-                    f.write(presuffix_)
+                else:
+                    presuffix_x = ""
+                    presuffix_ = os.path.splitext(os.path.splitext(nameO)[0])[-1]+"\n"
+                f.write(presuffix_)
             return nameO
         else:
             dlg.Destroy()
@@ -995,7 +996,6 @@ class TextProcessing(FileProcessed):
                     logger.debug("Index of subtitles deleted: {0}".format([i + 1 for i in to_delete]))
                     logger.debug("Index of subtitles trimmed: {0}".format(text_stripped))
                     logger.debug('{0} deleted, {1} trimmed'.format(len(to_delete), len(text_stripped)))
-                    # print("'{0}'".format(os.path.basename(filename)))
                     subs.save(filename, encoding= enkoding)
                     return len(to_delete), len(text_stripped)
             else:
