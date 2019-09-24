@@ -250,8 +250,9 @@ class FileProcessed:
         
             
     def checkErrors(self):
+        
         fpaterns = ['ï»¿Å', 'Ä', 'Å½', 'Ä', 'Ä', 'Å¡', 'Ä', 'Å¾', 'Ä', 'Ä',\
-                    "Ĺ˝", 'Ĺ ', 'ĹĄ', 'Ĺž', 'Ä', 'Å ', 'Ä‡', 'Ä¿', 'Ä²', 'Ä³', 'Å¿', 'Ã¢â', "�", "Д†", "Д‡"]
+                    "Ĺ˝", 'Ĺ ', 'ĹĄ', 'Ĺž', 'Ä', 'Å ', 'Ä‡', 'Ä¿', 'Ä²', 'Ä³', 'Å¿', 'Ã¢â', "�", "Д†", "Д‡", "Ť", "Lˇ"]
         fpaterns = list(set(fpaterns))
         
         text = self.getContent()
@@ -322,15 +323,18 @@ class FileProcessed:
         except:
             logger.debug(f"CheckChar, unexpected error: {sys.exc_info()[0]}")
         try:
-            rx = re.sub(r'[(\d+):(\d+):(\d+)\,(\d+)\s\-\-><\/\.]', '', x)
+            rx = re.sub(r'[(\d+):(\d+):(\d+)\,(\d+)\s\-\-><\/\.]', '', x, flags=re.I)
         except IOError as e:
             logger.debug(f"CheckChar, I/O error ({e.errno}): {e.strerror}")
         
         im = []
         for i in rx:
-            if de.is_in_alphabet(i, "CYRILLIC"):
-                im.append(i)
-        
+            try:
+                if de.is_in_alphabet(i, "CYRILLIC"):
+                    im.append(i)
+            except ValueError as e:
+                logger.debug(f"Velue erroer: {e},{i}")
+                continue
         statistic = OrderedDict()
         for x, y in zip(im, rx):
             if x in rx:
@@ -491,7 +495,13 @@ class FileProcessed:
         # Dodatni replace u binarnom formatu:
         # \xe2\x96\xa0 = ■, xc2\xad = SOFT HYPHEN, \xef\xbb\xbf = bom utf-8, \xe2\x80\x91 = NON-BREAKING HYPHEN
         btext = BytesIO()
-        p = intext.getvalue().encode(self.kode)
+        ca = ["utf-8", "windows-1250", "windows-1251", "iso-8859-1"]
+        for enc in ca:
+            try:
+                p = intext.getvalue().encode(enc)
+            except UnicodeEncodeError as e:
+                logger.debug(f"Error {e}")
+        
         mp = p.replace(b'\xc2\xad', b'') .replace(b'\xd0\x94\xc4', b'D') \
             .replace(b'\xe2\x80\x91', b'') .replace(b'\xc3\x83\xc2\xba', b'u') \
             .replace(b'\xc3\xa2\xe2\x82\xac\xe2\x80\x9d', b'\xe2\x80\x94') .replace(b'\xe2\x82\xac\xe2\x80\x9d', b'\xe2\x80\x94') \
@@ -1002,7 +1012,7 @@ class TextProcessing(FileProcessed):
                 logger.debug('No subtitles found.')
         except IOError as e:
             logger.debug("CleanSubtitle_CL, I/O error({0}): {1}".format(e.errno, e.strerror))
-        except Exception as e: #handle other exceptions such as attribute errors
+        except Exception:
             logger.debug(f"CleanSubtitle_CL, unexpected error: {traceback.format_exc}")
             
     def rm_dash(self):
