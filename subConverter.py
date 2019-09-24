@@ -3057,8 +3057,6 @@ class MyApp(wx.App):
             os.remove(os.path.join('resources', 'var', 'path0.pkl'))
         if os.path.isfile(os.path.join('resources', 'var', 'rpath0.pkl')):
             os.remove(os.path.join('resources', 'var', 'rpath0.pkl'))
-        #if os.path.isfile(os.path.join('resources', 'var', 'obsE.pkl')):
-            #os.remove(os.path.join('resources', 'var', 'obsE.pkl'))
         if not os.path.isdir('tmp'):
             os.mkdir('tmp')
         
