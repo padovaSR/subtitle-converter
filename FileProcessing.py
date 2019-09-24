@@ -36,7 +36,7 @@ from io import StringIO, BytesIO
 from textwrap import TextWrapper
 import pysrt
 import srt
-from alphabet_detector import AlphabetDetector
+# from alphabet_detector import AlphabetDetector
 
 from zamenaImena import dictionary_0, dictionary_1, dictionary_2, rplSmap,\
      searchReplc, dict0_n, dict0_n2, dict1_n, dict1_n2, dict2_n, dict2_n2,\
@@ -304,8 +304,6 @@ class FileProcessed:
             
     def checkChars(self):
         
-        de = AlphabetDetector()
-        
         path = self.putanja
         kode = self.kode
         
@@ -315,6 +313,12 @@ class FileProcessed:
             except ZeroDivisionError:
                 logger.debug('FileCheck Error, file is empty')
                 return 0
+            
+        slova = ['а', 'б', 'в', 'г', 'д', 'ђ', 'е', 'ж', 'з', 'и', 'ј', 'к', 'ю', 'я', 'Ю', 'Я', 'л', 'м', 'н', 'о', 'п',
+                    'ћ', 'у', 'ф', 'х', 'Ь', 'Ъ', 'ь', 'ъ', 'Э', 'э', 'ц', 'ч', 'ш', 'А', 'Б', 'В', 'Г', 'Д', 'Ђ', 'Е', 'Ж', 'З',
+                    'й', 'Й', 'Ь', 'Ы', 'Ъ', 'ь', 'ы', 'ъ', 'И', 'Ј', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'Ћ', 'У', 'Ф',
+                    'Ч', 'Ш', 'т', 'љ', 'њ', 'џ', 'Љ', 'Њ', 'Џ',  'р', 'с', 'Х', 'Ц']        
+            
         try:
             with  open(path, 'r', encoding=kode) as f:
                 x = f.read()
@@ -330,11 +334,11 @@ class FileProcessed:
         im = []
         for i in rx:
             try:
-                if de.is_in_alphabet(i, "CYRILLIC"):
+                if i in slova:
                     im.append(i)
             except ValueError as e:
                 logger.debug(f"Velue erroer: {e},{i}")
-                continue
+                
         statistic = OrderedDict()
         for x, y in zip(im, rx):
             if x in rx:
@@ -495,12 +499,8 @@ class FileProcessed:
         # Dodatni replace u binarnom formatu:
         # \xe2\x96\xa0 = ■, xc2\xad = SOFT HYPHEN, \xef\xbb\xbf = bom utf-8, \xe2\x80\x91 = NON-BREAKING HYPHEN
         btext = BytesIO()
-        ca = ["utf-8", "windows-1250", "windows-1251", "iso-8859-1"]
-        for enc in ca:
-            try:
-                p = intext.getvalue().encode(enc)
-            except UnicodeEncodeError as e:
-                logger.debug(f"Error {e}")
+        
+        p = intext.getvalue().encode(self.kode)
         
         mp = p.replace(b'\xc2\xad', b'') .replace(b'\xd0\x94\xc4', b'D') \
             .replace(b'\xe2\x80\x91', b'') .replace(b'\xc3\x83\xc2\xba', b'u') \
