@@ -494,7 +494,10 @@ class MyFrame(wx.Frame):
             if kodek in listChoices2:
                 kdef = listChoices2.index(kodek)
             else:
-                kdef = 0        
+                kdef = 0
+                with open(os.path.join('resources', 'var', 'obsE.pkl'), 'wb') as f:
+                    pickle.dump("auto", f)
+                
         
         comboBox1Choices = [u" auto", u" windows-1250", u" windows-1251", u" windows-1252", u" utf-8", u" utf-16", " utf-16le", u" utf-16be", 
             u" utf-32", u" iso-8859-1", u" iso-8859-2", u" iso-8859-5", u" latin", u" latin2" ]        
@@ -1294,7 +1297,7 @@ class MyFrame(wx.Frame):
             self.MenuBar.Enable(wx.ID_CLOSE, True)
             self.toolBar1.EnableTool(1010, True)  # Save
             self.toolBar1.EnableTool(1003, False)   # toANSI
-            self.toolBar1.EnableTool(101, True)
+            self.to_ansi.Enable(False)
             
             self.enchistory[path] = self.newEnc
             self.previous_action['toCYR'] = self.newEnc
@@ -1665,7 +1668,7 @@ class MyFrame(wx.Frame):
                 if self.newEnc == "utf-8-sig":
                     code = "BOM_UTF-8"
                 else:
-                    code = self.newEnc
+                    code = self.newEnc.upper()
                 msginfo = wx.MessageDialog(self, f'Tekst je konvertovan u enkoding: {code}.', 'SubConverter', wx.OK | wx.ICON_INFORMATION)
                 msginfo.ShowModal()
                 
@@ -3054,6 +3057,8 @@ class MyApp(wx.App):
             os.remove(os.path.join('resources', 'var', 'path0.pkl'))
         if os.path.isfile(os.path.join('resources', 'var', 'rpath0.pkl')):
             os.remove(os.path.join('resources', 'var', 'rpath0.pkl'))
+        #if os.path.isfile(os.path.join('resources', 'var', 'obsE.pkl')):
+            #os.remove(os.path.join('resources', 'var', 'obsE.pkl'))
         if not os.path.isdir('tmp'):
             os.mkdir('tmp')
         
