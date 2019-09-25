@@ -347,7 +347,7 @@ class FileProcessed:
         except:
             logger.debug(f"CheckChar, unexpected error: {sys.exc_info()[0]}")
         try:
-            rx = "".join(re.findall(r"[A-Za-z]", x, re.U)) + "".join(re.findall(r"[\u0400-\u04FF]", x, re.U))
+            rx = "".join(re.findall(r"[A-Za-z\u0400-\u04FF]", x, re.U))
         except IOError as e:
             logger.debug(f"CheckChar, I/O error ({e.errno}): {e.strerror}")
         
@@ -357,7 +357,7 @@ class FileProcessed:
                 if i in slova:
                     im.append(i)
             except ValueError as e:
-                logger.debug(f"Value erroer: {e},{i}")
+                logger.debug(f"Value error: {e},{i}")
                 
         statistic = OrderedDict()
         for x, y in zip(im, rx):
