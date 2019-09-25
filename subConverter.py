@@ -1644,10 +1644,12 @@ class MyFrame(wx.Frame):
                 code = "UTF-8"
                 if entered_enc == "utf-8-sig":
                     code = "BOM_UTF-8"                
-                logger.debug(f"toUTF: Encoding is {entered_enc}, nothing to do.")
-                msginfo = wx.MessageDialog(self, f'Tekst je već enkoding: {code}.\n', 'SubConverter', wx.OK | wx.ICON_INFORMATION)
-                msginfo.ShowModal()                
-                return
+                logger.debug(f"toUTF: Encoding is {entered_enc}.")
+                InfoDlg = wx.MessageDialog(self, f"Tekst je već enkoding {code}.\nNastavljate?", "SubConverter", style= wx.OK | wx.CANCEL|wx.CANCEL_DEFAULT | wx.ICON_INFORMATION)
+                if InfoDlg.ShowModal() == wx.ID_CANCEL:
+                    return
+                else:
+                    InfoDlg.Destroy()
                     
             fproc = FileProcessed(entered_enc, path)
             text = fproc.getContent()
@@ -1678,7 +1680,6 @@ class MyFrame(wx.Frame):
             self.MenuBar.Enable(wx.ID_SAVEAS, True)
             self.MenuBar.Enable(wx.ID_CLOSE, True)
             self.toolBar1.EnableTool(1010, True)  # Save
-            self.toolBar1.EnableTool(101, True)
             self.previous_action['toUTF'] = self.newEnc
             self.enchistory[path] = self.newEnc
             self.reloaded = 0
@@ -1760,7 +1761,7 @@ class MyFrame(wx.Frame):
                     l_srt_list = [x for x in lat_srt]                
                 
                 text1 = "Include original srt?\n\nPostojeći srt fajlovi:\n\n{}".format(t_out(l_srt_list))
-                text = "Include txt?\n\nPostojeći  *.txt fajlovi:\n\n{}".format(t_out(p_txt_list))
+                text = "Include utf-8?\n\nPostojeći  *utf-8* fajlovi:\n\n{}".format(t_out(p_txt_list))
                 dlg = wx.RichMessageDialog(self, text, "{}".format(os.path.basename(name)), wx.YES_NO|wx.ICON_QUESTION)
                 dlg1 = wx.RichMessageDialog(self, text1, "{}".format(os.path.basename(name)), wx.YES_NO|wx.ICON_QUESTION)
                 
