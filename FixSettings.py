@@ -65,12 +65,9 @@ class FixerSettings(wx.Dialog):
             except IOError as e:
                 logger.debug("fixerSettings, I/O error({0}): {1}".format(e.errno, e.strerror))
             except Exception as e: #handle other exceptions such as attribute errors
-                logger.debug("fixerSetting, unexpected error:", sys.exc_info()[0:2])
+                logger.debug(f"fixerSetting, unexpected error: {e}")
             else:
                               
-                with shelve.open(os.path.join('resources','var','dialog_settings.db'), flag='writeback') as s:
-                    del s['key1']  # = {'state1': a, 'state2': b, 'state3': c, 'state4': d, 'state5': e, 'state6': f, 'state7': g, 'state8': h}
-            
                 self.cb1.SetValue(cb1_s); self.cb2.SetValue(cb2_s); self.cb3.SetValue(cb3_s)
                 self.cb4.SetValue(cb4_s); self.cb5.SetValue(cb5_s); self.cb6.SetValue(cb6_s); self.cb7.SetValue(cb7_s)
                 self.cb8.SetValue(cb8_s)
@@ -210,7 +207,7 @@ class FixerSettings(wx.Dialog):
 
 class MyApp(wx.App):
     def OnInit(self):
-        self.dialog = fixerSettings(None, wx.ID_ANY, "")
+        self.dialog = FixerSettings(None, wx.ID_ANY, "")
         self.SetTopWindow(self.dialog)
         self.dialog.ShowModal()
         # self.dialog.Destroy()
