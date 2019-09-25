@@ -247,12 +247,14 @@ class FileProcessed:
             pickle.dump(self.putanja, v)
         with open(os.path.join('resources', 'var', 'rpath0.pkl'), 'wb') as f:
             pickle.dump(realFile, f)
-        
+        #with open(os.path.join('resources', 'var', 'obsE.pkl'), 'wb') as f:
+            #pickle.dump(self.kode, f)
             
     def checkErrors(self):
         
-        fpaterns = ['ï»¿Å', 'Ä', 'Å½', 'Ä', 'Ä', 'Å¡', 'Ä', 'Å¾', 'Ä', 'Ä',\
-                    "Ĺ˝", 'Ĺ ', 'ĹĄ', 'Ĺž', 'Ä', 'Å ', 'Ä‡', 'Ä¿', 'Ä²', 'Ä³', 'Å¿', 'Ã¢â', "�", "Д†", "Д‡", "Ť", "Lˇ"]
+        fpaterns = ['ï»¿Å', 'Ä', 'Å½', 'Ä', 'Ä', 'Å¡', 'Ä', 'Å¾', 'Ä', 'Ä', "ď»ż", "Ĺ˝", 'Ĺ ', 'ĹĄ', 'Ĺž', 'Ä', 'Å ', 'Ä‡',\
+                    'Ä¿', 'Ä²', 'Ä³', 'Å¿', 'Ã¢â', "�", "Д†", "Д‡", "Ť", "Lˇ"]
+        
         fpaterns = list(set(fpaterns))
         
         text = self.getContent()
@@ -314,7 +316,7 @@ class FileProcessed:
                 logger.debug('FileCheck Error, file is empty')
                 return 0
             
-        slova = ["Ѐ",
+        slova = "".join(["Ѐ",
                  "Ё", "Ђ", "Ѓ", "Є", "Ѕ", "І", "Ї", "Ј", "Љ", "Њ", "Ћ",\
                  "Ќ", "Ѝ", "Ў", "Џ", "А", "Б", "В", "Г", "Д", "Е", "Ж",\
                  "З", "И", "Й", "К", "Л", "М", "Н", "О", "П", "Р", "С",\
@@ -338,7 +340,7 @@ class FileProcessed:
                  "ӝ", "Ӟ", "ӟ", "Ӡ", "ӡ", "Ӣ", "ӣ", "Ӥ", "ӥ", "Ӧ", "ӧ",\
                  "Ө", "ө", "Ӫ", "ӫ", "Ӭ", "ӭ", "Ӯ", "ӯ", "Ӱ", "ӱ", "Ӳ",\
                  "ӳ", "Ӵ", "ӵ", "Ӷ", "ӷ", "Ӹ", "ӹ", "Ӻ", "ӻ", "Ӽ", "ӽ",\
-                 "Ӿ", "ӿ"]
+                 "Ӿ", "ӿ"])
         try:
             with  open(path, 'r', encoding=kode) as f:
                 x = f.read()
@@ -346,15 +348,18 @@ class FileProcessed:
             logger.debug(f"CheckChar, I/O error({e.errno}): {e.strerror}")
         except:
             logger.debug(f"CheckChar, unexpected error: {sys.exc_info()[0]}")
+            
+        st_pattern = re.compile(r"[A-Za-z\u0400-\u04FF]", re.U)
+        
         try:
-            rx = "".join(re.findall(r"[A-Za-z\u0400-\u04FF]", x, re.U))
+            rx = "".join(re.findall(st_pattern, x))
         except IOError as e:
             logger.debug(f"CheckChar, I/O error ({e.errno}): {e.strerror}")
         
         im = []
         for i in rx:
             try:
-                if i in slova:
+                if re.search(i, slova):
                     im.append(i)
             except ValueError as e:
                 logger.debug(f"Value error: {e},{i}")
@@ -522,7 +527,7 @@ class FileProcessed:
         
         p = intext.getvalue().encode(self.kode)
         
-        mp = p.replace(b'\xc2\xad', b'') .replace(b'\xd0\x94\xc4', b'D') \
+        mp = p.replace(b'\xc2\xad', b'') .replace(b'\xd0\x94\xc4', b'D').replace(b"\xc4\x8f\xc2\xbb\xc5\xbc", b"") \
             .replace(b'\xe2\x80\x91', b'') .replace(b'\xc3\x83\xc2\xba', b'u') \
             .replace(b'\xc3\xa2\xe2\x82\xac\xe2\x80\x9d', b'\xe2\x80\x94') .replace(b'\xe2\x82\xac\xe2\x80\x9d', b'\xe2\x80\x94') \
             .replace(b'\xef\xbb\xbf', b'') .replace(b'\xc5\xb8\xc5\x92', b'')# .replace(b'\x9e', b'\xc5\xbe')
@@ -558,7 +563,7 @@ class FileProcessed:
                 .replace(b'\xc3\xa2\xe2\x82\xac\xe2\x80\x9d', b'\xe2\x80\x94').replace(b' \n', b'\n') \
                 .replace(b'\xe2\x82\xac\xe2\x80\x9d', b'V') .replace(b'\xef\xbb\xbf', b'') \
                 .replace(b'\xc5\xb8\xc5\x92', b'').replace(b'\xd0\x94\xa0', b'\x44') \
-                .replace(b'\xc2\xa0', b' ')# .replace(b'\xc7\x88', b'\x4c\x6a') \
+                .replace(b'\xc2\xa0', b' ').replace(b"\xc4\x8f\xc2\xbb\xc5\xbc", b"")   # .replace(b'\xc7\x88', b'\x4c\x6a') \
                 #.replace(b'\xc7\x8b', b'\x4e\x6a') .replace(b'\xc7\x89', b'\x6c\x6a') .replace(b'\xc7\x8c', b'\x6e\x6a')
             if fp:
                 btext.write(fp)
