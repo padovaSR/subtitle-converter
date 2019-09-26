@@ -58,7 +58,7 @@ class FixerSettings(wx.Dialog):
          
         if os.path.exists(t1):
             try:
-                with shelve.open('resources\\var\\dialog_settings.db', flag='writeback') as  sp:
+                with shelve.open(os.path.join('resources', 'var', 'dialog_settings.db'), flag='writeback') as  sp:
                     ex = sp['key1']
                     cb1_s = ex['state1']; cb2_s = ex['state2']; cb3_s = ex['state3']
                     cb4_s = ex['state4']; cb5_s = ex['state5']; cb6_s = ex['state6']; cb7_s = ex['state7']; cb8_s = ex['state8']
