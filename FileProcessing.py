@@ -24,6 +24,7 @@ from logging.handlers import RotatingFileHandler
 import traceback
 import pickle
 import shelve
+import pickle
 import zipfile
 # import shutil
 import codecs
@@ -380,12 +381,13 @@ class FileProcessed:
         path = self.putanja
         presuffix_l = os.path.join("resources", "var", "presuffix_list.bak")
         
-        with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
-            ex = sp['key5']
-            em = sp['key2']
+        with open(os.path.join("resources", "var", "file_ext.pkl"), "rb") as f:
+            ex = pickle.load(f)
             value2_s = ex['cyr_utf8_txt']
             value5_s = ex['lat_utf8_srt']
-            value_m = em['f_suffix']        #  Merger suffix        
+            
+        with open(os.path.join("resources", "var", "m_extensions.pkl"), "rb") as f:
+            value_m = pickle.load(f)        #  Merger suffix
         
         with open(os.path.join('resources', 'var', 'tcf.pkl'), 'rb') as tf:
             oformat = pickle.load(tf)  # TXT suffix
