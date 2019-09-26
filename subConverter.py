@@ -1050,9 +1050,9 @@ class MyFrame(wx.Frame):
         
     def toANSI_multiple(self):
         
-        with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
-            ex = sp['key5']
-            value4_s = ex['lat_ansi_srt']        
+        with open(os.path.join("resources", "var", "file_ext.pkl"), "rb") as f:
+            ex = pickle.load(f)     # ["key5"]
+            value4_s = ex['lat_ansi_srt']
         
         self.text_1.SetValue("")
         self.text_1.SetValue("Files Processed:\n")
@@ -1308,11 +1308,11 @@ class MyFrame(wx.Frame):
         
     def toCyrillic_multiple(self):
         
-        with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
-            ex = sp['key5']
+        with open(os.path.join("resources", "var", "file_ext.pkl"), "rb") as f:
+            ex = pickle.load(f)     # ["key5"]   
             value1_s = ex['cyr_ansi_srt']
             value2_s = ex['cyr_utf8_txt']
-        
+            
         self.text_1.SetValue("")
         self.text_1.SetValue("Files Processed:\n")
         if os.path.isfile(self.droped0_p):
@@ -1331,6 +1331,7 @@ class MyFrame(wx.Frame):
             
             path=key
             entered_enc=value
+            
             fproc = FileProcessed(entered_enc, path)
             
             file_suffix = os.path.splitext(path)[-1]
@@ -1338,7 +1339,9 @@ class MyFrame(wx.Frame):
             text = fproc.getContent()
             if text:
                 text = text.replace('?', '¬')
+            
             utfText, suffix = fproc.newName(value2_s, multi=True)   # 'cyr_utf8'
+            
             if self.preferences.IsChecked(1011):  
                 utf8_enc = 'utf-8-sig'
             else:
@@ -1519,13 +1522,10 @@ class MyFrame(wx.Frame):
         
     def toCyrSRTutf8_multiple(self):
         
-        with open(os.path.join('resources', 'var', 'tcf.pkl'), 'wb') as tf:
-            pickle.dump("cyr_txt", tf)        
-        
-        with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
-            ex = sp['key5']
+        with open(os.path.join("resources", "var", "file_ext.pkl"), "rb") as f:
+            ex = pickle.load(f)     # ["key5"]
             value1_s = ex['cyr_ansi_srt']
-            value3_s = ex['cyr_utf8_srt']
+            value3_s = ex['cyr_utf8_srt']            
         
         self.text_1.SetValue("")
         self.text_1.SetValue("Files Processed:\n")
@@ -1760,7 +1760,7 @@ class MyFrame(wx.Frame):
                 elif len(lat_srt) < 16:
                     l_srt_list = [x for x in lat_srt]                
                 
-                text1 = "Include original srt?\n\nPostojeći srt fajlovi:\n\n{}".format(t_out(l_srt_list))
+                text1 = "Include original latin?\n\nPostojeći *latin fajlovi:\n\n{}".format(t_out(l_srt_list))
                 text = "Include utf-8?\n\nPostojeći  *utf-8* fajlovi:\n\n{}".format(t_out(p_txt_list))
                 dlg = wx.RichMessageDialog(self, text, "{}".format(os.path.basename(name)), wx.YES_NO|wx.ICON_QUESTION)
                 dlg1 = wx.RichMessageDialog(self, text1, "{}".format(os.path.basename(name)), wx.YES_NO|wx.ICON_QUESTION)
@@ -1840,16 +1840,14 @@ class MyFrame(wx.Frame):
                 # Dodaje putanju i enkoding u recnik
                 self.saved_file[path] = self.newEnc                
                 self.open_next.Enable(True)
-                # self.saved += 1
-                # self.resetTool()
         else:
             dlg.Destroy()
     
     def toUTF_multiple(self):
         
-        with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
-            ex = sp['key5']
-            value1_s = ex['lat_utf8_srt']        
+        with open(os.path.join("resources", "var", "file_ext.pkl"), "rb") as f:
+            ex = pickle.load(f)     # ["key5"]
+            value1_s = ex["lat_utf8_srt"]
         
         self.text_1.SetValue("")
         self.text_1.SetValue("Files Processed:\n")
@@ -2566,9 +2564,9 @@ class MyFrame(wx.Frame):
     
     def cyrToANSI_multiple(self):
         
-        with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
-            ex = sp['key5']
-            value1_s = ex['lat_ansi_srt']        
+        with open(os.path.join("resources", "var", "file_ext.pkl"), "rb") as f:
+            ex = pickle.load(f)     # ["key5"]
+            value1_s = ex["lat_ansi_srt"]
         
         self.text_1.SetValue("")
         self.text_1.SetValue("Files Processed:\n")
@@ -2721,9 +2719,9 @@ class MyFrame(wx.Frame):
         
     def cyrToUTF_multiple(self):
         
-        with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
-            ex = sp['key5']
-            value1_s = ex['lat_utf8_srt']        
+        with open(os.path.join("resources", "var", "file_ext.pkl"), "rb") as f:
+            ex = pickle.load(f)     # ["key5"]
+            value1_s = ex["lat_utf8_srt"]
         
         self.text_1.SetValue("")
         self.text_1.SetValue("Files Processed:\n")
