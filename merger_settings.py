@@ -5,7 +5,7 @@
 
 import wx
 import os
-# import codecs
+import pickle
 import shelve
 import logging
 from logging.handlers import RotatingFileHandler
@@ -65,7 +65,6 @@ class Settings(wx.Dialog):
         self.Bind(wx.EVT_BUTTON, self.onCloseSettings, self.button_1)
         self.Bind(wx.EVT_BUTTON, self.onSaveSettings, self.button_2)
         self.Bind(wx.EVT_CLOSE, self.onClose, id= -1)
-        #self.Bind(wx.EVT_TEXT, self.onText, id=-1, id2=wx.ID_ANY)
         # end wxGlade
         
 
@@ -149,8 +148,11 @@ class Settings(wx.Dialog):
         konf = [line_Lenght, max_Char, max_Gap, file_suffix]
         a = konf[0]; b = konf[1]; c = konf[2]; d = konf[3]  # ; e = konf[4]; f = konf[5]; g = konf[6]; h = konf[7]
         with shelve.open(os.path.join('resources', 'var', 'dialog_settings.db'), flag='writeback') as s:
-            s['key2'] = {'l_lenght': a, 'm_char': b, 'm_gap': c, 'f_suffix': d}       
-        # if sd.ShowModal() == wx.ID_OK:
+            s['key2'] = {'l_lenght': a, 'm_char': b, 'm_gap': c, 'f_suffix': d}
+            
+        with open(os.path.join("resources", "var", "m_extensions.pkl"), "wb") as f:
+            pickle.dump(file_suffix, f)
+            
             self.Destroy()
         event.Skip()
             
