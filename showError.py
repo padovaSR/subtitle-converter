@@ -67,6 +67,7 @@ def showMeError(infile, outfile, kode):
         st = "LINIJE SA GREŠKAMA:\n"
         if kode == 'windows-1251':
             st = "ЛИНИЈЕ СА ГРЕШКАМА:\n"
+            kode = "utf-8"
         FP = re.compile(r"\?")
         count = 0
         sl = pysrt.SubRipFile()
