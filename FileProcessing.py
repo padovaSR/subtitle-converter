@@ -512,7 +512,8 @@ class FileProcessed:
         logger.debug('\nSpecijalnih znakova ukupno: [{0}]'.format(len(nf)))
         if len(nf) > 0:
             logger.debug(f'SpecChars: {" ".join(nf)}\n')
-            msginfo = wx.MessageDialog(None, f'Specijalni znakovi u tekstu:\n\n{", ".join(nf)}.', 'SubConverter', wx.OK | wx.ICON_INFORMATION)
+            msginfo = wx.MessageDialog(None, f'Specijalni znakovi u tekstu:\n\n{os.path.basename(self.putanja)}\n\n{", ".join(nf)}.',\
+                                       'SubConverter', wx.OK | wx.ICON_INFORMATION)
             msginfo.ShowModal()
         
         for key, value in rplSmap.items():
