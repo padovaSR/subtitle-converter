@@ -3048,16 +3048,13 @@ class MyFrame(wx.Frame):
 class MyApp(wx.App):
     
     def remOnstart(self):
-        if os.path.isfile(os.path.join('resources', 'var', 'r_text0.pkl')):
-            os.remove(os.path.join('resources', 'var', 'r_text0.pkl'))
-        if os.path.isfile(os.path.join('resources', 'var', 'droped0.pkl')):
-            os.remove(os.path.join('resources', 'var', 'droped0.pkl'))
-        if os.path.exists(os.path.join('resources', 'LatCyr.map.cfg')):
-            os.remove(os.path.join('resources', 'LatCyr.map.cfg'))
-        if os.path.exists(os.path.join('resources', 'var', 'path0.pkl')):
-            os.remove(os.path.join('resources', 'var', 'path0.pkl'))
-        if os.path.isfile(os.path.join('resources', 'var', 'rpath0.pkl')):
-            os.remove(os.path.join('resources', 'var', 'rpath0.pkl'))
+        
+        f_list = ["r_text0.pkl", "droped0.pkl", "'LatCyr.map.cfg", "path0.pkl", "rpath0.pkl"]
+        for x in f_list:
+            file_path = os.path.join("resources", "var", x)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+                
         if not os.path.isdir('tmp'):
             os.mkdir('tmp')
         
@@ -3071,11 +3068,26 @@ class MyApp(wx.App):
                 out.write(line)
             out.close()
             
+    def m_files(self):
+        
+        missing_f = []
+        files_list = ["m_extensions.pkl", "file_ext.pkl"]
+        for i in files_list:
+            file_path = os.path.join("resources", "var", i)
+            if not os.path.isfile(file_path):
+                missing_f.append(file_path)
+                
+        if missing_f:
+            error_text = "File Not Found\n\n{}\nPlease check files missing!".format("".join([x+'\n' for x in missing_f]))
+            ErrorDlg = wx.MessageDialog(None, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
+            ErrorDlg.ShowModal()
+            
     def OnInit(self):
         self.frame = MyFrame(None, wx.ID_ANY, "")
         self.SetTopWindow(self.frame)
         self.frame.Show()
-        self.remOnstart()        
+        self.remOnstart()
+        self.m_files()
         return True
 
 # end of class MyApp
