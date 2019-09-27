@@ -1130,7 +1130,7 @@ class MyFrame(wx.Frame):
                         ErrorDlg = wx.MessageDialog(
                                 self, "Too many errors!\n\nAre you sure you want to proceed?\n", "SubConverter", style=wx.CANCEL|wx.CANCEL_DEFAULT|wx.OK|wx.ICON_ERROR)
                         if ErrorDlg.ShowModal() == wx.ID_CANCEL:
-                            return
+                            continue
                     newF = ansiAction(path)
                     error_text = fproc.checkFile(path, newF, multi=True)
                     newfproc = FileProcessed(self.newEnc, newF)
