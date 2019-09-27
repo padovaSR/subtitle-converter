@@ -20,7 +20,6 @@
 import os
 import sys
 import logging
-from logging.handlers import RotatingFileHandler
 import traceback
 import pickle
 import shelve
@@ -37,7 +36,6 @@ from io import StringIO, BytesIO
 from textwrap import TextWrapper
 import pysrt
 import srt
-# from alphabet_detector import AlphabetDetector
 
 from zamenaImena import dictionary_0, dictionary_1, dictionary_2, rplSmap,\
      searchReplc, dict0_n, dict0_n2, dict1_n, dict1_n2, dict2_n, dict2_n2,\
@@ -50,7 +48,7 @@ import wx
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
-handler = RotatingFileHandler(filename=os.path.join("resources", "var", "FileProcessing.log"), mode="a", maxBytes=4000, encoding="utf-8")
+handler = logging.FileHandler(filename=os.path.join("resources", "var", "FileProcessing.log"), mode="w", encoding="utf-8")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
@@ -158,7 +156,7 @@ class FileOpened:
                     fh.readlines()
                     fh.seek(0)
             except:
-                logger.debug(f'FindCode: UnicodeDecodeError {enc}')
+                logger.debug(f'FindCode: UnicodeDecodeError {enc},{os.path.basename(self.putanja)}')
             else:
                 logger.debug(f'Opening the file with encoding: {enc}')
                 break
@@ -355,7 +353,7 @@ class FileProcessed:
         try:
             rx = "".join(re.findall(st_pattern, x))
         except IOError as e:
-            logger.debug(f"CheckChar, I/O error ({e.errno}): {e.strerror}")
+            logger.debug(f"CheckChars, I/O error ({e.errno}): {e.strerror}")
         
         im = []
         for i in rx:
