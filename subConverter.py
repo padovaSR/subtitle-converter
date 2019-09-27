@@ -38,7 +38,6 @@ from merge import myMerger, fixLast, fixGaps
 from Manual import MyManual
 
 import logging
-from logging.handlers import RotatingFileHandler
 import traceback
 
 import wx
@@ -48,7 +47,7 @@ VERSION = "v0.5.7.0"
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
-handler = RotatingFileHandler(filename=os.path.join("resources", "var", "subtitle_converter.log"), mode="a", maxBytes=4000, encoding="utf-8")
+handler = logging.FileHandler(filename=os.path.join("resources", "var", "subtitle_converter.log"), mode="w", encoding="utf-8")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
@@ -102,9 +101,9 @@ class FileDrop(wx.FileDropTarget):
                         fproc = FileProcessed(enc, tmp_path)
                         fproc.normalizeText()
                         new_d[tmp_path] = enc
-                        text = os.path.basename(tmp_path)
+                        name = os.path.basename(tmp_path)
                         self.window.AppendText("\n")
-                        self.window.AppendText(text)
+                        self.window.AppendText(name)
                 else:
                     try:
                         fop = FileOpened(lfiles[i])
@@ -735,14 +734,14 @@ class MyFrame(wx.Frame):
                     elif len(outfile) > 1:  # Više fajlova u ZIP-u
                         self.text_1.SetValue('Files List:\n')
                         for i in range(len(outfile)):
-                            text = os.path.basename(outfile[i])
+                            name = os.path.basename(outfile[i])
                             fop = FileOpened(path=outfile[i])
                             enc = fop.findCode()
                             fproc = FileProcessed(enc, outfile[i])
                             fproc.normalizeText()
                             self.enchistory[outfile[i]] = enc
                             self.text_1.AppendText('\n')
-                            self.text_1.AppendText(text)
+                            self.text_1.AppendText(name)
                             self.multiFile[outfile[i]] = enc
                         with open(self.droped0_p, 'wb') as d:
                             pickle.dump(self.multiFile, d)
@@ -756,9 +755,10 @@ class MyFrame(wx.Frame):
             self.multipleTools()
             for i in range(len(paths_in)):
                 fpath = paths_out[i]
-                fop = FileOpened(fpath)
+                # fop = FileOpened(fpath)
                 
                 if zipfile.is_zipfile(fpath):
+                    fop = FileOpened(fpath)
                     try:
                         outfile, rfile = fop.isCompressed()
                     except TypeError as e:
@@ -782,6 +782,7 @@ class MyFrame(wx.Frame):
                         elif len(outfile) > 1:  # Više fajlova
                             for i in range(len(outfile)):
                                 fpath = outfile[i]
+                                fop = FileOpened(fpath)
                                 enc = fop.findCode()
                                 fproc = FileProcessed(enc, fpath)
                                 fproc.normalizeText()
@@ -790,16 +791,16 @@ class MyFrame(wx.Frame):
                                 self.text_1.AppendText(os.path.basename(fpath))
                                 self.multiFile[fpath] = enc
                 else:   # Nije ZIP
-                    text = os.path.basename(fpath)
+                    name = os.path.basename(fpath)
                     fop = FileOpened(fpath)
                     enc = fop.findCode()
                     fproc = FileProcessed(enc, fpath)
                     fproc.normalizeText()
                     self.text_1.AppendText("\n")
-                    self.text_1.AppendText(text)
+                    self.text_1.AppendText(name)
                     self.enchistory[fpath] = enc
                     self.multiFile[fpath] = enc
-                    self.reloadText = text
+                    self.reloadText = name
                     
             with open(self.droped0_p, 'wb') as d:
                 pickle.dump(self.multiFile, d)
@@ -832,14 +833,11 @@ class MyFrame(wx.Frame):
                 for fpath in self.filepath:
                     self.real_path.append(fpath)
                     
-            # self.previous_action='Open'
             self.handleFile(self.filepath)
             self.enableTool()
             self.open_next.Enable(False)
-            # self.resetTool()
             dlgOpen.Destroy()            
             
-        # self.toolBar1.EnableTool(1003, True)
         event.Skip()
 
     def onOpenNext(self, event):
@@ -949,11 +947,13 @@ class MyFrame(wx.Frame):
             self.pre_suffix = value4_s
             
             if entered_enc == self.newEnc:
-                logger.debug(f"Nothing to do, encoding is: {entered_enc}")
-                msginfo = wx.MessageDialog(self, f'Tekst je već enkoding: {entered_enc}.', 'SubConverter', wx.OK | wx.ICON_INFORMATION)
-                msginfo.ShowModal()                
-                return
-            
+                logger.debug(f"toANSI, ecoding is olready: {entered_enc}")
+                InfoDlg = wx.MessageDialog(self, f"Tekst je već enkoding {entered_enc.upper()}.\nNastavljate?", "SubConverter", style= wx.OK | wx.CANCEL|wx.CANCEL_DEFAULT | wx.ICON_INFORMATION)
+                if InfoDlg.ShowModal() == wx.ID_CANCEL:
+                    return
+                else:
+                    InfoDlg.Destroy()
+                
             def ansiAction(inpath):
                 fproc = FileProcessed(entered_enc, inpath)
                 if not entered_enc == 'windows-1251':
@@ -974,7 +974,7 @@ class MyFrame(wx.Frame):
                 if text:
                     with open(self.enc0_p, 'wb') as f:      
                         pickle.dump(self.newEnc, f)                    
-                    msginfo = wx.MessageDialog(self, f'Tekst je konvertovan u enkoding: {self.newEnc}.', 'SubConverter', wx.OK | wx.ICON_INFORMATION)
+                    msginfo = wx.MessageDialog(self, f'Tekst je konvertovan u enkoding: {self.newEnc.upper()}.', 'SubConverter', wx.OK | wx.ICON_INFORMATION)
                     msginfo.ShowModal()                
                 return text
             def postAnsi():
@@ -992,8 +992,10 @@ class MyFrame(wx.Frame):
                 ErrorDlg = wx.MessageDialog(self, text_1, "SubConverter", style= wx.OK | wx.CANCEL|wx.CANCEL_DEFAULT | wx.ICON_INFORMATION)
                 if ErrorDlg.ShowModal() == wx.ID_OK:
                     return True
+            
             fproc_a = FileProcessed(entered_enc, self.orig_path)
             zbir_slova, procent, chars = fproc_a.checkChars()
+            
             #----------------------------------------------------------------------------------------------------------
             if zbir_slova == 0 and procent == 0:
                 text = ansiAction(path)
@@ -1072,8 +1074,8 @@ class MyFrame(wx.Frame):
             
             if entered_enc == 'windows-1251':
                 logger.debug(f"------------------------------------------------------\n\
-                Operation not permitted when encoding windows-1251! {os.path.basename(path)}")
-                continue
+                Encoding is windows-1251! {os.path.basename(path)}")
+                pass
             
             zbir_slova, procent, chars = fproc.checkChars()
             
@@ -1121,7 +1123,7 @@ class MyFrame(wx.Frame):
                 logger.debug(f'ToANSI: Cyrillic alfabet u tekstu: {entered_enc} cyrillic')
                 self.SetStatusText(u'Greška u ulaznom fajlu.')
                 f_procent = 'Najmanje {} % teksta.\nIli najmanje [ {} ] znakova.'.format(procent, zbir_slova)
-                ErrorText = "Greška:\n\n{0}\nsadrži ćiriliči alfabet.\n{1}\n{2}\n\nNastavljate?\n".format(os.path.basename(path), ",".join(f_procent, chars))
+                ErrorText = "Greška:\n\n{0}\nsadrži ćiriliči alfabet.\n{1}\n{2}\n\nNastavljate?\n".format(os.path.basename(path), f_procent, ",".join(chars))
                 dlg = dialog1(ErrorText)
                 if dlg == True:
                     if procent >= 50:
