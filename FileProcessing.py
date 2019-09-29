@@ -765,11 +765,15 @@ class Preslovljavanje(FileProcessed):
             return ouword
         try:
             with open(intext, 'r', encoding=inkode) as fin:
+                
                 fr = fin.read()
+                
                 freg = re.compile(r'<.*?>', re.I)
                 wreg = re.compile(r'www\.\w+\.\w+\s*')
-                # preg = re.compile(r"прев\w\w:* \w+", re.I)
+                # preg = re.compile(r"превео:* |превод:* \w+", re.I)
+                
                 cf = freg.findall(fr) + wreg.findall(fr)# + preg.findall(fr)
+                
                 lj = []
                 for i in cf:
                     new = preFc(i)
@@ -971,7 +975,7 @@ class TextProcessing(FileProcessed):
                 
         except IOError as e:
             logger.debug(f"CleanSubtitle proc, I/O error({e.errno}): {e.strerror}")
-        except Exception as e: #handle other exceptions such as attribute errors
+        except Exception: #handle other exceptions such as attribute errors
             logger.debug(f"CleanSubtitle proc, unexpected error: {traceback.format_exc}")
             
     def cleanLine(self):
