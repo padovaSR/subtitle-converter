@@ -260,7 +260,7 @@ class FileProcessed:
             '[¬√][ÄÅÇÉÑÖÜáàâäãåçéèêëíìîïñúùûü†¢£§¶ß®©™≠ÆØ¥ªæø≤≥]|'
             r'\w√[±∂]\w|'
             '[ðđ][Ÿ\x9f]|'
-            'â€|'
+            'â€|ï»|'
             'вЂ[љћ¦°№™ќ“”]'+
             fpaterns)                
         
@@ -276,10 +276,12 @@ class FileProcessed:
             return f_list
         except IOError as e:
             logger.debug("CheckErrors IOError({0}{1}):".format(self.putanja, e))
+            return []
         except:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
             logger.debug(''.join('!' + line for line in lines))
+            return []
             
     def checkFile(self, file1, file2, multi):
         file1_name = file1
@@ -344,14 +346,15 @@ class FileProcessed:
         
         im = []
         for i in rx:
+            FP = re.compile(i)
             try:
-                if re.search(i, slova):
+                if re.search(FP, slova):
                     im.append(i)
             except ValueError as e:
                 logger.debug(f"Value error: {e},{i}")
                 
         statistic = OrderedDict()
-        for x, y in zip(im, rx):
+        for x in im:
             if x in rx:
                 num = rx.count(x)
                 statistic[x] = num
@@ -499,7 +502,8 @@ class FileProcessed:
         logger.debug('\nSpecijalnih znakova ukupno: [{0}]'.format(len(nf)))
         if len(nf) > 0:
             logger.debug(f'SpecChars: {" ".join(nf)}\n')
-            msginfo = wx.MessageDialog(None, f'Specijalni znakovi u tekstu:\n\n{os.path.basename(self.putanja)}\n\n{", ".join(nf)}.',\
+            f_path = re.sub(r"\.TEMP_\w*", "", os.path.basename(self.putanja), re.I)
+            msginfo = wx.MessageDialog(None, f'Specijalni znakovi u tekstu:\n\n{os.path.basename(f_path)}\n\n{", ".join(nf)}.',\
                                        'SubConverter', wx.OK | wx.ICON_INFORMATION)
             msginfo.ShowModal()
         
@@ -762,24 +766,17 @@ class Preslovljavanje(FileProcessed):
         try:
             with open(intext, 'r', encoding=inkode) as fin:
                 fr = fin.read()
-                freg = re.compile(r'<.*?>')
+                freg = re.compile(r'<.*?>', re.I)
                 wreg = re.compile(r'www\.\w+\.\w+\s*')
-                cf = freg.findall(fr)
-                wf = wreg.findall(fr)
+                # preg = re.compile(r"прев\w\w:* \w+", re.I)
+                cf = freg.findall(fr) + wreg.findall(fr)# + preg.findall(fr)
                 lj = []
-                wj = []
                 for i in cf:
                     new = preFc(i)
                     lj.append(new)
                 dok = dict(zip(cf, lj))
                 for key, value in dok.items():
                     fr = fr.replace(key, value)
-                for i in wf:
-                    new = preFc(i)
-                    wj.append(new)
-                dok = dict(zip(wf, wj))
-                for key, value in dok.items():
-                    fr = fr.replace(key, value)                
         except IOError as e:
             logger.debug("Tag translate, I/O error({0}): {1}".format(e.errno, e.strerror))
         except:
