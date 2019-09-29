@@ -25,7 +25,7 @@ import pickle
 import shelve
 import pickle
 import zipfile
-# import shutil
+
 import codecs
 import re
 import unicodedata
@@ -251,20 +251,27 @@ class FileProcessed:
             
     def checkErrors(self):
         
-        fpaterns = ['ï»¿Å', 'Ä', 'Å½', 'Ä', 'Ä', 'Å¡', 'Ä', 'Å¾', 'Ä', 'Ä', "ď»ż", "Ĺ˝", 'Ĺ ', 'ĹĄ', 'Ĺž', 'Ä', 'Å ', 'Ä‡',\
-                    'Ä¿', 'Ä²', 'Ä³', 'Å¿', 'Ã¢â', "�", "Д†", "Д‡", "Ť", "Lˇ"]
+        fpaterns = '|'.join(['ï»¿Å', 'Ä', 'Å½', 'Ä', 'Ä', 'Å¡', 'Ä', 'Å¾', 'Ä', 'Ä', "ď»ż", "Ĺ˝", 'Ĺ ', 'ĹĄ', 'Ĺž', 'Ä', 'Å ', 'Ä‡',\
+                    'Ä¿', 'Ä²', 'Ä³', 'Å¿', 'Ã¢â', "�", "Д†", "Д‡", "Ť", "Lˇ", "ï»¿", "ð"])
         
-        fpaterns = list(set(fpaterns))
+        MOJIBAKE_SYMBOL_RE = re.compile(
+            '[ÂÃĂ][\x80-\x9f€ƒ‚„†‡ˆ‰‹Œ“•˜œŸ¡¢£¤¥¦§¨ª«¬¯°±²³µ¶·¸¹º¼½¾¿ˇ˘˝]|'
+            r'[ÂÃĂ][›»‘”©™]\w|'
+            '[¬√][ÄÅÇÉÑÖÜáàâäãåçéèêëíìîïñúùûü†¢£§¶ß®©™≠ÆØ¥ªæø≤≥]|'
+            r'\w√[±∂]\w|'
+            '[ðđ][Ÿ\x9f]|'
+            'â€|'
+            'вЂ[љћ¦°№™ќ“”]'+
+            fpaterns)                
         
         text = self.getContent()
         l1 = []; l2 = []
         try:
-            for patern in fpaterns:
-                for match in re.finditer(patern, text):
-                    begin=match.start()
-                    end=match.end()
-                    l1.append(begin)
-                    l2.append(end)
+            for match in re.finditer(MOJIBAKE_SYMBOL_RE, text):
+                begin = match.start()
+                end = match.end()
+                l1.append(begin)
+                l2.append(end)
             f_list = [(x,y) for x, y in zip(l1, l2)]
             return f_list
         except IOError as e:
