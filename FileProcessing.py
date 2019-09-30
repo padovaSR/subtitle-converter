@@ -482,8 +482,8 @@ class FileProcessed:
             return None
         
     def rplStr(self, in_text):
+        
         # Rečnik je 'rplSmap'. Lista ključeva(keys) je 'rplsList'.
-        rplsList = rplSmap.keys()
         intext = StringIO()
         try:
             intext.write(in_text)
@@ -496,8 +496,8 @@ class FileProcessed:
             logger.debug(''.join('!' + line for line in lines))
             
         p = intext.getvalue()
-        ml = re.sub(r'[(\d+):(\d+):(\d+)\,(\d+)\s\-\-><\/\.]', '', p)  # Uklanja brojeve i crtice i spejseve, newline, ostaje samo jedan string.
-        nf = [x for x in rplsList if x in ml]
+        n_pattern = re.compile("|".join(list(rplSmap.keys())))
+        nf = n_pattern.findall(p) 
         
         logger.debug('\nSpecijalnih znakova ukupno: [{0}]'.format(len(nf)))
         if len(nf) > 0:
@@ -515,8 +515,8 @@ class FileProcessed:
             intext.seek(0)
         # Dodatni replace u binarnom formatu:
         # \xe2\x96\xa0 = ■, xc2\xad = SOFT HYPHEN, \xef\xbb\xbf = bom utf-8, \xe2\x80\x91 = NON-BREAKING HYPHEN
-        btext = BytesIO()
         
+        btext = BytesIO()
         p = intext.getvalue().encode(self.kode)
         
         mp = p.replace(b'\xc2\xad', b'') .replace(b'\xd0\x94\xc4', b'D').replace(b"\xc4\x8f\xc2\xbb\xc5\xbc", b"") \
