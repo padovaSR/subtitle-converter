@@ -517,7 +517,11 @@ class FileProcessed:
         # \xe2\x96\xa0 = ■, xc2\xad = SOFT HYPHEN, \xef\xbb\xbf = bom utf-8, \xe2\x80\x91 = NON-BREAKING HYPHEN
         
         btext = BytesIO()
-        p = intext.getvalue().encode(self.kode)
+        try:
+            p = intext.getvalue().encode(self.kode)
+            logger.debug(f"■ rplStr, string encode to: {self.kode}")
+        except Exception as e:
+            logger.debug(f"rplStr encode error: {e}")
         
         mp = p.replace(b'\xc2\xad', b'') .replace(b'\xd0\x94\xc4', b'D').replace(b"\xc4\x8f\xc2\xbb\xc5\xbc", b"") \
             .replace(b'\xe2\x80\x91', b'') .replace(b'\xc3\x83\xc2\xba', b'u') \
@@ -773,12 +777,10 @@ class Preslovljavanje(FileProcessed):
                 # preg = re.compile(r"превео:* |превод:* \w+", re.I)
                 
                 cf = freg.findall(fr) + wreg.findall(fr)# + preg.findall(fr)
+                lj = [preFc(i) for i in cf]
                 
-                lj = []
-                for i in cf:
-                    new = preFc(i)
-                    lj.append(new)
                 dok = dict(zip(cf, lj))
+                
                 for key, value in dok.items():
                     fr = fr.replace(key, value)
         except IOError as e:
