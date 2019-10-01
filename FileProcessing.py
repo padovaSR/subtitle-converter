@@ -772,11 +772,12 @@ class Preslovljavanje(FileProcessed):
                 
                 fr = fin.read()
                 
-                freg = re.compile(r'<.*?>', re.I)
-                wreg = re.compile(r'www\.\w+\.\w+\s*')
-                # preg = re.compile(r"превео:* |превод:* \w+", re.I)
+                # "превео:* |превод:* \w+"
+                re_list = ["<.*?>", "www\.\w+\.\w+\s*"]
+                f_reg = re.compile("|".join(re_list), re.I)
                 
-                cf = freg.findall(fr) + wreg.findall(fr)# + preg.findall(fr)
+                cf = f_reg.findall(fr)
+                
                 lj = [preFc(i) for i in cf]
                 
                 dok = dict(zip(cf, lj))
