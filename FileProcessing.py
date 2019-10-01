@@ -903,25 +903,25 @@ class TextProcessing(FileProcessed):
         infile = self.putanja
         enkoding = self.kode
         
-        u_okruglim = re.compile(r'(\([^\)]*\))', re.M)  # okrugle zagrade
-        u_kockastim = re.compile(r'(\[[^]]*\])', re.M)     # kockaste zagrade
-        u_viticastim = re.compile(r'(\{[^}]*\})', re.M)     #  vitičaste zagrade
-        reg1 = re.compile(r'(^\s*?\.+)$', re.M)     # Tačka na kraju, prazna linija
-        reg2 = re.compile(r'(^\s*?,+)$', re.M)      # Zarez na kraju, prazna linija 
-        reg3 = re.compile(r'(^\s*?;+)$', re.M)      # Tačka zarez na kraju, prazna linija
-        #reg4 = re.compile(r'((?!\n)([A-Z\s]*){1,3}(?=\:)(?<![0-9a-z])\:\s)')
-        reg4 = re.compile(r'(([A-Z ]*){1,3}(?=\:)(?<![0-9a-z])\:\s)')
+        # okrugle zagrade               '(\([^\)]*\))' 
+        # kockaste zagrade              '(\[[^]]*\])'
+        # vitičaste zagrade             '(\{[^}]*\})'
+        # crtice                        '(^\s*?\-+\s*?)$'
+        # Tačka na kraju, prazna linija '(^\s*?\.+)$'
+        # Zarez na kraju, prazna linija '(^\s*?,+)$' 
+        # Tačka zarez na kraju, prazna linija '(^\s*?;+)$'
+        # Spejs na kraju linije         '(\s*?)$'
+        # Uzvičnici                     '(^\s*?!+\s*?)$'
+        # Znak pitanja                  '(^\s*?\?+\s*?)$'
+        # Prva prazna linija            '(?<=,\d\d\d)\n\n(?=\w)'
+        # '(?<=,\d\d\d)\n\n(?=\s*\S*?)'
+        #reg-4 = re.compile(r'((?!\n)([A-Z\s]*){1,3}(?=\:)(?<![0-9a-z])\:\s)')
+        reg_4 = re.compile("|".join(["^\s*\-\.+\s+", "(([A-Z ]*){1,3}(?=\:)(?<![0-9a-z])\:\s)", "^[ \t]*"]), re.M)
+        reg_P6 = re.compile("|".join(["(\([^\)]*\))", "(\[[^]]*\])", "(\{[^}]*\})", "(<i>\s*<\/i>)", "(^\s*?\-+\s*?)$"]), re.M)
         reg4n = re.compile(r'([A-Z ]*) [0-3](?=\:)')  # MAN 1: broj 1-3
-        reg4a = re.compile(r'^\s*\-\.+\s+', re.M)
-        reg5 = re.compile(r'^[ \t]*', re.M)                   # Spejs Tab, Kompajlira se sa re.M da bi radilo za pocetak linije
-        reg6 = re.compile(r'(<i>\s*<\/i>)')         
-        reg7 = re.compile(r'(^\s*?\-+\s*?)$', re.M)         # Crtice
-        reg8 = re.compile(r'(\s*?)$', re.M)                 # Spejs na kraju linije
+        reg_P8 = re.compile("|".join(["(\s*?)$", "(^\s*?\.+)$", "(^\s*?,+)$", "(^\s*?;+)$", "(^\s*?!+\s*?)$", "(^\s*?\?+\s*?)$"]), re.M)
+        reg_S9 = re.compile("|".join(["(?<=,\d\d\d)\n\n(?=\w)", "(?<=,\d\d\d)\n\n(?=\s*\S*?)"]), re.M)
         reg8a = re.compile(r'^\s*(?<=\w)', re.M)            # Spejs na pocetku linije
-        reg9 = re.compile(r'(^\s*?!+\s*?)$', re.M)          # Uzvičnici
-        reg10 = re.compile(r'(^\s*?\?+\s*?)$', re.M)        # Znak pitanja
-        regS = re.compile(r'(?<=,\d\d\d)\n\n(?=\w)', re.M)   # Prva prazna linija
-        regT = re.compile(r'(?<=,\d\d\d)\n\n(?=\s*\S*?)', re.M)
         regN = re.compile(r'(?<=^-)\:\s*', re.M)            # dve tacke iza crtice
         
         def opFile():
@@ -945,32 +945,21 @@ class TextProcessing(FileProcessed):
         try:
             with open(infile, 'r', encoding= enkoding) as file_processed:
                 of = file_processed.read()
-                fp1 = reg4a.sub('', of)
-                fp2 = reg4.sub('', fp1)
-                fp3 = reg5.sub('', fp2)
+                fp3 = reg_4.sub("", of)
                 writeTempStr(infile, fp3, enkoding)
                 
             with open(infile, 'r', encoding=enkoding) as file_processed:
                 of = file_processed.read()
-                fp1 = u_okruglim.sub('', of)
-                fp2 = u_kockastim.sub('', fp1)
-                fp3 = u_viticastim.sub('', fp2)
-                fp4 = reg6.sub('', fp3)
-                fp5 = reg7.sub('', fp4)
+                fp5 = reg_P6.sub("", of)
                 writeTempStr(infile, fp5, enkoding)
+            
             rf1 = opFile()
             writeTempStr(infile, rf1, enkoding)
             
             with open(infile, 'r', encoding=enkoding) as file_processed:
                 fp5 = file_processed.read()
-                fp6 = reg8.sub('', fp5)
-                fp7 = reg1.sub('', fp6)
-                fp8 = reg2.sub('', fp7)
-                fp9 = reg3.sub('', fp8)
-                fp10 = reg9.sub('', fp9)
-                fp11 = reg10.sub('', fp10)
-                fp12 = regS.sub('\n', fp11)
-                fp13 = regT.sub('\n', fp12)
+                fp11 = reg_P8.sub("", fp5)
+                fp13 = reg_S9.sub("\n", fp11)
                 fp14 = regN.sub('', fp13)
                 fp15 = reg8a.sub('', fp14)            
                 
