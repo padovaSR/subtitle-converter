@@ -436,6 +436,7 @@ class FileProcessed:
                 continue
             fpattern = re.compile(i , re.I)
             count_s = len(re.findall(fpattern, name1[-len(i):]))
+            
             if count_s >= 2:
                 name1 = fpattern.sub("", name1, count_s-1)
                 
