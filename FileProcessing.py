@@ -435,10 +435,13 @@ class FileProcessed:
             if i == ".":
                 continue
             fpattern = re.compile(i , re.I)
-            count_s = len(re.findall(fpattern, name1[-len(i):]))
-            
+            count_s = len(re.findall(fpattern, name1))
             if count_s >= 2:
-                name1 = fpattern.sub("", name1, count_s-1)
+                if not i:
+                    continue
+                name1 = "".join(name1.rsplit(i, count_s))
+                if not name1.endswith(i):
+                    name1 = name1 + i
                 
         return name1, sufix    # Vraca samo ime fajla bez putanje
     
