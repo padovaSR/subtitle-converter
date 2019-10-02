@@ -432,16 +432,14 @@ class FileProcessed:
             name1 = name1[:-1]
             
         for i in suffix_list:
-            if i == ".":
+            if i == "." or not i:
                 continue
             fpattern = re.compile(i , re.I)
             count_s = len(re.findall(fpattern, name1))
             if count_s >= 2:
-                if not i:
-                    continue
-                name1 = "".join(name1.rsplit(i, count_s))
-                if not name1.endswith(i):
-                    name1 = name1 + i
+                name1 = "".join(name1.rsplit(i, count_s-1))
+                #if not name1.endswith(i):
+                    #name1 = name1 + i
                 
         return name1, sufix    # Vraca samo ime fajla bez putanje
     
