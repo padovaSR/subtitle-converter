@@ -486,18 +486,8 @@ class FileProcessed:
     def rplStr(self, in_text):
         
         # Rečnik je 'rplSmap'. Lista ključeva(keys) je 'rplsList'.
-        intext = StringIO()
-        try:
-            intext.write(in_text)
-            intext.seek(0)
-        except IOError as e:
-            logger.debug("String replace IOError({0}{1}):".format(self.putanja, e))
-        except:
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
-            logger.debug(''.join('!' + line for line in lines))
-            
-        p = intext.getvalue()
+        
+        p = in_text
         n_pattern = re.compile("|".join(list(rplSmap.keys())))
         nf = n_pattern.findall(p) 
         
@@ -508,55 +498,45 @@ class FileProcessed:
             msginfo = wx.MessageDialog(None, f'Specijalni znakovi u tekstu:\n\n{os.path.basename(f_path)}\n\n{", ".join(nf)}.',\
                                        'SubConverter', wx.OK | wx.ICON_INFORMATION)
             msginfo.ShowModal()
+        try:
+            for key, value in rplSmap.items():
+                p = p.replace(key, value)
+        except Exception as e:
+            logger.debug(f"rplStr .replace error: {e}")
         
-        for key, value in rplSmap.items():
-            p = p.replace(key, value)   # !!! Svuda treba da bude p "p=p.replace"!!!
-        if p:
-            intext = self.truncateBuffer(intext)
-            intext.write(p)
-            intext.seek(0)
         # Dodatni replace u binarnom formatu:
         # \xe2\x96\xa0 = ■, xc2\xad = SOFT HYPHEN, \xef\xbb\xbf = bom utf-8, \xe2\x80\x91 = NON-BREAKING HYPHEN
-        
         try:
-            p = intext.getvalue().encode(self.kode)
+            p = p.encode(self.kode)
             logger.debug(f"■ rplStr, string encode to: {self.kode}")
+            
+            mp = p.replace(b'\xc2\xad', b'') .replace(b'\xd0\x94\xc4', b'D').replace(b"\xc4\x8f\xc2\xbb\xc5\xbc", b"") \
+                .replace(b'\xe2\x80\x91', b'') .replace(b'\xc3\x83\xc2\xba', b'u') \
+                .replace(b'\xc3\xa2\xe2\x82\xac\xe2\x80\x9d', b'\xe2\x80\x94') .replace(b'\xe2\x82\xac\xe2\x80\x9d', b'\xe2\x80\x94') \
+                .replace(b'\xef\xbb\xbf', b'') .replace(b'\xc5\xb8\xc5\x92', b'')# .replace(b'\x9e', b'\xc5\xbe')
         except Exception as e:
-            logger.debug(f"rplStr encode error: {e}")
-        
-        mp = p.replace(b'\xc2\xad', b'') .replace(b'\xd0\x94\xc4', b'D').replace(b"\xc4\x8f\xc2\xbb\xc5\xbc", b"") \
-            .replace(b'\xe2\x80\x91', b'') .replace(b'\xc3\x83\xc2\xba', b'u') \
-            .replace(b'\xc3\xa2\xe2\x82\xac\xe2\x80\x9d', b'\xe2\x80\x94') .replace(b'\xe2\x82\xac\xe2\x80\x9d', b'\xe2\x80\x94') \
-            .replace(b'\xef\xbb\xbf', b'') .replace(b'\xc5\xb8\xc5\x92', b'')# .replace(b'\x9e', b'\xc5\xbe')
+            logger.debug(f"rplStr error: {e}")
+            
         if mp:
             text = mp.decode(self.kode)
             
             return text
     
     def fixI(self, in_text):
-        intext = StringIO()
-        try:
-            intext.write(in_text)
-            intext.seek(0)
-        except IOError as e:
-            logger.debug("fixI IOError({0}{1}):".format(self.putanja, e))
-        except:
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
-            logger.debug(''.join('!' + line for line in lines))
-            
-        p = intext.getvalue()        
+        
         try:
             # Slova č,ć,đ,Č,Ć,Đ se nalaze i u rplStr() fukciji takođe.
             #ligature: ǈ=b'\xc7\x88' ǋ=b'\xc7\x8b' ǉ=b'\xc7\x89' ǌ=b'\xc7\x8c' \xe2\x96\xa0 = ■
             # \xc2\xa0 = NO-BREAK SPACE, \xe2\x80\x94 = EM DASH
-            p = intext.getvalue().encode(self.kode)
+            
+            p = in_text.encode(self.kode)
+            
             fp = p.replace(b'/ ', b'/').replace(b' >', b'>').replace(b'- <', b'-<').replace(b'</i> \n<i>', b'\n') \
                 .replace(b'< ', b'<').replace(b'<<i>', b'<i>').replace(b'\xc3\x83\xc2\xba', b'\x75') \
                 .replace(b'\xc3\xa2\xe2\x82\xac\xe2\x80\x9d', b'\xe2\x80\x94').replace(b' \n', b'\n') \
                 .replace(b'\xe2\x82\xac\xe2\x80\x9d', b'V') .replace(b'\xef\xbb\xbf', b'') \
                 .replace(b'\xc5\xb8\xc5\x92', b'').replace(b'\xd0\x94\xa0', b'\x44') \
-                .replace(b'\xc2\xa0', b' ').replace(b"\xc4\x8f\xc2\xbb\xc5\xbc", b"")   # .replace(b'\xc7\x88', b'\x4c\x6a') \
+                .replace(b'\xc2\xa0', b' ').replace(b"\xc4\x8f\xc2\xbb\xc5\xbc", b"")  # .replace(b'\xc7\x88', b'\x4c\x6a') \
                 #.replace(b'\xc7\x8b', b'\x4e\x6a') .replace(b'\xc7\x89', b'\x6c\x6a') .replace(b'\xc7\x8c', b'\x6e\x6a')
             if fp:
                 text = fp.decode(self.kode)
