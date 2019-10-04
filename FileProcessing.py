@@ -437,7 +437,7 @@ class FileProcessed:
             fpattern = re.compile(i , re.I)
             count_s = len(re.findall(fpattern, name1))
             if count_s >= 2:
-                name1 = "".join(name1.rsplit(i, count_s-1))
+                name1 = "".join(name1.rsplit(i, count_s))
                 #if not name1.endswith(i):
                     #name1 = name1 + i
                 
@@ -518,7 +518,6 @@ class FileProcessed:
         # Dodatni replace u binarnom formatu:
         # \xe2\x96\xa0 = ■, xc2\xad = SOFT HYPHEN, \xef\xbb\xbf = bom utf-8, \xe2\x80\x91 = NON-BREAKING HYPHEN
         
-        btext = BytesIO()
         try:
             p = intext.getvalue().encode(self.kode)
             logger.debug(f"■ rplStr, string encode to: {self.kode}")
@@ -530,11 +529,8 @@ class FileProcessed:
             .replace(b'\xc3\xa2\xe2\x82\xac\xe2\x80\x9d', b'\xe2\x80\x94') .replace(b'\xe2\x82\xac\xe2\x80\x9d', b'\xe2\x80\x94') \
             .replace(b'\xef\xbb\xbf', b'') .replace(b'\xc5\xb8\xc5\x92', b'')# .replace(b'\x9e', b'\xc5\xbe')
         if mp:
-            btext.write(mp)
-            btext.seek(0)
-            text = btext.getvalue().decode(self.kode)
-            intext.close()
-            btext.close()
+            text = mp.decode(self.kode)
+            
             return text
     
     def fixI(self, in_text):
@@ -549,13 +545,12 @@ class FileProcessed:
             lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
             logger.debug(''.join('!' + line for line in lines))
             
-        btext = BytesIO()
         p = intext.getvalue()        
         try:
-            p = intext.getvalue().encode(self.kode)
             # Slova č,ć,đ,Č,Ć,Đ se nalaze i u rplStr() fukciji takođe.
             #ligature: ǈ=b'\xc7\x88' ǋ=b'\xc7\x8b' ǉ=b'\xc7\x89' ǌ=b'\xc7\x8c' \xe2\x96\xa0 = ■
             # \xc2\xa0 = NO-BREAK SPACE, \xe2\x80\x94 = EM DASH
+            p = intext.getvalue().encode(self.kode)
             fp = p.replace(b'/ ', b'/').replace(b' >', b'>').replace(b'- <', b'-<').replace(b'</i> \n<i>', b'\n') \
                 .replace(b'< ', b'<').replace(b'<<i>', b'<i>').replace(b'\xc3\x83\xc2\xba', b'\x75') \
                 .replace(b'\xc3\xa2\xe2\x82\xac\xe2\x80\x9d', b'\xe2\x80\x94').replace(b' \n', b'\n') \
@@ -564,12 +559,7 @@ class FileProcessed:
                 .replace(b'\xc2\xa0', b' ').replace(b"\xc4\x8f\xc2\xbb\xc5\xbc", b"")   # .replace(b'\xc7\x88', b'\x4c\x6a') \
                 #.replace(b'\xc7\x8b', b'\x4e\x6a') .replace(b'\xc7\x89', b'\x6c\x6a') .replace(b'\xc7\x8c', b'\x6e\x6a')
             if fp:
-                btext.write(fp)
-                btext.seek(0)
-                text = btext.getvalue().decode(self.kode)
-                btext.close()
-                intext.close()
-                # self.writeToFile(text)
+                text = fp.decode(self.kode)
             return text            
         except IOError as e:
             logger.debug("fixI IOError({0}{1}):".format(self.putanja, e))
