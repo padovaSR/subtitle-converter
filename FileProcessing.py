@@ -32,7 +32,6 @@ import unicodedata
 import tempfile
 import fnmatch
 from collections import OrderedDict
-from io import StringIO, BytesIO
 from textwrap import TextWrapper
 import pysrt
 import srt
@@ -226,10 +225,6 @@ class FileProcessed:
         try:
             with open(self.putanja, 'r', encoding=self.kode, errors=error) as opened:
                 content = opened.read()
-            buffered_content = StringIO()
-            buffered_content.write(content)
-            buffered_content.seek(0)
-            content = buffered_content.getvalue()
             return content
         except IOError as e:
             logger.debug("GetContent IOError({0}{1}):".format(self.putanja, e))
@@ -628,16 +623,7 @@ class FileProcessed:
                         chunk = fp.read(buffer_size)
                     fp.seek(-bom_length, os.SEEK_CUR)
                     fp.truncate()    
-       
-    def truncateBuffer(self, sio):
-        sio.truncate(0)
-        sio.seek(0)
-        return sio
-     
-    def newBuffer(self, sio):
-        return StringIO()    
-
-
+    
 class Preslovljavanje(FileProcessed):
     
     def changeLetters(self, reversed_action):
