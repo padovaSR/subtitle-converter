@@ -1407,6 +1407,9 @@ class MyFrame(wx.Frame):
         self.reloaded = 0   
         self.SetStatusText('Multiple files done.')
         self.multipleTools()
+        self.toolBar1.EnableTool(1003, False)
+        self.to_ansi.Enable(False)
+            
         
     def toCyrSRT_utf8(self, event):
         
@@ -1866,7 +1869,7 @@ class MyFrame(wx.Frame):
             self.newEnc = 'utf-8-sig'
         else:
             self.newEnc = 'utf-8'        
-        
+        entered_enc = ""
         for key, value in self.multiFile.items():
                     
             path=key
@@ -1902,6 +1905,11 @@ class MyFrame(wx.Frame):
             writeTempStr(path, text, entered_enc)
             fproc.unix2DOS()
         self.multipleTools()
+        if entered_enc == "windows-1251":
+            self.toolBar1.EnableTool(1003, False)
+            self.to_ansi.Enable(False)
+            msginfo = wx.MessageDialog(self, f'Novi enkoding: {self.newEnc} Ćirilica.', 'SubConverter', wx.OK | wx.ICON_INFORMATION)
+            msginfo.ShowModal()
         self.reloaded = 0
         self.previous_action['toUTF_multiple'] = self.newEnc
         self.SetStatusText('Multiple files done.')
