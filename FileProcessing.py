@@ -648,12 +648,13 @@ class Preslovljavanje(FileProcessed):
                         text_changed += MAPA[c]
                     else:
                         text_changed += c
+                        
             self.writeToFile(text_changed)
         
         except IOError as e:
             logger.debug("Preslovljavanje, I/O error({0}): {1}".format(e.errno, e.strerror))
-        except:
-            logger.debug("Preslovljavanje, unexpected error:", sys.exc_info()[0])
+        except Exception as e:
+            logger.debug(f"Preslovljavanje, unexpected error: {e}")
         
     def preLatin(self):
         kode = self.kode
@@ -665,8 +666,8 @@ class Preslovljavanje(FileProcessed):
                 fp = robjLatin.sub(lambda m: pLatin_rpl[m.group(0)], p)
         except IOError as e:
             logger.debug("PreLatin, I/O error({0}): {1}".format(e.errno, e.strerror))
-        except:
-            logger.debug("PreLatin, unexpected error:", sys.exc_info()[0])
+        except Exception as e:
+            logger.debug(f"PreLatin, unexpected error: {e}")
         else:
             if fp:
                 self.writeToFile(fp)
@@ -687,8 +688,8 @@ class Preslovljavanje(FileProcessed):
                     t_out = robjLat.sub(lambda m: pre_lat[m.group(0)], tNew)
         except IOError as e:
             logger.debug("Preprocessing, I/O error({0}): {1}".format(e.errno, e.strerror))
-        except:
-            logger.debug("Preprocessing, unexpected error:", sys.exc_info()[0])
+        except Exception as e:
+            logger.debug(f"Preprocessing, unexpected error: {e}")
         else:
             if t_out:
                 self.writeToFile(t_out)
@@ -710,8 +711,8 @@ class Preslovljavanje(FileProcessed):
                 c_out = robjCyr.sub(lambda m: cir_lat[m.group(0)], tNew)
         except IOError as e:
             logger.debug("Preprocessing, I/O error({0}): {1}".format(e.errno, e.strerror))
-        except:
-            logger.debug("Preprocessing, unexpected error:", sys.exc_info()[0])
+        except Exception as e:
+            logger.debug(f"Preprocessing, unexpected error: {e}")
         else:
             if c_out:
                 self.writeToFile(c_out)
@@ -744,8 +745,8 @@ class Preslovljavanje(FileProcessed):
                     fr = fr.replace(key, value)
         except IOError as e:
             logger.debug("Tag translate, I/O error({0}): {1}".format(e.errno, e.strerror))
-        except:
-            logger.debug("Tag translate, unexpected error:", sys.exc_info()[0])
+        except Exception as e:
+            logger.debug(f"Tag translate, unexpected error: {e}")
         else:
             if fr:
                 self.writeToFile(fr)
@@ -799,8 +800,8 @@ class TextProcessing(FileProcessed):
                 f.write(t_out6[0])
         except IOError as e:
             logger.debug("Transkripcija, I/O error({0}): {1}".format(e.errno, e.strerror))
-        except Exception as e: #handle other exceptions such as attribute errors
-            logger.debug(F"Transkripcija, unexpected error: {traceback.format_exc}")     
+        except Exception as e: 
+            logger.debug(F"Transkripcija, unexpected error: {e}")     
             
         def doRepl(inobj, indict):
             try:
@@ -812,15 +813,12 @@ class TextProcessing(FileProcessed):
                 return out[1]
             except IOError as e:
                 logger.debug("Replace keys, I/O error({0}): {1}".format(e.errno, e.strerror))
-            except Exception as e: #handle other exceptions such as attribute errors
-                logger.debug(f"Replace keys, unexpected error: {traceback.format_exc}")
+            except Exception as e: 
+                logger.debug(f"Replace keys, unexpected error: {e}")
                 
-        if not len(dict1_n2) == 0:
-            n1 = doRepl(robjL1, dict1_n2)
-        if not len(dict2_n2) == 0:
-            n2 = doRepl(robjL2, dict2_n2)
-        if not len(dict0_n2) == 0:
-            n3 = doRepl(robjL0, dict0_n2)        
+        if not len(dict1_n2) == 0: doRepl(robjL1, dict1_n2)
+        if not len(dict2_n2) == 0: doRepl(robjL2, dict2_n2)
+        if not len(dict0_n2) == 0: doRepl(robjL0, dict0_n2)        
         
         much = t_out1[1] + t_out2[1] + t_out3[1] + t_out4[1] + t_out5[1] + t_out6[1]        
         logger.debug('Transkripcija u toku.\n--------------------------------------')
@@ -838,6 +836,7 @@ class TextProcessing(FileProcessed):
             with open(infile, 'r', encoding=inkode) as f:
                 tNew = f.read()
                 t_out = robj_r.subn(lambda m: searchReplc[m.group(0)], tNew)
+        
         except IOError as e:
             logger.debug("DoReplace, I/O error({0}): {1}".format(e.errno, e.strerror))
         except AttributeError as e:
@@ -846,8 +845,9 @@ class TextProcessing(FileProcessed):
             logger.debug(f"DoReplace, UnicodeEncodeError: {e}")
         except UnicodeDecodeError as e:
             logger.debug(f"DoReplace, UnicodeDecodeError: {e}")
-        except Exception as e: #handle other exceptions such as attribute errors
-            logger.debug(f"DoReplace, unexpected error: {traceback.format_exc}")
+        except Exception as e:
+            logger.debug(f"DoReplace, unexpected error: {e}")
+        
         else:
             if t_out:
                 writeTempStr(self.putanja, t_out[0], self.kode)
