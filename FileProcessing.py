@@ -433,8 +433,8 @@ class FileProcessed:
             count_s = len(re.findall(fpattern, name1))
             if count_s >= 2:
                 name1 = "".join(name1.rsplit(i, count_s))
-                #if not name1.endswith(i):
-                    #name1 = name1 + i
+                if not name1.endswith(i):
+                    name1 = name1 + i
                 
         return name1, sufix    # Vraca samo ime fajla bez putanje
     
@@ -720,24 +720,21 @@ class Preslovljavanje(FileProcessed):
     def fontColor(self):
         inkode = self.kode
         intext = self.putanja        
-        def preFc(inword):
-            intab = 'АБВГДЕЗИЈКЛМНОПРСТУФХЦабвгдезијклмнопрстуфхц'
-            outab = 'ABVGDEZIJKLMNOPRSTUFHCabvgdezijklmnoprstufhc'
-            transltab = str.maketrans(intab, outab)
-            ouword = inword.translate(transltab)
-            return ouword
+        
+        intab = 'АБВГДЕЗИЈКЛМНОПРСТУФХЦабвгдезијклмнопрстуфхц'
+        outab = 'ABVGDEZIJKLMNOPRSTUFHCabvgdezijklmnoprstufhc'
+        transltab = str.maketrans(intab, outab)
         try:
             with open(intext, 'r', encoding=inkode) as fin:
                 
                 fr = fin.read()
                 
                 # "превео:* |превод:* \w+"
-                re_list = ["<.*?>", "www\.\w+\.\w+\s*"]
-                f_reg = re.compile("|".join(re_list), re.I)
+                f_reg = re.compile("<.*?>|www\.\w+\.\w+\s*", re.I)
                 
                 cf = f_reg.findall(fr)
                 
-                lj = [preFc(i) for i in cf]
+                lj = [i.translate(transltab) for i in cf]
                 
                 dok = dict(zip(cf, lj))
                 
@@ -748,8 +745,7 @@ class Preslovljavanje(FileProcessed):
         except Exception as e:
             logger.debug(f"Tag translate, unexpected error: {e}")
         else:
-            if fr:
-                self.writeToFile(fr)
+            self.writeToFile(fr)
                 
 ########################################################################
 class TextProcessing(FileProcessed):
@@ -874,11 +870,11 @@ class TextProcessing(FileProcessed):
         # Prva prazna linija            '(?<=,\d\d\d)\n\n(?=\w)'
         # '(?<=,\d\d\d)\n\n(?=\s*\S*?)'
         #reg-4 = re.compile(r'((?!\n)([A-Z\s]*){1,3}(?=\:)(?<![0-9a-z])\:\s)')
-        reg_4 = re.compile("|".join(["^\s*\-\.+\s+", "(([A-Z ]*){1,3}(?=\:)(?<![0-9a-z])\:\s)", "^[ \t]*"]), re.M)
-        reg_P6 = re.compile("|".join(["(\([^\)]*\))", "(\[[^]]*\])", "(\{[^}]*\})", "(<i>\s*<\/i>)", "(^\s*?\-+\s*?)$"]), re.M)
+        reg_4 = re.compile("^\s*\-\.+\s+|(([A-Z ]*){1,3}(?=\:)(?<![0-9a-z])\:\s)|^[ \t]*", re.M)
+        reg_P6 = re.compile("(\([^\)]*\))|(\[[^]]*\])|(\{[^}]*\})|(<i>\s*<\/i>)|(^\s*?\-+\s*?)$", re.M)
         reg4n = re.compile(r'([A-Z ]*) [0-3](?=\:)')  # MAN 1: broj 1-3
-        reg_P8 = re.compile("|".join(["(\s*?)$", "(^\s*?\.+)$", "(^\s*?,+)$", "(^\s*?;+)$", "(^\s*?!+\s*?)$", "(^\s*?\?+\s*?)$"]), re.M)
-        reg_S9 = re.compile("|".join(["(?<=,\d\d\d)\n\n(?=\w)", "(?<=,\d\d\d)\n\n(?=\s*\S*?)"]), re.M)
+        reg_P8 = re.compile("(\s*?)$|(^\s*?\.+)$|(^\s*?,+)$|(^\s*?;+)$|(^\s*?!+\s*?)$|(^\s*?\?+\s*?)$", re.M)
+        reg_S9 = re.compile("(?<=,\d\d\d)\n\n(?=\w)|(?<=,\d\d\d)\n\n(?=\s*\S*?)", re.M)
         reg8a = re.compile(r'^\s*(?<=\w)', re.M)            # Spejs na pocetku linije
         regN = re.compile(r'(?<=^-)\:\s*', re.M)            # dve tacke iza crtice
         
