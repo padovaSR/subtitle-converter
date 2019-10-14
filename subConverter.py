@@ -41,6 +41,7 @@ import logging
 import traceback
 
 import wx
+import wx.lib.agw.shortcuteditor as SE
 
 VERSION = "v0.5.7.0"
 
@@ -271,11 +272,13 @@ class MyFrame(wx.Frame):
         self.text_1.Bind(wx.EVT_TEXT, self.removeFiles, id=-1, id2=wx.ID_ANY)
         self.Bind(wx.EVT_MENU, self.toCyrSRT_utf8, id=82)
         self.Bind(wx.EVT_MENU, self.onFileSettings, id=83)
+        self.Bind(wx.EVT_TOOL, self.editShortcuts, id=84)
         
-        entries = [wx.AcceleratorEntry() for i in range(2)]
+        entries = [wx.AcceleratorEntry() for i in range(3)]
         
         entries[0].Set(wx.ACCEL_CTRL|wx.ACCEL_SHIFT, ord('Y'), 82)
-        entries[1].Set(wx.ACCEL_CTRL|wx.ACCEL_SHIFT, ord('F'), 83)        
+        entries[1].Set(wx.ACCEL_CTRL|wx.ACCEL_SHIFT, ord('F'), 83)
+        entries[2].Set(wx.ACCEL_CTRL|wx.ACCEL_SHIFT, ord("K"), 84)
         
         accel_tbl = wx.AcceleratorTable(entries)
         # accel_tbl = wx.AcceleratorTable([(wx.ACCEL_CTRL | wx.ACCEL_SHIFT,  ord('Y'), 82)], [(wx.ACCEL_CTRL | wx.ACCEL_SHIFT, ord('F'), 83)])
@@ -289,7 +292,7 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.onOpen, id=self.fopen.GetId())
         self.file.Append(self.fopen)
         
-        self.open_next = wx.MenuItem(self.file, wx.ID_ANY, u"Open next...\tAlt+E", u"Otvori sačuvani fajl", wx.ITEM_NORMAL)
+        self.open_next = wx.MenuItem(self.file, wx.ID_ANY, "Open next...\tAlt+E", u"Otvori sačuvani fajl", wx.ITEM_NORMAL)
         self.open_next.SetBitmap(wx.ArtProvider.GetBitmap(wx.ART_GO_DIR_UP, wx.ART_MENU))
         self.Bind(wx.EVT_MENU, self.onOpenNext, id=self.open_next.GetId())
         self.file.Append(self.open_next)
@@ -303,13 +306,13 @@ class MyFrame(wx.Frame):
         self.reload.Enable(False)
         self.file.AppendSeparator()
         
-        self.save = wx.MenuItem(self.file, wx.ID_SAVE, u"Save"+ u"\t" + u"Ctrl+S", u"Sačuvaj fajl", wx.ITEM_NORMAL)
+        self.save = wx.MenuItem(self.file, wx.ID_SAVE, "&Save\tCtrl+S", "Sačuvaj fajl", wx.ITEM_NORMAL)
         self.save.SetBitmap(wx.ArtProvider.GetBitmap(wx.ART_FILE_SAVE, wx.ART_MENU))
         self.Bind(wx.EVT_MENU, self.onSave, id=self.save.GetId())
         self.file.Append(self.save)
         self.save.Enable(False)
         
-        self.save_as = wx.MenuItem(self.file, wx.ID_SAVEAS, u"Save as..."+ u"\t" + u"Ctrl+Shift+S", u"Sačuvaj fajl kao...", wx.ITEM_NORMAL)
+        self.save_as = wx.MenuItem(self.file, wx.ID_SAVEAS, "&Save as...\tCtrl+Shift+S", u"Sačuvaj fajl kao...", wx.ITEM_NORMAL)
         self.save_as.SetBitmap(wx.ArtProvider.GetBitmap(wx.ART_FILE_SAVE_AS, wx.ART_MENU))
         self.Bind(wx.EVT_MENU, self.onSaveAs, id=self.save_as.GetId())
         self.file.Append(self.save_as)
@@ -323,7 +326,7 @@ class MyFrame(wx.Frame):
         
         self.file.AppendSeparator()
 
-        self.close = wx.MenuItem(self.file, wx.ID_CLOSE, u"Close"+ u"\t" + u"Ctrl+W", u"Zatvori fajl", wx.ITEM_NORMAL)
+        self.close = wx.MenuItem(self.file, wx.ID_CLOSE, "&Close\tCtrl+W", u"Zatvori fajl", wx.ITEM_NORMAL)
         self.close.SetBitmap(wx.ArtProvider.GetBitmap(wx.ART_CLOSE, wx.ART_MENU))
         self.Bind(wx.EVT_MENU, self.onCloseFile, id=self.close.GetId())
         self.file.Append(self.close)
@@ -339,7 +342,7 @@ class MyFrame(wx.Frame):
         self.file.AppendSeparator()
         # Submenu end        
 
-        self.quit_program = wx.MenuItem(self.file, wx.ID_ANY, u"Quit"+ u"\t" + u"Ctrl+Q", u"Quit program", wx.ITEM_NORMAL)
+        self.quit_program = wx.MenuItem(self.file, wx.ID_ANY, "&Quit\tCtrl+Q", u"Quit program", wx.ITEM_NORMAL)
         self.quit_program.SetBitmap(wx.Bitmap(os.path.join("resources", "icons", "application-exit.png"), wx.BITMAP_TYPE_ANY))
         self.Bind(wx.EVT_MENU, self.onQuit, id=self.quit_program.GetId())
         self.file.Append(self.quit_program)
@@ -347,19 +350,19 @@ class MyFrame(wx.Frame):
         
        # Actions   -----------------------------------------------------------------------------------------------------------------------
         self.action = wx.Menu()
-        self.to_cyrillic = wx.MenuItem(self.action, wx.ID_ANY, u"ToCyrillic"+ u"\t" + u"Ctr+Y", u"Konvertuje u cirilicu", wx.ITEM_NORMAL)
+        self.to_cyrillic = wx.MenuItem(self.action, wx.ID_ANY, "&ToCyrillic\tCtr+Y", u"Konvertuje u cirilicu", wx.ITEM_NORMAL)
         self.to_cyrillic.SetBitmap(wx.Bitmap(os.path.join("resources", "icons", "cyr-ltr.png"), wx.BITMAP_TYPE_ANY))
         self.Bind(wx.EVT_MENU, self.toCyrillic, id=self.to_cyrillic.GetId())
         self.action.Append(self.to_cyrillic)
         self.to_cyrillic.Enable(False)
 
-        self.to_ansi = wx.MenuItem(self.action, wx.ID_ANY, u"ToANSI"+ u"\t" + u"Alt+S", u"Konvertuje u ANSI", wx.ITEM_NORMAL)
+        self.to_ansi = wx.MenuItem(self.action, wx.ID_ANY, "&ToANSI\tAlt+S", u"Konvertuje u ANSI", wx.ITEM_NORMAL)
         self.to_ansi.SetBitmap(wx.Bitmap(os.path.join("resources", "icons", "go-next.png"), wx.BITMAP_TYPE_ANY))
         self.Bind(wx.EVT_MENU, self.toANSI, id=self.to_ansi.GetId())
         self.action.Append(self.to_ansi)
         self.to_ansi.Enable(False)
 
-        self.to_utf8 = wx.MenuItem(self.action, wx.ID_ANY, u"ToUTF"+ u"\t" + u"Alt+D", u"Konvertuje u UTF", wx.ITEM_NORMAL)
+        self.to_utf8 = wx.MenuItem(self.action, wx.ID_ANY, "&ToUTF\tAlt+D", u"Konvertuje u UTF", wx.ITEM_NORMAL)
         self.to_utf8.SetBitmap(wx.Bitmap(os.path.join("resources", "icons", "go-next.png"), wx.BITMAP_TYPE_ANY))
         self.Bind(wx.EVT_MENU, self.toUTF, id=self.to_utf8.GetId())
         self.action.Append(self.to_utf8)
@@ -367,19 +370,19 @@ class MyFrame(wx.Frame):
 
         self.action.AppendSeparator()
 
-        self.transcrib = wx.MenuItem(self.action, wx.ID_ANY, u"Transcribe"+ u"\t" + u"Alt+N", u"Transcribe", wx.ITEM_NORMAL)
+        self.transcrib = wx.MenuItem(self.action, wx.ID_ANY, "&Transcribe\tAlt+N", u"Transcribe", wx.ITEM_NORMAL)
         self.transcrib.SetBitmap(wx.ArtProvider.GetBitmap(wx.ART_HELP_SETTINGS, wx.ART_MENU))
         self.Bind(wx.EVT_MENU, self.onTranscribe, id=self.transcrib.GetId())
         self.action.Append(self.transcrib)
         self.transcrib.Enable(False)
 
-        self.specials = wx.MenuItem(self.action, wx.ID_ANY, u"&SpecReplace\tAlt+C", u"ReplaceSpecial definicije", wx.ITEM_NORMAL)
+        self.specials = wx.MenuItem(self.action, wx.ID_ANY, "&SpecReplace\tAlt+C", u"ReplaceSpecial definicije", wx.ITEM_NORMAL)
         self.specials.SetBitmap(wx.Bitmap(os.path.join("resources", "icons", "go-next.png"), wx.BITMAP_TYPE_ANY))
         self.Bind(wx.EVT_MENU, self.onRepSpecial, id=self.specials.GetId())
         self.action.Append(self.specials)
         self.specials.Enable(False)
        
-        self.cleaner = wx.MenuItem(self.action, wx.ID_ANY, u"Cleanup"+ u"\t" + u"Alt+K", u"Clean subtitle file", wx.ITEM_NORMAL)
+        self.cleaner = wx.MenuItem(self.action, wx.ID_ANY, "&Cleanup\tAlt+K", u"Clean subtitle file", wx.ITEM_NORMAL)
         self.cleaner.SetBitmap(wx.Bitmap(os.path.join("resources", "icons", "edit-clear-all.png"), wx.BITMAP_TYPE_ANY))
         self.Bind(wx.EVT_MENU, self.onCleanup, id=self.cleaner.GetId())
         self.action.Append(self.cleaner)
@@ -387,13 +390,13 @@ class MyFrame(wx.Frame):
 
         self.action.AppendSeparator()
 
-        self.cyr_to_ansi = wx.MenuItem(self.action, wx.ID_ANY, u"Cyr to latin ansi"+ u"\t" + u"Ctrl+U", u"Preslovljavanje cirilice u latinicu ansi", wx.ITEM_NORMAL)
+        self.cyr_to_ansi = wx.MenuItem(self.action, wx.ID_ANY, "&Cyr to latin ansi\tCtrl+U", u"Preslovljavanje cirilice u latinicu ansi", wx.ITEM_NORMAL)
         self.cyr_to_ansi.SetBitmap(wx.Bitmap(os.path.join("resources", "icons", "go-next.png"), wx.BITMAP_TYPE_ANY))
         self.Bind(wx.EVT_MENU, self.onCyrToANSI, id=self.cyr_to_ansi.GetId())
         self.action.Append(self.cyr_to_ansi)
         self.cyr_to_ansi.Enable(False)
 
-        self.cyr_to_utf = wx.MenuItem(self.action, wx.ID_ANY, u"Cyr to latin utf8"+ u"\t" + u"Ctrl+L", u"Preslovljavanje cirilice u latinicu utf8", wx.ITEM_NORMAL)
+        self.cyr_to_utf = wx.MenuItem(self.action, wx.ID_ANY, "&Cyr to latin utf8\tCtrl+L", u"Preslovljavanje cirilice u latinicu utf8", wx.ITEM_NORMAL)
         self.cyr_to_utf.SetBitmap(wx.Bitmap(os.path.join("resources", "icons", "go-next.png"), wx.BITMAP_TYPE_ANY))
         self.Bind(wx.EVT_MENU, self.onCyrToUTF, id=self.cyr_to_utf.GetId())
         self.action.Append(self.cyr_to_utf)
@@ -401,7 +404,7 @@ class MyFrame(wx.Frame):
 
         self.action.AppendSeparator()
         
-        self.fixer = wx.MenuItem(self.action, wx.ID_ANY, u"FixSubtitle"+ u"\t" + u"Alt+F", u"Fix subtitle file", wx.ITEM_NORMAL)
+        self.fixer = wx.MenuItem(self.action, wx.ID_ANY, "&FixSubtitle\tAlt+F", u"Fix subtitle file", wx.ITEM_NORMAL)
         self.fixer.SetBitmap(wx.Bitmap(os.path.join("resources", "icons", "go-next.png"), wx.BITMAP_TYPE_ANY))
         self.Bind(wx.EVT_MENU, self.onFixSubs, id=self.fixer.GetId())
         self.action.Append(self.fixer)
@@ -409,7 +412,7 @@ class MyFrame(wx.Frame):
 
         self.action.AppendSeparator()
 
-        self.merger = wx.MenuItem(self.action, wx.ID_ANY, u"Merger"+ u"\t" + u"Ctrl+M", u"Merge lines", wx.ITEM_NORMAL)
+        self.merger = wx.MenuItem(self.action, wx.ID_ANY, "&Merger\tCtrl+M", u"Merge lines", wx.ITEM_NORMAL)
         self.merger.SetBitmap(wx.Bitmap(os.path.join("resources", "icons", "merge.png"), wx.BITMAP_TYPE_ANY))
         self.Bind(wx.EVT_MENU, self.onMergeLines, id=self.merger.GetId())
         self.action.Append(self.merger)
@@ -429,7 +432,7 @@ class MyFrame(wx.Frame):
 
         self.preferences.AppendSeparator()
 
-        self.fonts = wx.MenuItem(self.preferences, wx.ID_ANY, u"Font settings"+ u"\t" + u"Ctrl+F", u"Font settings", wx.ITEM_NORMAL)
+        self.fonts = wx.MenuItem(self.preferences, wx.ID_ANY, "&Font settings\tCtrl+F", u"Font settings", wx.ITEM_NORMAL)
         self.fonts.SetBitmap(wx.Bitmap(os.path.join("resources", "icons", "preferences-font.png"), wx.BITMAP_TYPE_ANY))
         self.Bind(wx.EVT_MENU, self.onSelectFont, id=self.fonts.GetId())
         self.preferences.Append(self.fonts)
@@ -451,7 +454,7 @@ class MyFrame(wx.Frame):
         self.frame_menubar.Append(self.preferences, u"Preferences")
 
         self.help = wx.Menu()
-        self.about = wx.MenuItem(self.help, wx.ID_ANY, u"About"+ u"\t" + u"Ctrl+I", u"O programu", wx.ITEM_NORMAL)
+        self.about = wx.MenuItem(self.help, wx.ID_ANY, "&About\tCtrl+I", u"O programu", wx.ITEM_NORMAL)
         self.about.SetBitmap(wx.Bitmap(os.path.join("resources", "icons", "help-about.png"), wx.BITMAP_TYPE_ANY))
         self.Bind(wx.EVT_MENU, self.onAbout, id = self.about.GetId())
         self.help.Append(self.about)
@@ -3019,7 +3022,18 @@ class MyFrame(wx.Frame):
     def onFileSettings(self, event):
         settings_dlg = FileSettings(None)
         settings_dlg.ShowModal()
-        event.Skip()    
+        event.Skip()
+        
+    def editShortcuts(self, event):
+        
+        dlg = SE.ShortcutEditor(self)
+        dlg.FromMenuBar(self)
+        
+        if dlg.ShowModal() == wx.ID_OK:
+            dlg.ToMenuBar(self)
+        dlg.Destroy()        
+        
+        event.Skip()        
     
     def onQuit(self, event):
         tval = self.text_1.GetValue()
