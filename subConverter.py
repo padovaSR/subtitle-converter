@@ -43,7 +43,7 @@ import traceback
 import wx
 import wx.lib.agw.shortcuteditor as SE
 
-VERSION = "v0.5.8.0b1"
+VERSION = "v0.5.7.1"
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
