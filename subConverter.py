@@ -350,13 +350,13 @@ class MyFrame(wx.Frame):
         
        # Actions   -----------------------------------------------------------------------------------------------------------------------
         self.action = wx.Menu()
-        self.to_cyrillic = wx.MenuItem(self.action, wx.ID_ANY, "&ToCyrillic\tCtr+Y", u"Konvertuje u cirilicu", wx.ITEM_NORMAL)
+        self.to_cyrillic = wx.MenuItem(self.action, wx.ID_ANY, "&ToCyrillic\tCtrl+Y", u"Konvertuje u cirilicu", wx.ITEM_NORMAL)
         self.to_cyrillic.SetBitmap(wx.Bitmap(os.path.join("resources", "icons", "cyr-ltr.png"), wx.BITMAP_TYPE_ANY))
         self.Bind(wx.EVT_MENU, self.toCyrillic, id=self.to_cyrillic.GetId())
         self.action.Append(self.to_cyrillic)
         self.to_cyrillic.Enable(False)
 
-        self.to_ansi = wx.MenuItem(self.action, wx.ID_ANY, "&ToANSI\tAlt+S", u"Konvertuje u ANSI", wx.ITEM_NORMAL)
+        self.to_ansi = wx.MenuItem(self.action, wx.ID_ANY, "&ToANSI\tAlt+S", "Konvertuje u ANSI", wx.ITEM_NORMAL)
         self.to_ansi.SetBitmap(wx.Bitmap(os.path.join("resources", "icons", "go-next.png"), wx.BITMAP_TYPE_ANY))
         self.Bind(wx.EVT_MENU, self.toANSI, id=self.to_ansi.GetId())
         self.action.Append(self.to_ansi)
@@ -469,6 +469,7 @@ class MyFrame(wx.Frame):
         self.frame_menubar.Append(self.help, u"Help")
 
         self.SetMenuBar(self.frame_menubar)
+        
         # Menu Bar end
         
     # Tool Bar
@@ -3031,10 +3032,10 @@ class MyFrame(wx.Frame):
         
         if dlg.ShowModal() == wx.ID_OK:
             dlg.ToMenuBar(self)
-        dlg.Destroy()        
+        dlg.Destroy()
         
-        event.Skip()        
-    
+        event.Skip()
+        
     def onQuit(self, event):
         tval = self.text_1.GetValue()
         prev = ""
