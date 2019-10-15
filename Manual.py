@@ -8,7 +8,7 @@ import wx
 import wx.html as html
 import os
 
-page = 'resources\\uputstvo.htm'
+page = os.path.join('resources','uputstvo.htm')
 
 if not os.path.exists(page):
     # HTML String
@@ -68,7 +68,7 @@ class MyManual(wx.Frame):
         wx.Frame.__init__(self, *args, **kwargs)
         self.SetTitle("Subtitle Converter - Uputstvo")
         _icon = wx.NullIcon
-        _icon.CopyFromBitmap(wx.Bitmap("resources\\icons\\tool.ico", wx.BITMAP_TYPE_ANY))
+        _icon.CopyFromBitmap(wx.Bitmap(os.path.join("resources","icons","tool.ico"), wx.BITMAP_TYPE_ANY))
         self.SetIcon(_icon)
         self.SetSize((674, 520))
         
