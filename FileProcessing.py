@@ -23,7 +23,6 @@ import logging
 import traceback
 import pickle
 import shelve
-import pickle
 import zipfile
 
 import codecs
@@ -31,10 +30,11 @@ import re
 import unicodedata
 import tempfile
 import fnmatch
-from collections import OrderedDict
+from io import StringIO
 from textwrap import TextWrapper
 import pysrt
 import srt
+from datetime import timedelta 
 
 from zamenaImena import dictionary_0, dictionary_1, dictionary_2, rplSmap,\
      searchReplc, dict0_n, dict0_n2, dict1_n, dict1_n2, dict2_n, dict2_n2,\
@@ -50,6 +50,24 @@ formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
 handler = logging.FileHandler(filename=os.path.join("resources", "var", "FileProcessing.log"), mode="w", encoding="utf-8")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
+
+
+    
+def bufferCode(intext, outcode):
+    
+    codelist = ['utf-8', 'utf-8-sig', 'utf-16', 'utf-32', 'utf-16-be', 'utf-16-le', 'utf-32-be', 'utf-32-le']
+    if outcode in codelist: error = "surrogatepass"
+    else:
+        error = "replace"
+    try:
+        b_text = intext.encode(encoding=outcode, errors=error)
+        s_text = b_text.decode(encoding=outcode, errors=error)
+        logger.debug(f"bufferCode to encoding: {outcode}")
+    except Exception as e:
+        logger.debug(f"BufferCode error: {e}, intext: {type(intext)}")
+        return intext
+    else:
+        return s_text    
 
 def writeTempStr(inFile, text, kode):
     _error = 'strict'
@@ -74,26 +92,6 @@ def writeTempStr(inFile, text, kode):
     except Exception:
         logger.debug(f"WriteTempStr, unexpected error: {traceback.format_exc}")
 
-def convert_bytes(num):
-    """
-    this function will convert bytes to MB.... GB... etc
-    """
-    for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
-        if num < 1024.0:
-            return "%3.1f %s" % (num, x)
-        num /= 1024.0
-
-
-def file_size(file_path):
-    """
-    this function will return the file size
-    """
-    if os.path.isfile(file_path):
-        file_info = os.stat(file_path)
-        return convert_bytes(file_info.st_size)
-
-
-
 class FileOpened:
     
     def __init__(self, path):
@@ -101,7 +99,7 @@ class FileOpened:
         self.putanja = path    
     
     def isCompressed(self):
-        # basepath = os.path.dirname(self.putanja)
+        
         basepath = 'tmp'
         imeFajla = os.path.basename(self.putanja)
                   
@@ -166,6 +164,7 @@ class FileOpened:
 
 class FileProcessed:
     
+    work_text = StringIO()
     path0_p = os.path.join('resources', 'var', 'path0.pkl')
     enc0_p = os.path.join('resources', 'var', 'enc0.pkl')
     
@@ -177,7 +176,12 @@ class FileProcessed:
         pattern = name_pattern + "*" + suffix
         files = os.listdir(where)
         n_names = len(fnmatch.filter(files, pattern))  # + 1
-        return n_names    
+        return n_names
+    
+    def bufferText(self, intext, buffer):
+        buffer.truncate(0)
+        buffer.write(intext)
+        buffer.seek(0)    
     
     def normalizeText(self):
         error = 'strict'
@@ -196,38 +200,25 @@ class FileProcessed:
             logger.debug(''.join('!' + line for line in lines))
                         
         else:
-            if text_normalized:
-                try:
-                    with tempfile.TemporaryFile() as tfile:
-                        tfile.write(bytes(text_normalized, self.kode))
-                        tfile.seek(0)
-                        content = tfile.read()
-                        with open(self.putanja, 'wb') as  out: #, encoding=enc) as out:
-                            out.write(content)
-                except IOError as e:
-                    logger.debug(f"NormalizeText IOError: ({self.putanja}{e})")
-                except:
-                    exc_type, exc_value, exc_traceback = sys.exc_info()
-                    lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
-                    logger.debug(''.join('!' + line for line in lines))
-                    
-                    ErrorDlg = wx.MessageDialog(None, "DecodeError\n\n{0}.\nIzaberite drugo kodiranje.".format(self.kode), "SubConverter", wx.OK | wx.ICON_ERROR)
-                    ErrorDlg.ShowModal()    
-    
-    def getContent(self):
-        
-        codelist = ['utf-8', 'utf-8-sig', 'utf-16', 'utf-32', 'utf-16-be', 'utf-16-le', 'utf-32-be', 'utf-32-le']
-        if self.kode in codelist:
-            error = 'surrogatepass'
-        else:
-            error = 'strict'
-        # logger.debug(f"GetContent error type: {error}")
+            try:
+                self.bufferText(text_normalized, self.work_text)
+                text = self.work_text.getvalue()
+                return text
+            except Exception as e:
+                logger.debug(f"NormalizeText Error: ({e})")
+            except:
+                exc_type, exc_value, exc_traceback = sys.exc_info()
+                lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
+                logger.debug(''.join('!' + line for line in lines))
+                
+    def getContent(self, in_buffer):
+        if in_buffer == None:
+            in_buffer = self.work_text
         try:
-            with open(self.putanja, 'r', encoding=self.kode, errors=error) as opened:
-                content = opened.read()
-            return content
+            text = in_buffer.getvalue()
+            return text
         except IOError as e:
-            logger.debug("GetContent IOError({0}{1}):".format(self.putanja, e))
+            logger.debug(f"GetContent IOError: {e}")
         except:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
@@ -241,10 +232,11 @@ class FileProcessed:
             pickle.dump(self.putanja, v)
         with open(os.path.join('resources', 'var', 'rpath0.pkl'), 'wb') as f:
             pickle.dump(realFile, f)
+        
         #with open(os.path.join('resources', 'var', 'obsE.pkl'), 'wb') as f:
             #pickle.dump(self.kode, f)
             
-    def checkErrors(self):
+    def checkErrors(self, text_in):
         
         fpaterns = '|'.join(['ï»¿Å', 'Ä', 'Å½', 'Ä', 'Ä', 'Å¡', 'Ä', 'Å¾', 'Ä', 'Ä', "ď»ż", "Ĺ˝", 'Ĺ ', 'ĹĄ', 'Ĺž', 'Ä', 'Å ', 'Ä‡',\
                     'Ä¿', 'Ä²', 'Ä³', 'Å¿', 'Ã¢â', "�", "Д†", "Д‡", "Ť", "Lˇ", "ï»¿", "ð"])
@@ -259,7 +251,7 @@ class FileProcessed:
             'вЂ[љћ¦°№™ќ“”]'+
             fpaterns)                
         
-        text = self.getContent()
+        text = text_in
         l1 = []; l2 = []
         try:
             for match in re.finditer(MOJIBAKE_SYMBOL_RE, text):
@@ -278,39 +270,31 @@ class FileProcessed:
             logger.debug(''.join('!' + line for line in lines))
             return []
             
-    def checkFile(self, file1, file2, multi):
+    def checkFile(self, file1, file2, text_s, multi):
         file1_name = file1
         if file1.endswith('.orig'):
             file1_name = os.path.splitext(file1)[0]
         try:
-            with open(file1, 'rb') as f0:#, encoding='utf-8', errors='surrogatepass') as f0:
-                nu = f0.read()
-                n1 = nu.count(b'?')
-            with open(file2, 'rb') as  f1:#, encoding='windows-1251') as f1:
-                nu1 = f1.read()
-                n2 = nu1.count(b'?')
-            if n1 < n2:
-                chars = n2 - n1
-                if chars > 0:
-                    poruka = u'!! Greška u tekstu !!\n{0}\nNeispravnih znakova konvertovanih kao znak `?` ukupno: [ {1} ]'.format(os.path.basename(file1_name), chars)
-                    name = ''
-                    logger.debug(poruka)
-                    if multi == True:
-                        name = file2
-                    error_text = \
-                    "Greška:\n\n{0}\nBilo je neispravnih znakova u tekstu\nkonvertovanih kao znak `?`\nUkupno: [{1}]\nProverite tekst.".format(os.path.basename(name), chars)
+            n_sign = text_s.count("?")
+            if n_sign > 0:
+                poruka = u'!! Greška u tekstu !!\n{0}\nNeispravnih znakova konvertovanih kao znak `?` ukupno: [ {1} ]'\
+                    .format(os.path.basename(file1_name), n_sign)
+                name = ''
+                logger.debug(poruka)
+                if multi == True:
+                    name = file2
+                error_text = \
+                "Greška:\n\n{0}\nBilo je neispravnih znakova u tekstu\nkonvertovanih kao znak `?`\nUkupno: [{1}]\nProverite tekst."\
+                .format(os.path.basename(name), n_sign)
                 return error_text
         except UnboundLocalError as e:
             logger.debug(f"File_Check, error({e})")
         except IOError as e:
             logger.debug(f"FileCheck IOError({e.errno} {e.strerror})")
-        except: #handle other exceptions such as attribute errors
-            logger.debug("File_Check, unexpected error:", sys.exc_info()[0])
+        except Exception as e: #handle other exceptions such as attribute errors
+            logger.debug(f"File_Check, unexpected error: {e}")
             
-    def checkChars(self):
-        
-        path = self.putanja
-        kode = self.kode
+    def checkChars(self, text):
         
         def percentage(part, whole):
             try:
@@ -324,14 +308,7 @@ class FileProcessed:
         
         slova = "".join(chars("\u0400\u04ff"))
         
-        try:
-            with  open(path, 'r', encoding=kode) as f:
-                x = f.read()
-        except IOError as e:
-            logger.debug(f"CheckChar, I/O error({e.errno}): {e.strerror}")
-        except:
-            logger.debug(f"CheckChar, unexpected error: {sys.exc_info()[0]}")
-            
+        x = text
         st_pattern = re.compile(r"[A-Za-z\u0400-\u04FF]", re.U)
         
         try:
@@ -348,7 +325,7 @@ class FileProcessed:
             except ValueError as e:
                 logger.debug(f"Value error: {e},{i}")
                 
-        statistic = OrderedDict()
+        statistic = {}
         for x in im:
             if x in rx:
                 num = rx.count(x)
@@ -434,8 +411,8 @@ class FileProcessed:
             if count_s >= 2:
                 name1 = "".join(name1.rsplit(i, count_s))
                 if not name1.endswith(i):
-                    name1 = name1 + i
-                
+                    name1 = name1 + i            
+               
         return name1, sufix    # Vraca samo ime fajla bez putanje
     
     def nameDialog(self, name_entry, sufix_entry, dir_entry):
@@ -449,7 +426,8 @@ class FileProcessed:
         sufix = sufix_entry
         
         caption_str = '{}'.format(real_dir)
-        dlg = wx.TextEntryDialog(None, 'Ime fajla:', caption= caption_str, value="", style=wx.OK | wx.CANCEL | wx.CENTER, pos=wx.DefaultPosition)
+        dlg = wx.TextEntryDialog(None, 'Ime fajla:', caption= caption_str, value="",
+                                 style=wx.OK | wx.CANCEL | wx.CENTER, pos=wx.DefaultPosition)
         dlg.SetValue(name1)
         
         if dlg.ShowModal() == wx.ID_OK:
@@ -481,7 +459,6 @@ class FileProcessed:
     def rplStr(self, in_text):
         
         # Rečnik je 'rplSmap'. Lista ključeva(keys) je 'rplsList'.
-        
         p = in_text
         n_pattern = re.compile("|".join(list(rplSmap.keys())))
         nf = n_pattern.findall(p) 
@@ -493,48 +470,45 @@ class FileProcessed:
             msginfo = wx.MessageDialog(None, f'Specijalni znakovi u tekstu:\n\n{os.path.basename(f_path)}\n\n{", ".join(nf)}.',\
                                        'SubConverter', wx.OK | wx.ICON_INFORMATION)
             msginfo.ShowModal()
-        try:
-            for key, value in rplSmap.items():
-                p = p.replace(key, value)
-        except Exception as e:
-            logger.debug(f"rplStr .replace error: {e}")
+        
+        for key, value in rplSmap.items():
+            p = p.replace(key, value)   # !!! Svuda treba da bude p "p=p.replace"!!!
         
         # Dodatni replace u binarnom formatu:
         # \xe2\x96\xa0 = ■, xc2\xad = SOFT HYPHEN, \xef\xbb\xbf = bom utf-8, \xe2\x80\x91 = NON-BREAKING HYPHEN
+        
         try:
             p = p.encode(self.kode)
             logger.debug(f"■ rplStr, string encode to: {self.kode}")
-            
-            mp = p.replace(b'\xc2\xad', b'') .replace(b'\xd0\x94\xc4', b'D').replace(b"\xc4\x8f\xc2\xbb\xc5\xbc", b"") \
-                .replace(b'\xe2\x80\x91', b'') .replace(b'\xc3\x83\xc2\xba', b'u') \
-                .replace(b'\xc3\xa2\xe2\x82\xac\xe2\x80\x9d', b'\xe2\x80\x94') .replace(b'\xe2\x82\xac\xe2\x80\x9d', b'\xe2\x80\x94') \
-                .replace(b'\xef\xbb\xbf', b'') .replace(b'\xc5\xb8\xc5\x92', b'')# .replace(b'\x9e', b'\xc5\xbe')
         except Exception as e:
-            logger.debug(f"rplStr error: {e}")
-            
+            logger.debug(f"rplStr encode error: {e}")
+        
+        mp = p.replace(b'\xc2\xad', b'') .replace(b'\xd0\x94\xc4', b'D').replace(b"\xc4\x8f\xc2\xbb\xc5\xbc", b"") \
+            .replace(b'\xe2\x80\x91', b'') .replace(b'\xc3\x83\xc2\xba', b'u') \
+            .replace(b'\xc3\xa2\xe2\x82\xac\xe2\x80\x9d', b'\xe2\x80\x94') .replace(b'\xe2\x82\xac\xe2\x80\x9d', b'\xe2\x80\x94') \
+            .replace(b'\xef\xbb\xbf', b'') .replace(b'\xc5\xb8\xc5\x92', b'') # .replace(b'\x9e', b'\xc5\xbe')
         if mp:
             text = mp.decode(self.kode)
-            
             return text
     
     def fixI(self, in_text):
         
+        p = in_text        
         try:
+            p = in_text.encode(self.kode)
             # Slova č,ć,đ,Č,Ć,Đ se nalaze i u rplStr() fukciji takođe.
             #ligature: ǈ=b'\xc7\x88' ǋ=b'\xc7\x8b' ǉ=b'\xc7\x89' ǌ=b'\xc7\x8c' \xe2\x96\xa0 = ■
             # \xc2\xa0 = NO-BREAK SPACE, \xe2\x80\x94 = EM DASH
-            
-            p = in_text.encode(self.kode)
-            
             fp = p.replace(b'/ ', b'/').replace(b' >', b'>').replace(b'- <', b'-<').replace(b'</i> \n<i>', b'\n') \
                 .replace(b'< ', b'<').replace(b'<<i>', b'<i>').replace(b'\xc3\x83\xc2\xba', b'\x75') \
                 .replace(b'\xc3\xa2\xe2\x82\xac\xe2\x80\x9d', b'\xe2\x80\x94').replace(b' \n', b'\n') \
                 .replace(b'\xe2\x82\xac\xe2\x80\x9d', b'V') .replace(b'\xef\xbb\xbf', b'') \
                 .replace(b'\xc5\xb8\xc5\x92', b'').replace(b'\xd0\x94\xa0', b'\x44') \
-                .replace(b'\xc2\xa0', b' ').replace(b"\xc4\x8f\xc2\xbb\xc5\xbc", b"")  # .replace(b'\xc7\x88', b'\x4c\x6a') \
+                .replace(b'\xc2\xa0', b' ').replace(b"\xc4\x8f\xc2\xbb\xc5\xbc", b"")   # .replace(b'\xc7\x88', b'\x4c\x6a') \
                 #.replace(b'\xc7\x8b', b'\x4e\x6a') .replace(b'\xc7\x89', b'\x6c\x6a') .replace(b'\xc7\x8c', b'\x6e\x6a')
             if fp:
                 text = fp.decode(self.kode)
+                
             return text            
         except IOError as e:
             logger.debug("fixI IOError({0}{1}):".format(self.putanja, e))
@@ -551,8 +525,8 @@ class FileProcessed:
             f.close()
         except IOError as e:
             logger.debug(f"Unix2DOS, IOerror: {e}")
-        except: #handle other exceptions such as attribute errors
-            logger.debug("Unix2DOS, unexpected error:", sys.exc_info()[0])    
+        except Exception as e: 
+            logger.debug(f"Unix2DOS, unexpected error: {e}")    
             
     def writeToFile(self, text):
         
@@ -565,7 +539,7 @@ class FileProcessed:
         try:
             with open(self.putanja, 'w', encoding=self.kode, errors=error, newline='\r\n') as n_File:
                 n_File.write(text)
-                logger.debug("Write to file, encoding: {}".format(self.kode))
+                logger.debug(f"Write file: {os.path.basename(self.putanja)}, encoding: {self.kode}")
         except IOError as e:
             logger.debug("changeEncoding IOError({0}{1}):".format(self.putanja, e))
         except AttributeError as e:
@@ -580,10 +554,10 @@ class FileProcessed:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
             logger.debug(''.join('!' + line for line in lines))
-        text = self.getContent()
-        if text:
-            logger.debug(f"{os.path.basename(self.putanja)}, to encoding: {self.kode}")
-        return text
+        #text = self.getContent()
+        #if text:
+            #logger.debug(f"{os.path.basename(self.putanja)}, to encoding: {self.kode}")
+        #return text
     
     def remove_bom_inplace(self):
         """Removes BOM mark, if it exists, from a file and rewrites it in-place"""
@@ -623,13 +597,19 @@ class FileProcessed:
                         chunk = fp.read(buffer_size)
                     fp.seek(-bom_length, os.SEEK_CUR)
                     fp.truncate()    
-    
+       
+    def truncateBuffer(self, sio):
+        sio.truncate(0)
+        sio.seek(0)
+        return sio
+     
+    def newBuffer(self, sio):
+        return StringIO()    
+
+
 class Preslovljavanje(FileProcessed):
     
-    def changeLetters(self, reversed_action):
-        
-        inkode = self.kode
-        infile = self.putanja
+    def changeLetters(self, text_r, reversed_action):
         
         MAPA = lat_cir_mapa
         if reversed_action == True:
@@ -638,128 +618,107 @@ class Preslovljavanje(FileProcessed):
         
         # preslovljavanje, prepise se utfFile:
         try:
-            with open(infile, 'r', encoding=inkode) as f:
-                text_read = f.read()
-                
-                text_changed = ""
-                
-                for c in text_read:
-                    if c in MAPA:
-                        text_changed += MAPA[c]
-                    else:
-                        text_changed += c
-                        
-            self.writeToFile(text_changed)
+            text_changed = ""
+            
+            for c in text_r:
+                if c in MAPA:
+                    text_changed += MAPA[c]
+                else:
+                    text_changed += c
+            return text_changed
         
         except IOError as e:
             logger.debug("Preslovljavanje, I/O error({0}): {1}".format(e.errno, e.strerror))
         except Exception as e:
             logger.debug(f"Preslovljavanje, unexpected error: {e}")
         
-    def preLatin(self):
-        kode = self.kode
-        infile = self.putanja        
+    def preLatin(self, text_r):
+        
         robjLatin = re.compile('(%s)' % '|'.join(map(re.escape, pLatin_rpl.keys()))) # pLatin_rpl je rečnik iz cp1250.replace.cfg
         try:
-            with open(infile, 'r', encoding=kode) as f:
-                p = f.read()
-                fp = robjLatin.sub(lambda m: pLatin_rpl[m.group(0)], p)
+            fp = robjLatin.sub(lambda m: pLatin_rpl[m.group(0)], text_r)
         except IOError as e:
             logger.debug("PreLatin, I/O error({0}): {1}".format(e.errno, e.strerror))
         except Exception as e:
             logger.debug(f"PreLatin, unexpected error: {e}")
         else:
-            if fp:
-                self.writeToFile(fp)
+            return fp
                 
-    def preProc(self, reversed_action):
-        kode = self.kode
-        infile = self.putanja        
+    def preProc(self, text_r, reversed_action):
         
         try:
-            with open(infile, 'r', encoding=kode) as f:
-                tNew = f.read()
-                if reversed_action == False:
-                    robjCyr = re.compile('(%s)' % '|'.join(map(re.escape, pre_cyr.keys())))
-                    t_out = robjCyr.sub(lambda m: pre_cyr[m.group(0)], tNew)
-                elif reversed_action == True:
-                    pre_lat = dict(map(reversed, pre_cyr.items()))
-                    robjLat = re.compile('(%s)' % '|'.join(map(re.escape, pre_lat.keys())))
-                    t_out = robjLat.sub(lambda m: pre_lat[m.group(0)], tNew)
+            if reversed_action == False:
+                robjCyr = re.compile('(%s)' % '|'.join(map(re.escape, pre_cyr.keys())))
+                t_out = robjCyr.sub(lambda m: pre_cyr[m.group(0)], text_r)
+            elif reversed_action == True:
+                pre_lat = dict(map(reversed, pre_cyr.items()))
+                robjLat = re.compile('(%s)' % '|'.join(map(re.escape, pre_lat.keys())))
+                t_out = robjLat.sub(lambda m: pre_lat[m.group(0)], text_r)
         except IOError as e:
             logger.debug("Preprocessing, I/O error({0}): {1}".format(e.errno, e.strerror))
         except Exception as e:
             logger.debug(f"Preprocessing, unexpected error: {e}")
         else:
             if t_out:
-                self.writeToFile(t_out)
+                return t_out
                 
-    def fineTune(self):
-        kode = self.kode
-        Ufile = self.putanja        
+    def fineTune(self, text_r):
+        
         cir_lat = {
             'ЛЈ': 'Љ',
             'НЈ': 'Њ',
             'ДЖ': 'Џ',
         }
                 
-        BLOCK = 1048576
         try:
-            with open(Ufile, 'r', encoding= kode) as f:
-                tNew = f.read(BLOCK)
-                robjCyr = re.compile('(%s)' % '|'.join(map(re.escape, cir_lat.keys())))
-                c_out = robjCyr.sub(lambda m: cir_lat[m.group(0)], tNew)
+            robjCyr = re.compile('(%s)' % '|'.join(map(re.escape, cir_lat.keys())))
+            c_out = robjCyr.sub(lambda m: cir_lat[m.group(0)], text_r)
         except IOError as e:
             logger.debug("Preprocessing, I/O error({0}): {1}".format(e.errno, e.strerror))
         except Exception as e:
             logger.debug(f"Preprocessing, unexpected error: {e}")
         else:
             if c_out:
-                self.writeToFile(c_out)
+                return c_out
                 
-    def fontColor(self):
-        inkode = self.kode
-        intext = self.putanja        
+    def fontColor(self, text_r):
         
         intab = 'АБВГДЕЗИЈКЛМНОПРСТУФХЦабвгдезијклмнопрстуфхц'
         outab = 'ABVGDEZIJKLMNOPRSTUFHCabvgdezijklmnoprstufhc'
         transltab = str.maketrans(intab, outab)
+        
         try:
-            with open(intext, 'r', encoding=inkode) as fin:
-                
-                fr = fin.read()
-                
-                # "превео:* |превод:* \w+"
-                f_reg = re.compile("<.*?>|www\.\w+\.\w+\s*", re.I)
-                
-                cf = f_reg.findall(fr)
-                
-                lj = [i.translate(transltab) for i in cf]
-                
-                dok = dict(zip(cf, lj))
-                
-                for key, value in dok.items():
-                    fr = fr.replace(key, value)
+            # "превео:* \w+|превод:* \w+"
+            f_reg = re.compile("<.*?>|www\.\w+\.\w+\s*", re.I)
+            
+            cf = f_reg.findall(text_r)
+            
+            lj = [x.translate(transltab) for x in cf]
+            
+            dok = dict(zip(cf, lj))
+            
+            for key, value in dok.items():
+                text_r = text_r.replace(key, value)
         except IOError as e:
             logger.debug("Tag translate, I/O error({0}): {1}".format(e.errno, e.strerror))
         except Exception as e:
             logger.debug(f"Tag translate, unexpected error: {e}")
-        else:
-            self.writeToFile(fr)
+        
+        else: return text_r
                 
 ########################################################################
 class TextProcessing(FileProcessed):
     
-    def zameniImena(self):
+    def zameniImena(self, text):
         
         infile = self.putanja
         kode = self.kode
         
-        subs = pysrt.open(infile, encoding=kode)
+        subs = pysrt.from_string(text)
+        
         if len(subs) > 0:
             new_s = pysrt.SubRipFile()
             for i in subs:
-                # i.text = i.text.strip()
                 sub = pysrt.SubRipItem(i.index, i.start, i.end, i.text)
                 new_s.append(sub)
             new_s.clean_indexes()
@@ -779,25 +738,19 @@ class TextProcessing(FileProcessed):
         robjL1 = re.compile(r'\b(' + '|'.join(map(re.escape, dict1_n2.keys())) + r')\b')
         robjL2 = re.compile(r'\b(' + '|'.join(map(re.escape, dict2_n2.keys())) + r')\b')
         try:
-            with open(infile, 'r', encoding= kode) as f:
-                tNew = f.read()
-                t_out1 = robj1.subn(lambda x: dictionary_1[x.group(0)], tNew)
-                t_out2 = robj2.subn(lambda x: dictionary_2[x.group(0)], t_out1[0])
-                t_out3 = robj3.subn(lambda x: dictionary_0[x.group(0)], t_out2[0])
-            with open(infile, 'w', encoding= kode) as f:
-                f.write(t_out3[0])
+            t_out1 = robj1.subn(lambda x: dictionary_1[x.group(0)], text)
+            t_out2 = robj2.subn(lambda x: dictionary_2[x.group(0)], t_out1[0])
+            t_out3 = robj3.subn(lambda x: dictionary_0[x.group(0)], t_out2[0])
             
-            with open(infile, 'r', encoding= kode) as f:
-                tNew1 = f.read()
-                t_out4 = robjN1.subn(lambda x: dict1_n[x.group(0)], tNew1)
-                t_out5 = robjN2.subn(lambda x: dict2_n[x.group(0)], t_out4[0])
-                t_out6 = robjN0.subn(lambda x: dict0_n[x.group(0)], t_out5[0])
+            t_out4 = robjN1.subn(lambda x: dict1_n[x.group(0)], t_out3[0])
+            t_out5 = robjN2.subn(lambda x: dict2_n[x.group(0)], t_out4[0])
+            t_out6 = robjN0.subn(lambda x: dict0_n[x.group(0)], t_out5[0])
             with open(infile, 'w', encoding= kode) as f:
                 f.write(t_out6[0])
         except IOError as e:
             logger.debug("Transkripcija, I/O error({0}): {1}".format(e.errno, e.strerror))
-        except Exception as e: 
-            logger.debug(F"Transkripcija, unexpected error: {e}")     
+        except Exception as e: #handle other exceptions such as attribute errors
+            logger.debug(F"Transkripcija, unexpected error: {traceback.format_exc}")     
             
         def doRepl(inobj, indict):
             try:
@@ -806,15 +759,19 @@ class TextProcessing(FileProcessed):
                     out = inobj.subn(lambda x: indict[x.group(0)], t)
                 with open(infile, 'w', encoding= kode) as f:
                     f.write(out[0])
+                self.bufferText(out[0], self.work_text)
                 return out[1]
             except IOError as e:
                 logger.debug("Replace keys, I/O error({0}): {1}".format(e.errno, e.strerror))
-            except Exception as e: 
-                logger.debug(f"Replace keys, unexpected error: {e}")
+            except Exception as e: #handle other exceptions such as attribute errors
+                logger.debug(f"Replace keys, unexpected error: {traceback.format_exc}")
                 
-        if not len(dict1_n2) == 0: doRepl(robjL1, dict1_n2)
-        if not len(dict2_n2) == 0: doRepl(robjL2, dict2_n2)
-        if not len(dict0_n2) == 0: doRepl(robjL0, dict0_n2)        
+        if not len(dict1_n2) == 0:
+            doRepl(robjL1, dict1_n2)
+        if not len(dict2_n2) == 0:
+            doRepl(robjL2, dict2_n2)
+        if not len(dict0_n2) == 0:
+            doRepl(robjL0, dict0_n2)        
         
         much = t_out1[1] + t_out2[1] + t_out3[1] + t_out4[1] + t_out5[1] + t_out6[1]        
         logger.debug('Transkripcija u toku.\n--------------------------------------')
@@ -822,17 +779,11 @@ class TextProcessing(FileProcessed):
         
         return much
     
-    def doReplace(self):
-        
-        infile = self.putanja
-        inkode = self.kode
+    def doReplace(self, text):
         
         robj_r = re.compile('(%s)' % '|'.join(map(re.escape, searchReplc.keys())))
         try:
-            with open(infile, 'r', encoding=inkode) as f:
-                tNew = f.read()
-                t_out = robj_r.subn(lambda m: searchReplc[m.group(0)], tNew)
-        
+            t_out = robj_r.subn(lambda m: searchReplc[m.group(0)], text)
         except IOError as e:
             logger.debug("DoReplace, I/O error({0}): {1}".format(e.errno, e.strerror))
         except AttributeError as e:
@@ -841,21 +792,16 @@ class TextProcessing(FileProcessed):
             logger.debug(f"DoReplace, UnicodeEncodeError: {e}")
         except UnicodeDecodeError as e:
             logger.debug(f"DoReplace, UnicodeDecodeError: {e}")
-        except Exception as e:
-            logger.debug(f"DoReplace, unexpected error: {e}")
-        
+        except Exception as e: #handle other exceptions such as attribute errors
+            logger.debug(f"DoReplace, unexpected error: {traceback.format_exc}")
         else:
-            if t_out:
-                writeTempStr(self.putanja, t_out[0], self.kode)
+            self.bufferText(t_out[0], self.work_text)
             much = t_out[1]
             logger.debug(f'DoReplace, zamenjeno [{much}] objekata ')
         
-            return much
+            return much, t_out[0]
         
-    def cleanUp(self):
-        
-        infile = self.putanja
-        enkoding = self.kode
+    def cleanUp(self, text_in, parse):
         
         # okrugle zagrade               '(\([^\)]*\))' 
         # kockaste zagrade              '(\[[^]]*\])'
@@ -870,81 +816,69 @@ class TextProcessing(FileProcessed):
         # Prva prazna linija            '(?<=,\d\d\d)\n\n(?=\w)'
         # '(?<=,\d\d\d)\n\n(?=\s*\S*?)'
         #reg-4 = re.compile(r'((?!\n)([A-Z\s]*){1,3}(?=\:)(?<![0-9a-z])\:\s)')
-        reg_4 = re.compile("^\s*\-\.+\s+|(([A-Z ]*){1,3}(?=\:)(?<![0-9a-z])\:\s)|^[ \t]*", re.M)
-        reg_P6 = re.compile("(\([^\)]*\))|(\[[^]]*\])|(\{[^}]*\})|(<i>\s*<\/i>)|(^\s*?\-+\s*?)$", re.M)
+        reg_4 = re.compile(r"^\s*\-\.+\s+|(([A-Z ]*){1,3}(?=\:)(?<![0-9a-z])\:\s)|^[ \t]*", re.M)
+        reg_P6 = re.compile(r"(\([^\)]*\))|(\[[^]]*\])|(\{[^}]*\})|(<i>\s*<\/i>)|(^\s*?\-+\s*?)$", re.M)
         reg4n = re.compile(r'([A-Z ]*) [0-3](?=\:)')  # MAN 1: broj 1-3
-        reg_P8 = re.compile("(\s*?)$|(^\s*?\.+)$|(^\s*?,+)$|(^\s*?;+)$|(^\s*?!+\s*?)$|(^\s*?\?+\s*?)$", re.M)
+        reg_P8 = re.compile(r"(\s*?)$|(^\s*?\.+)$|(^\s*?,+)$|(^\s*?;+)$|(^\s*?!+\s*?)$|(^\s*?\?+\s*?)$", re.M)
         reg_S9 = re.compile("(?<=,\d\d\d)\n\n(?=\w)|(?<=,\d\d\d)\n\n(?=\s*\S*?)", re.M)
         reg8a = re.compile(r'^\s*(?<=\w)', re.M)            # Spejs na pocetku linije
         regN = re.compile(r'(?<=^-)\:\s*', re.M)            # dve tacke iza crtice
         
-        def opFile():
-            with open(infile, 'r', encoding=enkoding) as f:
-                of = f.read()
-                ofout = of.replace(']:', ']').replace('):', ')').replace('}:', '}').replace('  ', ' ')
-            return ofout         
-        
-        try:
-            with open(infile, 'r', encoding=enkoding) as f:
-                textis = srt.parse(f.read())
+        def opFile(in_text):
+            return in_text.replace(']:', ']').replace('):', ')').replace('}:', '}').replace('  ', ' ')
+
+        if parse == True:
+            try:
+                textis = srt.parse(text_in)
                 outf = srt.compose(textis)
-        except IOError as e:
-            logger.debug("CleanSubtitle_srt, I/O error({0}): {1}".format(e.errno, e.strerror))
-        except Exception as e: #handle other exceptions such as attribute errors
-            logger.debug(f"CleanSubtitle_srt, unexpected error: {traceback.format_exc}")
-        else:
-            if len(outf) > 0:
-                writeTempStr(inFile=infile, text=outf, kode=enkoding)
+            except IOError as e:
+                logger.debug("CleanSubtitle_srt, I/O error({0}): {1}".format(e.errno, e.strerror))
+            except Exception as e:
+                logger.debug(f"CleanSubtitle_srt, unexpected error: {e}")
+            else:
+                if len(outf) > 0: self.bufferText(outf, self.work_text)
+        else: self.bufferText(text_in, self.work_text)
                 
         try:
-            with open(infile, 'r', encoding= enkoding) as file_processed:
-                of = file_processed.read()
-                fp3 = reg_4.sub("", of)
-                writeTempStr(infile, fp3, enkoding)
-                
-            with open(infile, 'r', encoding=enkoding) as file_processed:
-                of = file_processed.read()
-                fp5 = reg_P6.sub("", of)
-                writeTempStr(infile, fp5, enkoding)
+            text_subs = self.work_text.getvalue()
+            fp3 = reg_4.sub("", text_subs)
+        
+            fp5 = reg_P6.sub("", fp3)
             
-            rf1 = opFile()
-            writeTempStr(infile, rf1, enkoding)
+            rf1 = opFile(fp5)
+
+            fp11 = reg_P8.sub("", rf1)
+            fp13 = reg_S9.sub("\n", fp11)
+            fp14 = regN.sub('', fp13)
+            fp15 = reg8a.sub('', fp14)            
             
-            with open(infile, 'r', encoding=enkoding) as file_processed:
-                fp5 = file_processed.read()
-                fp11 = reg_P8.sub("", fp5)
-                fp13 = reg_S9.sub("\n", fp11)
-                fp14 = regN.sub('', fp13)
-                fp15 = reg8a.sub('', fp14)            
-                
-                writeTempStr(infile, fp15, enkoding)
+            return fp15
                 
         except IOError as e:
             logger.debug(f"CleanSubtitle proc, I/O error({e.errno}): {e.strerror}")
-        except Exception: #handle other exceptions such as attribute errors
-            logger.debug(f"CleanSubtitle proc, unexpected error: {traceback.format_exc}")
+        except Exception as e:
+            logger.debug(f"CleanSubtitle proc, unexpected error: {e}")
             
-    def cleanLine(self):
-        filename = self.putanja
-        enkoding = self.kode
+    def cleanLine(self, text_in):
+        
         try:
-            subs = pysrt.open(filename, encoding=enkoding)
+            subs = list(srt.parse(text_in))
             if len(subs) > 0:
                 # Trim white spaces
                 text_stripped = []
                 for i in range(len(subs)):
-                    orig_text = subs[i].text
-                    stripped_text = subs[i].text.strip()
+                    orig_text = subs[i].content
+                    stripped_text = subs[i].content.strip()
                     if orig_text != stripped_text:
                         text_stripped.append(subs[i].index)
-                        subs[i].text = subs[i].text.strip()
+                        subs[i].content = subs[i].content.strip()
 
                 # Find the list index of the empty lines. This is different than the srt index!
                 # The list index starts from 0, but the srt index starts from 1.
                 count = 0
                 to_delete = []
                 for sub in subs:
-                    if not sub.text:
+                    if not sub.content:
                         to_delete.append(count)
                     count = count + 1
 
@@ -959,25 +893,24 @@ class TextProcessing(FileProcessed):
                     subs[i].index = i + 1
 
                 if not text_stripped and not to_delete:
-                    logger.debug("Subtitle clean. No changes made.")
-                    subs.save(filename, encoding=enkoding)
-                
+                    logger.debug("CleanLine, Subtitle clean. No changes made.")
+                    return 0, 0, srt.compose(subs)
+                    
                 else:
                     logger.debug("Index of subtitles deleted: {0}".format([i + 1 for i in to_delete]))
                     logger.debug("Index of subtitles trimmed: {0}".format(text_stripped))
                     logger.debug('{0} deleted, {1} trimmed'.format(len(to_delete), len(text_stripped)))
-                    subs.save(filename, encoding= enkoding)
-                    return len(to_delete), len(text_stripped)
+                    return len(to_delete), len(text_stripped), srt.compose(subs) 
             else:
                 logger.debug('No subtitles found.')
         except IOError as e:
-            logger.debug("CleanSubtitle_CL, I/O error({0}): {1}".format(e.errno, e.strerror))
-        except Exception:
-            logger.debug(f"CleanSubtitle_CL, unexpected error: {traceback.format_exc}")
+            logger.debug("CleanSubtitle_CL, I/O error({0}): {1}".format(e))
+        except Exception as e:
+            logger.debug(f"CleanSubtitle_CL, unexpected error: {e}")
             
-    def rm_dash(self):
-        kode = self.kode
-        intext = self.putanja
+    def rm_dash(self, text_in):
+        #kode = self.kode
+        #inpath = self.putanja
         # fix settings ------------------------------------------------------------------------------   
         try:
             with shelve.open(os.path.join('resources', 'var', 'dialog_settings.db'), flag='writeback') as  sp:
@@ -986,8 +919,8 @@ class TextProcessing(FileProcessed):
                 cb4_s = ex['state4']; cb5_s = ex['state5']; cb6_s = ex['state6']; cb7_s = ex['state7']; cb8_s = ex['state8']
         except IOError as e:
             logger.debug("FixSubtitle, I/O error({0}): {1}".format(e.errno, e.strerror))
-        except: #handle other exceptions such as attribute errors
-            logger.debug("FixSubtitle, unexpected error:", sys.exc_info()[0:2])
+        except Exception as e: 
+            logger.debug(f"FixSubtitle, unexpected error: {e}")
         #  cb1_s Popravi gapove, cb2_s Poravnaj linije, cb3_s Pokazi linije sa greskama,
         #  cb4_s Crtice na pocetku prvog reda, cb5_s Spejs iza crtice, cb6_s Vise spejseva u jedan
         # -------------------------------------------------------------------------------------------        
@@ -999,78 +932,70 @@ class TextProcessing(FileProcessed):
         cs_r = re.compile(r'\B- +')
         cs_r1 = re.compile(r'\B-')
         sp_n = 0
-        def remSel(intext, rep, reple, kode):
-            s = self.getContent()
-            s1 = rep.sub(reple, s)
-            writeTempStr(intext, s1, kode)
+        def remSel(text_in, rep, reple):
+            s1 = rep.sub(reple, text_in)
+            return s1
                 
-        remSel(intext, _space_r, '', kode)
+        text = remSel(text_in, _space_r, '')
         
         if cb4_s == True:
-            remSel(intext, for_rpls, '', kode)
+            text = remSel(text, for_rpls, '')
             
         if cb6_s == True:
-            remSel(intext, spaceS_r, ' ', kode)
+            text = remSel(text, spaceS_r, ' ')
             
         if cb5_s == True:
-            remSel(intext, cs_r, '-', kode)
+            text = remSel(text, cs_r, '-')
         elif cb5_s == False:
-            with open(intext, 'r', encoding=kode) as f:
-                sp_n = f.read().count('- ')
-                if sp_n >= 3:
-                    remSel(intext, cs_r, '-', kode)
-            
+            sp_n = text.count('- ')
+            if sp_n >= 3:
+                text = remSel(text, cs_r, '-')
+        
         if cb7_s == True:
-            subs = pysrt.open(intext, kode)
+            subs = list(srt.parse(text))
             if len(subs) > 0:
-                new_f = pysrt.SubRipFile()
-                for i in subs:
-                    t = i.text
+                new_f = []
+                for i in range(len(subs)):
+                    t = subs[i].content
                     t = t.replace('</i><i>', '').replace('</i> <i>', ' ').replace('</i>\n<i>', '\n').replace('</i>-<i>', '-').replace('</i>\n-<i>', '-\n')
-                    sub = pysrt.SubRipItem(i.index, i.start, i.end, t)
+                    sub = srt.Subtitle(subs[i].index, subs[i].start, subs[i].end, t)
                     new_f.append(sub)
-                new_f.clean_indexes()
-                new_f.save(intext, kode)
+                text = srt.compose(new_f)
             else:
                 logger.debug('Fixer: No subtitles found!')
+                
         if cb8_s == True:
-            subs = pysrt.open(intext, kode)
+            subs = pysrt.SubRipFile().from_string(text)
             if len(subs) > 0:
                 new_f = pysrt.SubRipFile()
                 for i in subs:
-                    i.start = i.end = pysrt.SubRipTime(0, 0, 0, 0)
+                    i.start = pysrt.SubRipTime(0, 0, 0, 0)
+                    i.end = pysrt.SubRipTime(0, 0, 0, 0)
                     sub = pysrt.SubRipItem(i.index, i.start, i.end, i.text)
-                    new_f.append(sub)
+                    subs.append(sub)
                 new_f.clean_indexes()
-                new_f.save(intext, kode)
+                pysrt.SubRipFile(new_s).write_into(self.work_text)
+                self.work_text.seek(0)
+                text = self.work_text.getvalue()
             else:
                 logger.debug('Fixer: No subtitles found!')        
             
-        # funkcija za zamenu spejsa na određenoj poziciji u stringu,------------------------------
-        # nprimer treći spejs u prvoj liniji
-        def replacenth(string, sub, wanted, n): 
-            where = [m.start() for m in re.finditer(sub, string)][n-1]
-            before = string[:where]
-            after = string[where:]
-            after = after.replace(sub, wanted, 1)
-            newString = before + after
-            return newString        
-        #------------------------------------------------------------------------------------------        
         if cb2_s == True:
-            subs = pysrt.open(intext, kode)
+            subs = list(srt.parse(text))
             if len(subs) > 0:            
-                new_s = pysrt.SubRipFile()
+                new_s = []
                 for i in subs:
-                    n = self.poravnLine(i.text)
+                    n = self.poravnLine(i.content)
                     if cb5_s == False and sp_n >= 3:
                         n = cs_r1.sub(r'- ', n)                    
-                    sub = pysrt.SubRipItem(i.index, i.start, i.end, n)
+                    sub = srt.Subtitle(i.index, i.start, i.end, n)
                     new_s.append(sub)
-                new_s.clean_indexes()
-                new_s.save(intext, encoding=kode)
+                text = srt.compose(new_s)
             else:
                 if not len(subs) > 0:
                     logger.debug('Fixer: No subtitles found!')
+                    
+        return text
                     
     def poravnLine(self, intext):
         def proCent(percent, whole):
