@@ -21,15 +21,13 @@ import sys
 import os
 import pysrt
 import webbrowser
-import shelve
 import pickle
 import logging
-from logging.handlers import RotatingFileHandler
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
-handler = RotatingFileHandler(os.path.join('resources', 'var', 'FileProcessing.log'), mode='a', maxBytes=40*1024, encoding="utf-8")
+handler = logging.FileHandler(filename=os.path.join("resources", "var", "File_Errors.log"), mode="a", encoding="utf-8")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
@@ -55,12 +53,12 @@ def w_position(_pattern, intext):
     f_list = [(x,y) for x, y in zip(l1, l2)]
     return f_list
 
-def showMeError(infile, outfile, kode):
+def showMeError(infile, in_text, outfile, kode):
     
     with open(os.path.join('resources', 'var', 'fixer_cb3.data'), 'rb') as f:
         cb3_s = pickle.load(f)
     
-    subs = pysrt.open(infile, encoding=kode)
+    subs = pysrt.from_string(in_text)
     
     if len(subs) > 0:
         
@@ -87,9 +85,10 @@ def showMeError(infile, outfile, kode):
                 logger.debug("ErrorFile, I/O error({0}): {1}".format(e.errno, e.strerror))
             except Exception as e: #handle other exceptions such as attribute errors
                 logger.debug("ErrorFile, unexpected error:", sys.exc_info()[0:2])        
-            if cb3_s == True:
-                webbrowser.open(outfile)
+            
+            if os.path.isfile(outfile): logger.debug(f"ErrorFile: {outfile}")
+            if cb3_s == True: webbrowser.open(outfile)
     else:
-        logger.debug(f'show_Me_Error: No subtitles found in {os.path.basename(infile)}.')
+        logger.debug(f'showMeError: No subtitles found in {os.path.basename(infile)}')
 
 # showMeError(test, outf, kode="utf-8")
