@@ -6,6 +6,7 @@
 import os
 import sys
 import shelve
+import pickle
 
 import wx
 
@@ -52,22 +53,15 @@ class FileSettings(wx.Dialog):
                     ex = sp['key5']
                     value1_s = ex['cyr_ansi_srt']; value2_s = ex['cyr_utf8_txt']; value3_s = ex['cyr_utf8_srt']; value4_s = ex['lat_ansi_srt']
                     value5_s = ex['lat_utf8_srt']; value6_s = ex['fixed_subs']; value7_s = ex['transcribe']; value8_s = ex['cleanup']
-                    # print(list(ex.values()))
+                    
                     self.text_1.SetValue(value1_s); self.text_2.SetValue(value2_s); self.text_3.SetValue(value3_s); self.text_4.SetValue(value4_s)
                     self.text_5.SetValue(value5_s); self.text_6.SetValue(value6_s); self.text_7.SetValue(value7_s); self.text_8.SetValue(value8_s)
                     
             except IOError as e:
                 print("FileSettings, I/O error({0}): {1}".format(e.errno, e.strerror))
-            except Exception: #handle other exceptions such as attribute errors
+            except Exception:
                 print("FileSetting, unexpected error:", sys.exc_info()[0])
-                
-            #else:
-                #with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as s:
-                    #del s['key5']        
-                    
-                #self.text_1.SetValue(value1_s); self.text_2.SetValue(value2_s); self.text_3.SetValue(value3_s); self.text_4.SetValue(value4_s)
-                #self.text_5.SetValue(value5_s); self.text_6.SetValue(value6_s); self.text_7.SetValue(value7_s); self.text_8.SetValue(value8_s)                
-
+            
         self.__set_properties()
         self.__do_layout()
 
@@ -159,12 +153,19 @@ class FileSettings(wx.Dialog):
         c4 = self.text_4.GetValue(); c5 = self.text_5.GetValue(); c6 = self.text_6.GetValue()
         c7 = self.text_7.GetValue(); c8 = self.text_8.GetValue()
         konf = [c1, c2, c3, c4, c5, c6, c7, c8]
-        #for i in konf:
-            #print(i)
+        
         a = konf[0]; b = konf[1]; c = konf[2]; d = konf[3]; e = konf[4]; f = konf[5]; g = konf[6]; h = konf[7]
+        
         with shelve.open(t1, flag='writeback') as s:
             s['key5'] = {'cyr_ansi_srt': a, 'cyr_utf8_txt': b, 'cyr_utf8_srt': c, 'lat_ansi_srt': d,\
                          'lat_utf8_srt': e, 'fixed_subs': f, 'transcribe': g, 'cleanup': h}
+
+        s_dict = {'cyr_ansi_srt': a, 'cyr_utf8_txt': b, 'cyr_utf8_srt': c, 'lat_ansi_srt': d,\
+                     'lat_utf8_srt': e, 'fixed_subs': f, 'transcribe': g, 'cleanup': h}
+        
+        with open(os.path.join("resources", "var", "file_ext.pkl"), "wb") as f:
+            pickle.dump(s_dict, f)
+        
         self.Destroy()
         event.Skip()
 
