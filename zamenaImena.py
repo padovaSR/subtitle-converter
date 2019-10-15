@@ -18,9 +18,6 @@
 
 import os
 import codecs
-import sys
-import collections
-import re
 
 
 fDict = os.path.join('dictionaries', 'Dictionary-1.txt')
@@ -57,8 +54,9 @@ def dict_fromFile(text_in, delim):
             t = 'Alpha=>Alfa\n'
             text_file.write(t)
     with open(text_in, 'r', encoding='utf-8') as dict_file:
-        #new_dict = {}
-        new_dict = collections.OrderedDict()
+        
+        new_dict = {}
+        
         for line in dict_file:
             x = line.strip().split(delim)
             if not line:
@@ -75,8 +73,9 @@ def dict_fromFile(text_in, delim):
 
 def new_dict(indict, n):
     with open(indict, 'r', encoding='utf-8') as dict_file:
-        newDict = collections.OrderedDict()
-    
+        
+        newDict = {}
+        
         for line in dict_file:
             x = line.strip().split('=>')
             if not line:
@@ -93,8 +92,9 @@ def new_dict(indict, n):
 
 def new_dict2(indict):
     with open(indict, 'r', encoding='utf-8') as dict_file:
-        newDict = collections.OrderedDict()
-    
+        
+        newDict = {}
+        
         for line in dict_file:
             x = line.strip().split('=>')
             if not line:
@@ -120,7 +120,6 @@ dictionary_0 = dict_fromFile(fDict0, delim='=>')
 dictionary_2 = dict_fromFile(fDict1, delim='=>')
 searchReplc = dict_fromFile(fDict_special, delim='=>')
 
-# print(dictionary_2)
 dict1_n = new_dict(fDict, n=1)
 dict2_n = new_dict(fDict1, n=1)
 dict0_n = new_dict(fDict0, n=1)
@@ -128,13 +127,12 @@ dict0_n = new_dict(fDict0, n=1)
 dict2_n2 = new_dict2(fDict1)
 dict1_n2 = new_dict2(fDict)
 dict0_n2 = new_dict2(fDict0)
-# print(dict2_n2)
 
 rplS = os.path.join('resources', 'LATIN_chars.cfg')
 remBom(rplS)
 
 with open(rplS, 'r', encoding='utf-8') as rplS_fyle:
-    drep = { }
+    drep = {}
     for line in rplS_fyle:
         x = line.strip().split('=')
         if not line:
@@ -149,8 +147,9 @@ with open(rplS, 'r', encoding='utf-8') as rplS_fyle:
         drep[a] = b
 
 rplSmap = dict((k, v) for k, v in drep.items() if k)
-# print(rplSmap)
-#---------------------------------------------------------------------------------------------------#
+
+#-------------------------------------------------------------------------------------------------------------#
+
 lat_cir_mapa = {'đ': 'ђ', 'Đ': 'Ђ', 'e': 'е', 'r': 'р', 't': 'т', 'z': 'з', 'u': 'у', 'i': 'и',
              'o': 'о', 'p': 'п', 'a': 'а', 's': 'с', 'd': 'д', 'f': 'ф', 'g': 'г', 'h': 'х',
              'j': 'ј', 'k': 'к', 'l': 'л', 'c': 'ц', 'v': 'в', 'b': 'б', 'n': 'н', 'm': 'м',
@@ -159,13 +158,15 @@ lat_cir_mapa = {'đ': 'ђ', 'Đ': 'Ђ', 'e': 'е', 'r': 'р', 't': 'т', 'z': '�
              'G': 'Г', 'H': 'Х', 'J': 'Ј', 'K': 'К', 'L': 'Л', 'C': 'Ц', 'V': 'В', 'B': 'Б',
              'N': 'Н', 'M': 'М', 'Š': 'Ш', 'Ž': 'Ж', 'Č': 'Ч', 'Ć': 'Ћ'}
 
-#---------------------------------------------------------------------------------------------------#
+#-------------------------------------------------------------------------------------------------------------#
+
 prelatCyr = os.path.join('resources', 'preLatCyr.map.cfg')
 remBom(prelatCyr)
 LatFile = os.path.join('resources', 'cp1250.replace.cfg')
 remBom(LatFile)
+
 with open(LatFile, 'r', encoding='utf-8') as inLat:
-    ln = { }
+    ln = {}
     for line in inLat:
         x = line.strip().split('=')
         if not line:
