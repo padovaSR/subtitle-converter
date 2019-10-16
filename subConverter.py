@@ -431,11 +431,11 @@ class MyFrame(wx.Frame):
         
         # Preferences menu ----------------------------------------------------------------------------------------------------------------
         self.preferences = wx.Menu()
-        self.bom_utf8 = wx.MenuItem(self.preferences, 1011, "bom_utf-8", u"Default za unikode", wx.ITEM_CHECK)
+        self.bom_utf8 = wx.MenuItem(self.preferences, 1011, "&bom_utf-8\t"+keyS["bom_utf-8"], u"Default za unikode", wx.ITEM_CHECK)
         self.bom_utf8.SetBitmap(wx.NullBitmap)
         self.preferences.Append(self.bom_utf8)
 
-        self.txt_utf8 = wx.MenuItem(self.preferences, 1012, "txt_utf-8", u"Default fajl format unikode", wx.ITEM_CHECK)
+        self.txt_utf8 = wx.MenuItem(self.preferences, 1012, "&txt_utf-8\t"+keyS["txt_utf-8"], u"Default fajl format unikode", wx.ITEM_CHECK)
         self.txt_utf8.SetBitmap(wx.NullBitmap)
         self.preferences.Append(self.txt_utf8)
 
