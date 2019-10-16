@@ -25,7 +25,7 @@ import pickle
 import shelve
 import pysrt
 import srt
-from io import StringIO 
+from io import StringIO, BytesIO
 from operator import itemgetter
 import glob
 from FileProcessing import FileProcessed, FileOpened, Preslovljavanje, writeTempStr, TextProcessing, bufferCode
@@ -55,6 +55,7 @@ logger.addHandler(handler)
 
 WORK_TEXT = StringIO()
 WORK_SUBS = StringIO()
+
 
 class FileDrop(wx.FileDropTarget):
     file_name = r""
@@ -221,6 +222,7 @@ class MyFrame(wx.Frame):
         self.dont_show = False
         
         self.workText = StringIO()
+        self.bytesText = BytesIO()
         
         self.real_path = []
         self.tmpPath = []
@@ -927,7 +929,7 @@ class MyFrame(wx.Frame):
         if enc in codelist: error = "surrogatepass"
         else:
             error = "strict"        
-        b_text = StringIO()
+        # b_text = StringIO()
         try:
             with open(path, mode="r", encoding=enc, errors=error) as f:
                 text = f.read()
@@ -937,6 +939,17 @@ class MyFrame(wx.Frame):
             return text
         except Exception as e:
             logger.debug(f"textToBuffer error: {e}")
+            
+    def bytesToBuffer(self, text, enc):
+        try:
+            self.bytesText.truncate(0)
+            self.bytesText.write(text.encode(enc))
+            self.bytesText.seek(0)
+        
+            return self.bytesText.getvalue()
+        except Exception as e:
+            logger.debug(f"bytesToBuffer error: {e}")
+        
         
     def toANSI(self, event):
         
@@ -1260,7 +1273,7 @@ class MyFrame(wx.Frame):
                 utf_path = '{0}_{1}{2}'.format(utf_path, nnm, suffix)
                 
             self.cyrUTF = utf_path
-            self.orig_path = self.real_path[-1]
+            self.orig_path = path
                    
             new_fproc = FileProcessed(utf8_enc, utf_path)
             
@@ -1292,7 +1305,8 @@ class MyFrame(wx.Frame):
                     pickle.dump(cyr_path, f)
                     
             cyr_proc.bufferText(text, WORK_SUBS)        
-            cyr_proc.bufferText(text, self.workText)        
+            cyr_proc.bufferText(text, self.workText)
+            self.bytesToBuffer(text, self.newEnc)
             
             if error_text:
                 ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
@@ -2309,7 +2323,7 @@ class MyFrame(wx.Frame):
                 if self.real_path:
                     fproc = FileProcessed(enc, tpath)
                     fname, nsufix = fproc.newName(self.pre_suffix, False)
-                    print(fname)
+                    
             except IOError as e:
                 logger.debug("On ZIP IOError({0}):".format(e))
             except IndexError as e:
@@ -2329,7 +2343,7 @@ class MyFrame(wx.Frame):
                         return b_data
                     if not buffer == None:
                         _data = buffer.getvalue()
-                        _data = _data.replace("\n", "\r\n")
+                        _data = _data.replace(b"\n", b"\r\n")
                         buffer.seek(0)
                         return _data
                                     
@@ -2338,10 +2352,10 @@ class MyFrame(wx.Frame):
                     tUTF = os.path.join("tmp", os.path.basename(self.cyrUTF))
                     shutil.copy(self.cyrUTF, tUTF)
                         
-                    info1 = fname + os.path.splitext(tpath)[-1] # info1 dodaje cyr pre_suffix i file se pise u ZIP pod tim imenom
-                    info1 = info1.strip('/')
+                    lat_file = fname + os.path.splitext(tpath)[-1] # info1 dodaje cyr pre_suffix i file se pise u ZIP pod tim imenom
+                    lat_file = lat_file.strip('/')
                     info2 = os.path.basename(tUTF)
-                    lat_file = os.path.basename(self.orig_path)# [:-5]
+                    info1 = os.path.basename(self.orig_path)# [:-5]
                     izbor = [info1, info2, lat_file]
                     
                     dlg = wx.MultiChoiceDialog(self, 'Pick files:', os.path.basename(name), izbor)
@@ -2365,7 +2379,7 @@ class MyFrame(wx.Frame):
                                     os.remove(self.cyrUTF)
                                 elif lat_file in files:
                                     info1 = None; info2 = None
-                                    ldata = data_out(self.workText, None)
+                                    ldata = data_out(self.bytesText, None)
                                     
                             except IOError as e:
                                 logger.debug("Export ZIP, IOError({0}{1}):".format(fpath, e))
@@ -2378,26 +2392,26 @@ class MyFrame(wx.Frame):
                             try:
                                 if not lat_file in files:
                                     lat_file = None
-                                    zdata = data_out(fpath)
-                                    tzdata = data_out(tUTF)
+                                    zdata = data_out(None, fpath)
+                                    tzdata = data_out(None, tUTF)
                                     logger.debug(f"Remove {self.cyrUTF}")
                                     os.remove(self.cyrUTF)
                                 elif not info2 in files:
                                     info2 = None
-                                    zdata = data_out(fpath)
-                                    ldata = data_out(self.orig_path)
+                                    zdata = data_out(None, fpath)
+                                    ldata = data_out(self.bytesText, None)
                                 elif not info1 in files:
                                     info1 = None
-                                    tzdata = data_out(tUTF)
+                                    tzdata = data_out(None, tUTF)
                                     logger.debug(f"Remove {self.cyrUTF}")
                                     os.remove(self.cyrUTF)
-                                    ldata = data_out(self.orig_path)
+                                    ldata = data_out(self.bytesText, None)
                                 elif len(files) == 3:
-                                    zdata = data_out(fpath)
-                                    tzdata = data_out(tUTF)
+                                    zdata = data_out(None, fpath)
+                                    tzdata = data_out(None, tUTF)
                                     logger.debug(f"Remove {self.cyrUTF}")
                                     os.remove(self.cyrUTF)
-                                    ldata = data_out(self.orig_path)
+                                    ldata = data_out(self.bytesText, None)
                             except IOError as e:
                                 logger.debug("Export ZIP_2, IOError({0}):".format(e))
                                 self.text_1.SetValue("Error!\nTry again.")
@@ -2420,13 +2434,13 @@ class MyFrame(wx.Frame):
                     if list(self.previous_action.keys())[-1] == 'toCyrSRTutf8':
                         tzdata = ""
                         ldata = ""
-                        zdata = data_out(self.cyrUTF)
+                        zdata = data_out(None, self.cyrUTF)
                         info1 = os.path.basename(self.cyrUTF).strip('/')
                         info2 = None
                         lat_file = None
                         os.remove(self.cyrUTF)
                     else:
-                        zdata = data_out(fpath)
+                        zdata = data_out(None, fpath)
                         tzdata = ""
                         ldata = ""
                         info1 = fname + os.path.splitext(tpath)[-1]
