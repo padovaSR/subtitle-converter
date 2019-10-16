@@ -2437,7 +2437,8 @@ class MyFrame(wx.Frame):
                         return
                             
                 else:
-                    if list(self.previous_action.keys())[-1] == 'toCyrSRTutf8':
+                    previous_action = list(self.previous_action.keys())[-1]
+                    if previous_action == 'toCyrSRTutf8':
                         tzdata = ""
                         ldata = ""
                         zdata = data_out(None, self.cyrUTF)
@@ -2445,28 +2446,33 @@ class MyFrame(wx.Frame):
                         info2 = None
                         lat_file = None
                         os.remove(self.cyrUTF)
-                    elif list(self.previous_action.keys())[-1] == "cyrToUTF":
+                    elif previous_action == "cyrToUTF" or previous_action == "cyrToANSI":
                         ldata = ""
                         zdata = ""
                         tzdata = data_out(self.bytesText, None)
-                        info2 = os.path.basename(self.real_path)[:-3] + "utf8.srt"
+                        suffix = self.real_path[-4:]
+                        presuffix = "lat"
+                        if previous_action == "cyrToUTF":
+                            presuffix = "utf8" 
+                        info2 = os.path.basename(self.real_path)[:-3]+presuffix+suffix
                         info1 = None; lat_file = None
-                    elif list(self.previous_action.keys())[-1] == "toANSI":
+                    elif previous_action == "toANSI":
                         ldata = ""
                         zdata = ""
                         tzdata = data_out(self.bytesText, None)
                         suffix = self.real_path[-4:]
                         info2 = os.path.basename(self.real_path)[:-3] + "lat" + suffix
                         info1 = None; lat_file = None                    
-                    else:
-                        zdata = data_out(None, fpath)
-                        tzdata = ""
+                    elif previous_action == "toUTF":
+                        tzdata = data_out(self.bytesText, None)
+                        zdata = ""
                         ldata = ""
-                        info1 = fname + os.path.splitext(tpath)[-1]
-                        if self.preferences.IsChecked(1012) and list(self.previous_action.keys())[-1] == "toUTF":
-                            info1 = os.path.splitext(info1)[0]+'.txt'                        
-                        info1 = info1.strip('/')
-                        info2 = None
+                        suffix = self.real_path[-4:]
+                        if self.preferences.IsChecked(1012):
+                            suffix = '.txt'
+                        presuffix = "utf8"
+                        info2 = os.path.basename(self.real_path)[:-3] + presuffix + suffix
+                        info1 = None
                         lat_file = None
                 try:
                     with zipfile.ZipFile(name, 'w') as fzip:
@@ -2599,6 +2605,7 @@ class MyFrame(wx.Frame):
             cyrproc.bufferText(text, WORK_SUBS)        
             cyrproc.bufferText(text, self.workText)
             self.bytesToBuffer(text, self.newEnc)
+            self.real_path = path
             
             self.SetStatusText(os.path.basename(path))
             self.save.Enable(True)
