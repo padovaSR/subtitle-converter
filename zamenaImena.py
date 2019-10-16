@@ -25,10 +25,6 @@ fDict1 = os.path.join('dictionaries', 'Dictionary-2.txt')
 fDict0 = os.path.join('dictionaries', 'Dictionary-0.txt')
 fDict_special = os.path.join('dictionaries', 'Special-Replace.txt')
     
-if not os.path.exists(fDict0):
-    with open(fDict0, 'w', encoding='utf-8', newline="\r\n") as text_file:
-        t = 'Alpha=>Alfa\n'
-        text_file.write(t)
 
 def remBom(infile):
     _BOM = codecs.BOM_UTF8
@@ -180,3 +176,6 @@ with open(LatFile, 'r', encoding='utf-8') as inLat:
 pLatin_rpl = dict((k, v) for k, v in ln.items() if k)
 
 pre_cyr = dict_fromFile(prelatCyr, delim='=')
+
+conf_file = os.path.join("resources", "shortcut_keys.cfg")
+shortcutsKey = dict_fromFile(conf_file, delim="=")
