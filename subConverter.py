@@ -1007,6 +1007,8 @@ class MyFrame(wx.Frame):
                 error_text = new_fproc.checkFile(inpath, inpath, text, multi=False)
                 text = self.fileErrors(inpath, self.newEnc, multi=False)
                 new_fproc.bufferText(text, self.workText)
+                self.bytesToBuffer(text, self.newEnc)
+                self.real_path = inpath
                 
                 self.tmpPath.append(inpath)
                 if text:
@@ -1676,6 +1678,8 @@ class MyFrame(wx.Frame):
             utfproc.bufferText(text, self.workText)# StringIO
             self.text_1.SetValue(text)
             
+            self.real_path = path
+            
             if text:
                 with open(self.enc0_p, 'wb') as f:      
                     pickle.dump(self.newEnc, f)
@@ -1687,7 +1691,9 @@ class MyFrame(wx.Frame):
                     code = self.newEnc.upper()
                     
                 utfproc.bufferText(text, WORK_SUBS)
-                msginfo = wx.MessageDialog(self, f'Tekst je konvertovan u enkoding: {code}.', 'SubConverter', wx.OK | wx.ICON_INFORMATION)
+                self.bytesToBuffer(text, self.newEnc)
+                msginfo = wx.MessageDialog(self, f'Tekst je konvertovan u enkoding: {code}.', 'SubConverter',
+                                           wx.OK | wx.ICON_INFORMATION)
                 msginfo.ShowModal()
                 
             self.enc = self.newEnc
@@ -2439,6 +2445,19 @@ class MyFrame(wx.Frame):
                         info2 = None
                         lat_file = None
                         os.remove(self.cyrUTF)
+                    elif list(self.previous_action.keys())[-1] == "cyrToUTF":
+                        ldata = ""
+                        zdata = ""
+                        tzdata = data_out(self.bytesText, None)
+                        info2 = os.path.basename(self.real_path)[:-3] + "utf8.srt"
+                        info1 = None; lat_file = None
+                    elif list(self.previous_action.keys())[-1] == "toANSI":
+                        ldata = ""
+                        zdata = ""
+                        tzdata = data_out(self.bytesText, None)
+                        suffix = self.real_path[-4:]
+                        info2 = os.path.basename(self.real_path)[:-3] + "lat" + suffix
+                        info1 = None; lat_file = None                    
                     else:
                         zdata = data_out(None, fpath)
                         tzdata = ""
@@ -2578,7 +2597,8 @@ class MyFrame(wx.Frame):
                 self.Error_Text = error_text
             
             cyrproc.bufferText(text, WORK_SUBS)        
-            cyrproc.bufferText(text, self.workText)            
+            cyrproc.bufferText(text, self.workText)
+            self.bytesToBuffer(text, self.newEnc)
             
             self.SetStatusText(os.path.basename(path))
             self.save.Enable(True)
@@ -2709,7 +2729,10 @@ class MyFrame(wx.Frame):
             text = self.fileErrors(path, self.newEnc, multi=False)
             
             cyproc.bufferText(text, WORK_SUBS)        
-            cyproc.bufferText(text, self.workText)            
+            cyproc.bufferText(text, self.workText)
+            self.bytesToBuffer(text, self.newEnc)
+            
+            self.real_path = path
             
             if error_text:
                 ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
