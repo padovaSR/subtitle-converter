@@ -941,12 +941,14 @@ class MyFrame(wx.Frame):
             logger.debug(f"textToBuffer error: {e}")
             
     def bytesToBuffer(self, text, enc):
+        
         try:
             self.bytesText.truncate(0)
             self.bytesText.write(text.encode(enc))
             self.bytesText.seek(0)
         
             return self.bytesText.getvalue()
+        
         except Exception as e:
             logger.debug(f"bytesToBuffer error: {e}")
         
@@ -983,7 +985,7 @@ class MyFrame(wx.Frame):
             self.pre_suffix = value4_s
             
             if entered_enc == self.newEnc:
-                logger.debug(f"toANSI, ecoding is olready: {entered_enc}")
+                logger.debug(f"toANSI, ecoding is already: {entered_enc}")
                 InfoDlg = wx.MessageDialog(self, f"Tekst je već enkoding {entered_enc.upper()}.\nNastavljate?", "SubConverter",
                                            style= wx.OK | wx.CANCEL|wx.CANCEL_DEFAULT | wx.ICON_INFORMATION)
                 if InfoDlg.ShowModal() == wx.ID_CANCEL:
@@ -1133,7 +1135,7 @@ class MyFrame(wx.Frame):
                 text = bufferCode(text, self.newEnc)
                 new_fproc = FileProcessed(self.newEnc, newF)
                 self.tmpPath.append(newF)
-                new_fproc.fixI(text)
+                text = new_fproc.fixI(text)
                 new_fproc.bufferText(text, self.workText)
                 return newF, text
             
@@ -2062,6 +2064,11 @@ class MyFrame(wx.Frame):
         self.toolBar1.EnableTool(101, True)
         self.previous_action['repSpec'] = self.newEnc
         self.reloaded = 0
+        
+        event.Skip()
+        
+    def applyRegex(self, event):
+        
         
         event.Skip()
         
