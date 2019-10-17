@@ -34,13 +34,11 @@ from io import StringIO
 from textwrap import TextWrapper
 import pysrt
 import srt
-from datetime import timedelta 
 
 from zamenaImena import dictionary_0, dictionary_1, dictionary_2, rplSmap,\
      searchReplc, dict0_n, dict0_n2, dict1_n, dict1_n2, dict2_n, dict2_n2,\
      lat_cir_mapa, pLatin_rpl, pre_cyr
 
-# from showError import w_position
 
 import wx
 
