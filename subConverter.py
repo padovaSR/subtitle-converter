@@ -936,13 +936,15 @@ class MyFrame(wx.Frame):
         if enc in codelist: error = "surrogatepass"
         else:
             error = "strict"        
-        # b_text = StringIO()
         try:
             with open(path, mode="r", encoding=enc, errors=error) as f:
                 text = f.read()
-                #b_text.truncate(0)
-                #b_text.write(text)
-                #b_text.seek(0)
+                self.workText.truncate(0)
+                self.workText.write(text)
+                self.workText.seek(0)
+                text = self.workText.getvalue()
+                if text:
+                    logger.debug(f"TextToBuffer content: {os.path.basename(path)}")
             return text
         except Exception as e:
             logger.debug(f"textToBuffer error: {e}")
