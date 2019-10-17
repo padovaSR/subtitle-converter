@@ -11,4 +11,4 @@ Program za obradu srt i txt fajlova.
 ## Download Binaries
 
 * [GitHub Releases](https://github.com/padovaSR/subtitle-converter/releases)
-* [Last Windows build](https://github.com/padovaSR/subtitle-converter/releases/download/v0.5.7.0/Subtitle.Converter-0.5.7.zip)
+* [Last Windows build](https://github.com/padovaSR/subtitle-converter/releases/download/v0.5.7.1/Subtitle.Converter-0.5.7.1.zip)
