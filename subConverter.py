@@ -2451,9 +2451,7 @@ class MyFrame(wx.Frame):
                         zdata = ""
                         tzdata = data_out(self.bytesText, None)
                         suffix = self.real_path[-4:]
-                        presuffix = "lat"
-                        if previous_action == "cyrToUTF":
-                            presuffix = "utf8" 
+                        presuffix = self.pre_suffix
                         info2 = os.path.basename(self.real_path)[:-3]+presuffix+suffix
                         info1 = None; lat_file = None
                     elif previous_action == "toANSI":
@@ -2461,7 +2459,7 @@ class MyFrame(wx.Frame):
                         zdata = ""
                         tzdata = data_out(self.bytesText, None)
                         suffix = self.real_path[-4:]
-                        info2 = os.path.basename(self.real_path)[:-3] + "lat" + suffix
+                        info2 = os.path.basename(self.real_path)[:-3]+self.pre_suffix+suffix
                         info1 = None; lat_file = None                    
                     elif previous_action == "toUTF":
                         tzdata = data_out(self.bytesText, None)
@@ -2470,8 +2468,8 @@ class MyFrame(wx.Frame):
                         suffix = self.real_path[-4:]
                         if self.preferences.IsChecked(1012):
                             suffix = '.txt'
-                        presuffix = "utf8"
-                        info2 = os.path.basename(self.real_path)[:-3] + presuffix + suffix
+                        presuffix = self.pre_suffix
+                        info2 = os.path.basename(self.real_path)[:-3]+presuffix+suffix
                         info1 = None
                         lat_file = None
                 try:
