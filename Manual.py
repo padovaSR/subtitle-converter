@@ -21,9 +21,10 @@ if not os.path.exists(page):
    2.0.35 i686) [Netscape]">
 
 </HEAD>
+
 <BODY TEXT="#808080" BGCOLOR="#ebf5fb" LINK="#0000FF" VLINK="#FF0000" ALINK="#000088">
 
-<H1><FONT COLOR="#000080">Subtitle Converter v - 0.5.7</FONT></H1>
+<H1><FONT COLOR="#000080">Subtitle Converter v-0.5.7</FONT></H1>
 
 <BR>&nbsp;
 
@@ -47,6 +48,16 @@ ili neku vrstu virusa, to je takozvani "False Positive" ili lažni alarm.</br>
 <p>https://malware.wikia.org/wiki/False_positive<br>
 https://support.avast.com/en-ww/article/168/</br>
 <br>https://www.windowscentral.com/how-exclude-files-and-folders-windows-defender-antivirus-scans</br></p>
+
+<br>&nbsp;
+
+<h2><font color="#1a5276">Actions</font></h2>
+<p>Neke od Akcija iz menija <b>Actions</b> se nastavjaju jedna na drugu.<br>
+To su sledeće Akcije: <b>Cleanup - SpecReplace - Transcribe - Merger</b>. Bilo kojim redom.</br><br>
+Prednost ovoga je što se mogu sačuvati sve promene teksta odjednom, nije potrebno sačuvati promene posle svake akcije pojedinačno.</br></p>
+
+<br>&nbsp;
+
 </BODY>
 </HTML>
     """
