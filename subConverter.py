@@ -862,17 +862,24 @@ class MyFrame(wx.Frame):
         _path = os.path.join("tmp", os.path.basename(open_next))
         
         ask = 'Open this file:\n{}'.format(os.path.basename(open_next))
-        askDlg = wx.MessageDialog(self, ask, caption="SubConverter", style= wx.OK_DEFAULT | wx.CANCEL | wx.ICON_QUESTION)
+        askDlg = wx.MessageDialog(self, ask, caption="SubConverter",
+                                  style= wx.OK_DEFAULT | wx.CANCEL | wx.ICON_QUESTION)
         if askDlg.ShowModal() == wx.ID_OK:
-            shutil.copy(open_next, _path)
-            self.text_1.SetValue("")
-            fop = FileProcessed(enc, _path)
-            logger.debug(f"Open_next: {os.path.basename(open_next)}, encoding: {enc}")
-            fop.regularFile(open_next)
-            text = fop.getContent()
-            self.text_1.SetValue(text)
-            self.SetStatusText(os.path.basename(open_next))
-            self.open_next.Enable(False)
+            try:
+                shutil.copy(open_next, _path)
+                self.text_1.SetValue("")
+                fop = FileProcessed(enc, _path)
+                
+                fop.regularFile(open_next)
+                text = self.textToBuffer(open_next, enc)
+                self.text_1.SetValue(text)
+                logger.debug(f"Open_next: {os.path.basename(open_next)}, encoding: {enc}")
+                fop.bufferText(text, self.workText)
+                fop.bufferText(text, WORK_TEXT)
+                self.SetStatusText(os.path.basename(open_next))
+                self.open_next.Enable(False)
+            except Exception as e:
+                logger.debug(f"OpneNext error: {e}")
         else:
             askDlg.Destroy()
         event.Skip()
