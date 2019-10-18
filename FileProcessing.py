@@ -923,6 +923,7 @@ class TextProcessing(FileProcessed):
         #  cb4_s Crtice na pocetku prvog reda, cb5_s Spejs iza crtice, cb6_s Vise spejseva u jedan
         # -------------------------------------------------------------------------------------------        
         
+        reg_0 = re.compile(r"\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}")
         for_rpls = re.compile(r'(?<=\d,\d\d\d\n)-+\s*')
         _space_r = re.compile(r'^ +', re.M)
         f_rpl = re.compile(r'^((.*?\n.*?){1})\n')
@@ -948,7 +949,7 @@ class TextProcessing(FileProcessed):
             sp_n = text.count('- ')
             if sp_n >= 3:
                 text = remSel(text, cs_r, '-')
-        
+                
         if cb7_s == True:
             subs = list(srt.parse(text))
             if len(subs) > 0:
@@ -962,22 +963,6 @@ class TextProcessing(FileProcessed):
             else:
                 logger.debug('Fixer: No subtitles found!')
                 
-        if cb8_s == True:
-            subs = pysrt.SubRipFile().from_string(text)
-            if len(subs) > 0:
-                new_f = pysrt.SubRipFile()
-                for i in subs:
-                    i.start = pysrt.SubRipTime(0, 0, 0, 0)
-                    i.end = pysrt.SubRipTime(0, 0, 0, 0)
-                    sub = pysrt.SubRipItem(i.index, i.start, i.end, i.text)
-                    new_f.append(sub)
-                new_f.clean_indexes()
-                pysrt.SubRipFile(new_f).write_into(self.work_text)
-                self.work_text.seek(0)
-                text = self.work_text.getvalue()
-            else:
-                logger.debug('Fixer: No subtitles found!')        
-            
         if cb2_s == True:
             subs = list(srt.parse(text))
             if len(subs) > 0:            
@@ -992,6 +977,13 @@ class TextProcessing(FileProcessed):
             else:
                 if not len(subs) > 0:
                     logger.debug('Fixer: No subtitles found!')
+                    
+        if cb8_s == True:
+            if not cb1_s:
+                try:
+                    text = remSel(text, reg_0, "00:00:00,000 --> 00:00:00,000")
+                except Exception as e:
+                    logger.debug('Fixer: {e}')        
                     
         return text
                     
