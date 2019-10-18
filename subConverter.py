@@ -1290,7 +1290,7 @@ class MyFrame(wx.Frame):
                    
             new_fproc = FileProcessed(utf8_enc, utf_path)
             
-            text = bufferCode(text, self.workText)
+            text = bufferCode(text, utf8_enc)
             text = new_fproc.fixI(text)
             
             cyr_proc = Preslovljavanje(utf8_enc, utf_path)
@@ -1298,7 +1298,6 @@ class MyFrame(wx.Frame):
             text = cyr_proc.preProc(text, reversed_action=False)
             text = cyr_proc.changeLetters(text, reversed_action=False)
             text = cyr_proc.rplStr(text)    
-            text = bufferCode(text, utf8_enc)
             text = cyr_proc.fineTune(text)
             text = cyr_proc.fontColor(text)
             
