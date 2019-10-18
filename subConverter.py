@@ -2000,6 +2000,8 @@ class MyFrame(wx.Frame):
         self.text_1.SetValue(text)
         newfproc.bufferText(text, WORK_SUBS)
         newfproc.bufferText(text, self.workText)
+        self.bytesToBuffer(text, self.newEnc)
+        self.real_path = path
         
         self.enc = self.newEnc
         self.SetStatusText(os.path.basename(path))
@@ -2131,6 +2133,9 @@ class MyFrame(wx.Frame):
                 fproc.bufferText(text_s, self.workText)
                 self.text_1.SetValue(text_s)
                 logger.debug(f"CleanUp _1: {sys.exc_info()}")
+                
+                self.bytesToBuffer(text_s, entered_enc)
+                self.real_path = path
 
                 if (deleted + trimmed) == 0:
                     msginfo = wx.MessageDialog(self, 'Subtitle clean\nno changes made.', 'SubConverter', wx.OK | wx.ICON_INFORMATION)
@@ -2217,6 +2222,8 @@ class MyFrame(wx.Frame):
             
             fproc.bufferText(text, WORK_TEXT)
             fproc.bufferText(text, WORK_SUBS)
+            self.bytesToBuffer(text, entered_enc)
+            self.real_path = path
             b1 = len(pysrt.open(path, encoding=entered_enc))
             a1 = len(subs_a)
             try:
@@ -2484,6 +2491,15 @@ class MyFrame(wx.Frame):
                         suffix = self.real_path[-4:]
                         if self.preferences.IsChecked(1012):
                             suffix = '.txt'
+                        presuffix = self.pre_suffix
+                        info2 = os.path.basename(self.real_path)[:-3]+presuffix+suffix
+                        info1 = None
+                        lat_file = None
+                    else:
+                        tzdata = data_out(self.bytesText, None)
+                        zdata =""
+                        ldata = ""
+                        suffix = self.real_path[-4:]
                         presuffix = self.pre_suffix
                         info2 = os.path.basename(self.real_path)[:-3]+presuffix+suffix
                         info1 = None
@@ -2935,6 +2951,8 @@ class MyFrame(wx.Frame):
             fproc.bufferText(text, WORK_TEXT)
             fproc.bufferText(text, WORK_SUBS)
             self.text_1.SetValue(text)
+            self.bytesToBuffer(text, entered_enc)
+            self.real_path = path
             
             if cb1_s == True:
                 if not cb8_s == True:
