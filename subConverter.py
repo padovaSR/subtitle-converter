@@ -2469,21 +2469,6 @@ class MyFrame(wx.Frame):
                         info2 = None
                         lat_file = None
                         os.remove(self.cyrUTF)
-                    elif previous_action == "cyrToUTF" or previous_action == "cyrToANSI":
-                        ldata = ""
-                        zdata = ""
-                        tzdata = data_out(self.bytesText, None)
-                        suffix = self.real_path[-4:]
-                        presuffix = self.pre_suffix
-                        info2 = os.path.basename(self.real_path)[:-3]+presuffix+suffix
-                        info1 = None; lat_file = None
-                    elif previous_action == "toANSI":
-                        ldata = ""
-                        zdata = ""
-                        tzdata = data_out(self.bytesText, None)
-                        suffix = self.real_path[-4:]
-                        info2 = os.path.basename(self.real_path)[:-3]+self.pre_suffix+suffix
-                        info1 = None; lat_file = None                    
                     elif previous_action == "toUTF":
                         tzdata = data_out(self.bytesText, None)
                         zdata = ""
