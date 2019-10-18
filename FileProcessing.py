@@ -970,9 +970,9 @@ class TextProcessing(FileProcessed):
                     i.start = pysrt.SubRipTime(0, 0, 0, 0)
                     i.end = pysrt.SubRipTime(0, 0, 0, 0)
                     sub = pysrt.SubRipItem(i.index, i.start, i.end, i.text)
-                    subs.append(sub)
+                    new_f.append(sub)
                 new_f.clean_indexes()
-                pysrt.SubRipFile(new_s).write_into(self.work_text)
+                pysrt.SubRipFile(new_f).write_into(self.work_text)
                 self.work_text.seek(0)
                 text = self.work_text.getvalue()
             else:
