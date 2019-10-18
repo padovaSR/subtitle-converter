@@ -639,8 +639,8 @@ class Preslovljavanje(FileProcessed):
             logger.debug("PreLatin, I/O error({0}): {1}".format(e.errno, e.strerror))
         except Exception as e:
             logger.debug(f"PreLatin, unexpected error: {e}")
-        else:
-            return fp
+        
+        else: return fp
                 
     def preProc(self, text_r, reversed_action):
         
@@ -656,9 +656,8 @@ class Preslovljavanje(FileProcessed):
             logger.debug("Preprocessing, I/O error({0}): {1}".format(e.errno, e.strerror))
         except Exception as e:
             logger.debug(f"Preprocessing, unexpected error: {e}")
-        else:
-            if t_out:
-                return t_out
+        
+        else: return t_out
                 
     def fineTune(self, text_r):
         
@@ -675,9 +674,8 @@ class Preslovljavanje(FileProcessed):
             logger.debug("Preprocessing, I/O error({0}): {1}".format(e.errno, e.strerror))
         except Exception as e:
             logger.debug(f"Preprocessing, unexpected error: {e}")
-        else:
-            if c_out:
-                return c_out
+        
+        else: return c_out
                 
     def fontColor(self, text_r):
         
@@ -956,7 +954,8 @@ class TextProcessing(FileProcessed):
                 new_f = []
                 for i in range(len(subs)):
                     t = subs[i].content
-                    t = t.replace('</i><i>', '').replace('</i> <i>', ' ').replace('</i>\n<i>', '\n').replace('</i>-<i>', '-').replace('</i>\n-<i>', '-\n')
+                    t = t.replace('</i><i>', '').replace('</i> <i>', ' ').replace('</i>\n<i>', '\n')\
+                        .replace('</i>-<i>', '-').replace('</i>\n-<i>', '-\n')
                     sub = srt.Subtitle(subs[i].index, subs[i].start, subs[i].end, t)
                     new_f.append(sub)
                 text = srt.compose(new_f)
@@ -983,7 +982,7 @@ class TextProcessing(FileProcessed):
                 try:
                     text = remSel(text, reg_0, "00:00:00,000 --> 00:00:00,000")
                 except Exception as e:
-                    logger.debug('Fixer: {e}')        
+                    logger.debug(f'Fixer: {e}')        
                     
         return text
                     
