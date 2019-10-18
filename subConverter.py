@@ -2655,41 +2655,43 @@ class MyFrame(wx.Frame):
             entered_enc=value        
             
             fproc = FileProcessed(entered_enc, path)
-            
-            text = fproc.normalizeText()
-            if text:
-                text = text.replace('?', '¬')
-            
-            cyrproc = Preslovljavanje(t_enc, path)
-            text = bufferCode(text, t_enc)
-            text = cyrproc.fixI(text)
-            text = cyrproc.preLatin(text)
-            text = cyrproc.preProc(text, reversed_action=True)
-            text = cyrproc.changeLetters(text, reversed_action=True)
-            text = cyrproc.rplStr(text)
-            
-            nam, b = fproc.newName(self.pre_suffix, True)
-            newF = '{0}{1}'.format(os.path.join(self.real_dir, nam), b)            
-            
-            self.text_1.AppendText('\n')
-            self.text_1.AppendText(os.path.basename(newF))
-            self.tmpPath.append(newF)
-            
-            text = bufferCode(text, self.newEnc)
-            cyrproc.bufferText(text, self.workText)            
-            
-            error_text = cyrproc.checkFile(path, newF, text, multi=True)
-            text = self.fileErrors(path, self.newEnc, multi=True)
-            
-            ansi_cyrproc = Preslovljavanje(self.newEnc, newF)
-            ansi_cyrproc.writeToFile(text)
-            
-            if error_text:
-                ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
-                ErrorDlg.ShowModal()
-                self.Error_Text = error_text
-            self.SetStatusText(f"Processing {os.path.basename(newF)}")
-            
+            try:
+                text = fproc.normalizeText()
+                if text:
+                    text = text.replace('?', '¬')
+                
+                cyrproc = Preslovljavanje(t_enc, path)
+                text = bufferCode(text, t_enc)
+                text = cyrproc.fixI(text)
+                text = cyrproc.preLatin(text)
+                text = cyrproc.preProc(text, reversed_action=True)
+                text = cyrproc.changeLetters(text, reversed_action=True)
+                text = cyrproc.rplStr(text)
+                
+                nam, b = fproc.newName(self.pre_suffix, True)
+                newF = '{0}{1}'.format(os.path.join(self.real_dir, nam), b)            
+                
+                self.text_1.AppendText('\n')
+                self.text_1.AppendText(os.path.basename(newF))
+                self.tmpPath.append(newF)
+                
+                text = bufferCode(text, self.newEnc)
+                cyrproc.bufferText(text, self.workText)            
+                
+                error_text = cyrproc.checkFile(path, newF, text, multi=True)
+                text = self.fileErrors(path, self.newEnc, multi=True)
+                
+                ansi_cyrproc = Preslovljavanje(self.newEnc, newF)
+                ansi_cyrproc.writeToFile(text)
+                
+                if error_text:
+                    ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
+                    ErrorDlg.ShowModal()
+                    self.Error_Text = error_text
+                self.SetStatusText(f"Processing {os.path.basename(newF)}")
+            except Exception as e:
+                logger.debug(f"cyrToANSI error: {e}")
+                
         self.multipleTools()
         self.reloaded = 0
         self.previous_action['cyrToANSI_multiple'] = self.newEnc
