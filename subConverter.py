@@ -2090,8 +2090,6 @@ class MyFrame(wx.Frame):
         
     def applyRegex(self, event):
         
-        d_file = os.path.join("resources", "Regex_def.config")
-        
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled() and self.reloaded == 0:
             if self.ShowDialog() == False:
@@ -2122,9 +2120,12 @@ class MyFrame(wx.Frame):
         subs = WORK_TEXT.getvalue()
         if subs: text = WORK_TEXT.getvalue()
         
+        d_file = os.path.join("resources", "Regex_def.config")
+        
         with open(d_file, "r", encoding="utf-8") as f_open:
             
-            reg_1=re.compile('replace=|find=|"', re.I)
+            reg_1=re.compile('find=|"', re.I)
+            
             for line in f_open:
                 
                 if line.startswith("#"): continue
@@ -2138,14 +2139,16 @@ class MyFrame(wx.Frame):
                 reps = re.sub(reg_1, '', x[-1]).strip()
                 rflags = re.M
                 try:
-                    reg_def = re.compile(finds, rflags)
-                    
+                
                     if "ignorecase" in reps:
                         reps = reps.replace("ignorecase", "").strip()
                         rflags = (re.M | re.I)
                         reg_def = re.compile(finds, rflags)
-                    
+                    else:
+                        reg_def = re.compile(finds, rflags)
+                        
                     text = reg_def.sub(reps, text)
+                
                 except Exception as e:
                     logger.debug(f"ApplyRegex error: {e}")
                 
