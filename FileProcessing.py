@@ -793,9 +793,10 @@ class TextProcessing(FileProcessed):
         else:
             self.bufferText(t_out[0], self.work_text)
             much = t_out[1]
+            
             logger.debug(f'DoReplace, zamenjeno [{much}] objekata ')
         
-            return much, t_out[0]
+            return much, self.work_text.getvalue()
         
     def cleanUp(self, text_in, parse):
         
@@ -949,40 +950,43 @@ class TextProcessing(FileProcessed):
                 text = remSel(text, cs_r, '-')
                 
         if cb7_s == True:
-            subs = list(srt.parse(text))
-            if len(subs) > 0:
-                new_f = []
-                for i in range(len(subs)):
-                    t = subs[i].content
-                    t = t.replace('</i><i>', '').replace('</i> <i>', ' ').replace('</i>\n<i>', '\n')\
-                        .replace('</i>-<i>', '-').replace('</i>\n-<i>', '-\n')
-                    sub = srt.Subtitle(subs[i].index, subs[i].start, subs[i].end, t)
-                    new_f.append(sub)
-                text = srt.compose(new_f)
-            else:
-                logger.debug('Fixer: No subtitles found!')
+            if not cb8_s:
+                subs = list(srt.parse(text))
+                if len(subs) > 0:
+                    new_f = []
+                    for i in range(len(subs)):
+                        t = subs[i].content
+                        t = t.replace('</i><i>', '').replace('</i> <i>', ' ').replace('</i>\n<i>', '\n')\
+                            .replace('</i>-<i>', '-').replace('</i>\n-<i>', '-\n')
+                        sub = srt.Subtitle(subs[i].index, subs[i].start, subs[i].end, t)
+                        new_f.append(sub)
+                    text = srt.compose(new_f)
+                else:
+                    logger.debug('Fixer: No subtitles found!')
                 
         if cb2_s == True:
-            subs = list(srt.parse(text))
-            if len(subs) > 0:            
-                new_s = []
-                for i in subs:
-                    n = self.poravnLine(i.content)
-                    if cb5_s == False and sp_n >= 3:
-                        n = cs_r1.sub(r'- ', n)                    
-                    sub = srt.Subtitle(i.index, i.start, i.end, n)
-                    new_s.append(sub)
-                text = srt.compose(new_s)
-            else:
-                if not len(subs) > 0:
-                    logger.debug('Fixer: No subtitles found!')
+            if not cb8_s:
+                subs = list(srt.parse(text))
+                if len(subs) > 0:            
+                    new_s = []
+                    for i in subs:
+                        n = self.poravnLine(i.content)
+                        if cb5_s == False and sp_n >= 3:
+                            n = cs_r1.sub(r'- ', n)                    
+                        sub = srt.Subtitle(i.index, i.start, i.end, n)
+                        new_s.append(sub)
+                    text = srt.compose(new_s)
+                else:
+                    if not len(subs) > 0:
+                        logger.debug('Fixer: No subtitles found!')
                     
         if cb8_s == True:
             if not cb1_s:
                 try:
                     text = remSel(text, reg_0, "00:00:00,000 --> 00:00:00,000")
                 except Exception as e:
-                    logger.debug(f'Fixer: {e}')        
+                    logger.debug(f'Fixer: {e}')
+                    
                     
         return text
                     
