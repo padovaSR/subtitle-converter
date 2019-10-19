@@ -2980,10 +2980,10 @@ class MyFrame(wx.Frame):
                         N += 1
                 return N
         
-            def rpt():
+            def rpt(path, enc):
                 m = 0; s1 = 0
                 while True:
-                    x, y = fixGaps(path, entered_enc)
+                    x, y = fixGaps(path, enc)
                     m += x
                     s1 += y
                     if x == 0:
@@ -2995,9 +2995,7 @@ class MyFrame(wx.Frame):
                 
                     pn = chg(subs)
                     if pn > 0:
-                        m, s1 = rpt()
-                        #text = open(path, "r", encoding=entered_enc).read()
-                        #subs = list(srt.parse(text))                    
+                        m, s1 = rpt(path, entered_enc)
                     else:
                         m = 0; s1 = 0
                 else:
