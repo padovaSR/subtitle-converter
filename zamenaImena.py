@@ -178,4 +178,7 @@ pLatin_rpl = dict((k, v) for k, v in ln.items() if k)
 pre_cyr = dict_fromFile(prelatCyr, delim='=')
 
 conf_file = os.path.join("resources", "shortcut_keys.cfg")
+
 shortcutsKey = dict_fromFile(conf_file, delim="=")
+if not "CustomRegex" in shortcutsKey.keys():
+    shortcutsKey["CustomRegex"] = "Ctrl+Shift+R"
