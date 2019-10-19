@@ -396,6 +396,13 @@ class MyFrame(wx.Frame):
         self.cleaner.Enable(False)
 
         self.action.AppendSeparator()
+        self._regex = wx.MenuItem(self.action, wx.ID_ANY, "&CustomRegex\t"+keyS["CustomRegex"], "Apply Regex", wx.ITEM_NORMAL)
+        self._regex.SetBitmap(wx.ArtProvider.GetBitmap(wx.ART_FIND_AND_REPLACE, wx.ART_MENU))
+        self.Bind(wx.EVT_MENU, self.applyRegex, id=self._regex.GetId())
+        self.action.Append(self._regex)
+        self._regex.Enable(False)
+        
+        self.action.AppendSeparator()
 
         self.cyr_to_ansi = wx.MenuItem(self.action, wx.ID_ANY, "&Cyr to latin ansi\t"+keyS["Cyr to latin ansi"],
                                        "Preslovljavanje cirilice u latinicu ansi", wx.ITEM_NORMAL)
@@ -649,6 +656,7 @@ class MyFrame(wx.Frame):
         self.export_zip.Enable(True)
        
     def enableTool(self):
+        
         self.toolBar1.EnableTool(wx.ID_CLOSE, True)
         self.toolBar1.EnableTool(1002, True)   # toCyrillic
         self.toolBar1.EnableTool(1003, True)   # toANSI
@@ -668,6 +676,7 @@ class MyFrame(wx.Frame):
         self.cyr_to_ansi.Enable(True)
         self.cyr_to_utf.Enable(True)
         self.export_zip.Enable(True)
+        self._regex.Enable(True)
     
     def disableTool(self):
         self.toolBar1.EnableTool(wx.ID_CLOSE, False)
@@ -2059,6 +2068,9 @@ class MyFrame(wx.Frame):
         fproc.bufferText(text_s, WORK_TEXT)
         fproc.bufferText(text_s, self.workText)
         
+        self.bytesToBuffer(text_s, entered_enc)
+        self.real_path = path
+        
         msginfo = wx.MessageDialog(self, 'Zamenjenih objekata\nukupno [ {} ]'.format(num), 'SubConverter', wx.OK | wx.ICON_INFORMATION)
         msginfo.ShowModal()            
         if error_text:
@@ -2071,7 +2083,6 @@ class MyFrame(wx.Frame):
         self.MenuBar.Enable(wx.ID_CLOSE, True)
         self.reload.Enable(True)
         self.toolBar1.EnableTool(1010, True)  # Save
-        self.toolBar1.EnableTool(101, True)
         self.previous_action['repSpec'] = self.newEnc
         self.reloaded = 0
         
@@ -2079,7 +2090,80 @@ class MyFrame(wx.Frame):
         
     def applyRegex(self, event):
         
+        d_file = os.path.join("resources", "Regex_def.config")
         
+        tval = self.text_1.GetValue()
+        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled() and self.reloaded == 0:
+            if self.ShowDialog() == False:
+                return
+        if os.path.isfile(self.droped0_p):
+            with open(self.droped0_p, 'rb') as d:
+                droped_files = pickle.load(d)
+            self.multiFile.clear()
+            self.multiFile.update(droped_files)        
+        if len(self.multiFile) >= 1:
+            return
+    
+        if os.path.isfile(self.path0_p):
+            with open(self.path0_p, 'rb') as p:
+                path = pickle.load(p)          # path je u tmp/ folderu
+            with open(self.enc0_p, 'rb') as e:
+                entered_enc = pickle.load(e)
+            self.enchistory[path] = entered_enc
+        
+        self.newEnc = entered_enc
+        self.previous_action.clear()
+        
+        self.pre_suffix = ""
+        
+        fproc = TextProcessing(entered_enc, path)
+        
+        text = WORK_TEXT.getvalue()
+        subs = WORK_TEXT.getvalue()
+        if subs: text = WORK_TEXT.getvalue()
+        
+        with open(d_file, "r", encoding="utf-8") as f_open:
+            
+            reg_1=re.compile('replace=|find=|"', re.I)
+            for line in f_open:
+                
+                if line.startswith("#"): continue
+                line = line.strip().lower()
+                
+                x = line.split("replace=")
+                
+                finds = re.sub(reg_1, '', x[0]).strip()
+                reps = re.sub(reg_1, '', x[-1]).strip()
+                rflags = re.M
+                
+                reg_def = re.compile(finds, rflags)
+                
+                if "ignorecase" in reps:
+                    reps = reps.replace("ignorecase", "").strip()
+                    rflags = (re.M | re.I)
+                    reg_def = re.compile(finds, rflags)
+                
+                text = reg_def.sub(reps, text)
+                
+        self.text_1.SetValue(text)
+        writeTempStr(path, text, entered_enc)
+        
+        fproc.bufferText(text, WORK_SUBS)
+        fproc.bufferText(text, WORK_TEXT)
+        fproc.bufferText(text, self.workText)
+        
+        self.bytesToBuffer(text, entered_enc)
+        self.real_path = path 
+        
+        self.SetStatusText(os.path.basename(path))
+        self.MenuBar.Enable(wx.ID_SAVE, True)
+        self.MenuBar.Enable(wx.ID_SAVEAS, True)
+        self.MenuBar.Enable(wx.ID_CLOSE, True)
+        self.reload.Enable(True)
+        self.toolBar1.EnableTool(1010, True)  # Save
+        self.previous_action['CustomRegex'] = entered_enc
+        self.reloaded = 0        
+                
         event.Skip()
         
     def onCleanup(self, event):
@@ -2132,6 +2216,7 @@ class MyFrame(wx.Frame):
                 fproc.bufferText(text_s, self.workText)
                 self.text_1.SetValue(text_s)
                 logger.debug(f"CleanUp _1: {sys.exc_info()}")
+                writeTempStr(path, text_s, entered_enc)
                 
                 self.bytesToBuffer(text_s, entered_enc)
                 self.real_path = path
@@ -2877,13 +2962,14 @@ class MyFrame(wx.Frame):
             
         self.pre_suffix = value1_s
         self.newEnc = entered_enc   # VAZNO za Save funkciju
+        fproc = TextProcessing(entered_enc, path)
         
-        subs = pysrt.open(path, encoding=entered_enc)
+        text=WORK_TEXT.getvalue()
+        subs=pysrt.from_string(text)
         
         if len(subs) == 0:
             logger.debug("Fixer: No subtitles found.")
         else:
-            fproc = TextProcessing(entered_enc, path)
             text = ""
             def chg(subs_in):
                 N = 0
@@ -2910,6 +2996,8 @@ class MyFrame(wx.Frame):
                     pn = chg(subs)
                     if pn > 0:
                         m, s1 = rpt()
+                        #text = open(path, "r", encoding=entered_enc).read()
+                        #subs = list(srt.parse(text))                    
                     else:
                         m = 0; s1 = 0
                 else:
@@ -2919,9 +3007,11 @@ class MyFrame(wx.Frame):
                 WORK_TEXT.truncate(0)
                 pysrt.SubRipFile(subs).write_into(WORK_TEXT)
                 WORK_TEXT.seek(0)
-                text = WORK_TEXT.getvalue()
-                textis = srt.parse(text)
-                text = srt.compose(textis)
+                if not cb8_s:
+                    text = WORK_TEXT.getvalue()
+                    textis = srt.parse(text)
+                    text = srt.compose(textis)
+                else: text = WORK_TEXT.getvalue()
                 
             except IOError as e:
                 logger.debug("FixSubtitle, I/O error({0}): {1}".format(e.errno, e.strerror))
@@ -2930,8 +3020,10 @@ class MyFrame(wx.Frame):
                         
             text = fproc.rm_dash(text)
             
-            subs = pysrt.from_string(text)
-            subs.save(path, encoding=entered_enc)
+            #subs = pysrt.from_string(text)
+            #subs.save(path, encoding=entered_enc)
+            subs=list(srt.parse(text))
+            writeTempStr(path, text, entered_enc)
             fproc.bufferText(text, WORK_TEXT)
             fproc.bufferText(text, WORK_SUBS)
             self.text_1.SetValue(text)
@@ -3140,12 +3232,13 @@ class MyApp(wx.App):
         missing_f = []
         files_list = ["m_extensions.pkl", "file_ext.pkl"]
         cfg1 = os.path.join("resources", "shortcut_keys.cfg")
+        d_file = os.path.join("resources", "Regex_def.config")
         for i in files_list:
             file_path = os.path.join("resources", "var", i)
             if not os.path.isfile(file_path):
                 missing_f.append(file_path)
-        if not os.path.isfile(cfg1):
-            missing_f.append(cfg1)
+        if not os.path.isfile(cfg1): missing_f.append(cfg1)
+        if not os.path.isfile(d_file): missing_f.append(d_file)
                 
         if missing_f:
             error_text = "File Not Found\n\n{}\nPlease check files missing!".format("".join([x+'\n' for x in missing_f]))
