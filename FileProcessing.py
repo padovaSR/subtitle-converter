@@ -818,7 +818,8 @@ class TextProcessing(FileProcessed):
         reg4n = re.compile(r'([A-Z ]*) [0-3](?=\:)')  # MAN 1: broj 1-3
         reg_P8 = re.compile(r"(\s*?)$|(^\s*?\.+)$|(^\s*?,+)$|(^\s*?;+)$|(^\s*?!+\s*?)$|(^\s*?\?+\s*?)$", re.M)
         reg_S9 = re.compile("(?<=,\d\d\d)\n\n(?=\w)|(?<=,\d\d\d)\n\n(?=\s*\S*?)", re.M)
-        reg8a = re.compile(r'^\s*(?<=\w)', re.M)            # Spejs na pocetku linije
+        #reg8a = re.compile(r'^\s*(?<=\w)', re.M)            # Spejs na pocetku linije
+        reg8a = re.compile(r'^\s*(?<=.)', re.M)
         regN = re.compile(r'(?<=^-)\:\s*', re.M)            # dve tacke iza crtice
         
         def opFile(in_text):
