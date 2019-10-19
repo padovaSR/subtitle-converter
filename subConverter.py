@@ -2128,6 +2128,8 @@ class MyFrame(wx.Frame):
             for line in f_open:
                 
                 if line.startswith("#"): continue
+                if not line: continue
+                
                 line = line.strip().lower()
                 
                 x = line.split("replace=")
@@ -2135,15 +2137,17 @@ class MyFrame(wx.Frame):
                 finds = re.sub(reg_1, '', x[0]).strip()
                 reps = re.sub(reg_1, '', x[-1]).strip()
                 rflags = re.M
-                
-                reg_def = re.compile(finds, rflags)
-                
-                if "ignorecase" in reps:
-                    reps = reps.replace("ignorecase", "").strip()
-                    rflags = (re.M | re.I)
+                try:
                     reg_def = re.compile(finds, rflags)
-                
-                text = reg_def.sub(reps, text)
+                    
+                    if "ignorecase" in reps:
+                        reps = reps.replace("ignorecase", "").strip()
+                        rflags = (re.M | re.I)
+                        reg_def = re.compile(finds, rflags)
+                    
+                    text = reg_def.sub(reps, text)
+                except Exception as e:
+                    logger.debug(f"ApplyRegex error: {e}")
                 
         self.text_1.SetValue(text)
         writeTempStr(path, text, entered_enc)
