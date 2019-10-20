@@ -2124,7 +2124,7 @@ class MyFrame(wx.Frame):
         
         with open(d_file, "r", encoding="utf-8") as f_open:
             
-            reg_1 = re.compile('find=|"', re.I)
+            reg_1 = re.compile('find=|\'|"', re.I)
             
             for line in f_open:
                 
@@ -2146,7 +2146,7 @@ class MyFrame(wx.Frame):
                         reg_def = re.compile(finds, rflags)
                     else:
                         reg_def = re.compile(finds, rflags)
-                        
+                    
                     text = reg_def.sub(reps, text)
                 
                 except Exception as e:
