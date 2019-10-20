@@ -800,12 +800,12 @@ class TextProcessing(FileProcessed):
         
     def cleanUp(self, text_in, parse):
         
-        # okrugle zagrade               '(\([^\)]*\))' 
-        # kockaste zagrade              '(\[[^]]*\])'
-        # vitičaste zagrade             '(\{[^}]*\})'
-        # crtice                        '(^\s*?\-+\s*?)$'
-        # Tačka na kraju, prazna linija '(^\s*?\.+)$'
-        # Zarez na kraju, prazna linija '(^\s*?,+)$' 
+        # okrugle zagrade                     '(\([^\)]*\))' 
+        # kockaste zagrade                    '(\[[^]]*\])'
+        # vitičaste zagrade                   '(\{[^}]*\})'
+        # crtice na početku prazne linije     '^\s*?\-+\s*?(?<=$)'
+        # Tačka na kraju, prazna linija       '(^\s*?\.+)$'
+        # Zarez na kraju, prazna linija       '(^\s*?,+)$' 
         # Tačka zarez na kraju, prazna linija '(^\s*?;+)$'
         # Spejs na kraju linije         '(\s*?)$'
         # Uzvičnici                     '(^\s*?!+\s*?)$'
@@ -814,7 +814,7 @@ class TextProcessing(FileProcessed):
         # '(?<=,\d\d\d)\n\n(?=\s*\S*?)'
         #reg-4 = re.compile(r'((?!\n)([A-Z\s]*){1,3}(?=\:)(?<![0-9a-z])\:\s)')
         reg_4 = re.compile(r"^\s*\-\.+\s+|(([A-Z ]*){1,3}(?=\:)(?<![0-9a-z])\:\s)|^[ \t]*", re.M)
-        reg_P6 = re.compile(r"(\([^\)]*\))|(\[[^]]*\])|(\{[^}]*\})|(<i>\s*<\/i>)|(^\s*?\-+\s*?)$", re.M)
+        reg_P6 = re.compile(r"(\([^\)]*\))|(\[[^]]*\])|(\{[^}]*\})|(<i>\s*<\/i>)|^\s*?\-+\s*?(?<=$)", re.M)
         reg4n = re.compile(r'([A-Z ]*) [0-3](?=\:)')  # MAN 1: broj 1-3
         reg_P8 = re.compile(r"(\s*?)$|(^\s*?\.+)$|(^\s*?,+)$|(^\s*?;+)$|(^\s*?!+\s*?)$|(^\s*?\?+\s*?)$", re.M)
         reg_S9 = re.compile("(?<=,\d\d\d)\n\n(?=\w)|(?<=,\d\d\d)\n\n(?=\s*\S*?)", re.M)
