@@ -230,6 +230,8 @@ class FileProcessed:
             pickle.dump(self.putanja, v)
         with open(os.path.join('resources', 'var', 'rpath0.pkl'), 'wb') as f:
             pickle.dump(realFile, f)
+        with open(os.path.join('resources', 'var', 'enc0.pkl'), 'wb') as f:      
+            pickle.dump(self.kode, f)        
         
         #with open(os.path.join('resources', 'var', 'obsE.pkl'), 'wb') as f:
             #pickle.dump(self.kode, f)
