@@ -27,8 +27,8 @@ import pysrt
 import srt
 from io import StringIO, BytesIO
 from operator import itemgetter
-import fileinput
 import glob
+
 from FileProcessing import FileProcessed, FileOpened, Preslovljavanje, writeTempStr, TextProcessing, bufferCode
 from zamenaImena import shortcutsKey
 from showError import w_position, showMeError
@@ -2053,7 +2053,6 @@ class MyFrame(wx.Frame):
         
         fproc = TextProcessing(entered_enc, path)
         
-        text = WORK_TEXT.getvalue()
         subs = WORK_SUBS.getvalue()
         if subs: text = WORK_SUBS.getvalue()
         
@@ -2068,6 +2067,7 @@ class MyFrame(wx.Frame):
         fproc.bufferText(text_s, WORK_SUBS)
         fproc.bufferText(text_s, WORK_TEXT)
         fproc.bufferText(text_s, self.workText)
+        writeTempStr(path, text_s, entered_enc)
         
         self.bytesToBuffer(text_s, entered_enc)
         self.real_path = path
@@ -2129,6 +2129,7 @@ class MyFrame(wx.Frame):
             cn = 0
             
             for line in f_open:
+                
                 cn += 1
                 if line.startswith("#"): continue
                 if not line: continue
@@ -2297,6 +2298,7 @@ class MyFrame(wx.Frame):
         try:
             text = WORK_TEXT.getvalue()
             subs_a=pysrt.from_string(text)
+        
         except IOError as e:
             logger.debug("Merger srt, I/O error({0}): {1}".format(e.errno, e.strerror))
         except Exception as e: logger.debug(f"Merger _1, unexpected error: {e}")
@@ -2992,7 +2994,8 @@ class MyFrame(wx.Frame):
             def rpt(path, enc):
                 m = 0; s1 = 0
                 while True:
-                    x, y = fixGaps(path, enc)
+                    subs = pysrt.open(path, encoding=enc)
+                    x, y = fixGaps(subs, path, enc)
                     m += x
                     s1 += y
                     if x == 0:
@@ -3027,10 +3030,6 @@ class MyFrame(wx.Frame):
                         
             text = fproc.rm_dash(text)
             
-            #subs = pysrt.from_string(text)
-            #subs.save(path, encoding=entered_enc)
-            subs=list(srt.parse(text))
-            writeTempStr(path, text, entered_enc)
             fproc.bufferText(text, WORK_TEXT)
             fproc.bufferText(text, WORK_SUBS)
             self.text_1.SetValue(text)
