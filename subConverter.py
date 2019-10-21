@@ -27,6 +27,7 @@ import pysrt
 import srt
 from io import StringIO, BytesIO
 from operator import itemgetter
+import fileinput
 import glob
 from FileProcessing import FileProcessed, FileOpened, Preslovljavanje, writeTempStr, TextProcessing, bufferCode
 from zamenaImena import shortcutsKey
@@ -2125,9 +2126,10 @@ class MyFrame(wx.Frame):
         with open(d_file, "r", encoding="utf-8") as f_open:
             
             reg_1 = re.compile('find=|\'|"', re.I)
+            cn = 0
             
             for line in f_open:
-                
+                cn += 1
                 if line.startswith("#"): continue
                 if not line: continue
                 
@@ -2137,7 +2139,7 @@ class MyFrame(wx.Frame):
                 
                 finds = re.sub(reg_1, '', x[0]).strip()
                 reps = re.sub(reg_1, '', x[-1]).strip()
-                rflags = re.M
+                
                 try:
                 
                     if "ignorecase" in reps:
@@ -2145,12 +2147,12 @@ class MyFrame(wx.Frame):
                         rflags = (re.M | re.I)
                         reg_def = re.compile(finds, rflags)
                     else:
-                        reg_def = re.compile(finds, rflags)
+                        reg_def = re.compile(finds, re.M)
                     
                     text = reg_def.sub(reps, text)
                 
                 except Exception as e:
-                    logger.debug(f"ApplyRegex error: {e}")
+                    logger.debug(f"Apply Regex error: line {cn}; {e}")
                 
         self.text_1.SetValue(text)
         writeTempStr(path, text, entered_enc)
