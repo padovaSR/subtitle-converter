@@ -2153,7 +2153,7 @@ class MyFrame(wx.Frame):
                     text = reg_def.sub(reps, text)
                 
                 except Exception as e:
-                    logger.debug(f"Apply Regex error: line {cn}; {e}")
+                    logger.debug(f"Apply Regex error:\n_{d_file}_, line {cn}; {e}")
                 
         self.text_1.SetValue(text)
         writeTempStr(path, text, entered_enc)
