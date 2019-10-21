@@ -211,14 +211,17 @@ class MyFrame(wx.Frame):
         wx.Frame.__init__(self, *args, **kwds)
         self.SetSize((637, 582))
         self.panel_1 = wx.Panel(self, wx.ID_ANY)
-        self.text_1 = wx.TextCtrl(self.panel_1, wx.ID_ANY, "", style=wx.TE_MULTILINE|wx.TE_READONLY|wx.TE_RICH|wx.TE_WORDWRAP)
+        self.text_1 = wx.TextCtrl(self.panel_1, wx.ID_ANY, "",\
+                                  style=wx.TE_MULTILINE|wx.TE_READONLY|wx.TE_RICH|wx.TE_WORDWRAP)
         
         # drop target
         dt = FileDrop(self.text_1)
         self.text_1.SetDropTarget(dt)        
         self.frame_statusbar = self.CreateStatusBar(1)
         
-        self.wildcard = "SubRip (*.zip; *.srt; *.txt)|*.zip;*.srt;*.txt|MicroDVD (*.sub)|*.sub|Text File (*.txt)|*.txt|All Files (*.*)|*.*"
+        self.wildcard = "SubRip (*.zip; *.srt;\
+        *.txt)|*.zip;*.srt;*.txt|MicroDVD (*.sub)|*.sub|Text File\
+        (*.txt)|*.txt|All Files (*.*)|*.*"
         
         self.dont_show = False
         
@@ -288,7 +291,6 @@ class MyFrame(wx.Frame):
         entries[2].Set(wx.ACCEL_CTRL|wx.ACCEL_SHIFT, ord("K"), 84)
         
         accel_tbl = wx.AcceleratorTable(entries)
-        # accel_tbl = wx.AcceleratorTable([(wx.ACCEL_CTRL | wx.ACCEL_SHIFT,  ord('Y'), 82)], [(wx.ACCEL_CTRL | wx.ACCEL_SHIFT, ord('F'), 83)])
         self.SetAcceleratorTable(accel_tbl)        
         # Menu Bar
     def __set_menuBar(self):
@@ -666,21 +668,17 @@ class MyFrame(wx.Frame):
         self.toolBar1.EnableTool(1006, True)   # Special
         self.toolBar1.EnableTool(1007, True)   # Cleanup
         
-        self.merger.Enable(True)
-        self.fixer.Enable(True)
-        self.to_cyrillic.Enable(True)
-        self.to_ansi.Enable(True)
-        self.to_utf8.Enable(True)
-        self.cleaner.Enable(True)
-        self.specials.Enable(True)
-        self.transcrib.Enable(True)
-        self.cyr_to_ansi.Enable(True)
-        self.cyr_to_utf.Enable(True)
-        self.export_zip.Enable(True)
-        self._regex.Enable(True)
-    
+        menu_items = [self.merger,
+                      self.fixer, self.to_cyrillic, self.to_ansi, self.to_utf8,
+                      self.cleaner, self.specials, self.transcrib, self.cyr_to_ansi,
+                      self.cyr_to_utf, self.export_zip, self._regex]
+        
+        for i in menu_items: i.Enable(True)
+        
     def disableTool(self):
+        
         self.toolBar1.EnableTool(wx.ID_CLOSE, False)
+        self.toolBar1.EnableTool(1010, False)
         self.toolBar1.EnableTool(1002, False)   # toCyrillic
         self.toolBar1.EnableTool(1003, False)   # toANSI
         self.toolBar1.EnableTool(1004, False)   # toUTF
@@ -688,20 +686,13 @@ class MyFrame(wx.Frame):
         self.toolBar1.EnableTool(1006, False)   # Special
         self.toolBar1.EnableTool(1007, False)   # Cleanup
         
-        self.merger.Enable(False)
-        self.fixer.Enable(False)
-        self.to_cyrillic.Enable(False)
-        self.to_ansi.Enable(False)
-        self.to_utf8.Enable(False)
-        self.cleaner.Enable(False)
-        self.specials.Enable(False)
-        self.transcrib.Enable(False)
-        self.cyr_to_ansi.Enable(False)
-        self.cyr_to_utf.Enable(False)
-        self.open_next.Enable(False)
-        self.reload.Enable(False)
-        self.export_zip.Enable(False)
+        menu_items = [self.merger,
+                      self.fixer, self.to_cyrillic, self.to_ansi, self.to_utf8,
+                      self.cleaner, self.specials, self.transcrib, self.cyr_to_ansi,
+                      self.cyr_to_utf, self.export_zip, self._regex, self.save, self.save_as, self.reload]
     
+        for i in menu_items: i.Enable(False)        
+        
     def handleFile(self, filepaths):
         def file_go(self, infile, realF):
             fop = FileOpened(infile)
@@ -836,10 +827,12 @@ class MyFrame(wx.Frame):
     def onOpen(self, event):
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled() and not self.previous_action:
-            dl1 = wx.MessageBox("Current content has not been saved! Proceed?", "Please confirm", wx.ICON_QUESTION | wx.YES_NO, self)
+            dl1 = wx.MessageBox("Current content has not been saved! Proceed?", "Please confirm",
+                                wx.ICON_QUESTION | wx.YES_NO, self)
             if dl1 == wx.NO:
                 return
-        dlgOpen = wx.FileDialog(self, "Otvori novi fajl", style=wx.FD_OPEN|wx.FD_MULTIPLE, wildcard=self.wildcard) # creates the Open File dialog
+        dlgOpen = wx.FileDialog(self, "Otvori novi fajl",
+                                style=wx.FD_OPEN|wx.FD_MULTIPLE, wildcard=self.wildcard) # creates the Open File dialog
         if dlgOpen.ShowModal() == wx.ID_OK:
             if len(self.multiFile) >= 1:
                 self.multiFile.clear()
@@ -2113,7 +2106,7 @@ class MyFrame(wx.Frame):
         self.newEnc = entered_enc
         self.previous_action.clear()
         
-        self.pre_suffix = ""
+        self.pre_suffix = "reg"
         
         fproc = TextProcessing(entered_enc, path)
         
@@ -2454,6 +2447,9 @@ class MyFrame(wx.Frame):
                 logger.debug("On ZIP IndexError({0}):".format(e))
             
             dlg.SetFilename(fname)
+            if not self.previous_action:
+                logger.debug(f"Export Zip: Nothing to do.")
+                return
             if dlg.ShowModal() == wx.ID_OK:
                 path = dlg.GetPath()
                 dirname = os.path.dirname(path)
@@ -2620,13 +2616,12 @@ class MyFrame(wx.Frame):
     
     def onCloseFile(self, event):
         self.text_1.SetValue('')
-        self.disableTool
+        self.disableTool()
         if os.path.exists(self.path0_p):
             os.remove(self.path0_p)
         if os.path.exists(self.enc0_p):
             os.remove(self.enc0_p)        
         self.SetStatusText('Subtitle Converter is ready')        
-        self.reload.Enable(True)
         event.Skip()
         
     def onFileHistory(self, event):
@@ -2637,6 +2632,8 @@ class MyFrame(wx.Frame):
         # add it back to the history so it will be moved up the list
         self.filehistory.AddFileToHistory(path)
         self.enchistory[path] = enc
+        fp = FileProcessed(enc, path)
+        fp.regularFile(self.filepath[-1])
         with open(path, 'r', encoding=enc, errors='replace') as f:
             text = f.read()
         self.text_1.SetValue(text)
