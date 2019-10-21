@@ -85,9 +85,8 @@ def myMerger(subs_in, file_out, max_time, max_char, _gap, kode):
 
     out_f.save(file_out, encoding=kode)
 
-def fixGaps(path, enc):
+def fixGaps(subs, path, enc):
     
-    subs = pysrt.open(path, encoding=enc)
     new_j = pysrt.SubRipFile()
     k = 0
     pfp = 0
