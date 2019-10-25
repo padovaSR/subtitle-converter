@@ -1123,13 +1123,14 @@ class MyFrame(wx.Frame):
         for key, value in self.multiFile.items():
             
             path=key
+            fpath = os.path.basename(path)
             entered_enc=value
             
             fproc = FileProcessed(entered_enc, path)
             
             if entered_enc == 'windows-1251':
                 logger.debug(f"------------------------------------------------------\n\
-                Encoding is windows-1251! {os.path.basename(path)}")
+                Encoding is windows-1251! {fpath}")
                 pass
             text = fproc.normalizeText()
             fproc.bufferText(text, self.workText)
@@ -1183,7 +1184,14 @@ class MyFrame(wx.Frame):
                 f_procent = 'Najmanje {} % teksta.\nIli najmanje [ {} ] znakova.'.format(procent, zbir_slova)
                 ErrorText = "Greška:\n\n{0}\nsadrži ćiriliči alfabet.\n{1}\n{2}\n\nNastavljate?\n"\
                     .format(os.path.basename(path), f_procent, ",".join(chars))
+                
+                if procent and entered_enc == "windows-1251":
+                    self.text_1.AppendText("\n")
+                    self.text_1.AppendText(fpath+" __skipped_")
+                    continue                
+                
                 dlg = dialog1(ErrorText)
+                
                 if dlg == True:
                     if procent >= 50:
                         ErrorDlg = wx.MessageDialog(
@@ -1211,6 +1219,12 @@ class MyFrame(wx.Frame):
                 f_zbir = 'Najmanje [ {} ] znakova.'.format(zbir_slova)
                 ErrorText = "Greška:\n\n{0}\nsadrži ćiriliči alfabet.\n{1}\n{2}\n\nNastavljate?\n"\
                     .format(os.path.basename(path),f_zbir, ",".join(chars))
+                
+                if zbir_slova and entered_enc == "windows-1251":
+                    self.text_1.AppendText("\n")
+                    self.text_1.AppendText(fpath+" __skipped_")
+                    continue
+                
                 dlg = dialog1(ErrorText)
                 if dlg == True:
                     newF,text = ansiAction(path)
@@ -2158,6 +2172,7 @@ class MyFrame(wx.Frame):
                 
         self.text_1.SetValue(text)
         
+        fproc.bufferText(text, WORK_SUBS)
         fproc.bufferText(text, WORK_TEXT)
         fproc.bufferText(text, self.workText)
         
