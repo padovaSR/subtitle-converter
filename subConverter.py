@@ -2322,13 +2322,14 @@ class MyFrame(wx.Frame):
             a1 = len(subs_a)
             
             text = WORK_SUBS.getvalue()
+            subs = list(srt.parse(text))
+            text = srt.compose(subs)
             fproc.bufferText(text, WORK_TEXT)
             fproc.bufferText(text, WORK_SUBS)
             fproc.bufferText(text, self.workText)
             self.bytesToBuffer(text, entered_enc)
             self.real_path = path
             
-            text = WORK_TEXT.getvalue()
             self.text_1.SetValue(text)
             
             try:
@@ -3012,7 +3013,7 @@ class MyFrame(wx.Frame):
                 m = 0; s1 = 0
                 while True:
                     subs = pysrt.from_string(WORK_TEXT.getvalue())
-                    x, y = fixGaps(subs, path, enc)
+                    x, y = fixGaps(subs)
                     m += x
                     s1 += y
                     if x == 0:
