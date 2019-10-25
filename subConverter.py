@@ -204,6 +204,7 @@ class FileDrop(wx.FileDropTarget):
         return True
 
 class MyFrame(wx.Frame):
+    
     def __init__(self, *args, **kwds):
         # begin wxGlade: MyFrame.__init__
         kwds["style"] = kwds.get("style", 0) | wx.DEFAULT_FRAME_STYLE
@@ -584,7 +585,12 @@ class MyFrame(wx.Frame):
         for i in range(len(frame_statusbar_fields)):
             self.frame_statusbar.SetStatusText(frame_statusbar_fields[i], i)
         # end wxGlade
-
+        
+        self.menu_items = [self.merger,
+                           self.fixer, self.to_cyrillic, self.to_ansi, self.to_utf8,
+                           self.cleaner, self.specials, self.transcrib, self.cyr_to_ansi,
+                           self.cyr_to_utf, self.export_zip, self._regex]
+        
     def __do_layout(self):
         # begin wxGlade: MyFrame.__do_layout
         sizer_1 = wx.BoxSizer(wx.VERTICAL)
@@ -667,12 +673,7 @@ class MyFrame(wx.Frame):
         self.toolBar1.EnableTool(1006, True)   # Special
         self.toolBar1.EnableTool(1007, True)   # Cleanup
         
-        menu_items = [self.merger,
-                      self.fixer, self.to_cyrillic, self.to_ansi, self.to_utf8,
-                      self.cleaner, self.specials, self.transcrib, self.cyr_to_ansi,
-                      self.cyr_to_utf, self.export_zip, self._regex]
-        
-        for i in menu_items: i.Enable(True)
+        for i in self.menu_items: i.Enable(True)
         
     def disableTool(self):
         
@@ -685,12 +686,10 @@ class MyFrame(wx.Frame):
         self.toolBar1.EnableTool(1006, False)   # Special
         self.toolBar1.EnableTool(1007, False)   # Cleanup
         
-        menu_items = [self.merger,
-                      self.fixer, self.to_cyrillic, self.to_ansi, self.to_utf8,
-                      self.cleaner, self.specials, self.transcrib, self.cyr_to_ansi,
-                      self.cyr_to_utf, self.export_zip, self._regex, self.save, self.save_as, self.reload]
-    
-        for i in menu_items: i.Enable(False)        
+        new_items = [self.save, self.save_as, self.reload]
+        
+        for i in new_items: i.Enable(False)
+        for i in self.menu_items: i.Enable(False)        
         
     def handleFile(self, filepaths):
         def file_go(self, infile, realF):
