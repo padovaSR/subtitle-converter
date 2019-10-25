@@ -951,6 +951,7 @@ class MyFrame(wx.Frame):
             with open(path, mode="r", encoding=enc, errors=error) as f:
                 text = f.read()
                 self.workText.truncate(0)
+                self.workText.seek(0)
                 self.workText.write(text)
                 self.workText.seek(0)
                 text = self.workText.getvalue()
@@ -964,6 +965,7 @@ class MyFrame(wx.Frame):
         
         try:
             self.bytesText.truncate(0)
+            self.bytesText.seek(0)
             self.bytesText.write(text.encode(enc))
             self.bytesText.seek(0)
         
@@ -3047,12 +3049,9 @@ class MyFrame(wx.Frame):
         
         self.previous_action['FixSubtitle'] = self.newEnc
         self.SetStatusText(os.path.basename(path))
-        self.save.Enable(True)
-        self.save_as.Enable(True)
-        self.close.Enable(True)
-        self.toolBar1.EnableTool(1010, True)  # Save
-        self.reload.Enable(True)
-        self.reloaded = 0        
+        
+        self.postAction()
+        
         event.Skip()
     
     def editShortcuts(self, event):
