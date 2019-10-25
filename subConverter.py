@@ -1008,9 +1008,9 @@ class MyFrame(wx.Frame):
                 fproc = FileProcessed(entered_enc, inpath)
                 if not entered_enc == 'windows-1251':
                     logger.debug(f'toANSI: {os.path.basename(inpath)}, {entered_enc}')
-                w_subs = WORK_SUBS.getvalue()
-                if w_subs: text = w_subs
-                else: text = WORK_TEXT.getvalue()                
+                
+                text = WORK_TEXT.getvalue()                
+                
                 text = fproc.rplStr(text)
                 text = text.replace('?', '¬')
                 new_fproc = FileProcessed(self.newEnc, inpath)
@@ -1279,9 +1279,7 @@ class MyFrame(wx.Frame):
             self.pre_suffix = value1_s
             
             fproc = FileProcessed(entered_enc, path)
-            w_subs = WORK_SUBS.getvalue()
-            if w_subs: text = w_subs
-            else: text = WORK_TEXT.getvalue()            
+            text = WORK_TEXT.getvalue()            
             
             if text:
                 text = text.replace('?', '¬')
@@ -1692,9 +1690,7 @@ class MyFrame(wx.Frame):
                 else:
                     InfoDlg.Destroy()
             
-            w_subs = WORK_SUBS.getvalue()
-            if w_subs: text = w_subs
-            else: text = WORK_TEXT.getvalue()
+            text = WORK_TEXT.getvalue()
             
             utfproc = FileProcessed(self.newEnc, path)
             text = bufferCode(text, self.newEnc)   # change to newEnc
@@ -2123,8 +2119,6 @@ class MyFrame(wx.Frame):
         fproc = TextProcessing(entered_enc, path)
         
         text = WORK_TEXT.getvalue()
-        subs = WORK_TEXT.getvalue()
-        if subs: text = WORK_TEXT.getvalue()
         
         d_file = os.path.join("resources", "Regex_def.config")
         
@@ -2698,9 +2692,7 @@ class MyFrame(wx.Frame):
             self.newEnc = 'windows-1250'
             t_enc = 'utf-8'
             
-            w_subs = WORK_SUBS.getvalue()
-            if w_subs: text = w_subs
-            else: text = WORK_TEXT.getvalue()
+            text = WORK_TEXT.getvalue()
             
             if text:
                 text = text.replace('?', '¬')
@@ -2841,9 +2833,7 @@ class MyFrame(wx.Frame):
             else:
                 self.newEnc = 'utf-8'
             
-            w_subs = WORK_SUBS.getvalue()
-            if w_subs: text = w_subs
-            else: text = WORK_TEXT.getvalue()
+            text = WORK_TEXT.getvalue()
             
             if text:
                 text = text.replace('?', '¬')
