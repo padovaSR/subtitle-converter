@@ -907,8 +907,7 @@ class TextProcessing(FileProcessed):
             logger.debug(f"CleanSubtitle_CL, unexpected error: {e}")
             
     def rm_dash(self, text_in):
-        #kode = self.kode
-        #inpath = self.putanja
+        
         # fix settings ------------------------------------------------------------------------------   
         try:
             with shelve.open(os.path.join('resources', 'var', 'dialog_settings.db'), flag='writeback') as  sp:
@@ -919,9 +918,10 @@ class TextProcessing(FileProcessed):
             logger.debug("FixSubtitle, I/O error({0}): {1}".format(e.errno, e.strerror))
         except Exception as e: 
             logger.debug(f"FixSubtitle, unexpected error: {e}")
-        #  cb1_s Popravi gapove, cb2_s Poravnaj linije, cb3_s Pokazi linije sa greskama,
-        #  cb4_s Crtice na pocetku prvog reda, cb5_s Spejs iza crtice, cb6_s Vise spejseva u jedan
-        # -------------------------------------------------------------------------------------------        
+        # ------------------------------------------------------------------------------------------ #
+        #  cb1_s Popravi gapove, cb2_s Poravnaj linije, cb3_s Pokazi linije sa greskama,             #
+        #  cb4_s Crtice na pocetku prvog reda, cb5_s Spejs iza crtice, cb6_s Vise spejseva u jedan   #
+        # ------------------------------------------------------------------------------------------ #        
         
         reg_0 = re.compile(r"\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}")
         for_rpls = re.compile(r'(?<=\d,\d\d\d\n)-+\s*')
