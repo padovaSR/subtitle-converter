@@ -20,6 +20,7 @@ import re
 import os
 from io import StringIO  
 import pysrt
+import srt
 from itertools import zip_longest 
 import logging
 
@@ -87,7 +88,7 @@ def myMerger(subs_in, max_time, max_char, _gap, kode):
     pysrt.SubRipFile(out_f).write_into(WORK_SUBS)
     WORK_SUBS.seek(0)
     
-def fixGaps(subs, path, enc):
+def fixGaps(subs):
     
     new_j = pysrt.SubRipFile()
     k = 0
