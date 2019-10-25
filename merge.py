@@ -23,7 +23,7 @@ import pysrt
 from itertools import zip_longest 
 import logging
 
-from FileProcessing import FileProcessed
+from settings import WORK_SUBS, WORK_TEXT
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -32,7 +32,7 @@ handler = logging.FileHandler(filename=os.path.join("resources", "var", "FilePro
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
-def myMerger(subs_in, file_out, max_time, max_char, _gap, kode):
+def myMerger(subs_in, max_time, max_char, _gap, kode):
     
     subs = subs_in
     
@@ -83,8 +83,10 @@ def myMerger(subs_in, file_out, max_time, max_char, _gap, kode):
     out_f, par3, nep3 = merge_lines(par2, nep2)
     out_f, par4, nep4 = merge_lines(par3, nep3)
 
-    out_f.save(file_out, encoding=kode)
-
+    WORK_SUBS.truncate(0)
+    pysrt.SubRipFile(out_f).write_into(WORK_SUBS)
+    WORK_SUBS.seek(0)
+    
 def fixGaps(subs, path, enc):
     
     new_j = pysrt.SubRipFile()
@@ -129,7 +131,9 @@ def fixGaps(subs, path, enc):
             new_f.append(subf)
     
     new_f.clean_indexes()
-    new_f.save(path, encoding=enc)
+    WORK_TEXT.truncate(0)
+    pysrt.SubRipFile(new_f).write_into(WORK_TEXT)
+    WORK_TEXT.seek(0)
     
     return k, pfp
 
