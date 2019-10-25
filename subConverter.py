@@ -39,6 +39,8 @@ from merge import myMerger, fixLast, fixGaps
 
 from Manual import MyManual
 
+from settings import WORK_TEXT,  WORK_SUBS
+
 import logging
 import traceback
 
@@ -53,9 +55,6 @@ formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
 handler = logging.FileHandler(filename=os.path.join("resources", "var", "subtitle_converter.log"), mode="w", encoding="utf-8")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
-
-WORK_TEXT = StringIO()
-WORK_SUBS = StringIO()
 
 
 class FileDrop(wx.FileDropTarget):
@@ -890,7 +889,8 @@ class MyFrame(wx.Frame):
     def onReload(self, event):
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
-            dl1 = wx.MessageBox("Current content has not been saved! Proceed?", "Please confirm", wx.ICON_QUESTION | wx.YES_NO, self)
+            dl1 = wx.MessageBox("Current content has not been saved! Proceed?", "Please confirm",
+                                wx.ICON_QUESTION | wx.YES_NO, self)
             if dl1 == wx.NO:
                 return        
         with open(self.path0_p, 'rb') as p:
@@ -1155,7 +1155,8 @@ class MyFrame(wx.Frame):
                 self.SetStatusText('Processing multiple files.')
                 self.previous_action['toANSI'] = self.newEnc
             def dialog1(text_1):
-                ErrorDlg = wx.MessageDialog(self, text_1, "SubConverter", style= wx.OK | wx.CANCEL|wx.CANCEL_DEFAULT | wx.ICON_INFORMATION)
+                ErrorDlg = wx.MessageDialog(self, text_1, "SubConverter",
+                                            style= wx.OK | wx.CANCEL|wx.CANCEL_DEFAULT | wx.ICON_INFORMATION)
                 if ErrorDlg.ShowModal() == wx.ID_OK:
                     return True
                     
@@ -1180,12 +1181,14 @@ class MyFrame(wx.Frame):
                 logger.debug(f'ToANSI: Cyrillic alfabet u tekstu: {entered_enc} cyrillic')
                 self.SetStatusText(u'Greška u ulaznom fajlu.')
                 f_procent = 'Najmanje {} % teksta.\nIli najmanje [ {} ] znakova.'.format(procent, zbir_slova)
-                ErrorText = "Greška:\n\n{0}\nsadrži ćiriliči alfabet.\n{1}\n{2}\n\nNastavljate?\n".format(os.path.basename(path), f_procent, ",".join(chars))
+                ErrorText = "Greška:\n\n{0}\nsadrži ćiriliči alfabet.\n{1}\n{2}\n\nNastavljate?\n"\
+                    .format(os.path.basename(path), f_procent, ",".join(chars))
                 dlg = dialog1(ErrorText)
                 if dlg == True:
                     if procent >= 50:
                         ErrorDlg = wx.MessageDialog(
-                                self, "Too many errors!\n\nAre you sure you want to proceed?\n", "SubConverter", style=wx.CANCEL|wx.CANCEL_DEFAULT|wx.OK|wx.ICON_ERROR)
+                                self, "Too many errors!\n\nAre you sure you want to proceed?\n", "SubConverter",
+                                style=wx.CANCEL|wx.CANCEL_DEFAULT|wx.OK|wx.ICON_ERROR)
                         if ErrorDlg.ShowModal() == wx.ID_CANCEL:
                             continue
                     newF,text = ansiAction(path)
@@ -1206,7 +1209,8 @@ class MyFrame(wx.Frame):
             elif zbir_slova > 0:
                 logger.debug(f'ToANSI: Cyrillic alfabet u tekstu: {entered_enc} cyrillic')
                 f_zbir = 'Najmanje [ {} ] znakova.'.format(zbir_slova)
-                ErrorText = "Greška:\n\n{0}\nsadrži ćiriliči alfabet.\n{1}\n{2}\n\nNastavljate?\n".format(os.path.basename(path),f_zbir, ",".join(chars))
+                ErrorText = "Greška:\n\n{0}\nsadrži ćiriliči alfabet.\n{1}\n{2}\n\nNastavljate?\n"\
+                    .format(os.path.basename(path),f_zbir, ",".join(chars))
                 dlg = dialog1(ErrorText)
                 if dlg == True:
                     newF,text = ansiAction(path)
@@ -1823,7 +1827,8 @@ class MyFrame(wx.Frame):
             else:
                 zlist = []
                 try:
-                    izbor = [os.path.join("tmp", x) if not x.startswith("tmp") else x for x in self.tmpPath if not x.endswith(".zip")]
+                    izbor = [os.path.join("tmp", x) if not x.startswith("tmp") else x for x in\
+                             self.tmpPath if not x.endswith(".zip")]
                     info = [os.path.basename(x) for x in self.tmpPath if not x.endswith(".zip")]
                     for i,x in zip(self.tmpPath, izbor):
                         if not os.path.exists(x) and not i.endswith(".zip"):
@@ -1871,7 +1876,8 @@ class MyFrame(wx.Frame):
     
             if os.path.isfile(path):
                 logger.debug("ZIP file saved sucessfully: {}".format(path))
-                sDlg = wx.MessageDialog(self, 'Fajl je uspešno sačuvan\n{}'.format(os.path.basename(path)), 'SubConverter', wx.OK | wx.ICON_INFORMATION)
+                sDlg = wx.MessageDialog(self, 'Fajl je uspešno sačuvan\n{}'.format(os.path.basename(path)),\
+                                        'SubConverter', wx.OK | wx.ICON_INFORMATION)
                 sDlg.ShowModal()
                 # Dodaje putanju i enkoding u recnik
                 self.saved_file[path] = self.newEnc                
@@ -1937,7 +1943,8 @@ class MyFrame(wx.Frame):
         if entered_enc == "windows-1251":
             self.toolBar1.EnableTool(1003, False)
             self.to_ansi.Enable(False)
-            msginfo = wx.MessageDialog(self, f'Novi enkoding: {self.newEnc} Ćirilica.', 'SubConverter', wx.OK | wx.ICON_INFORMATION)
+            msginfo = wx.MessageDialog(self, f'Novi enkoding: {self.newEnc} Ćirilica.', 'SubConverter',
+                                       wx.OK | wx.ICON_INFORMATION)
             msginfo.ShowModal()
         self.reloaded = 0
         self.previous_action['toUTF_multiple'] = self.newEnc
@@ -1977,9 +1984,8 @@ class MyFrame(wx.Frame):
         else:
             self.newEnc = 'utf-8'
         
-        w_subs = WORK_SUBS.getvalue()
-        if w_subs: text = w_subs
-        else: text = WORK_TEXT.getvalue()
+        w_subs = WORK_TEXT.getvalue()
+        text = WORK_TEXT.getvalue()
         
         utf_proc = FileProcessed(self.newEnc, path)
         text = bufferCode(text, self.newEnc)
@@ -2000,7 +2006,7 @@ class MyFrame(wx.Frame):
         text = newfproc.getContent(None)
         text = newfproc.rplStr(text)
         self.text_1.SetValue(text)
-        newfproc.bufferText(text, WORK_SUBS)
+        newfproc.bufferText(text, WORK_TEXT)
         newfproc.bufferText(text, self.workText)
         self.bytesToBuffer(text, self.newEnc)
         self.real_path = path
@@ -2046,8 +2052,7 @@ class MyFrame(wx.Frame):
         
         fproc = TextProcessing(entered_enc, path)
         
-        subs = WORK_SUBS.getvalue()
-        if subs: text = WORK_SUBS.getvalue()
+        text = WORK_TEXT.getvalue()
         
         text = text.replace('?', '¬')
         
@@ -2060,12 +2065,12 @@ class MyFrame(wx.Frame):
         fproc.bufferText(text_s, WORK_SUBS)
         fproc.bufferText(text_s, WORK_TEXT)
         fproc.bufferText(text_s, self.workText)
-        writeTempStr(path, text_s, entered_enc)
         
         self.bytesToBuffer(text_s, entered_enc)
         self.real_path = path
         
-        msginfo = wx.MessageDialog(self, 'Zamenjenih objekata\nukupno [ {} ]'.format(num), 'SubConverter', wx.OK | wx.ICON_INFORMATION)
+        msginfo = wx.MessageDialog(self, 'Zamenjenih objekata\nukupno [ {} ]'\
+                                   .format(num), 'SubConverter', wx.OK | wx.ICON_INFORMATION)
         msginfo.ShowModal()            
         if error_text:
             ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
@@ -2129,6 +2134,9 @@ class MyFrame(wx.Frame):
                 
                 line = line.strip().lower()
                 
+                if line and not "replace=" in line:
+                    logger.debug(f"Apply Regex, missing argument, line {cn}; {d_file}")                
+                
                 x = line.split("replace=")
                 
                 finds = re.sub(reg_1, '', x[0]).strip()
@@ -2149,9 +2157,7 @@ class MyFrame(wx.Frame):
                     logger.debug(f"Apply Regex error:\n_{d_file}_, line {cn}; {e}")
                 
         self.text_1.SetValue(text)
-        writeTempStr(path, text, entered_enc)
         
-        fproc.bufferText(text, WORK_SUBS)
         fproc.bufferText(text, WORK_TEXT)
         fproc.bufferText(text, self.workText)
         
@@ -2198,10 +2204,12 @@ class MyFrame(wx.Frame):
         self.newEnc = entered_enc
         self.pre_suffix = value1_s
         
-        text = WORK_SUBS.getvalue()
+        text = WORK_TEXT.getvalue()
+            
         subs = list(srt.parse(text))
+        
         if len(subs) > 0:
-            subs = list(srt.parse(WORK_SUBS.getvalue()))
+            subs = list(srt.parse(WORK_TEXT.getvalue()))
             subs = srt.compose(subs)
             
             fproc = TextProcessing(entered_enc, path)
@@ -2215,21 +2223,21 @@ class MyFrame(wx.Frame):
                 
                 deleted, trimmed,text_s = fproc.cleanLine(text)
                 
-                fproc.bufferText(text_s, WORK_SUBS)
+                fproc.bufferText(text_s, WORK_TEXT)
                 fproc.bufferText(text_s, self.workText)
                 self.text_1.SetValue(text_s)
                 logger.debug(f"CleanUp _1: {sys.exc_info()}")
-                writeTempStr(path, text_s, entered_enc)
                 
                 self.bytesToBuffer(text_s, entered_enc)
                 self.real_path = path
 
                 if (deleted + trimmed) == 0:
-                    msginfo = wx.MessageDialog(self, 'Subtitle clean\nno changes made.', 'SubConverter', wx.OK | wx.ICON_INFORMATION)
+                    msginfo = wx.MessageDialog(self, 'Subtitle clean\nno changes made.', 'SubConverter',
+                                               wx.OK | wx.ICON_INFORMATION)
                     msginfo.ShowModal()
                 else:
-                    msginfo = wx.MessageDialog(self, f'Subtitles deleted:   [ {deleted} ]\nSubtitles trimmed: [ {trimmed} ]', 'SubConverter',
-                                               wx.OK | wx.ICON_INFORMATION)
+                    msginfo = wx.MessageDialog(self, f'Subtitles deleted: [{deleted} ]\nSubtitles trimmed: [{trimmed} ]',\
+                                               'SubConverter', wx.OK | wx.ICON_INFORMATION)
                     msginfo.ShowModal()                
             except:
                 exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -2300,20 +2308,21 @@ class MyFrame(wx.Frame):
         
         if len(subs_a) > 0:
                 
-            myMerger(subs_in=subs_a, file_out=path, max_time=lineLenght, max_char=maxChar, _gap=maxGap, kode=entered_enc)
+            myMerger(subs_in=subs_a, max_time=lineLenght, max_char=maxChar, _gap=maxGap, kode=entered_enc)
             
-            fixLast(infile=path, kode=entered_enc)
-            text = self.textToBuffer(path, entered_enc)
-            fproc.bufferText(text, self.workText)
-            text = fproc.getContent(self.workText)
-            self.text_1.SetValue(text)
+            b1 = len(pysrt.from_string(WORK_SUBS.getvalue()))
+            a1 = len(subs_a)
             
+            text = WORK_SUBS.getvalue()
             fproc.bufferText(text, WORK_TEXT)
             fproc.bufferText(text, WORK_SUBS)
+            fproc.bufferText(text, self.workText)
             self.bytesToBuffer(text, entered_enc)
             self.real_path = path
-            b1 = len(pysrt.open(path, encoding=entered_enc))
-            a1 = len(subs_a)
+            
+            text = WORK_TEXT.getvalue()
+            self.text_1.SetValue(text)
+            
             try:
                 prf = format(((a1 - b1) / a1 * 100), '.2f')
             except ZeroDivisionError as e:
@@ -2354,7 +2363,8 @@ class MyFrame(wx.Frame):
                 self.reloadText = text
                 if os.path.isfile(outpath):
                     logger.debug(f"File saved: {outpath}")
-                    sDlg = wx.MessageDialog(self, 'Fajl je uspešno sačuvan\n{}'.format(os.path.basename(outpath)), 'SubConverter', wx.OK | wx.ICON_INFORMATION)
+                    sDlg = wx.MessageDialog(self, 'Fajl je uspešno sačuvan\n{}'.format(os.path.basename(outpath)),\
+                                            'SubConverter', wx.OK | wx.ICON_INFORMATION)
                     sDlg.ShowModal()
                     # Dodaje putanju i enkoding u recnik
                     self.saved_file[outpath] = self.newEnc
@@ -2392,7 +2402,8 @@ class MyFrame(wx.Frame):
             self.reloadText = text
             if os.path.isfile(path):
                 logger.debug(f"File saved sucessfully. {path}")
-                sDlg = wx.MessageDialog(self, 'Fajl je uspešno sačuvan\n{}'.format(os.path.basename(path)), 'SubConverter', wx.OK | wx.ICON_INFORMATION)
+                sDlg = wx.MessageDialog(self, 'Fajl je uspešno sačuvan\n{}'.format(os.path.basename(path)),\
+                                        'SubConverter', wx.OK | wx.ICON_INFORMATION)
                 sDlg.ShowModal()
                 # Dodaje putanju i enkoding u recnik
                 self.saved_file[path] = self.newEnc                
@@ -2602,7 +2613,8 @@ class MyFrame(wx.Frame):
                     os.remove(tpath)
                 if os.path.isfile(path):
                     logger.debug("ZIP file saved sucessfully: {}".format(path))
-                    sDlg = wx.MessageDialog(self, 'Fajl je uspešno sačuvan\n{}'.format(os.path.basename(path)), 'SubConverter', wx.OK | wx.ICON_INFORMATION)
+                    sDlg = wx.MessageDialog(self, 'Fajl je uspešno sačuvan\n{}'\
+                                            .format(os.path.basename(path)), 'SubConverter', wx.OK | wx.ICON_INFORMATION)
                     sDlg.ShowModal()
                     # Dodaje putanju i enkoding u recnik
                     self.saved_file[path] = self.newEnc                
@@ -2991,7 +3003,7 @@ class MyFrame(wx.Frame):
             def rpt(path, enc):
                 m = 0; s1 = 0
                 while True:
-                    subs = pysrt.open(path, encoding=enc)
+                    subs = pysrt.from_string(WORK_TEXT.getvalue())
                     x, y = fixGaps(subs, path, enc)
                     m += x
                     s1 += y
@@ -3010,10 +3022,6 @@ class MyFrame(wx.Frame):
                 else:
                     logger.debug("Fixer: Remove gaps not enabled.")
             try:
-                subs = pysrt.open(path, encoding=entered_enc)
-                WORK_TEXT.truncate(0)
-                pysrt.SubRipFile(subs).write_into(WORK_TEXT)
-                WORK_TEXT.seek(0)
                 if not cb8_s:
                     text = WORK_TEXT.getvalue()
                     textis = srt.parse(text)
@@ -3029,6 +3037,7 @@ class MyFrame(wx.Frame):
             
             fproc.bufferText(text, WORK_TEXT)
             fproc.bufferText(text, WORK_SUBS)
+            fproc.bufferText(text, self.workText)
             self.text_1.SetValue(text)
             self.bytesToBuffer(text, entered_enc)
             self.real_path = path
@@ -3046,6 +3055,7 @@ class MyFrame(wx.Frame):
                         sDlg = wx.MessageDialog(self, 'Subtitle fix\n\nPopravljenih gapova među linijama ukupno: {}\n{}'
                                                         .format(m, m1), 'SubConverter', wx.OK | wx.ICON_INFORMATION)
                         sDlg.ShowModal()
+        
         self.previous_action['FixSubtitle'] = self.newEnc
         self.SetStatusText(os.path.basename(path))
         self.save.Enable(True)
