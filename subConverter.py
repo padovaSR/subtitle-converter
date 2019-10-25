@@ -3047,7 +3047,9 @@ class MyFrame(wx.Frame):
             fproc.bufferText(text, WORK_TEXT)
             fproc.bufferText(text, WORK_SUBS)
             fproc.bufferText(text, self.workText)
+            
             self.text_1.SetValue(text)
+            
             self.bytesToBuffer(text, entered_enc)
             self.real_path = path
             
@@ -3246,8 +3248,6 @@ class MyApp(wx.App):
             for line in line_set:
                 out.write(line)
             out.close()
-        WORK_SUBS.truncate(0)
-        WORK_TEXT.truncate(0)
             
     def m_files(self):
         
