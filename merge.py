@@ -131,6 +131,7 @@ def fixGaps(subs):
     
     new_f.clean_indexes()
     WORK_TEXT.truncate(0)
+    WORK_TEXT.seek(0)
     pysrt.SubRipFile(new_f).write_into(WORK_TEXT)
     WORK_TEXT.seek(0)
     
