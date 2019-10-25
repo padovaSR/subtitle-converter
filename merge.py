@@ -18,9 +18,7 @@
 
 import re
 import os
-from io import StringIO  
 import pysrt
-import srt
 from itertools import zip_longest 
 import logging
 
