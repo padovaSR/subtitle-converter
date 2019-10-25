@@ -689,7 +689,16 @@ class MyFrame(wx.Frame):
         new_items = [self.save, self.save_as, self.reload]
         
         for i in new_items: i.Enable(False)
-        for i in self.menu_items: i.Enable(False)        
+        for i in self.menu_items: i.Enable(False)
+        
+    def postAction(self):
+        
+        self.MenuBar.Enable(wx.ID_SAVE, True)
+        self.MenuBar.Enable(wx.ID_SAVEAS, True)
+        self.MenuBar.Enable(wx.ID_CLOSE, True)
+        self.reload.Enable(True)
+        self.toolBar1.EnableTool(1010, True)  # Save
+        self.reloaded = 0
         
     def handleFile(self, filepaths):
         def file_go(self, infile, realF):
@@ -1338,13 +1347,13 @@ class MyFrame(wx.Frame):
                 self.Error_Text = error_text
             
             self.enc = self.newEnc
+            
             if path:
+                
                 self.SetStatusText(os.path.basename(path))
-                self.reload.Enable(True)
-                self.MenuBar.Enable(wx.ID_SAVE, True)
-                self.MenuBar.Enable(wx.ID_SAVEAS, True)
-                self.MenuBar.Enable(wx.ID_CLOSE, True)
-                self.toolBar1.EnableTool(1010, True)  # Save
+                
+                self.postAction()
+                
                 self.toolBar1.EnableTool(1003, False)   # toANSI
                 self.to_ansi.Enable(False)
                 
@@ -1541,17 +1550,17 @@ class MyFrame(wx.Frame):
             self.newEnc = utf8_enc
             
             self.SetStatusText(os.path.basename(path))
-            self.MenuBar.Enable(wx.ID_SAVE, True)
-            self.MenuBar.Enable(wx.ID_SAVEAS, True)
-            self.MenuBar.Enable(wx.ID_CLOSE, True)
-            self.reload.Enable(True)
+            
+            self.postAction()
+            
             self.toolBar1.EnableTool(1010, False)  # Save
             self.toolBar1.EnableTool(1003, False)
+            self.save.Enable(False)
+            
             
             self.enchistory[path] = self.newEnc
             self.previous_action['toCyrSRTutf8'] = self.newEnc
             self.cyrUTF = utf_path
-            self.reloaded = 0
                 
         event.Skip()
         
@@ -1718,14 +1727,11 @@ class MyFrame(wx.Frame):
                 
             self.enc = self.newEnc
             self.SetStatusText(os.path.basename(path))
-            self.MenuBar.Enable(wx.ID_SAVE, True)
-            self.MenuBar.Enable(wx.ID_SAVEAS, True)
-            self.MenuBar.Enable(wx.ID_CLOSE, True)
-            self.reload.Enable(True)
-            self.toolBar1.EnableTool(1010, True)  # Save
+            
+            self.postAction()
+            
             self.previous_action['toUTF'] = self.newEnc
             self.enchistory[path] = self.newEnc
-            self.reloaded = 0
                             
         event.Skip()
         
@@ -1987,7 +1993,6 @@ class MyFrame(wx.Frame):
         else:
             self.newEnc = 'utf-8'
         
-        w_subs = WORK_TEXT.getvalue()
         text = WORK_TEXT.getvalue()
         
         utf_proc = FileProcessed(self.newEnc, path)
@@ -2016,14 +2021,11 @@ class MyFrame(wx.Frame):
         
         self.enc = self.newEnc
         self.SetStatusText(os.path.basename(path))
-        self.MenuBar.Enable(wx.ID_SAVE, True)
-        self.MenuBar.Enable(wx.ID_SAVEAS, True)
-        self.MenuBar.Enable(wx.ID_CLOSE, True)
-        self.reload.Enable(True)
-        self.toolBar1.EnableTool(1010, True)  # Save
+        
+        self.postAction()
+        
         self.previous_action['Transcribe'] = self.newEnc
         self.enchistory[path] = self.newEnc
-        self.reloaded = 0
         
         event.Skip()
         
@@ -2079,14 +2081,12 @@ class MyFrame(wx.Frame):
             ErrorDlg = wx.MessageDialog(self, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
             ErrorDlg.ShowModal()
             self.Error_Text = error_text
+        
         self.SetStatusText(os.path.basename(path))
-        self.MenuBar.Enable(wx.ID_SAVE, True)
-        self.MenuBar.Enable(wx.ID_SAVEAS, True)
-        self.MenuBar.Enable(wx.ID_CLOSE, True)
-        self.reload.Enable(True)
-        self.toolBar1.EnableTool(1010, True)  # Save
+        
+        self.postAction()
+        
         self.previous_action['repSpec'] = self.newEnc
-        self.reloaded = 0
         
         event.Skip()
         
@@ -2167,13 +2167,10 @@ class MyFrame(wx.Frame):
         self.real_path = path 
         
         self.SetStatusText(os.path.basename(path))
-        self.MenuBar.Enable(wx.ID_SAVE, True)
-        self.MenuBar.Enable(wx.ID_SAVEAS, True)
-        self.MenuBar.Enable(wx.ID_CLOSE, True)
-        self.reload.Enable(True)
-        self.toolBar1.EnableTool(1010, True)  # Save
+        
+        self.postAction()
+        
         self.previous_action['CustomRegex'] = entered_enc
-        self.reloaded = 0        
                 
         event.Skip()
         
@@ -2248,17 +2245,16 @@ class MyFrame(wx.Frame):
                 self.text_1.SetValue(f"{os.path.basename(path)}\nERROR")
                 
             self.SetStatusText(os.path.basename(path))
-            self.MenuBar.Enable(wx.ID_SAVE, True)
-            self.MenuBar.Enable(wx.ID_SAVEAS, True)
-            self.MenuBar.Enable(wx.ID_CLOSE, True)
-            self.reload.Enable(True)
-            self.toolBar1.EnableTool(1010, True)  # Save
+            
+            self.postAction()
+            
             self.previous_action['Cleanup'] = self.newEnc
-            self.reloaded = 0
+            
         else:
             logger.debug(f"Cleanup: No subtitles found!")
             self.previous_action['Cleanup'] = self.newEnc
             return
+        
         event.Skip()
     
     def onMergeLines(self, event):
@@ -2321,6 +2317,7 @@ class MyFrame(wx.Frame):
             fproc.bufferText(text, WORK_TEXT)
             fproc.bufferText(text, WORK_SUBS)
             fproc.bufferText(text, self.workText)
+            
             self.bytesToBuffer(text, entered_enc)
             self.real_path = path
             
@@ -2337,12 +2334,9 @@ class MyFrame(wx.Frame):
                 sDlg.ShowModal()
             
             self.SetStatusText(os.path.basename(path))
-            self.MenuBar.Enable(wx.ID_SAVE, True)
-            self.MenuBar.Enable(wx.ID_SAVEAS, True)
-            self.MenuBar.Enable(wx.ID_CLOSE, True)
-            self.reload.Enable(True)
-            self.toolBar1.EnableTool(1010, True)  # Save
-            self.reloaded = 0
+            
+            self.postAction()
+            
             self.previous_action['Merger'] = self.newEnc
         
         event.Skip()
@@ -2728,12 +2722,9 @@ class MyFrame(wx.Frame):
             self.real_path = path
             
             self.SetStatusText(os.path.basename(path))
-            self.save.Enable(True)
-            self.save_as.Enable(True)
-            self.close.Enable(True)
-            self.toolBar1.EnableTool(1010, True)  # Save
-            self.reload.Enable(True)
-            self.reloaded = 0
+            
+            self.postAction()
+            
             self.previous_action['cyrToANSI'] = self.newEnc
             self.enchistory[path] = self.newEnc
         event.Skip()
@@ -2867,12 +2858,9 @@ class MyFrame(wx.Frame):
                 self.Error_Text = error_text
             if path:
                 self.SetStatusText(os.path.basename(path))
-                self.save.Enable(True)
-                self.save_as.Enable(True)
-                self.close.Enable(True)
-                self.toolBar1.EnableTool(1010, True)  # Save
-                self.reload.Enable(True)
-                self.reloaded = 0
+                
+                self.postAction()
+                
                 self.previous_action['cyrToUTF'] = self.newEnc
                 self.enchistory[path] = self.newEnc
         event.Skip()
