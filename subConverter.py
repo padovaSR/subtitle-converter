@@ -1131,7 +1131,10 @@ class MyFrame(wx.Frame):
             if entered_enc == 'windows-1251':
                 logger.debug(f"------------------------------------------------------\n\
                 Encoding is windows-1251! {fpath}")
-                pass
+                self.text_1.AppendText("\n")
+                self.text_1.AppendText(fpath+" __skipped_")                
+                continue
+               
             text = fproc.normalizeText()
             fproc.bufferText(text, self.workText)
             zbir_slova, procent, chars = fproc.checkChars(text)
@@ -1185,11 +1188,6 @@ class MyFrame(wx.Frame):
                 ErrorText = "Greška:\n\n{0}\nsadrži ćiriliči alfabet.\n{1}\n{2}\n\nNastavljate?\n"\
                     .format(os.path.basename(path), f_procent, ",".join(chars))
                 
-                if procent and entered_enc == "windows-1251":
-                    self.text_1.AppendText("\n")
-                    self.text_1.AppendText(fpath+" __skipped_")
-                    continue                
-                
                 dlg = dialog1(ErrorText)
                 
                 if dlg == True:
@@ -1220,12 +1218,8 @@ class MyFrame(wx.Frame):
                 ErrorText = "Greška:\n\n{0}\nsadrži ćiriliči alfabet.\n{1}\n{2}\n\nNastavljate?\n"\
                     .format(os.path.basename(path),f_zbir, ",".join(chars))
                 
-                if zbir_slova and entered_enc == "windows-1251":
-                    self.text_1.AppendText("\n")
-                    self.text_1.AppendText(fpath+" __skipped_")
-                    continue
-                
                 dlg = dialog1(ErrorText)
+                
                 if dlg == True:
                     newF,text = ansiAction(path)
                     error_text = fproc.checkFile(path, path, text, multi=True)
