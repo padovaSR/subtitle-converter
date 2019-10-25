@@ -176,7 +176,9 @@ class FileProcessed:
         return n_names
     
     def bufferText(self, intext, buffer):
+        
         buffer.truncate(0)
+        buffer.seek(0)
         buffer.write(intext)
         buffer.seek(0)    
     
