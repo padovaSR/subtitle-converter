@@ -1046,6 +1046,7 @@ class MyFrame(wx.Frame):
                                                'SubConverter', wx.OK | wx.ICON_INFORMATION)
                     msginfo.ShowModal()
                     new_fproc.bufferText(text, WORK_SUBS)
+                    new_fproc.bufferText(text, WORK_TEXT)
                 return text, error_text
             
             def postAnsi():
@@ -1343,7 +1344,8 @@ class MyFrame(wx.Frame):
                 with open(self.path0_p, "wb") as f:
                     pickle.dump(cyr_path, f)
                     
-            cyr_proc.bufferText(text, WORK_SUBS)        
+            cyr_proc.bufferText(text, WORK_SUBS)
+            cyr_proc.bufferText(text, WORK_TEXT)
             cyr_proc.bufferText(text, self.workText)
             self.bytesToBuffer(text, self.newEnc)
             
@@ -1536,6 +1538,7 @@ class MyFrame(wx.Frame):
             text = cyr_proc.fineTune(text)
             text = cyr_proc.fontColor(text)
             cyr_proc.bufferText(text, self.workText)
+            cyr_proc.bufferText(text, WORK_TEXT)
             
             error_text = cyr_proc.checkFile(path, utf_path, text, multi=False)
             text = self.fileErrors(utf_path, utf8_enc, multi=False)
@@ -1727,6 +1730,7 @@ class MyFrame(wx.Frame):
                     code = self.newEnc.upper()
                     
                 utfproc.bufferText(text, WORK_SUBS)
+                utfproc.bufferText(text, WORK_TEXT)
                 self.bytesToBuffer(text, self.newEnc)
                 msginfo = wx.MessageDialog(self, f'Tekst je konvertovan u enkoding: {code}.', 'SubConverter',
                                            wx.OK | wx.ICON_INFORMATION)
@@ -2213,7 +2217,7 @@ class MyFrame(wx.Frame):
         self.pre_suffix = value1_s
         
         text = WORK_TEXT.getvalue()
-            
+        
         subs = list(srt.parse(text))
         
         if len(subs) > 0:
@@ -2227,6 +2231,7 @@ class MyFrame(wx.Frame):
                 arg1 = True
             try:
                 text = fproc.cleanUp(subs, arg1)
+                
                 self.previous_action.clear()
                 
                 deleted, trimmed,text_s = fproc.cleanLine(text)
@@ -2732,7 +2737,8 @@ class MyFrame(wx.Frame):
                 ErrorDlg.ShowModal()
                 self.Error_Text = error_text
             
-            cyrproc.bufferText(text, WORK_SUBS)        
+            cyrproc.bufferText(text, WORK_SUBS)
+            cyrproc.bufferText(text, WORK_TEXT)
             cyrproc.bufferText(text, self.workText)
             self.bytesToBuffer(text, self.newEnc)
             self.real_path = path
@@ -2862,7 +2868,8 @@ class MyFrame(wx.Frame):
             error_text = cyproc.checkFile(path, path, text, multi=False)
             text = self.fileErrors(path, self.newEnc, multi=False)
             
-            cyproc.bufferText(text, WORK_SUBS)        
+            cyproc.bufferText(text, WORK_SUBS)
+            cyproc.bufferText(text, WORK_TEXT)
             cyproc.bufferText(text, self.workText)
             self.bytesToBuffer(text, self.newEnc)
             
