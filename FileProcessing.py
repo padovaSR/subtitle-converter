@@ -468,7 +468,7 @@ class FileProcessed:
         if len(nf) > 0:
             logger.debug(f'SpecChars: {" ".join(nf)}\n')
             f_path = re.sub(r"\.TEMP_\w*", "", os.path.basename(self.putanja), re.I)
-            msginfo = wx.MessageDialog(None, f'Specijalni znakovi u tekstu:\n\n{os.path.basename(f_path)}\n\n{", ".join(nf)}.',\
+            msginfo = wx.MessageDialog(None, f'Specijalni znakovi u tekstu:\n\n{os.path.basename(f_path)}\n\n{", ".join(set(nf))}.',\
                                        'SubConverter', wx.OK | wx.ICON_INFORMATION)
             msginfo.ShowModal()
         
