@@ -2180,6 +2180,8 @@ class MyFrame(wx.Frame):
         
         with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
             ex = sp['key5']
+            ef = sp['key1']
+            cb8_s = ef["state8"]
             value1_s = ex['cleanup']        
         
         tval = self.text_1.GetValue()
@@ -2244,13 +2246,13 @@ class MyFrame(wx.Frame):
                 exc_type, exc_value, exc_traceback = sys.exc_info()
                 lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
                 logger.debug(''.join('!' + line for line in lines))
-                self.text_1.SetValue(f"{os.path.basename(path)}\nERROR")
+                if cb8_s: m = "All values are zero!\nPlease reload file."
+                self.text_1.SetValue(f"{os.path.basename(path)}\nERROR\n{m}")
                 
             self.SetStatusText(os.path.basename(path))
+            self.previous_action['Cleanup'] = self.newEnc
             
             self.postAction()
-            
-            self.previous_action['Cleanup'] = self.newEnc
             
         else:
             logger.debug(f"Cleanup: No subtitles found!")
@@ -2303,6 +2305,13 @@ class MyFrame(wx.Frame):
         except IOError as e:
             logger.debug("Merger srt, I/O error({0}): {1}".format(e.errno, e.strerror))
         except Exception as e: logger.debug(f"Merger _1, unexpected error: {e}")
+        
+        if subs_a[1].start and subs_a[2].start == "00:00:00,000":
+            
+            msginfo = wx.MessageDialog(self, 'Erroneous subtitle\n\nAll values are zero!', 'SubConverter',
+                                       wx.OK | wx.ICON_INFORMATION)
+            msginfo.ShowModal()
+            return        
             
         self.pre_suffix = file_suffix
         
