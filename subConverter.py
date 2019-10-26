@@ -39,7 +39,7 @@ from merge import myMerger, fixLast, fixGaps
 
 from Manual import MyManual
 
-from settings import WORK_TEXT,  WORK_SUBS
+from settings import WORK_TEXT,  WORK_SUBS, NEW_ENCODING
 
 import logging
 import traceback
@@ -906,6 +906,8 @@ class MyFrame(wx.Frame):
         with open(self.enc0_p, 'rb') as p:
             enc = pickle.load(p)
         
+        fproc = FileProcessed(enc, path)
+        
         if os.path.isfile(os.path.join('resources', 'var', 'r_text0.pkl')):
             with open(os.path.join('resources', 'var', 'r_text0.pkl'), 'rb') as f:
                 text=pickle.load(f)
@@ -914,11 +916,13 @@ class MyFrame(wx.Frame):
             self.text_1.SetValue(text)
             writeTempStr(path, text, enc)
             os.remove(os.path.join('resources', 'var', 'r_text0.pkl'))
+            fproc.bufferText(text, WORK_TEXT)
             self.reloaded += 1
         else:
             text = self.reloadText
             self.text_1.SetValue(text)
             writeTempStr(path, text, enc)
+            fproc.bufferText(text, WORK_TEXT)
             self.reloaded += 1
         logger.debug('Reloaded {}, encoding: {}'.format(os.path.basename(path), enc))
         
