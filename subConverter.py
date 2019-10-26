@@ -39,7 +39,7 @@ from merge import myMerger, fixLast, fixGaps
 
 from Manual import MyManual
 
-from settings import WORK_TEXT,  WORK_SUBS, NEW_ENCODING
+from settings import WORK_TEXT,  WORK_SUBS
 
 import logging
 import traceback
@@ -1560,6 +1560,7 @@ class MyFrame(wx.Frame):
             self.postAction()
             
             self.toolBar1.EnableTool(1010, False)  # Save
+            self.to_ansi.Enable(False)
             self.toolBar1.EnableTool(1003, False)
             self.save.Enable(False)
             
