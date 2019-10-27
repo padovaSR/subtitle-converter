@@ -529,7 +529,9 @@ class MyFrame(wx.Frame):
         self.comboBox1.SetToolTip("Ulazno kodiranje fajla\nako je poznato\nili nije automatski pronađeno\n")
         self.comboBox1.SetSelection(kdef)
         self.toolBar1.AddControl(self.comboBox1)
+        
         self.toolBar1.Realize()
+        
         self.toolBar1.EnableTool(1010, False)
         self.toolBar1.EnableTool(1002, False)
         self.toolBar1.EnableTool(1003, False)

@@ -7,5 +7,7 @@ from io import StringIO
 WORK_TEXT = StringIO()
     
 WORK_SUBS = StringIO()
+
+NEW_ENCODING = r""
     
     
