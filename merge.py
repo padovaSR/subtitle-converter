@@ -82,9 +82,10 @@ def myMerger(subs_in, max_time, max_char, _gap, kode):
     out_f, par3, nep3 = merge_lines(par2, nep2)
     out_f, par4, nep4 = merge_lines(par3, nep3)
 
-    WORK_SUBS.truncate(0)
-    pysrt.SubRipFile(out_f).write_into(WORK_SUBS)
-    WORK_SUBS.seek(0)
+    WORK_TEXT.truncate(0)
+    WORK_TEXT.seek(0)
+    pysrt.SubRipFile(out_f).write_into(WORK_TEXT)
+    WORK_TEXT.seek(0)
     
 def fixGaps(subs):
     
