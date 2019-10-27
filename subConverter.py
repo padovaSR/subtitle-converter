@@ -2331,10 +2331,10 @@ class MyFrame(wx.Frame):
                 
             myMerger(subs_in=subs_a, max_time=lineLenght, max_char=maxChar, _gap=maxGap, kode=entered_enc)
             
-            b1 = len(pysrt.from_string(WORK_SUBS.getvalue()))
+            b1 = len(pysrt.from_string(WORK_TEXT.getvalue()))
             a1 = len(subs_a)
             
-            text = WORK_SUBS.getvalue()
+            text = WORK_TEXT.getvalue()
             subs = list(srt.parse(text))
             text = srt.compose(subs)
             fproc.bufferText(text, WORK_TEXT)
@@ -2668,6 +2668,9 @@ class MyFrame(wx.Frame):
         fp.regularFile(self.filepath[-1])
         with open(path, 'r', encoding=enc, errors='replace') as f:
             text = f.read()
+        fp.bufferText(text, WORK_TEXT)
+        fp.bufferText(text, WORK_SUBS)
+        fp.bufferText(text, self.workText)
         self.text_1.SetValue(text)
         with open(self.path0_p, 'wb') as v:
             pickle.dump(path, v)        
