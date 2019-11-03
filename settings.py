@@ -3,11 +3,12 @@
 # 
 
 from io import StringIO
+import os
 
 WORK_TEXT = StringIO()
     
 WORK_SUBS = StringIO()
 
-NEW_ENCODING = r""
+def filePath(*args): return os.path.join(*args)
     
     
