@@ -3101,23 +3101,23 @@ class MyFrame(wx.Frame):
         if dlg.ShowModal() == wx.ID_OK:
             dlg.ToMenuBar(self)
             
-            shortcutsKey.update([(key, self.sc[key]) for key in self.sc.keys()])
+            #shortcutsKey.update([(key, self.sc[key]) for key in self.sc.keys()])
             
-            i_list = list(shortcutsKey.keys())
+            #i_list = list(shortcutsKey.keys())
             
-            with open(filePath("resources","shortcut_keys.cfg"), "r", encoding="utf-8") as cf:
-                new_f = ""
-                for line in cf:
-                    if any(line.startswith(n) for n in i_list):
-                        x = line.split("=")
-                        line = x[0].strip()+"="+shortcutsKey[x[0]]+"\n"
-                        new_f += line
-                    else: new_f += line
+            #with open(filePath("resources","shortcut_keys.cfg"), "r", encoding="utf-8") as cf:
+                #new_f = ""
+                #for line in cf:
+                    #if any(line.startswith(n) for n in i_list):
+                        #x = line.split("=")
+                        #line = x[0].strip()+"="+shortcutsKey[x[0]]+"\n"
+                        #new_f += line
+                    #else: new_f += line
             
-            with  open(filePath("resources","shortcut_keys.cfg"), "w", encoding="utf-8") as cf:
-                cf.write(new_f)            
+            #with  open(filePath("resources","shortcut_keys.cfg"), "w", encoding="utf-8") as cf:
+                #cf.write(new_f)            
             
-        dlg.Destroy()
+        #dlg.Destroy()
         
         event.Skip()
         
