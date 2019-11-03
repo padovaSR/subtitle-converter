@@ -35,6 +35,8 @@ from textwrap import TextWrapper
 import pysrt
 import srt
 
+from settings import filePath
+
 from zamenaImena import dictionary_0, dictionary_1, dictionary_2, rplSmap,\
      searchReplc, dict0_n, dict0_n2, dict1_n, dict1_n2, dict2_n, dict2_n2,\
      lat_cir_mapa, pLatin_rpl, pre_cyr
@@ -44,7 +46,7 @@ import wx
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
-handler = logging.FileHandler(filename=os.path.join("resources", "var", "FileProcessing.log"), mode="w", encoding="utf-8")
+handler = logging.FileHandler(filename=filePath("resources", "var", "FileProcessing.log"), mode="w", encoding="utf-8")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
@@ -104,12 +106,12 @@ class FileOpened:
             singlefajl = len(zf.namelist())
             if singlefajl == 1:
                 jedanFajl = zf.namelist()[0]
-                outfile = [os.path.join(basepath, jedanFajl)]
-                with open(os.path.join('resources', 'var', 'path0.pkl'), 'wb') as f:    # path je u tmp/ folderu
+                outfile = [filePath(basepath, jedanFajl)]
+                with open(filePath('resources', 'var', 'path0.pkl'), 'wb') as f:    # path je u tmp/ folderu
                     pickle.dump(outfile, f)
                 with open(outfile[0], 'wb') as f:
                     f.write(zf.read(jedanFajl))
-                outfile1 = os.path.join(os.path.dirname(self.putanja), jedanFajl)
+                outfile1 = filePath(os.path.dirname(self.putanja), jedanFajl)
                 return outfile, outfile1
             elif singlefajl >= 2:
                 izbor = [x for x in zf.namelist() if not x.endswith('/')]
@@ -118,14 +120,14 @@ class FileOpened:
                     response = dlg.GetSelections()
                     files = [izbor[x] for x in response]
                     names = [os.path.basename(i) for i in files]
-                    outfiles = [os.path.join(basepath, x) for x in names]
-                    single = os.path.join(os.path.dirname(self.putanja), os.path.basename(files[-1]))
-                    with open(os.path.join('resources', 'var', 'path0.pkl'), 'wb') as f:    # path je u tmp/ folderu
+                    outfiles = [filePath(basepath, x) for x in names]
+                    single = filePath(os.path.dirname(self.putanja), os.path.basename(files[-1]))
+                    with open(filePath('resources', 'var', 'path0.pkl'), 'wb') as f:    # path je u tmp/ folderu
                         pickle.dump(single, f)                    
                     for i, x in zip(files, outfiles):
                         with open(x, 'wb') as f:
                             f.write(zf.read(i))
-                    with open(os.path.join('resources', 'var', 'path0.pkl'), 'wb') as f:    # path je u tmp/ folderu
+                    with open(filePath('resources', 'var', 'path0.pkl'), 'wb') as f:    # path je u tmp/ folderu
                         pickle.dump(outfiles, f)
                     return outfiles, single
                 
@@ -134,7 +136,7 @@ class FileOpened:
                     
     def findCode(self):
         
-        with open(os.path.join('resources', 'var', 'obsE.pkl'), 'rb') as f:
+        with open(filePath('resources', 'var', 'obsE.pkl'), 'rb') as f:
             kodek = pickle.load(f).strip()
         if kodek != 'auto':
             ukode = kodek
@@ -154,7 +156,7 @@ class FileOpened:
             else:
                 logger.debug(f'Opening the file with encoding: {enc}')
                 break
-        with open(os.path.join('resources', 'var', 'enc0.pkl'), 'wb') as f:      
+        with open(filePath('resources', 'var', 'enc0.pkl'), 'wb') as f:      
             pickle.dump(enc, f)
         return enc
         
@@ -162,8 +164,8 @@ class FileOpened:
 class FileProcessed:
     
     work_text = StringIO()
-    path0_p = os.path.join('resources', 'var', 'path0.pkl')
-    enc0_p = os.path.join('resources', 'var', 'enc0.pkl')
+    path0_p = filePath('resources', 'var', 'path0.pkl')
+    enc0_p = filePath('resources', 'var', 'enc0.pkl')
     
     def __init__(self, enc, path):
         self.kode = enc
@@ -224,17 +226,17 @@ class FileProcessed:
             logger.debug(''.join('!' + line for line in lines))
     
     def regularFile(self, realFile):
-        with shelve.open(os.path.join('resources', 'var', 'dialog_settings.db'), flag='writeback') as s:
+        with shelve.open(filePath('resources', 'var', 'dialog_settings.db'), flag='writeback') as s:
             s['key3'] = {'tmPath': self.putanja, 'kode': self.kode, 'realPath': realFile}
         
         with open(self.path0_p, 'wb') as v:
             pickle.dump(self.putanja, v)
-        with open(os.path.join('resources', 'var', 'rpath0.pkl'), 'wb') as f:
+        with open(filePath('resources', 'var', 'rpath0.pkl'), 'wb') as f:
             pickle.dump(realFile, f)
-        with open(os.path.join('resources', 'var', 'enc0.pkl'), 'wb') as f:      
+        with open(filePath('resources', 'var', 'enc0.pkl'), 'wb') as f:      
             pickle.dump(self.kode, f)        
         
-        #with open(os.path.join('resources', 'var', 'obsE.pkl'), 'wb') as f:
+        #with open(filePath('resources', 'var', 'obsE.pkl'), 'wb') as f:
             #pickle.dump(self.kode, f)
             
     def checkErrors(self, text_in):
@@ -340,17 +342,17 @@ class FileProcessed:
     def newName(self, pre_suffix, multi):
         
         path = self.putanja
-        presuffix_l = os.path.join("resources", "var", "presuffix_list.bak")
+        presuffix_l = filePath("resources", "var", "presuffix_list.bak")
         
-        with open(os.path.join("resources", "var", "file_ext.pkl"), "rb") as f:
+        with open(filePath("resources", "var", "file_ext.pkl"), "rb") as f:
             ex = pickle.load(f)
             value2_s = ex['cyr_utf8_txt']
             value5_s = ex['lat_utf8_srt']
             
-        with open(os.path.join("resources", "var", "m_extensions.pkl"), "rb") as f:
+        with open(filePath("resources", "var", "m_extensions.pkl"), "rb") as f:
             value_m = pickle.load(f)        #  Merger suffix
         
-        with open(os.path.join('resources', 'var', 'tcf.pkl'), 'rb') as tf:
+        with open(filePath('resources', 'var', 'tcf.pkl'), 'rb') as tf:
             oformat = pickle.load(tf)  # TXT suffix
 
         spattern = re.compile(r"\.srt\.srt", re.I)
@@ -418,10 +420,10 @@ class FileProcessed:
     
     def nameDialog(self, name_entry, sufix_entry, dir_entry):
         
-        with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
+        with shelve.open(filePath("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
             ex = sp['key5']
             
-        presuffix_l = os.path.join("resources", "var", "presuffix_list.bak")
+        presuffix_l = filePath("resources", "var", "presuffix_list.bak")
         real_dir = dir_entry
         name1 = name_entry
         sufix = sufix_entry
@@ -433,8 +435,8 @@ class FileProcessed:
         
         if dlg.ShowModal() == wx.ID_OK:
             name = dlg.GetValue() # Get the file name
-            tmpnameO = os.path.join(real_dir, name)
-            nameO = '{0}{1}'.format(os.path.join(real_dir, name), sufix)
+            tmpnameO = filePath(real_dir, name)
+            nameO = '{0}{1}'.format(filePath(real_dir, name), sufix)
             if nameO.endswith("."):
                 nameO = nameO[:-1]
             if os.path.exists(nameO):
@@ -912,7 +914,7 @@ class TextProcessing(FileProcessed):
         
         # fix settings ------------------------------------------------------------------------------   
         try:
-            with shelve.open(os.path.join('resources', 'var', 'dialog_settings.db'), flag='writeback') as  sp:
+            with shelve.open(filePath('resources', 'var', 'dialog_settings.db'), flag='writeback') as  sp:
                 ex = sp['key1']
                 cb1_s = ex['state1']; cb2_s = ex['state2']; cb3_s = ex['state3']
                 cb4_s = ex['state4']; cb5_s = ex['state5']; cb6_s = ex['state6']; cb7_s = ex['state7']; cb8_s = ex['state8']
