@@ -296,14 +296,10 @@ class MyFrame(wx.Frame):
         # Menu Bar
     def __set_menuBar(self):
         
-        with open(filePath("resources", "var", "shortcut_keys.pkl"), "rb") as f:
-            try:
-                keyS = pickle.load(f)
-                if not len(keyS) >= 27: keyS = shortcutsKey
-            except Exception as e:
-                logger.debug(f"MenuBar: {e}")
-                keyS = shortcutsKey
-            
+        try:
+            keyS = shortcutsKey
+        except Exception as e: logger.debug(f"MenuBar: {e}")
+                
         self.frame_menubar = wx.MenuBar()
         self.file = wx.Menu()
         self.fopen = wx.MenuItem(self.file, wx.ID_OPEN, "&Open\t"+keyS["Open"], "Otvori fajl", wx.ITEM_NORMAL)
@@ -3104,12 +3100,24 @@ class MyFrame(wx.Frame):
         
         if dlg.ShowModal() == wx.ID_OK:
             dlg.ToMenuBar(self)
+            
+            shortcutsKey.update([(key, self.sc[key]) for key in self.sc.keys()])
+            
+            i_list = list(shortcutsKey.keys())
+            
+            with open(filePath("resources","shortcut_keys.cfg"), "r", encoding="utf-8") as cf:
+                new_f = ""
+                for line in cf:
+                    if any(line.startswith(n) for n in i_list):
+                        x = line.split("=")
+                        line = x[0].strip()+"="+shortcutsKey[x[0]]+"\n"
+                        new_f += line
+                    else: new_f += line
+            
+            with  open(filePath("resources","shortcut_keys.cfg"), "w", encoding="utf-8") as cf:
+                cf.write(new_f)            
+            
         dlg.Destroy()
-        
-        shortcutsKey.update([(key, self.sc[key]) for key in self.sc.keys()])
-        
-        with open(filePath("resources", "var", "shortcut_keys.pkl"), "wb") as p_obj:
-            pickle.dump(shortcutsKey, p_obj)
         
         event.Skip()
         
@@ -3286,7 +3294,7 @@ class MyApp(wx.App):
     def m_files(self):
         
         missing_f = []
-        files_list = ["m_extensions.pkl", "file_ext.pkl", "shortcut_keys.pkl"]
+        files_list = ["m_extensions.pkl", "file_ext.pkl"]
         cfg1 = filePath("resources", "shortcut_keys.cfg")
         d_file = filePath("resources", "Regex_def.config")
         for i in files_list:
