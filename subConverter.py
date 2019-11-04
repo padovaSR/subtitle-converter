@@ -45,6 +45,7 @@ import logging
 import traceback
 
 import wx
+import wx.adv
 import wx.lib.agw.shortcuteditor as SE
 
 VERSION = "v0.5.7.2"
@@ -473,7 +474,7 @@ class MyFrame(wx.Frame):
         self.preferences.AppendSeparator()
         
         self.shortcuts = wx.MenuItem(self.preferences, wx.ID_ANY, "&ShortcutEditor\t"+keyS["ShortcutEditor"], "Shortcut keys", wx.ITEM_NORMAL)
-        self.shortcuts.SetBitmap(wx.ArtProvider.GetBitmap(wx.ART_HELP_SETTINGS, wx.ART_MENU))
+        self.shortcuts.SetBitmap(wx.Bitmap(filePath("resources", "icons", "input-keyboard.png"), wx.BITMAP_TYPE_ANY))
         self.Bind(wx.EVT_MENU, self.editShortcuts, id = self.shortcuts.GetId())
         self.preferences.Append(self.shortcuts)
         
@@ -537,7 +538,8 @@ class MyFrame(wx.Frame):
         
         comboBox1Choices = [u" auto", u" windows-1250", u" windows-1251", u" windows-1252", u" utf-8", u" utf-16", " utf-16le", u" utf-16be", 
             u" utf-32", u" iso-8859-1", u" iso-8859-2", u" iso-8859-5", u" latin", u" latin2" ]        
-        self.comboBox1 = wx.ComboBox(self.toolBar1, wx.ID_ANY, u"auto", wx.DefaultPosition, wx.DefaultSize, comboBox1Choices, wx.CB_DROPDOWN|wx.CB_READONLY)
+        self.comboBox1 = wx.adv.BitmapComboBox(self.toolBar1, wx.ID_ANY, u"auto",
+                                               wx.DefaultPosition, wx.DefaultSize, comboBox1Choices, wx.CB_READONLY|wx.ALWAYS_SHOW_SB)
         self.comboBox1.SetToolTip("Ulazno kodiranje fajla\nako je poznato\nili nije automatski pronađeno\n")
         self.comboBox1.SetSelection(kdef)
         self.toolBar1.AddControl(self.comboBox1)
@@ -3114,7 +3116,7 @@ class MyFrame(wx.Frame):
                         new_f += line
                     else: new_f += line
             
-            with  open(filePath("resources","shortcut_keys.cfg"), "w", encoding="utf-8") as cf:
+            with  open(filePath("resources","shortcut_keys.cfg"), "w", encoding="utf-8", newline="\r\n") as cf:
                 cf.write(new_f)            
             
         dlg.Destroy()
@@ -3125,6 +3127,8 @@ class MyFrame(wx.Frame):
 
         shortcut = event.GetShortcut()
         newAccel = event.GetAccelerator()
+        if newAccel == "Disabled":
+            newAccel = ""
         self.sc[shortcut.label] = newAccel
         
         event.Skip()
@@ -3297,12 +3301,14 @@ class MyApp(wx.App):
         files_list = ["m_extensions.pkl", "file_ext.pkl"]
         cfg1 = filePath("resources", "shortcut_keys.cfg")
         d_file = filePath("resources", "Regex_def.config")
+        i_file = filePath("resources", "icons", "input-keyboard.png")
         for i in files_list:
             file_path = filePath("resources", "var", i)
             if not os.path.isfile(file_path):
                 missing_f.append(file_path)
         if not os.path.isfile(cfg1): missing_f.append(cfg1)
         if not os.path.isfile(d_file): missing_f.append(d_file)
+        if not os.path.isfile(i_file): missing_f.append(i_file)
                 
         if missing_f:
             error_text = "File Not Found\n\n{}\nPlease check files missing!".format("".join([x+'\n' for x in missing_f]))
