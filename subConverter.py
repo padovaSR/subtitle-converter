@@ -3327,21 +3327,18 @@ class MyApp(wx.App):
             
     def m_files(self):
         
-        missing_f = []
-        files_list = ["m_extensions.pkl", "file_ext.pkl"]
-        cfg1 = filePath("resources", "shortcut_keys.cfg")
-        d_file = filePath("resources", "Regex_def.config")
+        r_files = ["shortcut_keys.cfg", "Regex_def.config"]
+        v_files = ["m_extensions.pkl", "file_ext.pkl"]
+        missing_r = [os.path.join("resources", x) for x in r_files]
         i_file = filePath("resources", "icons", "input-keyboard.png")
-        for i in files_list:
-            file_path = filePath("resources", "var", i)
-            if not os.path.isfile(file_path):
-                missing_f.append(file_path)
-        if not os.path.isfile(cfg1): missing_f.append(cfg1)
-        if not os.path.isfile(d_file): missing_f.append(d_file)
-        if not os.path.isfile(i_file): missing_f.append(i_file)
-                
+        files_list = [os.path.join("resources","var", x) for x in v_files] + missing_r
+        files_list.append(i_file)
+        
+        missing_f = [x for x in files_list if not os.path.isfile(x)]
+        
         if missing_f:
-            error_text = "File Not Found\n\n{}\nPlease check files missing!".format("".join([x+'\n' for x in missing_f]))
+            error_text = "File Not Found\n\n{}\nPlease check files missing!"\
+                .format("".join([x+'\n' for x in missing_f]))
             ErrorDlg = wx.MessageDialog(None, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
             ErrorDlg.ShowModal()
             
