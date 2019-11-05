@@ -3031,6 +3031,13 @@ class MyFrame(wx.Frame):
         if len(subs) == 0:
             logger.debug("Fixer: No subtitles found.")
         else:
+            
+            if subs[1].start and subs[2].start == "00:00:00,000":
+                
+                msginfo = wx.MessageDialog(self, 'Erroneous subtitle\n\nAll values are zero!', 'SubConverter',
+                                           wx.OK | wx.ICON_INFORMATION)
+                msginfo.ShowModal()
+                return
             text = ""
             def chg(subs_in):
                 N = 0
