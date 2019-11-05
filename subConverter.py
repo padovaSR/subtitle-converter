@@ -210,7 +210,16 @@ class MyFrame(wx.Frame):
         # begin wxGlade: MyFrame.__init__
         kwds["style"] = kwds.get("style", 0) | wx.DEFAULT_FRAME_STYLE
         wx.Frame.__init__(self, *args, **kwds)
-        self.SetSize((637, 582))
+        try:
+            with open(filePath("resources","var","set_size.pkl"), "rb") as wf:
+                size_dict = pickle.load(wf)
+                w = size_dict["W"]
+                h = size_dict["H"]
+            self.SetSize((w, h))
+        except Exception as e:
+            logger.debug(f"Init error: {e}")
+            self.SetSize((637, 582))
+        
         self.panel_1 = wx.Panel(self, wx.ID_ANY)
         self.text_1 = wx.TextCtrl(self.panel_1, wx.ID_ANY, "",\
                                   style=wx.TE_MULTILINE|wx.TE_READONLY|wx.TE_RICH|wx.TE_WORDWRAP)
@@ -227,6 +236,7 @@ class MyFrame(wx.Frame):
         self.dont_show = False
         
         self.sc = {}
+        self.fsize = {}
         
         self.workText = StringIO()
         self.bytesText = BytesIO()
@@ -285,6 +295,8 @@ class MyFrame(wx.Frame):
         self.text_1.Bind(wx.EVT_TEXT, self.removeFiles, id=-1, id2=wx.ID_ANY)
         self.Bind(wx.EVT_MENU, self.toCyrSRT_utf8, id=82)
         self.Bind(wx.EVT_MENU, self.onFileSettings, id=83)
+        self.Bind(wx.EVT_SIZE, self.size_frame, id=-1)
+        self.Bind(wx.EVT_CLOSE, self.onClose, id=-1)
         
         entries = [wx.AcceleratorEntry() for i in range(2)]
         
@@ -1832,7 +1844,7 @@ class MyFrame(wx.Frame):
                 lat_srt = [os.path.basename(x) for x in lat_files]
                 if len(lat_srt) > 16:
                     l_srt_list = [x for x in lat_srt[:12]]
-                    l_srt_list.append("...\n...\nUkupno [{}]".format(lat_srt))
+                    l_srt_list.append("...\n...\nUkupno [{}]".format(len(lat_srt)))
                 elif len(lat_srt) < 16:
                     l_srt_list = [x for x in lat_srt]                
                 
@@ -3241,6 +3253,10 @@ class MyFrame(wx.Frame):
         event.Skip()    
     
     def onQuit(self, event):
+        
+        with open(filePath("resources","var","set_size.pkl"), "wb") as wf:
+            pickle.dump(self.fsize, wf)
+            
         tval = self.text_1.GetValue()
         prev = ""
         if self.previous_action:
@@ -3253,6 +3269,11 @@ class MyFrame(wx.Frame):
                 self.Destroy()
         else:
             self.Destroy()
+            
+    def onClose(self, event):
+        with open(filePath("resources","var","set_size.pkl"), "wb") as wf:
+            pickle.dump(self.fsize, wf)
+        self.Destroy()
             
     def ShowDialog(self):
     
@@ -3269,6 +3290,15 @@ class MyFrame(wx.Frame):
             if dlg.IsCheckBoxChecked():
                 self.dont_show = True            
             return False
+        
+    def size_frame(self, event):
+        
+        width, height = event.GetSize()
+        
+        self.fsize["W"] = width
+        self.fsize["H"] = height
+        
+        event.Skip()    
         
 # end of class MyFrame
 
