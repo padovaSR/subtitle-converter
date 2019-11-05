@@ -70,6 +70,8 @@ class FixerSettings(wx.Dialog):
                 self.cb4.SetValue(cb4_s); self.cb5.SetValue(cb5_s); self.cb6.SetValue(cb6_s); self.cb7.SetValue(cb7_s)
                 self.cb8.SetValue(cb8_s)
                 
+                if self.cb8.IsChecked() and self.cb1.IsChecked(): self.cb1.SetValue(False)
+                
         self.button_2 = wx.Button(self, wx.ID_ANY, "Cancel")
         self.button_1 = wx.Button(self, wx.ID_OK, "OK")
 
@@ -184,6 +186,7 @@ class FixerSettings(wx.Dialog):
         c1 = self.cb1.GetValue(); c2 = self.cb2.GetValue(); c3 = self.cb3.GetValue()
         c4 = self.cb4.GetValue(); c5 = self.cb5.GetValue(); c6 = self.cb6.GetValue()
         c7 = self.cb7.GetValue(); c8 = self.cb8.GetValue()
+        
         konf = [c1, c2, c3, c4, c5, c6, c7, c8]
         a = konf[0]; b = konf[1]; c = konf[2]; d = konf[3]; e = konf[4]; f = konf[5]; g = konf[6]; h = konf[7]
         with shelve.open(os.path.join('resources', 'var', 'dialog_settings.db'), flag='writeback') as s:
