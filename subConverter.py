@@ -2246,9 +2246,13 @@ class MyFrame(wx.Frame):
         
         text = WORK_TEXT.getvalue()
         
-        subs = list(srt.parse(text))
+        try:
+            subs = list(srt.parse(text))
+        except Exception as e:
+            logger.debug(f"Cleanup error: {e}")
+            subs = []
         
-        if len(subs) > 0:
+        if subs and len(subs) > 0:
             subs = list(srt.parse(WORK_TEXT.getvalue()))
             subs = srt.compose(subs)
             

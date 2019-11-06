@@ -8,12 +8,17 @@ import sys
 import shelve
 import pickle
 import logging
+from settings import filePath 
 
 import wx
 
 
 logger = logging.getLogger(__name__)
-
+logger.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
+handler = logging.FileHandler(filename=filePath("resources", "var", "subtitle_converter.log"), mode="a", encoding="utf-8")
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
 class FileSettings(wx.Dialog):
     def __init__(self, *args, **kwds):
