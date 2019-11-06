@@ -53,7 +53,7 @@ VERSION = "v0.5.7.2"
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
-handler = logging.FileHandler(filename=filePath("resources", "var", "subtitle_converter.log"), mode="w", encoding="utf-8")
+handler = logging.FileHandler(filename=filePath("resources", "var", "subtitle_converter.log"), mode="a", encoding="utf-8")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 

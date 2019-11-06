@@ -25,11 +25,6 @@ import pickle
 import logging
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
-handler = logging.FileHandler(filename=os.path.join("resources", "var", "File_Errors.log"), mode="a", encoding="utf-8")
-handler.setFormatter(formatter)
-logger.addHandler(handler)
 
 def unifiedL(origList, errorList):
     newList = []

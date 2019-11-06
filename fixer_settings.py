@@ -14,11 +14,7 @@ import os
 import logging
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
-handler = logging.FileHandler(filename=os.path.join("resources", "var", "FileProcessing.log"), mode="a", encoding="utf-8")
-handler.setFormatter(formatter)
-logger.addHandler(handler)
+
 
 class FixerSettings(wx.Dialog):
     def __init__(self, *args, **kwds):

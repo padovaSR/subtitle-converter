@@ -44,12 +44,6 @@ from zamenaImena import dictionary_0, dictionary_1, dictionary_2, rplSmap,\
 import wx
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
-handler = logging.FileHandler(filename=filePath("resources", "var", "FileProcessing.log"), mode="w", encoding="utf-8")
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-
 
     
 def bufferCode(intext, outcode):
