@@ -45,8 +45,8 @@ import logging
 import traceback
 
 import wx
-import wx.adv
 import wx.lib.agw.shortcuteditor as SE
+
 
 VERSION = "v0.5.7.2"
 
@@ -550,8 +550,8 @@ class MyFrame(wx.Frame):
         
         comboBox1Choices = [u" auto", u" windows-1250", u" windows-1251", u" windows-1252", u" utf-8", u" utf-16", " utf-16le", u" utf-16be", 
             u" utf-32", u" iso-8859-1", u" iso-8859-2", u" iso-8859-5", u" latin", u" latin2" ]        
-        self.comboBox1 = wx.adv.BitmapComboBox(self.toolBar1, wx.ID_ANY, u"auto",
-                                               wx.DefaultPosition, wx.DefaultSize, comboBox1Choices, wx.CB_READONLY|wx.ALWAYS_SHOW_SB)
+        self.comboBox1 = wx.ComboBox(self.toolBar1, wx.ID_ANY, u"auto",
+                                               wx.DefaultPosition, wx.DefaultSize, comboBox1Choices, wx.CB_DROPDOWN)
         self.comboBox1.SetToolTip("Ulazno kodiranje fajla\nako je poznato\nili nije automatski pronađeno\n")
         self.comboBox1.SetSelection(kdef)
         self.toolBar1.AddControl(self.comboBox1)
