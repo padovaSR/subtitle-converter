@@ -2182,6 +2182,11 @@ class MyFrame(wx.Frame):
                 finds = re.sub(reg_1, '', x[0]).strip()
                 reps = re.sub(reg_1, '', x[-1]).strip()
                 
+                if reps:
+                    x = reps.split("#")
+                    if x[-1]:
+                        reps = x[0].strip()                
+                
                 try:
                 
                     if "ignorecase" in reps:
