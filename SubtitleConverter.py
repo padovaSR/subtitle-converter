@@ -89,6 +89,7 @@ class MyFrame(ConverterFrame):
         self.multiFile = {}
         self.enchistory = {}
         self.droped = {}
+        self.saved_file = {}
         self.newEnc = ""
         self.real_dir = ""
         self.location = "tmp"
@@ -417,16 +418,11 @@ class MyFrame(ConverterFrame):
                 self.multiFile.clear()
                 self.previous_action.clear()
                 self.enchistory.clear()
-                if os.path.isfile(self.droped0_p):
-                    os.remove(self.droped0_p)
             self.filepath = dlgOpen.GetPaths() # Get the file location
             if len(self.filepath) == 1:
                 real_path = self.filepath[-1]
                 self.real_path = [real_path]
-                REAL_PATH = real_path
-                #with open(os.path.join('resources', 'var', 'rpath0.pkl'), 'wb') as f:
-                    #pickle.dump(real_path)                
-                # real_dir = self.real_dir
+                self.real_dir = os.path.dirname(real_path)
             else:
                 for fpath in self.filepath:
                     self.real_path.append(fpath)
@@ -453,7 +449,6 @@ class MyFrame(ConverterFrame):
                 self.text_1.SetValue("")
                 fop = FileProcessed(enc, _path)
                 
-                fop.regularFile(open_next)
                 text = self.textToBuffer(open_next, enc)
                 self.text_1.SetValue(text)
                 logger.debug(f"Open_next: {os.path.basename(open_next)}, encoding: {enc}")
@@ -476,11 +471,6 @@ class MyFrame(ConverterFrame):
                 return        
         path = self.tmpPath[-1]
         enc = self.enchistory[path]
-        
-        #with open(self.path0_p, 'rb') as p:
-            #path = pickle.load(p)
-        #with open(self.enc0_p, 'rb') as p:
-            #enc = pickle.load(p)
         
         fproc = FileProcessed(enc, path)
         
@@ -1401,7 +1391,7 @@ class MyFrame(ConverterFrame):
                                         'SubtitleConverter', wx.OK | wx.ICON_INFORMATION)
                 sDlg.ShowModal()
                 # Dodaje putanju i enkoding u recnik
-                # self.saved_file[path] = self.newEnc                
+                self.saved_file[path] = self.newEnc                
                 self.open_next.Enable(True)
         else:
             dlg.Destroy()
@@ -1822,8 +1812,8 @@ class MyFrame(ConverterFrame):
             
             fproc = FileProcessed(enc, tpath)
             fname, nsuffix = fproc.newName(self.pre_suffix, multi=False)
-            real_dir = os.path.dirname(self.real_path[-1])
-            outpath = fproc.nameDialog(fname, nsuffix, real_dir)  # Puna putanja sa imenom novog fajla
+            
+            outpath = fproc.nameDialog(fname, nsuffix, self.real_dir)  # Puna putanja sa imenom novog fajla
             
             if outpath:
                 text = self.workText.getvalue()
@@ -1836,7 +1826,7 @@ class MyFrame(ConverterFrame):
                                             'SubtitleConverter', wx.OK | wx.ICON_INFORMATION)
                     sDlg.ShowModal()
                     # Dodaje putanju i enkoding u recnik
-                    # self.saved_file[outpath] = self.newEnc
+                    self.saved_file[outpath] = self.newEnc
                     self.MenuBar.Enable(wx.ID_SAVE, False)
                     self.MenuBar.Enable(wx.ID_SAVEAS, False)
                     self.frame_toolbar.EnableTool(1010, False)
@@ -1875,7 +1865,7 @@ class MyFrame(ConverterFrame):
                                         'SubtitleConverter', wx.OK | wx.ICON_INFORMATION)
                 sDlg.ShowModal()
                 # Dodaje putanju i enkoding u recnik
-                # self.saved_file[path] = self.newEnc                
+                self.saved_file[path] = self.newEnc                
                 self.MenuBar.Enable(wx.ID_SAVE, False)
                 self.MenuBar.Enable(wx.ID_SAVEAS, False)
                 self.frame_toolbar.EnableTool(1010, False)
@@ -2077,7 +2067,7 @@ class MyFrame(ConverterFrame):
                                             .format(os.path.basename(path)), 'SubtitleConverter', wx.OK | wx.ICON_INFORMATION)
                     sDlg.ShowModal()
                     # Dodaje putanju i enkoding u recnik
-                    # self.saved_file[path] = self.newEnc                
+                    self.saved_file[path] = self.newEnc                
                     self.open_next.Enable(True)
                     # self.saved += 1
                     # self.resetTool()
@@ -2105,15 +2095,16 @@ class MyFrame(ConverterFrame):
         self.filehistory.AddFileToHistory(path)
         self.enchistory[path] = enc
         fp = FileProcessed(enc, path)
-        fp.regularFile(self.filepath[-1])
+        
         with open(path, 'r', encoding=enc, errors='replace') as f:
             text = f.read()
         self.text_1.SetValue(text)
-        with open(self.path0_p, 'wb') as v:
-            pickle.dump(path, v)        
+        
         self.enableTool()
+        
         logger.debug(f'From fileHistory: {os.path.basename(path)} encoding: {enc}')
         self.SetStatusText(os.path.basename(path))
+        
         event.Skip()
         
     def onCyrToANSI(self, event):
