@@ -183,5 +183,3 @@ shortcutsKey = dict_fromFile(conf_file, delim="=")
 
 if not "CustomRegex" in shortcutsKey.keys():
     shortcutsKey["CustomRegex"] = "Ctrl+Shift+R"
-if not "ShortcutEditor" in shortcutsKey.keys():
-    shortcutsKey["ShortcutEditor"] = "Ctrl+Shift+K"
