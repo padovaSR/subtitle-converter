@@ -34,21 +34,24 @@ from io import StringIO
 from textwrap import TextWrapper
 import pysrt
 import srt
-
-from settings import filePath
+from pydispatch import dispatcher 
 
 from zamenaImena import dictionary_0, dictionary_1, dictionary_2, rplSmap,\
      searchReplc, dict0_n, dict0_n2, dict1_n, dict1_n2, dict2_n, dict2_n2,\
      lat_cir_mapa, pLatin_rpl, pre_cyr
+
+from settings import filePath 
 
 import wx
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
-handler = logging.FileHandler(filename=filePath("resources", "var", "FileProcessing.log"), mode="a", encoding="utf-8")
+handler = logging.FileHandler(filename=os.path.join("resources", "var", "FileProcessing.log"), mode="w", encoding="utf-8")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
+
+
     
 def bufferCode(intext, outcode):
     
@@ -104,12 +107,10 @@ class FileOpened:
             singlefajl = len(zf.namelist())
             if singlefajl == 1:
                 jedanFajl = zf.namelist()[0]
-                outfile = [filePath(basepath, jedanFajl)]
-                with open(filePath('resources', 'var', 'path0.pkl'), 'wb') as f:    # path je u tmp/ folderu
-                    pickle.dump(outfile, f)
+                outfile = [os.path.join(basepath, jedanFajl)]
                 with open(outfile[0], 'wb') as f:
                     f.write(zf.read(jedanFajl))
-                outfile1 = filePath(os.path.dirname(self.putanja), jedanFajl)
+                outfile1 = os.path.join(os.path.dirname(self.putanja), jedanFajl)
                 return outfile, outfile1
             elif singlefajl >= 2:
                 izbor = [x for x in zf.namelist() if not x.endswith('/')]
@@ -118,23 +119,18 @@ class FileOpened:
                     response = dlg.GetSelections()
                     files = [izbor[x] for x in response]
                     names = [os.path.basename(i) for i in files]
-                    outfiles = [filePath(basepath, x) for x in names]
-                    single = filePath(os.path.dirname(self.putanja), os.path.basename(files[-1]))
-                    with open(filePath('resources', 'var', 'path0.pkl'), 'wb') as f:    # path je u tmp/ folderu
-                        pickle.dump(single, f)                    
+                    outfiles = [os.path.join(basepath, x) for x in names]
+                    single = os.path.join(os.path.dirname(self.putanja), os.path.basename(files[-1]))
                     for i, x in zip(files, outfiles):
                         with open(x, 'wb') as f:
                             f.write(zf.read(i))
-                    with open(filePath('resources', 'var', 'path0.pkl'), 'wb') as f:    # path je u tmp/ folderu
-                        pickle.dump(outfiles, f)
                     return outfiles, single
-                
                 else:
                     logger.debug(f'{self.putanja}: Canceled.')
                     
     def findCode(self):
         
-        with open(filePath('resources', 'var', 'obsE.pkl'), 'rb') as f:
+        with open(os.path.join('resources', 'var', 'obsE.pkl'), 'rb') as f:
             kodek = pickle.load(f).strip()
         if kodek != 'auto':
             ukode = kodek
@@ -150,20 +146,19 @@ class FileOpened:
                     fh.readlines()
                     fh.seek(0)
             except:
-                logger.debug(f'FindCode: UnicodeDecodeError {enc},{os.path.basename(self.putanja)}')
+                pass
             else:
-                logger.debug(f'Opening the file with encoding: {enc}')
+                logger.debug(f' {os.path.basename(self.putanja)}, encoding: {enc}')
                 break
-        with open(filePath('resources', 'var', 'enc0.pkl'), 'wb') as f:      
-            pickle.dump(enc, f)
+        
         return enc
         
 
 class FileProcessed:
     
     work_text = StringIO()
-    path0_p = filePath('resources', 'var', 'path0.pkl')
-    enc0_p = filePath('resources', 'var', 'enc0.pkl')
+    path0_p = os.path.join('resources', 'var', 'path0.pkl')
+    enc0_p = os.path.join('resources', 'var', 'enc0.pkl')
     
     def __init__(self, enc, path):
         self.kode = enc
@@ -223,20 +218,6 @@ class FileProcessed:
             lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
             logger.debug(''.join('!' + line for line in lines))
     
-    def regularFile(self, realFile):
-        with shelve.open(filePath('resources', 'var', 'dialog_settings.db'), flag='writeback') as s:
-            s['key3'] = {'tmPath': self.putanja, 'kode': self.kode, 'realPath': realFile}
-        
-        with open(self.path0_p, 'wb') as v:
-            pickle.dump(self.putanja, v)
-        with open(filePath('resources', 'var', 'rpath0.pkl'), 'wb') as f:
-            pickle.dump(realFile, f)
-        with open(filePath('resources', 'var', 'enc0.pkl'), 'wb') as f:      
-            pickle.dump(self.kode, f)        
-        
-        #with open(filePath('resources', 'var', 'obsE.pkl'), 'wb') as f:
-            #pickle.dump(self.kode, f)
-            
     def checkErrors(self, text_in):
         
         fpaterns = '|'.join(['ï»¿Å', 'Ä', 'Å½', 'Ä', 'Ä', 'Å¡', 'Ä', 'Å¾', 'Ä', 'Ä', "ď»ż", "Ĺ˝", 'Ĺ ', 'ĹĄ', 'Ĺž', 'Ä', 'Å ', 'Ä‡',\
@@ -273,8 +254,6 @@ class FileProcessed:
             
     def checkFile(self, file1, file2, text_s, multi):
         file1_name = file1
-        if file1.endswith('.orig'):
-            file1_name = os.path.splitext(file1)[0]
         try:
             n_sign = text_s.count("?")
             if n_sign > 0:
@@ -340,17 +319,17 @@ class FileProcessed:
     def newName(self, pre_suffix, multi):
         
         path = self.putanja
-        presuffix_l = filePath("resources", "var", "presuffix_list.bak")
+        presuffix_l = os.path.join("resources", "var", "presuffix_list.bak")
         
-        with open(filePath("resources", "var", "file_ext.pkl"), "rb") as f:
+        with open(os.path.join("resources", "var", "file_ext.pkl"), "rb") as f:
             ex = pickle.load(f)
             value2_s = ex['cyr_utf8_txt']
             value5_s = ex['lat_utf8_srt']
             
-        with open(filePath("resources", "var", "m_extensions.pkl"), "rb") as f:
+        with open(os.path.join("resources", "var", "m_extensions.pkl"), "rb") as f:
             value_m = pickle.load(f)        #  Merger suffix
         
-        with open(filePath('resources', 'var', 'tcf.pkl'), 'rb') as tf:
+        with open(os.path.join('resources', 'var', 'tcf.pkl'), 'rb') as tf:
             oformat = pickle.load(tf)  # TXT suffix
 
         spattern = re.compile(r"\.srt\.srt", re.I)
@@ -418,10 +397,10 @@ class FileProcessed:
     
     def nameDialog(self, name_entry, sufix_entry, dir_entry):
         
-        with shelve.open(filePath("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
+        with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
             ex = sp['key5']
             
-        presuffix_l = filePath("resources", "var", "presuffix_list.bak")
+        presuffix_l = os.path.join("resources", "var", "presuffix_list.bak")
         real_dir = dir_entry
         name1 = name_entry
         sufix = sufix_entry
@@ -433,8 +412,8 @@ class FileProcessed:
         
         if dlg.ShowModal() == wx.ID_OK:
             name = dlg.GetValue() # Get the file name
-            tmpnameO = filePath(real_dir, name)
-            nameO = '{0}{1}'.format(filePath(real_dir, name), sufix)
+            tmpnameO = os.path.join(real_dir, name)
+            nameO = '{0}{1}'.format(os.path.join(real_dir, name), sufix)
             if nameO.endswith("."):
                 nameO = nameO[:-1]
             if os.path.exists(nameO):
@@ -468,7 +447,7 @@ class FileProcessed:
         if len(nf) > 0:
             logger.debug(f'SpecChars: {" ".join(nf)}\n')
             f_path = re.sub(r"\.TEMP_\w*", "", os.path.basename(self.putanja), re.I)
-            msginfo = wx.MessageDialog(None, f'Specijalni znakovi u tekstu:\n\n{os.path.basename(f_path)}\n\n{", ".join(set(nf))}.',\
+            msginfo = wx.MessageDialog(None, f'Specijalni znakovi:\n\n{os.path.basename(f_path)}\n\n{", ".join(set(nf))}.',\
                                        'SubConverter', wx.OK | wx.ICON_INFORMATION)
             msginfo.ShowModal()
         
@@ -517,17 +496,6 @@ class FileProcessed:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
             logger.debug(''.join('!' + line for line in lines))
-            
-    def unix2DOS(self):
-        try:
-            fileContents = open(self.putanja,"r", encoding=self.kode, errors='replace').read()
-            f = open(self.putanja,"w", encoding=self.kode, errors='replace', newline="\r\n")
-            f.write(fileContents)
-            f.close()
-        except IOError as e:
-            logger.debug(f"Unix2DOS, IOerror: {e}")
-        except Exception as e: 
-            logger.debug(f"Unix2DOS, unexpected error: {e}")    
             
     def writeToFile(self, text):
         
@@ -912,7 +880,7 @@ class TextProcessing(FileProcessed):
         
         # fix settings ------------------------------------------------------------------------------   
         try:
-            with shelve.open(filePath('resources', 'var', 'dialog_settings.db'), flag='writeback') as  sp:
+            with shelve.open(os.path.join('resources', 'var', 'dialog_settings.db'), flag='writeback') as  sp:
                 ex = sp['key1']
                 cb1_s = ex['state1']; cb2_s = ex['state2']; cb3_s = ex['state3']
                 cb4_s = ex['state4']; cb5_s = ex['state5']; cb6_s = ex['state6']; cb7_s = ex['state7']; cb8_s = ex['state8']
