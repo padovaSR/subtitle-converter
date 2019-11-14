@@ -2184,11 +2184,9 @@ class MyFrame(wx.Frame):
                 
                 if reps:
                     x = reps.split("#")
-                    if x[-1]:
-                        reps = x[0].strip()                
-                
+                    if x[-1]: reps = x[0].strip()
+                    if reps == " ": reps = ""
                 try:
-                
                     if "ignorecase" in reps:
                         reps = reps.replace("ignorecase", "").strip()
                         rflags = (re.M | re.I)
