@@ -8,12 +8,11 @@ import os
 import pickle
 import shelve
 import logging
-from settings import filePath 
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
-handler = logging.FileHandler(filename=filePath("resources", "var", "subtitle_converter.log"), mode="a", encoding="utf-8")
+handler = logging.FileHandler(filename=os.path.join("resources", "var", "FileProcessing.log"), mode="a", encoding="utf-8")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
