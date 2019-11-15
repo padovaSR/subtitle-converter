@@ -19,6 +19,8 @@
 import os
 import codecs
 
+from collections import defaultdict 
+
 
 fDict = os.path.join('dictionaries', 'Dictionary-1.txt')
 fDict1 = os.path.join('dictionaries', 'Dictionary-2.txt')
@@ -179,7 +181,10 @@ pre_cyr = dict_fromFile(prelatCyr, delim='=')
 
 conf_file = os.path.join("resources", "shortcut_keys.cfg")
 
-shortcutsKey = dict_fromFile(conf_file, delim="=")
+_shortcutsKey = dict_fromFile(conf_file, delim="=")
+
+shortcutsKey = defaultdict(str)
+shortcutsKey.update(_shortcutsKey)
 
 if not "CustomRegex" in shortcutsKey.keys():
     shortcutsKey["CustomRegex"] = "Ctrl+Shift+R"
