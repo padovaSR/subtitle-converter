@@ -62,7 +62,7 @@ class FileDrop(wx.FileDropTarget):
         
         if len(lfiles) > 1:
             new_d = {}
-            rpath = lfiles[-1]
+            rpath = [lfiles[-1]]
             self.window.SetValue('Files List:\n')
             dispatcher.send("TMP_PATH", message=lfiles, msg=[rpath, enc, True])
             for i in range(len(lfiles)):
@@ -121,7 +121,7 @@ class FileDrop(wx.FileDropTarget):
                 try:
                     fop = FileOpened(name)
                     outfile, rfile = fop.isCompressed()
-                    rpath = rfile
+                    rpath = [rfile]
                 except:
                     logger.debug('No files selected.')
                 
