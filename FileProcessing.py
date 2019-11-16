@@ -157,20 +157,20 @@ class FileOpened:
 class FileProcessed:
     
     work_text = StringIO()
-    path0_p = os.path.join('resources', 'var', 'path0.pkl')
-    enc0_p = os.path.join('resources', 'var', 'enc0.pkl')
     
     def __init__(self, enc, path):
         self.kode = enc
         self.putanja = path
         
-    def nameCheck(self, name_pattern, where, suffix):
+    @staticmethod    
+    def nameCheck(name_pattern, where, suffix):
         pattern = name_pattern + "*" + suffix
         files = os.listdir(where)
         n_names = len(fnmatch.filter(files, pattern))  # + 1
         return n_names
     
-    def bufferText(self, intext, buffer):
+    @staticmethod
+    def bufferText(intext, buffer):
         
         buffer.truncate(0)
         buffer.seek(0)
@@ -218,7 +218,8 @@ class FileProcessed:
             lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
             logger.debug(''.join('!' + line for line in lines))
     
-    def checkErrors(self, text_in):
+    @staticmethod
+    def checkErrors(text_in):
         
         fpaterns = '|'.join(['ï»¿Å', 'Ä', 'Å½', 'Ä', 'Ä', 'Å¡', 'Ä', 'Å¾', 'Ä', 'Ä', "ď»ż", "Ĺ˝", 'Ĺ ', 'ĹĄ', 'Ĺž', 'Ä', 'Å ', 'Ä‡',\
                     'Ä¿', 'Ä²', 'Ä³', 'Å¿', 'Ã¢â', "�", "Д†", "Д‡", "Ť", "Lˇ", "ï»¿", "ð"])
@@ -252,7 +253,8 @@ class FileProcessed:
             logger.debug(''.join('!' + line for line in lines))
             return []
             
-    def checkFile(self, file1, file2, text_s, multi):
+    @staticmethod
+    def checkFile(file1, file2, text_s, multi):
         file1_name = file1
         try:
             n_sign = text_s.count("?")
@@ -273,8 +275,9 @@ class FileProcessed:
             logger.debug(f"FileCheck IOError({e.errno} {e.strerror})")
         except Exception as e: #handle other exceptions such as attribute errors
             logger.debug(f"File_Check, unexpected error: {e}")
-            
-    def checkChars(self, text):
+    
+    @staticmethod        
+    def checkChars(text):
         
         def percentage(part, whole):
             try:
@@ -395,7 +398,8 @@ class FileProcessed:
                
         return name1, sufix    # Vraca samo ime fajla bez putanje
     
-    def nameDialog(self, name_entry, sufix_entry, dir_entry):
+    @staticmethod
+    def nameDialog(name_entry, sufix_entry, dir_entry):
         
         with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
             ex = sp['key5']
@@ -417,7 +421,7 @@ class FileProcessed:
             if nameO.endswith("."):
                 nameO = nameO[:-1]
             if os.path.exists(nameO):
-                nnm = self.nameCheck(name, real_dir, sufix)
+                nnm = FileProcessed.nameCheck(name, real_dir, sufix)
                 nameO = '{0}_{1}{2}'.format(tmpnameO, nnm, sufix)
             dlg.Destroy()
             with open(presuffix_l, 'a', encoding='utf-8') as f:
@@ -584,8 +588,6 @@ class Preslovljavanje(FileProcessed):
         if reversed_action == True:
             cyr_lat_mapa = dict(map(reversed, lat_cir_mapa.items()))
             MAPA = cyr_lat_mapa        
-        
-        # preslovljavanje, prepise se utfFile:
         try:
             text_changed = ""
             
@@ -730,15 +732,12 @@ class TextProcessing(FileProcessed):
                 return out[1]
             except IOError as e:
                 logger.debug("Replace keys, I/O error({0}): {1}".format(e.errno, e.strerror))
-            except Exception as e: #handle other exceptions such as attribute errors
+            except Exception as e:
                 logger.debug(f"Replace keys, unexpected error: {traceback.format_exc}")
                 
-        if not len(dict1_n2) == 0:
-            doRepl(robjL1, dict1_n2)
-        if not len(dict2_n2) == 0:
-            doRepl(robjL2, dict2_n2)
-        if not len(dict0_n2) == 0:
-            doRepl(robjL0, dict0_n2)        
+        if not len(dict1_n2) == 0: doRepl(robjL1, dict1_n2)
+        if not len(dict2_n2) == 0: doRepl(robjL2, dict2_n2)
+        if not len(dict0_n2) == 0: doRepl(robjL0, dict0_n2)        
         
         much = t_out1[1] + t_out2[1] + t_out3[1] + t_out4[1] + t_out5[1] + t_out6[1]        
         logger.debug('Transkripcija u toku.\n--------------------------------------')
@@ -759,7 +758,7 @@ class TextProcessing(FileProcessed):
             logger.debug(f"DoReplace, UnicodeEncodeError: {e}")
         except UnicodeDecodeError as e:
             logger.debug(f"DoReplace, UnicodeDecodeError: {e}")
-        except Exception as e: #handle other exceptions such as attribute errors
+        except Exception as e:
             logger.debug(f"DoReplace, unexpected error: {traceback.format_exc}")
         else:
             self.bufferText(t_out[0], self.work_text)
