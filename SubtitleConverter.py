@@ -85,6 +85,9 @@ class MyFrame(ConverterFrame):
         self.workText = StringIO()
         self.bytesText = BytesIO()        
         
+        self.undo_text = []
+        self.redo_text = []
+        
         self.previous_action= {}
         self.multiFile = {}
         self.enchistory = {}
@@ -100,8 +103,6 @@ class MyFrame(ConverterFrame):
         self.filehistory = wx.FileHistory()
         self.filehistory.UseMenu(self.file_sub)
         self.filehistory.AddFilesToMenu()        
-        
-        self.path0_p = filePath('resources', 'var', 'path0.pkl')
         
         self.menu_items = [self.merger,
                            self.fixer, self.to_cyrillic, self.to_ansi, self.to_utf8,
@@ -158,6 +159,7 @@ class MyFrame(ConverterFrame):
         self.Bind(wx.EVT_TOOL, self.redoAction, id = 102)
         
         # Events other -----------------------------------------------------------------------------#
+        self.text_1.Bind(wx.EVT_KEY_DOWN, self.onKeyDown, id=wx.ID_ANY)
         self.text_1.Bind(wx.EVT_TEXT, self.removeFiles, id=-1, id2=wx.ID_ANY)
         self.Bind(wx.EVT_MENU_RANGE, self.onFileHistory, id=wx.ID_FILE1, id2=wx.ID_FILE9)
         self.comboBox1.Bind(wx.EVT_COMBOBOX, self.onChoice, id=-1, id2=wx.ID_ANY)
@@ -165,6 +167,7 @@ class MyFrame(ConverterFrame):
         self.Bind(wx.EVT_MENU, self.onFileSettings, id=83)
         self.Bind(wx.EVT_MENU, self.ShowDialog, id=84)
         self.Bind(wx.EVT_SIZE, self.size_frame, id=-1)
+        self.Bind(wx.EVT_CLOSE, self.onClose, id=wx.ID_ANY)
         #-------------------------------------------------------------------------------------------#
         entries = [wx.AcceleratorEntry() for i in range(2)]
         entries[0].Set(wx.ACCEL_CTRL|wx.ACCEL_SHIFT, ord('Y'), 82)
@@ -203,6 +206,9 @@ class MyFrame(ConverterFrame):
         self.enchistory[tpath] = enc
         self.real_path = [rlPath]
         
+    def dropedFiles(self, msg):
+        self.droped = msg
+        
     def updateUI(self):
         self.curClr = wx.BLACK
         with shelve.open(filePath('resources', 'var', 'dialog_settings.db'), flag='writeback') as s:
@@ -219,9 +225,6 @@ class MyFrame(ConverterFrame):
         self.curClr = wx.Colour((fC[0], fC[1], fC[2], fC[3]))   
         self.text_1.SetFont(self.curFont)
         self.text_1.SetForegroundColour(self.curClr)    
-        
-    def dropedFiles(self, msg):
-        self.droped = msg
         
     def multipleTools(self):
         self.disableTool()
@@ -277,7 +280,7 @@ class MyFrame(ConverterFrame):
         
     def handleFile(self, filepaths):
         
-        def file_go(self, infile, realF):
+        def file_go(infile, realF):
             fop = FileOpened(infile)
             enc = fop.findCode()
             fproc = FileProcessed(enc, infile)
@@ -285,6 +288,7 @@ class MyFrame(ConverterFrame):
             fproc.bufferText(text, WORK_TEXT)
             nlist = fproc.checkErrors(text)
             self.text_1.SetValue(text)
+            self.undo_text.append(text)
             for i in nlist:
                 a = i[0]
                 b = i[1]                        
@@ -314,7 +318,7 @@ class MyFrame(ConverterFrame):
             tpath = tmp_path[0]
             if not zipfile.is_zipfile(path):
                 shutil.copy(path, tpath)
-                file_go(self, tpath, path)    # U tmp/ folderu
+                file_go(tpath, path)    # U tmp/ folderu
                 self.tmpPath.append(tpath)
                 self.SetStatusText(os.path.basename(path))
             elif zipfile.is_zipfile(path):
@@ -326,7 +330,7 @@ class MyFrame(ConverterFrame):
                     logger.debug(f'{path}: No files selected.')
                 else:
                     if len(outfile) == 1:   # Jedan fajl u ZIP-u
-                        file_go(self, outfile[0], rfile)
+                        file_go(outfile[0], rfile)
                         self.tmpPath.append(outfile[0])
                         self.SetStatusText(os.path.basename(outfile[0]))
                     elif len(outfile) > 1:  # Više fajlova u ZIP-u
@@ -497,10 +501,9 @@ class MyFrame(ConverterFrame):
     def fileErrors(self, path, new_enc, multi):
         
         text = self.workText.getvalue()
-        nlist = w_position(r'\?', text)     # Lociramo novonastale znakove ako ih ima
+        nlist = w_position('\?', text)     # Locira novonastale znakove ako ih ima
         epath = os.path.basename(path)
-        real_dir = os.path.dirname(self.real_path[-1])
-        outf = os.path.join(real_dir, os.path.splitext(epath)[0] + '_error.log')
+        outf = os.path.join(self.real_dir, os.path.splitext(epath)[0]+'_error.log')
         showMeError(path, text, outf, new_enc)
         text = text.replace('¬', '?')
         if multi == False:
@@ -2582,18 +2585,27 @@ class MyFrame(ConverterFrame):
         event.Skip()    
     
     def onQuit(self, event):
+        with open(filePath("resources","var","set_size.pkl"), "wb") as wf:
+            pickle.dump(self.fsize, wf)        
         tval = self.text_1.GetValue()
         prev = ""
         if self.previous_action:
             prev = list(self.previous_action.keys())[0]
-        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled() and not prev == 'toCyrSRTutf8':
-            dl1 = wx.MessageBox("Current content has not been saved! Proceed?", "Please confirm", wx.ICON_QUESTION | wx.YES_NO, self)
+        if not tval.startswith('Files ') and len(tval) > 0\
+           and self.save.IsEnabled() and not prev == 'toCyrSRTutf8':
+            dl1 = wx.MessageBox("Current content has not been saved! Proceed?",
+                                "Please confirm", wx.ICON_QUESTION | wx.YES_NO, self)
             if dl1 == wx.NO:
                 return
             else:
                 self.Destroy()
         else:
             self.Destroy()
+    
+    def onClose(self, event):
+        with open(filePath("resources","var","set_size.pkl"), "wb") as wf:
+            pickle.dump(self.fsize, wf)        
+        self.Destroy()
             
     def ShowDialog(self):
     
@@ -2611,8 +2623,25 @@ class MyFrame(ConverterFrame):
                 self.dont_show = True            
             return False
         
-    def onUndo(self, event):
+    def onKeyDown(self, event):
         
+        keycode = event.GetKeyCode()
+        ip = self.text_1.GetInsertionPoint()
+        self.undo_text.append(self.text_1.GetRange(0, ip))
+        if len(self.undo_text) >= 30: self.undo_text=self.undo_text[1:]
+        self.enableTool()
+        print(self.undo_text)
+        event.Skip()
+        
+    def onUndo(self, event):
+        place=self.text_1.GetInsertionPoint()
+        self.redo_text.append(self.text_1.GetRange(0, place))
+        # self.text_1.SetInsertionPoint(place)
+        if self.undo_text:
+            self.text_1.SetValue(self.undo_text[len(self.undo_text)-1])
+            self.text_1.SetInsertionPoint(place)
+            self.undo_text=self.undo_text[:-1]
+        if len(self.redo_text) >= 30: self.redo_text=self.redo_text[1:]        
         event.Skip()
         
     def onRedo(self, event):
@@ -2683,9 +2712,6 @@ class MyFrame(ConverterFrame):
         
         self.fsize["W"] = width
         self.fsize["H"] = height
-        
-        with open(filePath("resources","var","set_size.pkl"), "wb") as wf:
-            pickle.dump(self.fsize, wf)
         
         event.Skip()
     
