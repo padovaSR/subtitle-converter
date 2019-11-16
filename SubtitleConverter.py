@@ -159,7 +159,7 @@ class MyFrame(ConverterFrame):
         self.Bind(wx.EVT_TOOL, self.redoAction, id = 102)
         
         # Events other -----------------------------------------------------------------------------#
-        self.text_1.Bind(wx.EVT_KEY_DOWN, self.onKeyDown, id=wx.ID_ANY)
+        self.text_1.Bind(wx.EVT_KEY_UP, self.onChanged, id=wx.ID_ANY)
         self.text_1.Bind(wx.EVT_TEXT, self.removeFiles, id=-1, id2=wx.ID_ANY)
         self.Bind(wx.EVT_MENU_RANGE, self.onFileHistory, id=wx.ID_FILE1, id2=wx.ID_FILE9)
         self.comboBox1.Bind(wx.EVT_COMBOBOX, self.onChoice, id=-1, id2=wx.ID_ANY)
@@ -198,7 +198,6 @@ class MyFrame(ConverterFrame):
         
         rlPath = msg[0]
         tpath = message
-        
         if type(tpath) == list: tpath = tpath[-1]
         enc = msg[1]
             
@@ -415,9 +414,11 @@ class MyFrame(ConverterFrame):
                                 wx.ICON_QUESTION | wx.YES_NO, self)
             if dl1 == wx.NO:
                 return
+        
         dlgOpen = wx.FileDialog(self, "Otvori novi fajl",
                                 style=wx.FD_OPEN|wx.FD_MULTIPLE, wildcard=self.wildcard)
         if dlgOpen.ShowModal() == wx.ID_OK:
+            self.tmpPath.clear()
             if len(self.multiFile) >= 1:
                 self.multiFile.clear()
                 self.previous_action.clear()
@@ -586,7 +587,8 @@ class MyFrame(ConverterFrame):
                 if not entered_enc == 'windows-1251':
                     logger.debug(f'toANSI: {os.path.basename(inpath)}, {entered_enc}')
                 
-                text = WORK_TEXT.getvalue()                
+                # text = WORK_TEXT.getvalue()                
+                text = self.text_1.GetValue()
                 
                 text = fproc.rplStr(text)
                 text = text.replace('?', '¬')
@@ -827,12 +829,13 @@ class MyFrame(ConverterFrame):
             if self.ShowDialog() == False:
                 return
         
+        path, entered_enc = self.PathEnc()
+        
         if len(self.multiFile) >= 1:
             self.multipleTools()
             self.toCyrillic_multiple()
+        
         else:        
-            path, entered_enc = self.PathEnc()
-                
             self.previous_action.clear()
                 
             self.newEnc = 'windows-1251'
@@ -840,10 +843,10 @@ class MyFrame(ConverterFrame):
             self.pre_suffix = value1_s
             
             fproc = FileProcessed(entered_enc, path)
-            text = WORK_TEXT.getvalue()            
+            # text = WORK_TEXT.getvalue()
+            text = self.text_1.GetValue()
             
-            if text:
-                text = text.replace('?', '¬')
+            if text: text = text.replace('?', '¬')
             
             utfText, suffix = fproc.newName(value2_s, multi=False)
             
@@ -851,11 +854,10 @@ class MyFrame(ConverterFrame):
                 utf8_enc = 'utf-8-sig'
             else:
                 utf8_enc = 'utf-8'
-            real_dir = os.path.dirname(self.real_path[-1])
-            utf_path = os.path.join(real_dir, utfText+suffix)
+            utf_path = os.path.join(self.real_dir, utfText+suffix)
             
             if os.path.exists(utf_path):
-                nnm = fproc.nameCheck(os.path.basename(utf_path), real_dir, suffix)+1
+                nnm = fproc.nameCheck(os.path.basename(utf_path), self.real_dir, suffix)+1
                 utf_path = '{0}_{1}{2}'.format(utf_path, nnm, suffix)
                 
             self.cyrUTF = utf_path
@@ -1027,10 +1029,10 @@ class MyFrame(ConverterFrame):
             self.pre_suffix = value1_s
             
             fproc = FileProcessed(entered_enc, path)
-            text = WORK_TEXT.getvalue()
+            # text = WORK_TEXT.getvalue()
+            text = self.text_1.GetValue()
             
-            if text:
-                text = text.replace('?', '¬')
+            if text: text = text.replace('?', '¬')
             
             utfText, suffix = fproc.newName(value2_s, multi=False)
             suffix = ".srt"
@@ -1211,7 +1213,8 @@ class MyFrame(ConverterFrame):
                 else:
                     InfoDlg.Destroy()
             
-            text = WORK_TEXT.getvalue()
+            # text = WORK_TEXT.getvalue()
+            text = self.text_1.GetValue()
             
             utfproc = FileProcessed(self.newEnc, path)
             text = bufferCode(text, self.newEnc)   # change to newEnc
@@ -1487,7 +1490,8 @@ class MyFrame(ConverterFrame):
         else:
             self.newEnc = 'utf-8'
         
-        text = WORK_TEXT.getvalue()
+        # text = WORK_TEXT.getvalue()
+        text = self.text_1.GetValue()
         
         utf_proc = FileProcessed(self.newEnc, path)
         text = bufferCode(text, self.newEnc)
@@ -1538,7 +1542,8 @@ class MyFrame(ConverterFrame):
         
         fproc = TextProcessing(entered_enc, path)
         
-        text = WORK_TEXT.getvalue()
+        # text = WORK_TEXT.getvalue()
+        text = self.text_1.GetValue()
         
         text = text.replace('?', '¬')
         
@@ -1588,7 +1593,8 @@ class MyFrame(ConverterFrame):
         
         fproc = TextProcessing(entered_enc, path)
         
-        text = WORK_TEXT.getvalue()
+        # text = WORK_TEXT.getvalue()
+        text = self.text_1.GetValue()
         
         d_file = os.path.join("resources", "Regex_def.config")
         
@@ -1681,7 +1687,8 @@ class MyFrame(ConverterFrame):
         self.enchistory[path] = entered_enc
         self.pre_suffix = value1_s
         
-        text = WORK_TEXT.getvalue()
+        # text = WORK_TEXT.getvalue()
+        text = self.text_1.GetValue()
         
         try:
             subs = list(srt.parse(text))
@@ -1749,13 +1756,14 @@ class MyFrame(ConverterFrame):
                 lineLenght = ex['l_lenght']; maxChar = ex['m_char']; maxGap = ex['m_gap']; file_suffix = ex['f_suffix']
         except IOError as e:
             logger.debug("Merger, I/O error({0}): {1}".format(e.errno, e.strerror))
-        except Exception as e: #handle other exceptions such as attribute errors
+        except Exception as e:
             logger.debug("Merger, unexpected error:", sys.exc_info())        
         
         fproc = FileProcessed(entered_enc, path)
         
         try:
-            text = WORK_TEXT.getvalue()
+            # text = WORK_TEXT.getvalue()
+            text = self.text_1.GetValue()
             subs_a=pysrt.from_string(text)
         
         except IOError as e:
@@ -2129,10 +2137,10 @@ class MyFrame(ConverterFrame):
             self.newEnc = 'windows-1250'
             t_enc = 'utf-8'
             
-            text = WORK_TEXT.getvalue()
+            # text = WORK_TEXT.getvalue()
+            text = self.text_1.GetValue()
             
-            if text:
-                text = text.replace('?', '¬')
+            if text: text = text.replace('?', '¬')
                 
             cyrproc = Preslovljavanje(t_enc, path)
             text = bufferCode(text, t_enc)
@@ -2251,10 +2259,10 @@ class MyFrame(ConverterFrame):
             else:
                 self.newEnc = 'utf-8'
             
-            text = WORK_TEXT.getvalue()
+            # text = WORK_TEXT.getvalue()
+            text = self.text_1.GetValue()
             
-            if text:
-                text = text.replace('?', '¬')
+            if text: text = text.replace('?', '¬')
                     
             cyproc = Preslovljavanje(self.newEnc, path)
             text = bufferCode(text, self.newEnc)
@@ -2377,7 +2385,8 @@ class MyFrame(ConverterFrame):
         self.newEnc = entered_enc   # VAZNO za Save funkciju
         fproc = TextProcessing(entered_enc, path)
         
-        text=WORK_TEXT.getvalue()
+        # text=WORK_TEXT.getvalue()
+        text = self.text_1.GetValue()
         subs=pysrt.from_string(text)
         
         if len(subs) == 0:
@@ -2623,23 +2632,22 @@ class MyFrame(ConverterFrame):
                 self.dont_show = True            
             return False
         
-    def onKeyDown(self, event):
-        
-        keycode = event.GetKeyCode()
-        ip = self.text_1.GetInsertionPoint()
-        self.undo_text.append(self.text_1.GetRange(0, ip))
-        if len(self.undo_text) >= 30: self.undo_text=self.undo_text[1:]
-        self.enableTool()
-        print(self.undo_text)
+    def onChanged(self, event):
+        tv = self.text_1.GetValue()
+        if self.text_1.IsModified and not tv == "":
+            self.undo_text.append(self.text_1.GetValue())
+            if len(self.undo_text) >= 30: self.undo_text=self.undo_text[1:]
+            self.enableTool()
         event.Skip()
         
     def onUndo(self, event):
+        
         place=self.text_1.GetInsertionPoint()
-        self.redo_text.append(self.text_1.GetRange(0, place))
-        # self.text_1.SetInsertionPoint(place)
+        self.redo_text.append(self.text_1.GetValue())
+        
         if self.undo_text:
             self.text_1.SetValue(self.undo_text[len(self.undo_text)-1])
-            self.text_1.SetInsertionPoint(place)
+            self.text_1.SetInsertionPoint(0)
             self.undo_text=self.undo_text[:-1]
         if len(self.redo_text) >= 30: self.redo_text=self.redo_text[1:]        
         event.Skip()
