@@ -38,7 +38,7 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 class FileDrop(wx.FileDropTarget):
-    file_name = r""
+    
     def __init__(self, window):
         wx.FileDropTarget.__init__(self)
         self.window = window
@@ -46,12 +46,10 @@ class FileDrop(wx.FileDropTarget):
     def OnDropFiles(self, x, y, filenames):
         lfiles = [x for x in filenames]
         rpath = ''
-        tpath = ''
         enc = ''
         droped = 0
         
         def file_go(infile, rfile):
-            FileDrop.file_name = infile
             fop = FileOpened(infile)
             enc = fop.findCode()
             fproc = FileProcessed(enc, infile)
