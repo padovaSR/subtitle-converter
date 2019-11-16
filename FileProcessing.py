@@ -415,7 +415,7 @@ class FileProcessed:
         dlg.SetValue(name1)
         
         if dlg.ShowModal() == wx.ID_OK:
-            name = dlg.GetValue() # Get the file name
+            name = dlg.GetValue()
             tmpnameO = os.path.join(real_dir, name)
             nameO = '{0}{1}'.format(os.path.join(real_dir, name), sufix)
             if nameO.endswith("."):
