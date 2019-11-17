@@ -87,6 +87,8 @@ class MyFrame(ConverterFrame):
         
         self.undo_text = []
         self.redo_text = []
+        self.undo_action = []
+        self.redo_action = []
         
         self.previous_action= {}
         self.multiFile = {}
@@ -109,43 +111,43 @@ class MyFrame(ConverterFrame):
                            self.cleaner, self.specials, self.transcrib, self.cyr_to_ansi,
                            self.cyr_to_utf, self.export_zip, self._regex]
         
-        #  MenuBar events --------------------------------------------------------------------------#
-        self.Bind(wx.EVT_MENU, self.onOpen, id=self.fopen.GetId())                                  # 
-        self.Bind(wx.EVT_MENU, self.onOpenNext, id=self.open_next.GetId())                          # 
-        self.Bind(wx.EVT_MENU, self.onReload, id=self.reload.GetId())                               # 
-        self.Bind(wx.EVT_MENU, self.onSave, id=self.save.GetId())                                   # 
-        self.Bind(wx.EVT_MENU, self.onSaveAs, id=self.save_as.GetId())                              # 
-        self.Bind(wx.EVT_MENU, self.exportZIP, id=self.export_zip.GetId())                          # 
-        self.Bind(wx.EVT_MENU, self.onCloseFile, id=self.close.GetId())                             # 
-        self.Bind(wx.EVT_MENU, self.onQuit, id=self.quit_program.GetId())                           # 
-        #############################################################################               #
-        self.Bind(wx.EVT_MENU, self.onUndo, id=self.undo.GetId())                                   # 
-        self.Bind(wx.EVT_MENU, self.onRedo, id=self.redo.GetId())                                   # 
-        self.Bind(wx.EVT_MENU, self.onCut, id=self.cut.GetId())                                     # 
-        self.Bind(wx.EVT_MENU, self.onCopy, id=self.copy.GetId())                                   # 
-        self.Bind(wx.EVT_MENU, self.onPaste, id=self.paste.GetId())                                 # 
-        self.Bind(wx.EVT_MENU, self.onFind, id=self.find.GetId())                                   # 
-        #############################################################################               #
-        self.Bind(wx.EVT_MENU, self.toCyrillic, id=self.to_cyrillic.GetId())                        #
-        self.Bind(wx.EVT_MENU, self.toANSI, id=self.to_ansi.GetId())                                #
-        self.Bind(wx.EVT_MENU, self.toUTF, id=self.to_utf8.GetId())                                 #
-        self.Bind(wx.EVT_MENU, self.onTranscribe, id=self.transcrib.GetId())                        #
-        self.Bind(wx.EVT_MENU, self.onRepSpecial, id=self.specials.GetId())                         #
-        self.Bind(wx.EVT_MENU, self.onCleanup, id=self.cleaner.GetId())                             #
-        self.Bind(wx.EVT_MENU, self.applyRegex, id=self._regex.GetId())                             #
-        self.Bind(wx.EVT_MENU, self.onCyrToANSI, id=self.cyr_to_ansi.GetId())                       #
-        self.Bind(wx.EVT_MENU, self.onCyrToUTF, id=self.cyr_to_utf.GetId())                         #
-        self.Bind(wx.EVT_MENU, self.onFixSubs, id=self.fixer.GetId())                               #
-        self.Bind(wx.EVT_MENU, self.onMergeLines, id=self.merger.GetId())                           #
-        #############################################################################               #
-        self.Bind(wx.EVT_MENU, self.onSelectFont, id=self.fonts.GetId())                            #
-        self.Bind(wx.EVT_MENU, self.onFixerSettings, id=self.fixer_settings.GetId())                #
-        self.Bind(wx.EVT_MENU, self.editShortcuts, id=self.shortcuts.GetId())                       #
-        self.Bind(wx.EVT_MENU, self.onMergerSettings, id=self.merger_pref.GetId())                  #
-        self.Bind(wx.EVT_MENU, self.onAbout, id = self.about.GetId())                               #
-        self.Bind(wx.EVT_MENU, self.onManual, id=self.manual.GetId())                               #
-        #                                                                                           #
-        # Toolbar events ---------------------------------------------------------------------------#
+        #  MenuBar events ###########################################################################
+        self.Bind(wx.EVT_MENU, self.onOpen, id=self.fopen.GetId())                                   
+        self.Bind(wx.EVT_MENU, self.onOpenNext, id=self.open_next.GetId())                           
+        self.Bind(wx.EVT_MENU, self.onReload, id=self.reload.GetId())                                
+        self.Bind(wx.EVT_MENU, self.onSave, id=self.save.GetId())                                    
+        self.Bind(wx.EVT_MENU, self.onSaveAs, id=self.save_as.GetId())                               
+        self.Bind(wx.EVT_MENU, self.exportZIP, id=self.export_zip.GetId())                           
+        self.Bind(wx.EVT_MENU, self.onCloseFile, id=self.close.GetId())                              
+        self.Bind(wx.EVT_MENU, self.onQuit, id=self.quit_program.GetId())                            
+        #############################################################################################
+        self.Bind(wx.EVT_MENU, self.onUndo, id=self.undo.GetId())                                    
+        self.Bind(wx.EVT_MENU, self.onRedo, id=self.redo.GetId())                                    
+        self.Bind(wx.EVT_MENU, self.onCut, id=self.cut.GetId())                                      
+        self.Bind(wx.EVT_MENU, self.onCopy, id=self.copy.GetId())                                    
+        self.Bind(wx.EVT_MENU, self.onPaste, id=self.paste.GetId())                                  
+        self.Bind(wx.EVT_MENU, self.onFind, id=self.find.GetId())                                    
+        #############################################################################################
+        self.Bind(wx.EVT_MENU, self.toCyrillic, id=self.to_cyrillic.GetId())                        
+        self.Bind(wx.EVT_MENU, self.toANSI, id=self.to_ansi.GetId())                                
+        self.Bind(wx.EVT_MENU, self.toUTF, id=self.to_utf8.GetId())                                 
+        self.Bind(wx.EVT_MENU, self.onTranscribe, id=self.transcrib.GetId())                        
+        self.Bind(wx.EVT_MENU, self.onRepSpecial, id=self.specials.GetId())                         
+        self.Bind(wx.EVT_MENU, self.onCleanup, id=self.cleaner.GetId())                             
+        self.Bind(wx.EVT_MENU, self.applyRegex, id=self._regex.GetId())                             
+        self.Bind(wx.EVT_MENU, self.onCyrToANSI, id=self.cyr_to_ansi.GetId())                       
+        self.Bind(wx.EVT_MENU, self.onCyrToUTF, id=self.cyr_to_utf.GetId())                         
+        self.Bind(wx.EVT_MENU, self.onFixSubs, id=self.fixer.GetId())                               
+        self.Bind(wx.EVT_MENU, self.onMergeLines, id=self.merger.GetId())                           
+        #############################################################################################
+        self.Bind(wx.EVT_MENU, self.onSelectFont, id=self.fonts.GetId())                            
+        self.Bind(wx.EVT_MENU, self.onFixerSettings, id=self.fixer_settings.GetId())                
+        self.Bind(wx.EVT_MENU, self.editShortcuts, id=self.shortcuts.GetId())                       
+        self.Bind(wx.EVT_MENU, self.onMergerSettings, id=self.merger_pref.GetId())                  
+        self.Bind(wx.EVT_MENU, self.onAbout, id = self.about.GetId())                               
+        self.Bind(wx.EVT_MENU, self.onManual, id=self.manual.GetId())                               
+        #                                                                                           
+        # Toolbar events ############################################################################
         self.Bind(wx.EVT_TOOL, self.onOpen, id = 1001)
         self.Bind(wx.EVT_TOOL, self.onSave, id = 1010)
         self.Bind(wx.EVT_TOOL, self.toCyrillic, id = 1002)
@@ -158,7 +160,7 @@ class MyFrame(ConverterFrame):
         self.Bind(wx.EVT_TOOL, self.undoAction, id = 101)
         self.Bind(wx.EVT_TOOL, self.redoAction, id = 102)
         
-        # Events other -----------------------------------------------------------------------------#
+        # Events other ##############################################################################
         self.text_1.Bind(wx.EVT_KEY_UP, self.onChanged, id=wx.ID_ANY)
         self.text_1.Bind(wx.EVT_TEXT, self.removeFiles, id=-1, id2=wx.ID_ANY)
         self.Bind(wx.EVT_MENU_RANGE, self.onFileHistory, id=wx.ID_FILE1, id2=wx.ID_FILE9)
@@ -168,14 +170,14 @@ class MyFrame(ConverterFrame):
         self.Bind(wx.EVT_MENU, self.ShowDialog, id=84)
         self.Bind(wx.EVT_SIZE, self.size_frame, id=-1)
         self.Bind(wx.EVT_CLOSE, self.onClose, id=wx.ID_ANY)
-        #-------------------------------------------------------------------------------------------#
+        #############################################################################################
         entries = [wx.AcceleratorEntry() for i in range(2)]
         entries[0].Set(wx.ACCEL_CTRL|wx.ACCEL_SHIFT, ord('Y'), 82)
         entries[1].Set(wx.ACCEL_CTRL|wx.ACCEL_SHIFT, ord('F'), 83)
         
         accel_tbl = wx.AcceleratorTable(entries)
         self.SetAcceleratorTable(accel_tbl)
-        #-------------------------------------------------------------------------------------------#
+        #############################################################################################
     
         dispatcher.connect(self.updateStatus, "TMP_PATH", sender=dispatcher.Any)
         dispatcher.connect(self.enKode, "TMP_PATH", sender=dispatcher.Any)
@@ -2637,7 +2639,7 @@ class MyFrame(ConverterFrame):
         if self.text_1.CanUndo():
             
             self.undo_text.append(self.text_1.GetValue())
-            if len(self.undo_text) >= 30: self.undo_text=self.undo_text[1:]
+            if len(self.undo_text) >= 40: self.undo_text=self.undo_text[1:]
             self.enableTool()
             
         event.Skip()
@@ -2646,7 +2648,7 @@ class MyFrame(ConverterFrame):
         
         place = self.text_1.GetLastPosition()
        
-        if (place - self.text_1.GetInsertionPoint()) > 12:
+        if (place - self.text_1.GetInsertionPoint()) > 24:
             place=self.text_1.GetInsertionPoint()-1
         
         self.redo_text.append(self.text_1.GetValue())
@@ -2656,7 +2658,7 @@ class MyFrame(ConverterFrame):
             self.text_1.SetValue(self.undo_text[len(self.undo_text)-1])
             self.text_1.SetInsertionPoint(place)
             self.undo_text=self.undo_text[:-1]
-        if len(self.redo_text) >= 60: self.redo_text=self.redo_text[1:]        
+        if len(self.redo_text) >= 40: self.redo_text=self.redo_text[1:]        
         
         event.Skip()
         
