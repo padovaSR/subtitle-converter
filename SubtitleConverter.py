@@ -2633,23 +2633,30 @@ class MyFrame(ConverterFrame):
             return False
         
     def onChanged(self, event):
-        tv = self.text_1.GetValue()
-        if self.text_1.IsModified and not tv == "":
+        
+        if self.text_1.CanUndo():
+            
             self.undo_text.append(self.text_1.GetValue())
             if len(self.undo_text) >= 30: self.undo_text=self.undo_text[1:]
             self.enableTool()
+            
         event.Skip()
         
     def onUndo(self, event):
         
-        place=self.text_1.GetInsertionPoint()
+        place = self.text_1.GetLastPosition()
+       
+        if (place - self.text_1.GetInsertionPoint()) > 12:
+            place=self.text_1.GetInsertionPoint()-1
+        
         self.redo_text.append(self.text_1.GetValue())
         
         if self.undo_text:
+            self.text_1.Undo()
             self.text_1.SetValue(self.undo_text[len(self.undo_text)-1])
-            self.text_1.SetInsertionPoint(0)
+            self.text_1.SetInsertionPoint(place)
             self.undo_text=self.undo_text[:-1]
-        if len(self.redo_text) >= 30: self.redo_text=self.redo_text[1:]        
+        if len(self.redo_text) >= 60: self.redo_text=self.redo_text[1:]        
         event.Skip()
         
     def onRedo(self, event):
