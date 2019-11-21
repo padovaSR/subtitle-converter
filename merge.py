@@ -22,7 +22,7 @@ import pysrt
 from itertools import zip_longest 
 import logging
 
-from settings import WORK_SUBS, WORK_TEXT
+from settings import WORK_TEXT
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
