@@ -12,8 +12,8 @@ from zamenaImena import shortcutsKey
 
 import wx
 
-
 logger = logging.getLogger(__name__)
+
 
 class ConverterFrame(wx.Frame):
     def __init__(self, *args, **kwds):
@@ -278,12 +278,6 @@ class ConverterFrame(wx.Frame):
                                    wx.NullBitmap, wx.ITEM_NORMAL, "Save file", "Save file")
 
         self.frame_toolbar.AddSeparator()
-        
-        self.frame_toolbar.AddTool(101, "Undo_action", wx.ArtProvider.GetBitmap(wx.ART_UNDO, wx.ART_TOOLBAR, wx.DefaultSize),
-                                   wx.NullBitmap, wx.ITEM_NORMAL, "Undo action", "Undo action")
-        self.frame_toolbar.AddTool(102, "Redo_action", wx.ArtProvider.GetBitmap(wx.ART_REDO, wx.ART_TOOLBAR, wx.DefaultSize),
-                                   wx.NullBitmap, wx.ITEM_NORMAL, "Redo action", "Redo Action")
-        self.frame_toolbar.AddSeparator()
 
         self.frame_toolbar.AddTool(1002, "Cirilica", wx.Bitmap(filePath("resources","icons","cyrillic.png"), wx.BITMAP_TYPE_ANY),
                                    wx.NullBitmap, wx.ITEM_NORMAL, "U cirilicu", "U cirilicu")
@@ -316,8 +310,8 @@ class ConverterFrame(wx.Frame):
         # Tool Bar end
         self.panel_1 = wx.Panel(self, wx.ID_ANY)
         self.text_1 = wx.TextCtrl(self.panel_1, wx.ID_ANY,
-                                  "", style=wx.TE_MULTILINE | wx.TE_PROCESS_ENTER | wx.TE_PROCESS_TAB | wx.TE_RICH | wx.TE_WORDWRAP)
-
+                                  "", style=wx.TE_MULTILINE | wx.TE_PROCESS_ENTER | wx.TE_PROCESS_TAB | wx.TE_RICH2 | wx.TE_WORDWRAP)
+        
         self.__set_properties()
         self.__do_layout()
 
