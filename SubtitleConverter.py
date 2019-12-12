@@ -37,7 +37,7 @@ import wx.lib.agw.shortcuteditor as SE
 from subtitle_converter_gui import ConverterFrame 
 
 
-VERSION = "v0.5.8"
+VERSION = "v0.5.8_test"
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -157,9 +157,7 @@ class MyFrame(ConverterFrame):
         self.Bind(wx.EVT_TOOL, self.onRepSpecial, id = 1006)
         self.Bind(wx.EVT_TOOL, self.onCleanup, id = 1007)
         self.Bind(wx.EVT_TOOL, self.onQuit, id = 1008)
-        self.Bind(wx.EVT_TOOL, self.undoAction, id = 101)
-        self.Bind(wx.EVT_TOOL, self.redoAction, id = 102)
-        
+        #
         # Events other ##############################################################################
         self.text_1.Bind(wx.EVT_KEY_UP, self.onChanged, id=wx.ID_ANY)
         self.text_1.Bind(wx.EVT_TEXT, self.removeFiles, id=-1, id2=wx.ID_ANY)
@@ -2635,21 +2633,24 @@ class MyFrame(ConverterFrame):
             return False
         
     def onChanged(self, event):
-        
+                
         if self.text_1.CanUndo():
-            
             self.undo_text.append(self.text_1.GetValue())
             if len(self.undo_text) >= 40: self.undo_text=self.undo_text[1:]
             self.enableTool()
+            
+        else:
+            self.disableTool()
             
         event.Skip()
         
     def onUndo(self, event):
         
-        place = self.text_1.GetLastPosition()
+        # place = self.text_1.GetLastPosition()
+        place = self.text_1.GetInsertionPoint()
        
-        if (place - self.text_1.GetInsertionPoint()) > 24:
-            place=self.text_1.GetInsertionPoint()-1
+        #if (place - self.text_1.GetInsertionPoint()) > 24:
+            #place=self.text_1.GetInsertionPoint()-1
         
         self.redo_text.append(self.text_1.GetValue())
         
@@ -2692,7 +2693,6 @@ class MyFrame(ConverterFrame):
         
         event.Skip()
         
-    
     def editShortcuts(self, event):
         
         dlg = SE.ShortcutEditor(self)
