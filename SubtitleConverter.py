@@ -2734,10 +2734,52 @@ class MyFrame(ConverterFrame):
         event.Skip()
     
 class MyApp(wx.App):
+    
+    def remOnstart(self):
+        
+        f_list = ["r_text0.pkl", "droped0.pkl", "'LatCyr.map.cfg", "path0.pkl", "rpath0.pkl"]
+        for x in f_list:
+            file_path = filePath("resources", "var", x)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+                
+        if not os.path.isdir('tmp'):
+            os.mkdir('tmp')
+        
+        b_file = filePath("resources", "var", "presuffix_list.bak")
+        if os.path.exists(b_file):
+            with open(b_file, "r", encoding="utf-8") as f:
+                lines = f.readlines()
+            line_set = set(lines)
+            out = open(b_file, "w", encoding="utf-8")
+            for line in line_set:
+                out.write(line)
+            out.close()
+            
+    def m_files(self):
+        
+        missing_f = []
+        files_list = ["m_extensions.pkl", "file_ext.pkl"]
+        cfg1 = filePath("resources", "shortcut_keys.cfg")
+        d_file = filePath("resources", "Regex_def.config")
+        for i in files_list:
+            file_path = filePath("resources", "var", i)
+            if not os.path.isfile(file_path):
+                missing_f.append(file_path)
+        if not os.path.isfile(cfg1): missing_f.append(cfg1)
+        if not os.path.isfile(d_file): missing_f.append(d_file)
+                
+        if missing_f:
+            error_text = "File Not Found\n\n{}\nPlease check files missing!".format("".join([x+'\n' for x in missing_f]))
+            ErrorDlg = wx.MessageDialog(None, error_text, "SubConverter", wx.OK | wx.ICON_ERROR)
+            ErrorDlg.ShowModal()    
+    
     def OnInit(self):
         self.frame = MyFrame(None, wx.ID_ANY, "")
         self.SetTopWindow(self.frame)
         self.frame.Show()
+        self.remOnstart()
+        self.m_files()
         return True
 
 
