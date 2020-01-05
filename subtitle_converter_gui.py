@@ -342,7 +342,6 @@ class ConverterFrame(wx.Frame):
         self.frame_toolbar.Realize()
         self.text_1.SetFont(wx.Font(9, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, 0, "Segoe UI"))
         self.text_1.SetToolTip("ToolTip")
-        self.text_1.ShowNativeCaret(show=True)
         self.text_1.SetFocus()
         # end wxGlade
 
