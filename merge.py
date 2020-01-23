@@ -19,7 +19,7 @@
 import re
 import os
 import pysrt
-from itertools import zip_longest 
+from itertools import zip_longest
 import logging
 
 from settings import WORK_TEXT
@@ -27,16 +27,26 @@ from settings import WORK_TEXT
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
-handler = logging.FileHandler(filename=os.path.join("resources", "var", "FileProcessing.log"), mode="a", encoding="utf-8")
+handler = logging.FileHandler(
+    filename=os.path.join("resources", "var", "FileProcessing.log"),
+    mode="a",
+    encoding="utf-8",
+)
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
+
 def myMerger(subs_in, max_time, max_char, _gap, kode):
-    
+
     subs = subs_in
-    
+
     if not len(subs) % 2 == 0:
-        dsub = pysrt.SubRipItem(subs[-1].index+1, subs[-1].start+6000, subs[-1].end+11000, 'Darkstar test appliance')
+        dsub = pysrt.SubRipItem(
+            subs[-1].index + 1,
+            subs[-1].start + 6000,
+            subs[-1].end + 11000,
+            'Darkstar test appliance',
+        )
         subs.append(dsub)
     else:
         dsub = None
@@ -49,22 +59,37 @@ def myMerger(subs_in, max_time, max_char, _gap, kode):
         new_j = pysrt.SubRipFile()
         for first, second, in zip_longest(inNepar, inPar, fillvalue=subs[-1]):
             gap = second.start.ordinal - first.end.ordinal
-            trajanje = second.end.ordinal - first.start.ordinal     # ordinal je vreme u milisekundama
-            tekst1 = re.sub(re_pattern, '', first.text) # convert to string
-            tekst2 = re.sub(re_pattern, '',  second.text)
+            trajanje = (
+                second.end.ordinal - first.start.ordinal
+            )  # ordinal je vreme u milisekundama
+            tekst1 = re.sub(re_pattern, '', first.text)  # convert to string
+            tekst2 = re.sub(re_pattern, '', second.text)
             text_len = len(tekst1) + len(tekst2)
             if gap <= _gap and trajanje <= max_time and text_len <= max_char:
                 # dodaj spojene linije kao string
-                if first.text == second.text and first.start == second.start and first.end == second.end:
-                    sub = pysrt.SubRipItem(first.index, first.start, second.end, first.text)
+                if (
+                    first.text == second.text
+                    and first.start == second.start
+                    and first.end == second.end
+                ):
+                    sub = pysrt.SubRipItem(
+                        first.index, first.start, second.end, first.text
+                    )
                     new_j.append(sub)
                 else:
-                    sub = pysrt.SubRipItem(first.index, first.start, second.end, first.text + " " + second.text)
+                    sub = pysrt.SubRipItem(
+                        first.index,
+                        first.start,
+                        second.end,
+                        first.text + " " + second.text,
+                    )
                     new_j.append(sub)
             else:
                 # dodaj originalne linije kao string
                 sub1 = pysrt.SubRipItem(first.index, first.start, first.end, first.text)
-                sub2 = pysrt.SubRipItem(second.index, second.start, second.end, second.text)
+                sub2 = pysrt.SubRipItem(
+                    second.index, second.start, second.end, second.text
+                )
                 new_j.append(sub1)
                 new_j.append(sub2)
 
@@ -73,7 +98,7 @@ def myMerger(subs_in, max_time, max_char, _gap, kode):
         new_j.clean_indexes()
 
         parni = [x for x in new_j[1::2]]
-        neparni = [x for x in new_j[0::2]]        
+        neparni = [x for x in new_j[0::2]]
 
         return new_j, parni, neparni
 
@@ -86,9 +111,10 @@ def myMerger(subs_in, max_time, max_char, _gap, kode):
     WORK_TEXT.seek(0)
     pysrt.SubRipFile(out_f).write_into(WORK_TEXT)
     WORK_TEXT.seek(0)
-    
+
+
 def fixGaps(subs):
-    
+
     new_j = pysrt.SubRipFile()
     k = 0
     pfp = 0
@@ -102,7 +128,7 @@ def fixGaps(subs):
 
         if t1 > t2 or t2 - t1 < 85:
             k += 1
-            #first.shift(milliseconds=-25)
+            # first.shift(milliseconds=-25)
             t_fix = pysrt.SubRipTime.from_ordinal((second.start.ordinal) - 70)
             sub = pysrt.SubRipItem(first.index, first.start, t_fix, first.text)
             new_j.append(sub)
@@ -129,14 +155,15 @@ def fixGaps(subs):
         else:
             subf = pysrt.SubRipItem(second.index, second.start, second.end, second.text)
             new_f.append(subf)
-    
+
     new_f.clean_indexes()
     WORK_TEXT.truncate(0)
     WORK_TEXT.seek(0)
     pysrt.SubRipFile(new_f).write_into(WORK_TEXT)
     WORK_TEXT.seek(0)
-    
+
     return k, pfp
+
 
 def fixLast(infile, kode):
     subs = pysrt.open(infile, encoding=kode)
@@ -154,4 +181,4 @@ def fixLast(infile, kode):
     elif s1 == s2:
         subs.remove(subs[-1])
         subs.clean_indexes()
-        subs.save(infile, encoding=kode)        
+        subs.save(infile, encoding=kode)
