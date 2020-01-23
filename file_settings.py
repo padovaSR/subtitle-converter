@@ -16,52 +16,84 @@ import wx
 # begin wxGlade: extracode
 # end wxGlade
 
+
 class FileSettings(wx.Dialog):
     def __init__(self, *args, **kwds):
         # begin wxGlade: FileSettings.__init__
         kwds["style"] = kwds.get("style", 0) | wx.DEFAULT_DIALOG_STYLE
         wx.Dialog.__init__(self, *args, **kwds)
         self.SetSize((319, 316))
-        
-        self.label_1 = wx.StaticText(self, wx.ID_ANY, u"Ćirilica ansi srt", style=wx.ALIGN_LEFT)
-        self.label_6 = wx.StaticText(self, wx.ID_ANY, u"Ćirilica utf-8 txt", style=wx.ALIGN_LEFT)
-        self.label_5 = wx.StaticText(self, wx.ID_ANY, u"Ćirilica utf-8 srt", style=wx.ALIGN_LEFT)
-        self.label_4 = wx.StaticText(self, wx.ID_ANY, "Latinica ansi srt", style=wx.ALIGN_LEFT)
-        self.label_3 = wx.StaticText(self, wx.ID_ANY, "Latinica utf-8 srt", style=wx.ALIGN_LEFT)
-        self.label_2 = wx.StaticText(self, wx.ID_ANY, "Fixed subtitle", style=wx.ALIGN_LEFT)
-        self.label_7 = wx.StaticText(self, wx.ID_ANY, "Transcribe srt", style=wx.ALIGN_LEFT)
-        self.label_8 = wx.StaticText(self, wx.ID_ANY, "Cleanup srt", style=wx.ALIGN_LEFT)
-        
+
+        self.label_1 = wx.StaticText(
+            self, wx.ID_ANY, u"Ćirilica ansi srt", style=wx.ALIGN_LEFT
+        )
+        self.label_6 = wx.StaticText(
+            self, wx.ID_ANY, u"Ćirilica utf-8 txt", style=wx.ALIGN_LEFT
+        )
+        self.label_5 = wx.StaticText(
+            self, wx.ID_ANY, u"Ćirilica utf-8 srt", style=wx.ALIGN_LEFT
+        )
+        self.label_4 = wx.StaticText(
+            self, wx.ID_ANY, "Latinica ansi srt", style=wx.ALIGN_LEFT
+        )
+        self.label_3 = wx.StaticText(
+            self, wx.ID_ANY, "Latinica utf-8 srt", style=wx.ALIGN_LEFT
+        )
+        self.label_2 = wx.StaticText(
+            self, wx.ID_ANY, "Fixed subtitle", style=wx.ALIGN_LEFT
+        )
+        self.label_7 = wx.StaticText(
+            self, wx.ID_ANY, "Transcribe srt", style=wx.ALIGN_LEFT
+        )
+        self.label_8 = wx.StaticText(
+            self, wx.ID_ANY, "Cleanup srt", style=wx.ALIGN_LEFT
+        )
+
         self.static_line_1 = wx.StaticLine(self, wx.ID_ANY)
-        
+
         self.text_1 = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_PROCESS_ENTER)
-        self.text_2 = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_PROCESS_ENTER)        
+        self.text_2 = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_PROCESS_ENTER)
         self.text_3 = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_PROCESS_ENTER)
         self.text_4 = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_PROCESS_ENTER)
         self.text_5 = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_PROCESS_ENTER)
         self.text_6 = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_PROCESS_ENTER)
         self.text_7 = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_PROCESS_ENTER)
-        self.text_8 = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_PROCESS_ENTER)        
-        
+        self.text_8 = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_PROCESS_ENTER)
+
         self.button_3 = wx.Button(self, wx.ID_CANCEL, "")
         self.button_4 = wx.Button(self, wx.ID_SAVE, "")
-        
-        t1 = os.path.join("resources","var","dialog_settings.db.dat")
+
+        t1 = os.path.join("resources", "var", "dialog_settings.db.dat")
         if os.path.exists(t1):
             try:
-                with shelve.open(os.path.join("resources", "var", "dialog_settings.db"), flag='writeback') as  sp:
+                with shelve.open(
+                    os.path.join("resources", "var", "dialog_settings.db"),
+                    flag='writeback',
+                ) as sp:
                     ex = sp['key5']
-                    value1_s = ex['cyr_ansi_srt']; value2_s = ex['cyr_utf8_txt']; value3_s = ex['cyr_utf8_srt']; value4_s = ex['lat_ansi_srt']
-                    value5_s = ex['lat_utf8_srt']; value6_s = ex['fixed_subs']; value7_s = ex['transcribe']; value8_s = ex['cleanup']
-                    
-                    self.text_1.SetValue(value1_s); self.text_2.SetValue(value2_s); self.text_3.SetValue(value3_s); self.text_4.SetValue(value4_s)
-                    self.text_5.SetValue(value5_s); self.text_6.SetValue(value6_s); self.text_7.SetValue(value7_s); self.text_8.SetValue(value8_s)
-                    
+                    value1_s = ex['cyr_ansi_srt']
+                    value2_s = ex['cyr_utf8_txt']
+                    value3_s = ex['cyr_utf8_srt']
+                    value4_s = ex['lat_ansi_srt']
+                    value5_s = ex['lat_utf8_srt']
+                    value6_s = ex['fixed_subs']
+                    value7_s = ex['transcribe']
+                    value8_s = ex['cleanup']
+
+                    self.text_1.SetValue(value1_s)
+                    self.text_2.SetValue(value2_s)
+                    self.text_3.SetValue(value3_s)
+                    self.text_4.SetValue(value4_s)
+                    self.text_5.SetValue(value5_s)
+                    self.text_6.SetValue(value6_s)
+                    self.text_7.SetValue(value7_s)
+                    self.text_8.SetValue(value8_s)
+
             except IOError as e:
                 print("FileSettings, I/O error({0}): {1}".format(e.errno, e.strerror))
             except Exception:
                 print("FileSetting, unexpected error:", sys.exc_info()[0])
-            
+
         self.__set_properties()
         self.__do_layout()
 
@@ -74,33 +106,109 @@ class FileSettings(wx.Dialog):
         # begin wxGlade: FileSettings.__set_properties
         self.SetTitle("File settings")
         _icon = wx.NullIcon
-        _icon.CopyFromBitmap(wx.Bitmap(os.path.join("resources","icons","tool.ico"), wx.BITMAP_TYPE_ANY))
+        _icon.CopyFromBitmap(
+            wx.Bitmap(
+                os.path.join("resources", "icons", "tool.ico"), wx.BITMAP_TYPE_ANY
+            )
+        )
         self.SetIcon(_icon)
         self.SetSize((319, 316))
         self.SetFocus()
-        
+
         self.label_1.SetMinSize((113, 14))
-        self.label_1.SetFont(wx.Font(9, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, 0, "Segoe UI"))
+        self.label_1.SetFont(
+            wx.Font(
+                9,
+                wx.FONTFAMILY_DEFAULT,
+                wx.FONTSTYLE_NORMAL,
+                wx.FONTWEIGHT_NORMAL,
+                0,
+                "Segoe UI",
+            )
+        )
         self.label_6.SetMinSize((113, 14))
-        self.label_6.SetFont(wx.Font(9, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, 0, "Segoe UI"))
+        self.label_6.SetFont(
+            wx.Font(
+                9,
+                wx.FONTFAMILY_DEFAULT,
+                wx.FONTSTYLE_NORMAL,
+                wx.FONTWEIGHT_NORMAL,
+                0,
+                "Segoe UI",
+            )
+        )
         self.text_1.SetMinSize((136, 23))
         self.text_2.SetMinSize((136, 23))
         self.label_5.SetMinSize((113, 14))
-        self.label_5.SetFont(wx.Font(9, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, 0, "Segoe UI"))
+        self.label_5.SetFont(
+            wx.Font(
+                9,
+                wx.FONTFAMILY_DEFAULT,
+                wx.FONTSTYLE_NORMAL,
+                wx.FONTWEIGHT_NORMAL,
+                0,
+                "Segoe UI",
+            )
+        )
         self.label_4.SetMinSize((113, 14))
-        self.label_4.SetFont(wx.Font(9, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, 0, "Segoe UI"))
+        self.label_4.SetFont(
+            wx.Font(
+                9,
+                wx.FONTFAMILY_DEFAULT,
+                wx.FONTSTYLE_NORMAL,
+                wx.FONTWEIGHT_NORMAL,
+                0,
+                "Segoe UI",
+            )
+        )
         self.text_3.SetMinSize((136, 23))
         self.text_4.SetMinSize((136, 23))
         self.label_3.SetMinSize((113, 14))
-        self.label_3.SetFont(wx.Font(9, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, 0, "Segoe UI"))
+        self.label_3.SetFont(
+            wx.Font(
+                9,
+                wx.FONTFAMILY_DEFAULT,
+                wx.FONTSTYLE_NORMAL,
+                wx.FONTWEIGHT_NORMAL,
+                0,
+                "Segoe UI",
+            )
+        )
         self.label_2.SetMinSize((113, 14))
-        self.label_2.SetFont(wx.Font(9, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, 0, "Segoe UI"))
+        self.label_2.SetFont(
+            wx.Font(
+                9,
+                wx.FONTFAMILY_DEFAULT,
+                wx.FONTSTYLE_NORMAL,
+                wx.FONTWEIGHT_NORMAL,
+                0,
+                "Segoe UI",
+            )
+        )
         self.text_5.SetMinSize((136, 23))
         self.text_6.SetMinSize((136, 23))
         self.label_7.SetMinSize((113, 14))
-        self.label_7.SetFont(wx.Font(9, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, 0, "Segoe UI"))
+        self.label_7.SetFont(
+            wx.Font(
+                9,
+                wx.FONTFAMILY_DEFAULT,
+                wx.FONTSTYLE_NORMAL,
+                wx.FONTWEIGHT_NORMAL,
+                0,
+                "Segoe UI",
+            )
+        )
         self.label_8.SetMinSize((113, 14))
-        self.label_8.SetFont(wx.Font(9, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, 0, "Segoe UI"))
+        self.label_8.SetFont(
+            wx.Font(
+                9,
+                wx.FONTFAMILY_DEFAULT,
+                wx.FONTSTYLE_NORMAL,
+                wx.FONTWEIGHT_NORMAL,
+                0,
+                "Segoe UI",
+            )
+        )
         self.text_7.SetMinSize((136, 23))
         self.text_8.SetMinSize((136, 23))
         self.static_line_1.SetMinSize((0, 1))
@@ -111,26 +219,60 @@ class FileSettings(wx.Dialog):
 
     def __do_layout(self):
         # begin wxGlade: FileSettings.__do_layout
-        self.sizer_1 = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, "Pre_suffix"), wx.VERTICAL)
+        self.sizer_1 = wx.StaticBoxSizer(
+            wx.StaticBox(self, wx.ID_ANY, "Pre_suffix"), wx.VERTICAL
+        )
         self.sizer_3 = wx.WrapSizer(wx.HORIZONTAL)
         self.sizer_2 = wx.GridSizer(1, 1, 0, 0)
         self.grid_sizer_1 = wx.FlexGridSizer(8, 2, 0, 10)
-        self.grid_sizer_1.Add(self.label_1, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.RIGHT | wx.TOP, 5)
-        self.grid_sizer_1.Add(self.label_6, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.RIGHT | wx.TOP, 5)
-        self.grid_sizer_1.Add(self.text_1, 0, wx.BOTTOM | wx.EXPAND | wx.RIGHT | wx.TOP, 5)
-        self.grid_sizer_1.Add(self.text_2, 0, wx.BOTTOM | wx.EXPAND | wx.RIGHT | wx.TOP, 5)
-        self.grid_sizer_1.Add(self.label_5, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.RIGHT | wx.TOP, 5)
-        self.grid_sizer_1.Add(self.label_4, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.RIGHT | wx.TOP, 5)
-        self.grid_sizer_1.Add(self.text_3, 0, wx.BOTTOM | wx.EXPAND | wx.RIGHT | wx.TOP, 5)
-        self.grid_sizer_1.Add(self.text_4, 0, wx.BOTTOM | wx.EXPAND | wx.RIGHT | wx.TOP, 5)
-        self.grid_sizer_1.Add(self.label_3, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.RIGHT | wx.TOP, 5)
-        self.grid_sizer_1.Add(self.label_2, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.RIGHT | wx.TOP, 5)
-        self.grid_sizer_1.Add(self.text_5, 0, wx.BOTTOM | wx.EXPAND | wx.RIGHT | wx.TOP, 5)
-        self.grid_sizer_1.Add(self.text_6, 0, wx.BOTTOM | wx.EXPAND | wx.RIGHT | wx.TOP, 5)
-        self.grid_sizer_1.Add(self.label_7, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.RIGHT | wx.TOP, 5)
-        self.grid_sizer_1.Add(self.label_8, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.RIGHT | wx.TOP, 5)
-        self.grid_sizer_1.Add(self.text_7, 0, wx.BOTTOM | wx.EXPAND | wx.RIGHT | wx.TOP, 5)
-        self.grid_sizer_1.Add(self.text_8, 0, wx.BOTTOM | wx.EXPAND | wx.RIGHT | wx.TOP, 5)
+        self.grid_sizer_1.Add(
+            self.label_1, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.RIGHT | wx.TOP, 5
+        )
+        self.grid_sizer_1.Add(
+            self.label_6, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.RIGHT | wx.TOP, 5
+        )
+        self.grid_sizer_1.Add(
+            self.text_1, 0, wx.BOTTOM | wx.EXPAND | wx.RIGHT | wx.TOP, 5
+        )
+        self.grid_sizer_1.Add(
+            self.text_2, 0, wx.BOTTOM | wx.EXPAND | wx.RIGHT | wx.TOP, 5
+        )
+        self.grid_sizer_1.Add(
+            self.label_5, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.RIGHT | wx.TOP, 5
+        )
+        self.grid_sizer_1.Add(
+            self.label_4, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.RIGHT | wx.TOP, 5
+        )
+        self.grid_sizer_1.Add(
+            self.text_3, 0, wx.BOTTOM | wx.EXPAND | wx.RIGHT | wx.TOP, 5
+        )
+        self.grid_sizer_1.Add(
+            self.text_4, 0, wx.BOTTOM | wx.EXPAND | wx.RIGHT | wx.TOP, 5
+        )
+        self.grid_sizer_1.Add(
+            self.label_3, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.RIGHT | wx.TOP, 5
+        )
+        self.grid_sizer_1.Add(
+            self.label_2, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.RIGHT | wx.TOP, 5
+        )
+        self.grid_sizer_1.Add(
+            self.text_5, 0, wx.BOTTOM | wx.EXPAND | wx.RIGHT | wx.TOP, 5
+        )
+        self.grid_sizer_1.Add(
+            self.text_6, 0, wx.BOTTOM | wx.EXPAND | wx.RIGHT | wx.TOP, 5
+        )
+        self.grid_sizer_1.Add(
+            self.label_7, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.RIGHT | wx.TOP, 5
+        )
+        self.grid_sizer_1.Add(
+            self.label_8, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.RIGHT | wx.TOP, 5
+        )
+        self.grid_sizer_1.Add(
+            self.text_7, 0, wx.BOTTOM | wx.EXPAND | wx.RIGHT | wx.TOP, 5
+        )
+        self.grid_sizer_1.Add(
+            self.text_8, 0, wx.BOTTOM | wx.EXPAND | wx.RIGHT | wx.TOP, 5
+        )
         self.sizer_1.Add(self.grid_sizer_1, 1, wx.EXPAND, 0)
         self.sizer_2.Add(self.static_line_1, 1, wx.BOTTOM | wx.EXPAND | wx.TOP, 5)
         self.sizer_1.Add(self.sizer_2, 0, wx.EXPAND, 0)
@@ -146,30 +288,60 @@ class FileSettings(wx.Dialog):
         event.Skip()
 
     def onSave(self, event):  # wxGlade: FileSettings.<event_handler>
-        
-        t1 = os.path.join("resources", "var", "dialog_settings.db")       
-        
-        c1 = self.text_1.GetValue(); c2 = self.text_2.GetValue(); c3 = self.text_3.GetValue()
-        c4 = self.text_4.GetValue(); c5 = self.text_5.GetValue(); c6 = self.text_6.GetValue()
-        c7 = self.text_7.GetValue(); c8 = self.text_8.GetValue()
-        konf = [c1, c2, c3, c4, c5, c6, c7, c8]
-        
-        a = konf[0]; b = konf[1]; c = konf[2]; d = konf[3]; e = konf[4]; f = konf[5]; g = konf[6]; h = konf[7]
-        
-        with shelve.open(t1, flag='writeback') as s:
-            s['key5'] = {'cyr_ansi_srt': a, 'cyr_utf8_txt': b, 'cyr_utf8_srt': c, 'lat_ansi_srt': d,\
-                         'lat_utf8_srt': e, 'fixed_subs': f, 'transcribe': g, 'cleanup': h}
 
-        s_dict = {'cyr_ansi_srt': a, 'cyr_utf8_txt': b, 'cyr_utf8_srt': c, 'lat_ansi_srt': d,\
-                     'lat_utf8_srt': e, 'fixed_subs': f, 'transcribe': g, 'cleanup': h}
-        
+        t1 = os.path.join("resources", "var", "dialog_settings.db")
+
+        c1 = self.text_1.GetValue()
+        c2 = self.text_2.GetValue()
+        c3 = self.text_3.GetValue()
+        c4 = self.text_4.GetValue()
+        c5 = self.text_5.GetValue()
+        c6 = self.text_6.GetValue()
+        c7 = self.text_7.GetValue()
+        c8 = self.text_8.GetValue()
+        konf = [c1, c2, c3, c4, c5, c6, c7, c8]
+
+        a = konf[0]
+        b = konf[1]
+        c = konf[2]
+        d = konf[3]
+        e = konf[4]
+        f = konf[5]
+        g = konf[6]
+        h = konf[7]
+
+        with shelve.open(t1, flag='writeback') as s:
+            s['key5'] = {
+                'cyr_ansi_srt': a,
+                'cyr_utf8_txt': b,
+                'cyr_utf8_srt': c,
+                'lat_ansi_srt': d,
+                'lat_utf8_srt': e,
+                'fixed_subs': f,
+                'transcribe': g,
+                'cleanup': h,
+            }
+
+        s_dict = {
+            'cyr_ansi_srt': a,
+            'cyr_utf8_txt': b,
+            'cyr_utf8_srt': c,
+            'lat_ansi_srt': d,
+            'lat_utf8_srt': e,
+            'fixed_subs': f,
+            'transcribe': g,
+            'cleanup': h,
+        }
+
         with open(os.path.join("resources", "var", "file_ext.pkl"), "wb") as f:
             pickle.dump(s_dict, f)
-        
+
         self.Destroy()
         event.Skip()
 
+
 # end of class FileSettings
+
 
 class MyApp(wx.App):
     def OnInit(self):
@@ -178,6 +350,7 @@ class MyApp(wx.App):
         self.dialog.ShowModal()
         # self.dialog.Destroy()
         return True
+
 
 # end of class MyApp
 
