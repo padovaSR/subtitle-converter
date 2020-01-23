@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-# 
+#
 #  Copyright (C) 2019  padovaSR
 #
 #   This program is free software: you can redistribute it and/or modify
@@ -19,14 +19,14 @@
 import os
 import codecs
 
-from collections import defaultdict 
+from collections import defaultdict
 
 
 fDict = os.path.join('dictionaries', 'Dictionary-1.txt')
 fDict1 = os.path.join('dictionaries', 'Dictionary-2.txt')
 fDict0 = os.path.join('dictionaries', 'Dictionary-0.txt')
 fDict_special = os.path.join('dictionaries', 'Special-Replace.txt')
-    
+
 
 def remBom(infile):
     _BOM = codecs.BOM_UTF8
@@ -44,7 +44,8 @@ def remBom(infile):
                 fp.seek(bom_length, os.SEEK_CUR)
                 chunk = fp.read(buffer_size)
             fp.seek(-bom_length, os.SEEK_CUR)
-            fp.truncate()    
+            fp.truncate()
+
 
 def dict_fromFile(text_in, delim):
     if not os.path.exists(text_in):
@@ -52,9 +53,9 @@ def dict_fromFile(text_in, delim):
             t = 'Alpha=>Alfa\n'
             text_file.write(t)
     with open(text_in, 'r', encoding='utf-8') as dict_file:
-        
+
         new_dict = {}
-        
+
         for line in dict_file:
             x = line.strip().split(delim)
             if not line:
@@ -69,11 +70,12 @@ def dict_fromFile(text_in, delim):
             new_dict[key] = value
         return new_dict
 
+
 def new_dict(indict, n):
     with open(indict, 'r', encoding='utf-8') as dict_file:
-        
+
         newDict = {}
-        
+
         for line in dict_file:
             x = line.strip().split('=>')
             if not line:
@@ -81,18 +83,19 @@ def new_dict(indict, n):
             if line.startswith('#'):
                 continue
             if not x[0]:
-                continue            
+                continue
             if len(x[0].split(' ')) >= 2:
                 key = x[0].replace(' ', '\n', n)
                 value = x[-1]
                 newDict[key] = value
         return newDict
 
+
 def new_dict2(indict):
     with open(indict, 'r', encoding='utf-8') as dict_file:
-        
+
         newDict = {}
-        
+
         for line in dict_file:
             x = line.strip().split('=>')
             if not line:
@@ -100,14 +103,15 @@ def new_dict2(indict):
             if line.startswith('#'):
                 continue
             if not x[0]:
-                continue            
+                continue
             if len(x[0].split(' ')) == 3:
                 w = x[0].split()
-                key = w[0]+' '+w[1]+'\n'+w[-1]
+                key = w[0] + ' ' + w[1] + '\n' + w[-1]
                 value = x[-1]
                 newDict[key] = value
         return newDict
-    
+
+
 remBom(fDict)
 remBom(fDict1)
 remBom(fDict0)
@@ -146,17 +150,66 @@ with open(rplS, 'r', encoding='utf-8') as rplS_fyle:
 
 rplSmap = dict((k, v) for k, v in drep.items() if k)
 
-#-------------------------------------------------------------------------------------------------------------#
+# ------------------------------------------------------------------------------#
 
-lat_cir_mapa = {'đ': 'ђ', 'Đ': 'Ђ', 'e': 'е', 'r': 'р', 't': 'т', 'z': 'з', 'u': 'у', 'i': 'и',
-             'o': 'о', 'p': 'п', 'a': 'а', 's': 'с', 'd': 'д', 'f': 'ф', 'g': 'г', 'h': 'х',
-             'j': 'ј', 'k': 'к', 'l': 'л', 'c': 'ц', 'v': 'в', 'b': 'б', 'n': 'н', 'm': 'м',
-             'š': 'ш', 'ž': 'ж', 'č': 'ч', 'ć': 'ћ', 'E': 'Е', 'R': 'Р', 'T': 'Т', 'Z': 'З',
-             'U': 'У', 'I': 'И', 'O': 'О', 'P': 'П', 'A': 'А', 'S': 'С', 'D': 'Д', 'F': 'Ф',
-             'G': 'Г', 'H': 'Х', 'J': 'Ј', 'K': 'К', 'L': 'Л', 'C': 'Ц', 'V': 'В', 'B': 'Б',
-             'N': 'Н', 'M': 'М', 'Š': 'Ш', 'Ž': 'Ж', 'Č': 'Ч', 'Ć': 'Ћ'}
+lat_cir_mapa = {
+    'đ': 'ђ',
+    'Đ': 'Ђ',
+    'e': 'е',
+    'r': 'р',
+    't': 'т',
+    'z': 'з',
+    'u': 'у',
+    'i': 'и',
+    'o': 'о',
+    'p': 'п',
+    'a': 'а',
+    's': 'с',
+    'd': 'д',
+    'f': 'ф',
+    'g': 'г',
+    'h': 'х',
+    'j': 'ј',
+    'k': 'к',
+    'l': 'л',
+    'c': 'ц',
+    'v': 'в',
+    'b': 'б',
+    'n': 'н',
+    'm': 'м',
+    'š': 'ш',
+    'ž': 'ж',
+    'č': 'ч',
+    'ć': 'ћ',
+    'E': 'Е',
+    'R': 'Р',
+    'T': 'Т',
+    'Z': 'З',
+    'U': 'У',
+    'I': 'И',
+    'O': 'О',
+    'P': 'П',
+    'A': 'А',
+    'S': 'С',
+    'D': 'Д',
+    'F': 'Ф',
+    'G': 'Г',
+    'H': 'Х',
+    'J': 'Ј',
+    'K': 'К',
+    'L': 'Л',
+    'C': 'Ц',
+    'V': 'В',
+    'B': 'Б',
+    'N': 'Н',
+    'M': 'М',
+    'Š': 'Ш',
+    'Ž': 'Ж',
+    'Č': 'Ч',
+    'Ć': 'Ћ',
+}
 
-#-------------------------------------------------------------------------------------------------------------#
+# ------------------------------------------------------------------------------#
 
 prelatCyr = os.path.join('resources', 'preLatCyr.map.cfg')
 remBom(prelatCyr)
@@ -170,7 +223,7 @@ with open(LatFile, 'r', encoding='utf-8') as inLat:
         if not line:
             continue
         if line.startswith('#'):
-            continue        
+            continue
         a = x[0]
         b = x[-1]
         ln[a] = b
