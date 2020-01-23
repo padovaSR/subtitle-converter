@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-# 
+#
 #  Copyright (C) 2019  padovaSR
 #
 #   This program is free software: you can redistribute it and/or modify
@@ -22,10 +22,10 @@ import shelve
 import zipfile
 import shutil
 import logging
-from pydispatch import dispatcher 
+from pydispatch import dispatcher
 
 from settings import filePath, WORK_TEXT, WORK_SUBS, ENT_ENCODING
-from FileProcessing import FileProcessed, FileOpened 
+from FileProcessing import FileProcessed, FileOpened
 
 import wx
 
@@ -33,22 +33,24 @@ import wx
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
-handler = logging.FileHandler(filename=filePath("resources", "var", "file_drop.log"), mode="w", encoding="utf-8")
+handler = logging.FileHandler(
+    filename=filePath("resources", "var", "file_drop.log"), mode="w", encoding="utf-8"
+)
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
+
 class FileDrop(wx.FileDropTarget):
-    
     def __init__(self, window):
         wx.FileDropTarget.__init__(self)
         self.window = window
-        
+
     def OnDropFiles(self, x, y, filenames):
         lfiles = [x for x in filenames]
         rpath = ''
         enc = ''
         droped = 0
-        
+
         def file_go(infile, rfile):
             fop = FileOpened(infile)
             enc = fop.findCode()
@@ -59,7 +61,7 @@ class FileDrop(wx.FileDropTarget):
             logger.debug(f"FileDrop: {os.path.basename(infile)}")
             self.window.SetValue(text)
             return enc, text
-        
+
         if len(lfiles) > 1:
             new_d = {}
             rpath = [lfiles[-1]]
@@ -69,7 +71,9 @@ class FileDrop(wx.FileDropTarget):
                 if not zipfile.is_zipfile(lfiles[i]):
                     try:
                         tmp_path = filePath('tmp', os.path.basename(lfiles[i]))
-                        if lfiles[i].endswith(('zip', 'srt', 'txt', 'ZIP', 'SRT', 'TXT')):
+                        if lfiles[i].endswith(
+                            ('zip', 'srt', 'txt', 'ZIP', 'SRT', 'TXT')
+                        ):
                             shutil.copy(lfiles[i], tmp_path)
                     except:
                         logger.debug('FileDrop: Unexpected file type.')
@@ -111,7 +115,7 @@ class FileDrop(wx.FileDropTarget):
                                 new_d[outfile[i]] = enc
                                 text = os.path.basename(outfile[i])
                                 self.window.AppendText("\n")
-                                self.window.AppendText(text)                            
+                                self.window.AppendText(text)
             logger.debug('FileDrop: Ready for multiple files.')
             dispatcher.send("droped", msg=new_d)
         else:
@@ -124,7 +128,7 @@ class FileDrop(wx.FileDropTarget):
                     rpath = [rfile]
                 except:
                     logger.debug('No files selected.')
-                
+
                 else:
                     if len(outfile) == 1:
                         enc, t = file_go(outfile[0], rfile)
@@ -132,7 +136,9 @@ class FileDrop(wx.FileDropTarget):
                         droped += 1
                         empty = {}
                         self.window.SetValue(t)
-                        dispatcher.send("TMP_PATH", message=outfile, msg=[rpath, enc, False])
+                        dispatcher.send(
+                            "TMP_PATH", message=outfile, msg=[rpath, enc, False]
+                        )
                         dispatcher.send("droped", msg=empty)
                     elif len(outfile) > 1:
                         droped += 1
@@ -147,7 +153,9 @@ class FileDrop(wx.FileDropTarget):
                             text = os.path.basename(outfile[i])
                             self.window.AppendText("\n")
                             self.window.AppendText(text)
-                        dispatcher.send("TMP_PATH", message=outfile, msg=[rpath, enc, True])
+                        dispatcher.send(
+                            "TMP_PATH", message=outfile, msg=[rpath, enc, True]
+                        )
                         dispatcher.send("droped", msg=new_d)
                         logger.debug('FileDrop: Ready for multiple files.')
             elif zipfile.is_zipfile(name) == False:
@@ -160,5 +168,5 @@ class FileDrop(wx.FileDropTarget):
                 self.window.SetValue(txt1)
                 dispatcher.send("droped", msg=empty)
                 dispatcher.send("TMP_PATH", message=tmp_path, msg=[rpath, enc, False])
-            
+
         return True
