@@ -8,7 +8,8 @@ import zipfile
 import pickle
 import shelve
 import logging
-from text_processing import codelist 
+from text_processing import codelist
+from settings import chreg
 
 import wx
 
@@ -267,6 +268,7 @@ def writeToFile(text, path, enc, multi):
             )
             if dlg == wx.NO:
                 return
+    text = chreg.sub("?", text)
     try:
         with open(
             path, 'w', encoding=enc, errors=error, newline='\r\n'
