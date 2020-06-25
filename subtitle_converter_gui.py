@@ -45,12 +45,7 @@ class ConverterFrame(wx.Frame):
         keyS = shortcutsKey
         self.menubar1 = wx.MenuBar()
         self.file = wx.Menu()
-        #self.newfile = wx.MenuItem(self.file, wx.ID_NEW, "&New\t" + keyS["New"], "New file")
-        #self.newfile.SetBitmap(
-            #wx.ArtProvider.GetBitmap(wx.ART_NEW, wx.ART_MENU)
-        #)
-        #self.file.Append(self.newfile)
-
+        
         self.fopen = wx.MenuItem(
             self.file, wx.ID_OPEN, "&Open\t" + keyS["Open"], "Otvori fajl"
         )
@@ -635,35 +630,6 @@ class ConverterFrame(wx.Frame):
         self.frame_toolbar.AddControl(self.comboBox1)
         self.comboBox1.SetSelection(0)
         
-        # self.m_staticline1 = wx.StaticLine(self.frame_toolbar, wx.ID_ANY, wx.DefaultPosition, wx.Size(3,0), wx.LI_VERTICAL)
-        # self.m_staticline1.SetForegroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_MENU))
-        # self.frame_toolbar.AddControl(self.m_staticline1)        
-        
-        #self.frame_toolbar.AddSeparator()
-        
-        #self.searchCtrl1 = wx.SearchCtrl(
-            #self.frame_toolbar,
-            #wx.ID_ANY,
-            #wx.EmptyString,
-            #wx.DefaultPosition,
-            #size=(138, 24),
-            #style=wx.TE_PROCESS_ENTER
-            #| wx.BORDER_DEFAULT
-            #| wx.FULL_REPAINT_ON_RESIZE
-            #| wx.WANTS_CHARS,
-        #)
-        #if 'gtk3' in wx.PlatformInfo:
-            ## Something is wrong with the bestsize of the SearchCtrl, so for now
-            ## let's set it based on the size of a TextCtrl.
-            #txt = wx.TextCtrl(self)
-            #bs = txt.GetBestSize()
-            #txt.DestroyLater()
-            #self.searchCtrl1.SetMinSize((135, bs.height+6))        
-        #self.searchCtrl1.ShowSearchButton(True)
-        #self.searchCtrl1.ShowCancelButton(False)
-        #self.searchCtrl1.SetToolTip("Search text")
-        #self.frame_toolbar.AddControl(self.searchCtrl1)
-
         self.SetToolBar(self.frame_toolbar)
         self.frame_toolbar.Realize()
         # Tool Bar end
