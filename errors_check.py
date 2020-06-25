@@ -39,7 +39,7 @@ def w_position(_pattern, intext):
 def checkFile(path, newfile, text_s, multi):
     file1_name = path
     try:
-        n_sign = text_s.count("?")
+        n_sign = text_s.count(r"\?")
         if n_sign > 0:
             poruka = re.sub(
                 r"(?: ){2,14}",
@@ -166,7 +166,7 @@ def checkChars(text):
 
 def displayError(text, tctrl, rdir, path, new_enc, multi):
     """"""
-    nlist = w_position("\?", text)
+    nlist = w_position(r"\?", text)
     
     epath = os.path.basename(path)
     outf = os.path.join(rdir, os.path.splitext(epath)[0]+'_error.log')
