@@ -869,7 +869,6 @@ class MyFrame(ConverterFrame):
                 )
 
                 self.bytesToBuffer(text, self.newEnc)
-                # self.real_path.append(path)
                 self.tmpPath.append(inpath)
                 if text:
                     msginfo = wx.MessageDialog(
@@ -1276,8 +1275,7 @@ class MyFrame(ConverterFrame):
             value2_s = ex['cyr_utf8_txt']
 
         self.text_1.SetValue("")
-        # self.text_1.SetValue("Files Processed:\n")
-
+        
         self.newEnc = 'windows-1251'
         self.pre_suffix = value1_s
         f_text = ["Files Processed:\n"]
@@ -1286,7 +1284,7 @@ class MyFrame(ConverterFrame):
 
         self.tmpPath.clear()
         self.cyrUTFmulti.clear()
-
+        
         for key, value in self.multiFile.items():
 
             path = key
@@ -2001,7 +1999,7 @@ class MyFrame(ConverterFrame):
 
         self.PathEnc()
 
-        if len(self.multiFile) > 1:
+        if len(self.multiFile) >= 1:
             self.multipleTools()
             self.exportZIPmultiple()
         else:
@@ -3066,7 +3064,7 @@ class MyFrame(ConverterFrame):
         
         path = self.tmpPath[0]
         actions = [x.action for x in PREVIOUS]
-        print(actions)
+        
         self.REDO.append(PREVIOUS[-1])
         if not "Open" in actions:
             prev_items = PREVIOUS.pop(len(PREVIOUS)-2)
@@ -3120,10 +3118,8 @@ class MyFrame(ConverterFrame):
         prev = self.REDO.pop()
         
         actions = [x.action for x in self.REDO]
-        print("REDO act ", actions)
         
         if prev:
-            print("REDO ", prev.action, prev.enc)
             text = prev.content
             bufferText(text, WORK_TEXT)
             bufferText(text, self.workText)
