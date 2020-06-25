@@ -49,7 +49,7 @@ import wx
 
 from subtitle_converter_gui import ConverterFrame
 
-VERSION = "v0.5.8"
+VERSION = "v0.5.8_test1"
 
 
 logger = logging.getLogger(__name__)
@@ -216,7 +216,7 @@ class MyFrame(ConverterFrame):
             id=wx.ID_FILE1,
             id2=wx.ID_FILE9,
         )
-        # self.comboBox1.Bind(wx.EVT_COMBOBOX, self.onChoice, id=-1, id2=wx.ID_ANY)
+        self.comboBox1.Bind(wx.EVT_COMBOBOX, self.onChoice, id=-1, id2=wx.ID_ANY)
         self.Bind(wx.EVT_MENU, self.onFileSettings, id=83)
         # self.Bind(wx.EVT_MENU, self.ShowDialog, id=84)
         self.Bind(wx.EVT_SIZE, self.size_frame, id=-1)
@@ -3079,8 +3079,6 @@ class MyFrame(ConverterFrame):
             if len(PREVIOUS) > 2:
                 PREVIOUS.pop()
         
-        print("PREV ", [prev_items.action, prev_items.enc])
-        print("PRE ", [v for s in [[x.action, x.enc] for x in PREVIOUS] for v in s])
         entered_enc = prev_items.enc
         self.UNDO.append(prev_items.content)
         
@@ -3150,6 +3148,16 @@ class MyFrame(ConverterFrame):
         self.addHistory(self.enchistory, path, enc)
         self.addPrevious(prev.action, prev.enc, text, self.pre_suffix)
         
+        event.Skip()
+        
+    def onChoice(self, event):
+        
+        ctrl = event.GetEventObject()
+        value = ctrl.GetValue()
+        
+        with open(filePath('resources', 'var', 'obsE.pkl'), 'wb') as f:
+            pickle.dump(value, f)
+            
         event.Skip()
         
 class MyApp(wx.App):
