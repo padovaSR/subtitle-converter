@@ -996,8 +996,8 @@ class MyFrame(ConverterFrame):
             value4_s = ex['lat_ansi_srt']
 
         self.text_1.SetValue("")
-        self.text_1.SetValue("Files Processed:\n")
-        f_text = []
+        # self.text_1.SetValue("Files Processed:\n")
+        f_text = ["Files Processed:\n"]
         self.PathEnc()
 
         self.newEnc = 'windows-1250'
@@ -1262,7 +1262,6 @@ class MyFrame(ConverterFrame):
             
             self.addHistory(self.enchistory, path, self.newEnc)
             self.addPrevious("toCYR", self.newEnc, text, self.pre_suffix)
-            print(f"UNDO {len(self.UNDO)}")
             self.reloaded = 0            
                 
         event.Skip()
@@ -1277,11 +1276,11 @@ class MyFrame(ConverterFrame):
             value2_s = ex['cyr_utf8_txt']
 
         self.text_1.SetValue("")
-        self.text_1.SetValue("Files Processed:\n")
+        # self.text_1.SetValue("Files Processed:\n")
 
         self.newEnc = 'windows-1251'
         self.pre_suffix = value1_s
-        f_text = []
+        f_text = ["Files Processed:\n"]
 
         self.PathEnc()
 
@@ -1452,7 +1451,7 @@ class MyFrame(ConverterFrame):
             value1_s = ex["lat_utf8_srt"]
 
         self.text_1.SetValue("")
-        self.text_1.SetValue("Files Processed:\n")
+        # self.text_1.SetValue("Files Processed:\n")
 
         self.PathEnc()
 
@@ -1464,7 +1463,7 @@ class MyFrame(ConverterFrame):
         else:
             self.newEnc = 'utf-8'
         entered_enc = ""
-        f_text = []
+        f_text = ["Files Processed:\n"]
         for key, value in self.multiFile.items():
 
             path = key
@@ -2567,7 +2566,7 @@ class MyFrame(ConverterFrame):
             ex = pickle.load(f)  # ["key5"]
             value1_s = ex["lat_ansi_srt"]
         self.text_1.SetValue("")
-        self.text_1.SetValue("Files Processed:\n")
+        # self.text_1.SetValue("Files Processed:\n")
 
         self.PathEnc()
 
@@ -2575,7 +2574,7 @@ class MyFrame(ConverterFrame):
         self.pre_suffix = value1_s
         self.newEnc = 'windows-1250'
         t_enc = 'utf-8'
-        f_text = []
+        f_text = ["Files Processed:\n"]
 
         for key, value in self.multiFile.items():
             path = key
@@ -2707,8 +2706,7 @@ class MyFrame(ConverterFrame):
             value1_s = ex["lat_utf8_srt"]
 
         self.text_1.SetValue("")
-        self.text_1.SetValue("Files Processed:\n")
-        f_text = []
+        f_text = ["Files Processed:\n"]
         self.PathEnc()
 
         self.pre_suffix = value1_s
@@ -3080,7 +3078,6 @@ class MyFrame(ConverterFrame):
                 PREVIOUS.pop()
         
         entered_enc = prev_items.enc
-        self.UNDO.append(prev_items.content)
         
         if prev_items:
             text = prev_items.content
