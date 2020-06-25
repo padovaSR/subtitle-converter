@@ -55,8 +55,8 @@ codelist = [
 ]
 
 def writeTempStr(inFile, text, kode):
+    
     _error = 'strict'
-    codelist = ['utf-8', 'utf-16', 'utf-32', 'utf-16-be', 'utf-16-le', 'utf-32-be', 'utf-32-le']
     if kode in codelist:
         _error = 'surrogatepass'
     try:
