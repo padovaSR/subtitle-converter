@@ -1441,8 +1441,7 @@ class MyFrame(ConverterFrame):
             value1_s = ex["lat_utf8_srt"]
 
         self.text_1.SetValue("")
-        # self.text_1.SetValue("Files Processed:\n")
-
+        
         self.PathEnc()
 
         self.tmpPath.clear()
@@ -2607,7 +2606,6 @@ class MyFrame(ConverterFrame):
                     ErrorDlg.ShowModal()
                     self.Error_Text = error_text
                 self.SetStatusText(f"Processing {os.path.basename(newF)}")
-                self.SetStatusText(self.newEnc, 1)
             except Exception as e:
                 logger.debug(f"cyrToANSI error: {e}")
         
@@ -2750,8 +2748,7 @@ class MyFrame(ConverterFrame):
                 ErrorDlg.ShowModal()
                 self.Error_Text = error_text
             self.SetStatusText(os.path.basename(path))
-            self.SetStatusText(self.newEnc, 1)
-        
+            
         for item in f_text:
             self.text_1.WriteText(item)
         self.multipleTools()
@@ -3110,7 +3107,7 @@ class MyFrame(ConverterFrame):
         path = self.tmpPath[0]
         prev = self.REDO.pop()
         
-        actions = [x.action for x in self.REDO]
+        # actions = [x.action for x in self.REDO]
         
         if prev:
             text = prev.content
@@ -3127,7 +3124,6 @@ class MyFrame(ConverterFrame):
             enc = "UTF-8 BOM"
         elif enc == "utf-8":
             enc = "UTF-8"
-        print("RENC=", enc)
         self.postAction(path)
         self.SetStatusText(enc, 1)
         self.pre_suffix = prev.psuffix
