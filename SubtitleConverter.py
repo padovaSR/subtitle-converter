@@ -165,7 +165,6 @@ class MyFrame(ConverterFrame):
         ]
 
         ## MENU EVENTS ##############################################################################
-        # self.Bind(wx.EVT_MENU, self.onNew, id=self.newfile.GetId())
         self.Bind(wx.EVT_MENU, self.onOpen, id=self.fopen.GetId())
         self.Bind(wx.EVT_MENU, self.onOpenNext, id=self.open_next.GetId())
         self.Bind(wx.EVT_MENU, self.onReload, id=self.reload.GetId())
@@ -175,16 +174,6 @@ class MyFrame(ConverterFrame):
         self.Bind(wx.EVT_MENU, self.onCloseFile, id=self.close.GetId())
         self.Bind(wx.EVT_MENU, self.onQuit, id=self.quit_program.GetId())
         #############################################################################################
-        # self.Bind(wx.EVT_MENU, self.onUndo1, id=self.undo.GetId())
-        # self.Bind(wx.EVT_MENU, self.onRedo, id=self.redo.GetId())
-        self.Bind(wx.EVT_MENU, self.editMenu)
-        # self.Bind(wx.EVT_MENU, self.OnShowFindReplace, id=self.find.GetId())
-        #self.text_1.Bind(wx.EVT_CHAR, self.changeText, id=wx.ID_ANY)
-        #self.text_1.Bind(wx.EVT_TEXT_ENTER, self.changeText, id=wx.ID_ANY)
-        #self.text_1.Bind(wx.EVT_TEXT, self.changeText, id=wx.ID_ANY)
-        #self.text_1.Bind(wx.EVT_LEFT_UP, self.onLeft, id=-1)
-        #self.text_1.Bind(wx.EVT_CHAR, self.getChararcter, id=-1)
-        #self.text_1.Bind(wx.EVT_KEY_UP, self.onKeyUp, id=wx.ID_ANY)
         self.Bind(wx.EVT_MENU, self.clearUndoRedo, id=self.clear.GetId())
         self.Bind(wx.EVT_MENU, self.onReloadText, id=self.reloadtext.GetId())
         self.Bind(wx.EVT_MENU, self.undoAction, id=self.undo.GetId())
@@ -219,9 +208,7 @@ class MyFrame(ConverterFrame):
         self.Bind(wx.EVT_TOOL, self.onRepSpecial, id=1006)
         self.Bind(wx.EVT_TOOL, self.onCleanup, id=1007)
         self.Bind(wx.EVT_TOOL, self.onQuit, id=1008)
-        # self.searchCtrl1.Bind(wx.EVT_SEARCHCTRL_SEARCH_BTN, self.txtSearch)
         ## Events other #############################################################################
-        # self.text_1.Bind(wx.EVT_KEY_UP, self.onChanged, id=wx.ID_ANY)
         self.text_1.Bind(wx.EVT_TEXT, self.removeFiles, id=-1, id2=wx.ID_ANY)
         self.Bind(
             wx.EVT_MENU_RANGE,
@@ -370,10 +357,6 @@ class MyFrame(ConverterFrame):
         
         self.reloaded = 0
         
-    def onNew(self, event):  
-        print("Event handler 'onNew' not implemented!")
-        event.Skip()
-
     def handleFile(self, filepaths):
         
         def file_go(infile, realF):
@@ -806,123 +789,6 @@ class MyFrame(ConverterFrame):
             self.Destroy()
         event.Skip()
 
-    def onUndo1(self, event):
-        path, enc = self.PathEnc()
-        text = ""
-        if len(self.text_1.GetValue()) > 1000:
-            if self.undohist:
-            
-                pos = self.text_1.GetInsertionPoint()
-                t1 = self.undohist[-1]
-                print("T1 ", t1)
-                self.text_1.SetValue(t1)
-                self.text_1.SetInsertionPoint(pos)
-                self.text_1.SetScrollPos(wx.VERTICAL, pos)
-                self.text_1.SetFocus()
-                self.redohist.append(t1)
-                self.undohist = self.undohist[:-1]
-                self.undocount += 1
-                self.reload.Enable(True)
-                # if not self.undohist:
-        else:
-            if self.tmp_range:
-                if (
-                    all(i == 0 for i in self.tmp_range)
-                    or len(set(self.tmp_range)) == 1
-                ):
-                    self.tmp_range.clear()
-                if self.tmp_range:
-                    p1 = self.tmp_range[0]
-                    p2 = self.tmp_range[len(self.tmp_range)-1]+1
-                    print(p1, p2)
-                    self.undoRange.append((p1, p2))
-                    self.tmp_range.clear()
-            if self.undoRange:
-                pos = len(self.undoRange)-1
-                p1 = self.undoRange[pos][0]
-                p2 = self.undoRange[pos][1]+1
-                text = self.text_1.GetRange(p1, p2)
-                self.redoRange.append((text, p1, p2))
-                self.text_1.SetInsertionPoint(p1)
-                self.text_1.Remove(p1, p2)
-                self.undoRange = list(set(self.undoRange))
-                self.undoRange = sorted(self.undoRange)
-                self.undoRange = self.undoRange[:-1]
-                if not self.undoRange:
-                    self.firstPosition.clear()
-        self.reload.Enable(True)
-
-        if not self.undoRange:
-            self.SetStatusText("Nothing to Undo")
-            self.SetStatusText("", 1)
-        if len(self.redohist) >= 70:
-            self.redohist = self.redohist[1:]
-        self.clear.Enable(True)
-        self.previous_action["Undo"] = enc
-        
-        event.Skip()
-    def onUndo(self, event):
-        ## self.text_1.Undo()
-        #t1 = self.text_1.GetValue()
-        #if self.undohist:
-            #pos = len(self.undohist)-1
-            #if t1 == self.undohist[pos][0]:
-                #del self.undohist[pos]
-                #if self.undohist:
-                    #pos = len(self.undohist) - 1
-                    #place = self.undohist[pos][1]
-                    ## self.text_1.GetRange(from_, to_)
-                    #if place >= len(t1):
-                        #place = self.firstPosition
-                    #print("Undo_0 ", place, pos)
-                    #self.text_1.ChangeValue(self.undohist[pos][0])
-                    #self.text_1.SetInsertionPoint(place)
-                    #print("SCROLL: ", self.text_1.GetScrollPos(wx.VERTICAL))
-                    #self.text_1.SetScrollPos(wx.VERTICAL, self.text_1.GetScrollPos(wx.VERTICAL))
-                    #if self.undohist:
-                        #self.redohist.append(self.undohist[-1])                    
-                    #self.undohist = self.undohist[:-1]
-            #else:
-                #pos = len(self.undohist) - 1
-                #place = self.undohist[pos][1]
-                #print("Undo_1, ", place)
-                #self.text_1.SetInsertionPoint(place)
-                #self.text_1.SetValue(self.undohist[pos][0])
-                #self.undohist = self.undohist[:-1]
-                #self.redohist.append((t1, place+1))
-        #else:
-            #self.undo.Enable(False)
-        event.Skip()
-        
-    def onRedo(self, event):  
-        
-        path, enc = self.PathEnc()
-        
-        if self.redoRange:
-            
-            pos = len(self.redoRange)-1
-            text = self.redoRange[pos][0]
-            t1 = self.redoRange[pos][1]
-            t2 = self.redoRange[pos][1]
-            
-            self.text_1.Replace(t1, t2, text)
-            self.text_1.SetInsertionPoint(t1)
-            if (t1 and t2) and text:
-                try:
-                    self.text_1.SetStyle(
-                        t1, t2 + 1, wx.TextAttr("BLACK", "YELLOW")
-                    )
-                except Exception as e:
-                    logger.debug(f"SetStyle: {e}")
-                    pass
-                    
-            self.text_1.SetInsertionPoint(t2 + 1)
-            self.undoRange.append((t1, t2))
-            self.redoRange = self.redoRange[:-1]
-            self.previous_action["Undo"] = enc
-        
-        event.Skip()
-        
     def clearUndoRedo(self, event):
         '''CLear Undo-Redo history'''
         self.UNDO.clear()
@@ -933,47 +799,6 @@ class MyFrame(ConverterFrame):
         self.clear.Enable(False)
         
         event.Skip()
-
-    def editMenu(self, event):
-        evt_id = event.GetId()
-        actions = {
-            wx.ID_COPY: self.text_1.Copy,
-            wx.ID_CUT: self.text_1.Cut,
-            wx.ID_PASTE: self.text_1.Paste,
-        }
-        action = actions.get(evt_id, None)
-        if action:
-            action()
-        else:
-            event.Skip()
-
-    
-    def find_str(self,sub,text):
-        '''return positions of the word'''
-        starts = [x.start() for x in re.finditer(sub,text)]
-        ends = [x.end() for x in re.finditer(sub, text)]
-        f_list = [(x,y) for x, y in zip(starts, ends)]
-        return f_list
-    
-    def changeStyle(self, ctrl, positions, c1, c2):
-
-        for i in positions:
-            ctrl.SetStyle(i[0], i[1], wx.TextAttr(c1, c2))
-            ctrl.SetInsertionPoint(i[1])
-        ctrl.SetFocus()
-        ctrl.SetInsertionPoint(positions[0][0])
-        
-    def txtSearch(self, event):
-        fstring = re.escape(self.searchCtrl1.GetValue())
-        if self.pos:
-            for i in self.pos:
-                self.text_1.SetStyle(
-                    i[0], i[1], wx.TextAttr("BLACK", "WHITE")
-                )
-            self.pos.clear()
-        self.pos = self.find_str(fstring, self.text_1.GetValue())
-        self.changeStyle(self.text_1, self.pos, "WHITE", "DODGERBLUE1")
-        event.Skip()    
         
     def toANSI(self, event):
         
@@ -3229,122 +3054,6 @@ class MyFrame(ConverterFrame):
         self.fsize["H"] = height
         
         event.Skip()
-        
-    def onKeyUp(self, event):
-        
-        text = self.text_1.GetValue()
-        
-        keycode = event.GetKeyCode()
-        keys = [x for x in range(32)] + [306, 308, 314, 315, 316, 317, 90]
-        keys.remove(8)
-        
-        self.undohist.append(text)
-        self.undohist = self.undohist[-2:]
-        
-        if keycode not in keys and keycode in [127, 8]:
-                
-            if self.undohist and len(self.undohist) >= 2:
-                self.undohist=[self.undohist[-2]]
-            else:
-                self.undohist.clear()
-                
-        print("onKeyUp: ", keycode)
-        #if self.undohist:
-            #print(self.undohist)
-        
-        event.Skip()
-        
-    def changeText(self, event):
-        
-        place = self.text_1.GetInsertionPoint()
-        self.points.append(place)
-        if "R" in self.points:
-            self.points = self.points[:self.points.index("R")]
-            p1 = self.points[0]
-            p2 = self.points[-1]
-            text = self.text_1.GetRange(p1, p2)
-            if p1 == p2:
-                self.undoRange.append((p1, p2, text))
-            self.points.append("N")
-            #self.tmp_range.clear()
-            #self.points.clear()
-        elif "N" in self.points:
-            self.points = self.points[:self.points.index("N")]
-            p1 = self.points[0]
-            p2 = self.points[-1]
-            text = self.text_1.GetRange(p1, p2)
-            if p1 == p2:
-                self.undoRange.append((p1, p2, text))
-            # self.points.clear()
-            
-        
-        # print("PL ", self.undoRange)
-        
-        self.enableTool()
-        
-        event.Skip()
-        
-    def onLeft(self, event):
-        self.text_1.SetInsertionPoint(self.text_1.GetInsertionPoint())
-        self.firstPosition.append(self.text_1.GetInsertionPoint())
-        self.text_1.SetScrollPos(
-            wx.VERTICAL, self.text_1.GetScrollPos(wx.VERTICAL)
-        )
-        if not self.undohist:
-            self.undohist.append(self.text_1.GetValue())
-        event.Skip()
-        
-    def getChararcter(self, event):
-        
-        keycode = event.GetUnicodeKey()
-        if keycode == wx.WXK_NONE:
-            keycode = event.GetKeyCode()
-        
-        if keycode == 13:
-            self.points.append("R")
-            
-        if keycode == 8:
-            print(f"-{self.text_1.GetInsertionPoint()}-")
-        p = self.text_1.GetInsertionPoint()
-        
-        # print("Pressed ", keycode, p)
-        keys = [x for x in range(32)] + [314, 315, 316, 317]
-        if not keycode in keys:
-            place = self.text_1.GetInsertionPoint()
-            self.tmp_range.append(place)
-            
-            
-            p1 = self.tmp_range[0]
-            p2 = self.tmp_range[-1]
-            self.undoRange.append((p1, p2))
-
-            #n = [
-                #self.undoRange.index(i)
-                #for i in self.undoRange
-                #if i[0] == i[1]
-            #]
-            self.tmp_range.clear()
-            # self.tmp_range = self.tmp_range[1:]
-            
-        pos = len(self.tmp_range) - 1
-        if keycode and keycode == 13:
-            place = self.text_1.GetInsertionPoint()
-            self.tmp_range.append(place)
-            start_pos = self.tmp_range[0]
-            self.undoRange.append((start_pos, self.tmp_range[pos]))
-            self.tmp_range.clear()
-        
-        if self.tmpPath:
-            self.SetStatusText(os.path.basename(self.tmpPath[-1]))
-        else:
-            self.SetStatusText("")
-        event.Skip()
-        
-    def ForwardEvent(self, event):
-        # The RichTextCtrl can handle menu and update events for undo,
-        # redo, cut, copy, paste, delete, and select all, so just
-        # forward the event to it.
-        self.text_1.ProcessEvent(event)
         
     def addPrevious(self, action, enc, content, psuffix):
         '''This function creates namedtuple'''
