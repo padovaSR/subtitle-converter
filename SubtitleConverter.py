@@ -995,7 +995,6 @@ class MyFrame(ConverterFrame):
             value4_s = ex['lat_ansi_srt']
 
         self.text_1.SetValue("")
-        # self.text_1.SetValue("Files Processed:\n")
         f_text = ["Files Processed:\n"]
         self.PathEnc()
 
@@ -1019,23 +1018,20 @@ class MyFrame(ConverterFrame):
                 continue
 
             text = normalizeText(entered_enc, path)
-            bufferText(text, self.workText)
             zbir_slova, procent, chars = checkChars(text)
 
-            def ansiAction(path):
+            def ansiAction(path, text_in):
                 if not entered_enc == 'windows-1251':
                     logger.debug(
                         'ToANSI, next input encoding: {}'.format(entered_enc)
                     )
-                text = self.workText.getvalue()
-                text,msg = rplStr(text, entered_enc)
+                text,msg = rplStr(text_in, entered_enc)
                 text = text.replace('?', '¬')
                 text = bufferCode(text, self.newEnc)
                 nam, b = newName(path, self.pre_suffix, multi=True)
                 newF = os.path.join(self.real_dir, nam + b)
                 self.tmpPath.append(newF)
                 text = fixI(text, self.newEnc)
-                bufferText(text, self.workText)
                 return newF, text
 
             def postAnsi():
@@ -1056,7 +1052,7 @@ class MyFrame(ConverterFrame):
                     return True
 
             if zbir_slova == 0 and procent == 0:
-                newF, text = ansiAction(path)
+                newF, text = ansiAction(path, text)
 
                 error_text = checkFile(path, newF, text, multi=True)
 
@@ -1068,7 +1064,6 @@ class MyFrame(ConverterFrame):
                     self.newEnc,
                     multi=True,
                 )
-                bufferText(text, self.workText)
                 writeToFile(text, newF, self.newEnc, multi=True)
                 
                 f_text.append('\n')
@@ -1110,7 +1105,7 @@ class MyFrame(ConverterFrame):
                         )
                         if ErrorDlg.ShowModal() == wx.ID_CANCEL:
                             continue
-                    newF, text = ansiAction(path)
+                    newF, text = ansiAction(path, text)
                     error_text = checkFile(path, newF, text, multi=True)
 
                     text = displayError(
@@ -1121,7 +1116,6 @@ class MyFrame(ConverterFrame):
                         self.newEnc,
                         multi=True,
                     )
-                    bufferText(text, self.workText)
                     writeToFile(text, newF, self.newEnc, multi=True)
 
                     f_text.append('\n')
@@ -1148,7 +1142,7 @@ class MyFrame(ConverterFrame):
                 dlg = dialog1(ErTxt)
 
                 if dlg == True:
-                    newF, text = ansiAction(path)
+                    newF, text = ansiAction(path, text)
                     error_text = checkFile(path, path, text, multi=True)
 
                     f_text.append('\n')
@@ -1162,7 +1156,6 @@ class MyFrame(ConverterFrame):
                         self.newEnc,
                         multi=True,
                     )
-                    bufferText(text, self.workText)
                     writeToFile(text, newF, self.newEnc, multi=True)
 
                     if error_text:
@@ -1217,14 +1210,19 @@ class MyFrame(ConverterFrame):
             
             self.utf8_latText = text.encode(encoding="utf-8", errors="surrogatepass").replace(b"\n", b"\r\n")
             
-            if text: text = text.replace('?', '¬')
+            if text:
+                text = text.replace('?', '¬')
 
             utf_name, suffix = newName(path, value2_s, multi=False)
             utf_path = os.path.join(self.real_dir, (utf_name + suffix))
-
+            
             text, msg = changeLetters(text, utf8_enc, reversed_action=False)
             cyr_path = path
             self.cyrUTF = utf_path
+            
+            writeToFile(text, utf_path, utf8_enc, multi=False)
+            
+            text = bufferCode(text, self.newEnc)
             
             error_text = checkFile(path, cyr_path, text, multi=False)
             text = displayError(
@@ -1236,8 +1234,6 @@ class MyFrame(ConverterFrame):
                 multi=False
             )
             
-            writeToFile(text, utf_path, utf8_enc, multi=False)
-
             bufferText(text, self.workText)
             bufferText(text, WORK_TEXT)
             
@@ -1311,32 +1307,28 @@ class MyFrame(ConverterFrame):
             # utf_path = '{0}_{1}{2}'.format(utf_path, nnm, suffix)
 
             text,msg = changeLetters(text, utf8_enc, reversed_action=False)
-
+            
+            writeToFile(text, utf_path, utf8_enc, multi=True)
+            
             cyr_name, cyr_suffix = newName(path, value1_s, multi=True)
             cyr_path = os.path.join(self.real_dir, cyr_name + file_suffix)
 
             self.tmpPath.append(cyr_path)
-
-            error_text = checkFile(utf_path, cyr_path, text, multi=True)
+            
+            text_ansi = bufferCode(text, self.newEnc)
+            
+            error_text = checkFile(utf_path, cyr_path, text_ansi, multi=True)
             text = displayError(
-                text,
+                text_ansi,
                 self.text_1,
                 self.real_path,
                 cyr_path,
                 self.newEnc,
                 multi=True,
             )
-
-            # text_ansi = bufferCode(text, self.newEnc)
-
-            writeToFile(text, utf_path, utf8_enc, multi=True)
-            writeToFile(text, cyr_path, self.newEnc, multi=True)
-
-            bufferText(text, self.workText)
-            bufferText(text, WORK_TEXT)
-
-            self.bytesToBuffer(text, self.newEnc)
-
+            
+            writeToFile(text_ansi, cyr_path, self.newEnc, multi=True)
+            
             f_text.append("\n")
             f_text.append(os.path.basename(cyr_path))
 
@@ -1477,8 +1469,7 @@ class MyFrame(ConverterFrame):
             text = bufferCode(text, self.newEnc)
             self.tmpPath.append(newF)  # VAZNO
             text = fixI(text, self.newEnc)
-            bufferText(text, self.workText)
-
+            
             error_text = checkFile(path, newF, text, multi=True)
 
             text = displayError(
@@ -1555,7 +1546,7 @@ class MyFrame(ConverterFrame):
         text = WORK_TEXT.getvalue()
         # text = self.text_1.GetValue()
 
-        text = bufferCode(text, self.newEnc)
+        # text = bufferCode(text, self.newEnc)
         text = fixI(text, self.newEnc)
 
         num, text = zameniImena(text)
@@ -2518,8 +2509,9 @@ class MyFrame(ConverterFrame):
                 text = text.replace('?', '¬')
 
             text, msg = changeLetters(text, t_enc, reversed_action=True)
-
             cyr_path = path
+            
+            text = bufferCode(text, self.newEnc)
             
             error_text = checkFile(path, cyr_path, text, multi=False)
             text = displayError(
@@ -2564,8 +2556,7 @@ class MyFrame(ConverterFrame):
             ex = pickle.load(f)  # ["key5"]
             value1_s = ex["lat_ansi_srt"]
         self.text_1.SetValue("")
-        # self.text_1.SetValue("Files Processed:\n")
-
+        
         self.PathEnc()
 
         self.tmpPath.clear()
@@ -2592,8 +2583,8 @@ class MyFrame(ConverterFrame):
                 f_text.append(os.path.basename(newF))
                 self.tmpPath.append(newF)
 
-                bufferText(text, self.workText)
-
+                text = bufferCode(text, self.newEnc)
+                
                 error_text = checkFile(path, newF, text, multi=True)
                 text = displayError(
                     text,
@@ -2653,8 +2644,9 @@ class MyFrame(ConverterFrame):
             if text: text = text.replace('?', '¬')
                     
             text, msg = changeLetters(text, self.newEnc, reversed_action=True)
-            
             cyr_path = path
+            
+            text = bufferCode(text, self.newEnc)
             
             error_text = checkFile(path, cyr_path, text, multi=False)
             text = displayError(
@@ -2729,7 +2721,8 @@ class MyFrame(ConverterFrame):
             text, msg = changeLetters(
                 text, self.newEnc, reversed_action=True
             )
-            bufferText(text, self.workText)
+            
+            text = bufferCode(text, self.newEnc)
 
             error_text = checkFile(path, newF, text, multi=True)
             text = displayError(
