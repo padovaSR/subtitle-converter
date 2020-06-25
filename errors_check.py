@@ -49,15 +49,11 @@ def checkFile(path, newfile, text_s, multi):
             [{1} ]',
             ).format(os.path.basename(file1_name), n_sign)
 
-            name = ''
             logger.debug(poruka)
             if multi == True:
-                name = newfile
-            error_text = f"Greška:\n\n{os.path.basename(name)}\nBilo je neispravnih znakova u\
-            tekstu\nkonvertovanih kao znak `?`\nUkupno: [{1}]\nProverite\
-            tekst.".format(
-                os.path.basename(name), n_sign
-            )
+                file1_name = newfile
+            error_text = f"Greška:\n\n{os.path.basename(file1_name)}\nBilo je neispravnih znakova u\
+            tekstu\nkonvertovanih kao znak `?`\nUkupno: [{n_sign}]\nProverite tekst."
             if error_text:
                 error_text = re.sub("(?: ){2,4}", " ", error_text)
             return error_text
@@ -173,7 +169,8 @@ def displayError(text, tctrl, rdir, path, new_enc, multi):
     nlist = w_position("\?", text)
     
     epath = os.path.basename(path)
-    outf = os.path.join(rdir[-1], os.path.splitext(epath)[0]+'_error.log')
+    outf = os.path.join(rdir, os.path.splitext(epath)[0]+'_error.log')
+    
     showMeError(path, text, outf, new_enc)
     text = text.replace('¬', '?')
     
