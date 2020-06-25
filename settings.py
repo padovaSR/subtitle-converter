@@ -4,8 +4,11 @@
 
 from io import StringIO
 import os
+import re
 
 def filePath(*args): return os.path.join(*args)
+
+chreg = re.compile("¬")
 
 PREVIOUS = []
 
