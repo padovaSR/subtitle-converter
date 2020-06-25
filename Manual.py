@@ -56,9 +56,10 @@ Postoje opcije u meniju <b>Edit</b> Undo i Redo akcije.</br></p>
 <br>&nbsp;
 
 <h2><font color="#777F95">Preslovljavanje</font></h2>
-<p>Teks titla se preslovljava iz Latinice u Ćirilicu i obratno. Tekst unutar tagova: <b>&lt; &gt;</b> ostaje u latinici.<br>
-Slova unutar tagova kojih nema u kodnom rasporedu <b>windows-1251: ŠšđĐĆćČčŽž</b>, će se sačuvati samo u UTF-8 tekstu,<br>
-u ANSI tekstu će umesto biti znakovi pitanja: <b>?</b>
+<p>Teks titla se preslovljava iz Latinice u Ćirilicu i obratno.<br>
+Predviđeno je da tekst unutar tagova: <b>&lt; &gt;</b> ostaje u latinici.<br>
+Slova unutar tagova kojih nema u kodnom rasporedu <b>windows-1251: <font color="#7fb3d5">ŠšđĐĆćČčŽž</font></b>, će se sačuvati samo u UTF-8 tekstu,<br>
+u ANSI tekstu će umesto biti znakovi pitanja: <b>?</b><br>
 Opcije za preslovljavanje iz Ćirilice u Latinicu nalaze se u meniju <b>Actions: Cyr to latin ansi, Cyr to latin utf8</b></br></p>
 
 <br>&nbsp;
