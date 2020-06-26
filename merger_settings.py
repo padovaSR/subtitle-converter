@@ -202,24 +202,19 @@ class Settings(wx.Dialog):
         self.sizer_6.Add(
             (20, 20),
             1,
-            wx.ALIGN_BOTTOM | wx.ALIGN_RIGHT | wx.ALL | wx.EXPAND,
+            wx.ALL | wx.EXPAND,
             3,
         )
         self.sizer_6.Add(
             self.button_1,
             1,
-            wx.ALIGN_BOTTOM | wx.ALIGN_RIGHT | wx.ALL | wx.EXPAND,
+            wx.ALL | wx.EXPAND,
             3,
         )
         self.sizer_6.Add(
             self.button_2,
             1,
-            wx.ALIGN_BOTTOM
-            | wx.ALIGN_RIGHT
-            | wx.BOTTOM
-            | wx.EXPAND
-            | wx.LEFT
-            | wx.TOP,
+            wx.ALL | wx.EXPAND, 
             3,
         )
         sizer_5.Add(self.sizer_6, 1, wx.ALL | wx.EXPAND, 3)
