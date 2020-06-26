@@ -54,18 +54,6 @@ class ConverterFrame(wx.Frame):
         )
         
         self.file.Append(self.fopen)
-        self.file.AppendSeparator()
-        self.open_next = wx.MenuItem(
-            self.file,
-            wx.ID_ANY,
-            "&Open next...\t" + keyS["Open next"],
-            u"Otvori sačuvani fajl",
-            wx.ITEM_NORMAL,
-        )
-        self.open_next.SetBitmap(
-            wx.ArtProvider.GetBitmap(wx.ART_GO_DIR_UP, wx.ART_MENU)
-        )
-        self.file.Append(self.open_next)
         
         self.file.AppendSeparator()
         self.reload = wx.MenuItem(
