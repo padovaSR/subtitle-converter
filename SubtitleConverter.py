@@ -50,7 +50,7 @@ import wx
 
 from subtitle_converter_gui import ConverterFrame
 
-VERSION = "v0.5.8_test1"
+VERSION = "v0.5.8_test2"
 
 
 logger = logging.getLogger(__name__)
@@ -276,6 +276,8 @@ class MyFrame(ConverterFrame):
         
     def dropedFiles(self, msg):
         self.droped = msg
+        if not self.droped:
+            self.multiFile.clear()
 
     def updateUI(self):
         self.curClr = wx.BLACK
