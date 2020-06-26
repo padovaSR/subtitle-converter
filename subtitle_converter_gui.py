@@ -386,7 +386,16 @@ class ConverterFrame(wx.Frame):
             wx.ITEM_CHECK,
         )
         self.preferences.Append(self.show)
+        self.preferences.AppendSeparator()
         
+        self.prelatin = wx.MenuItem(
+            self.preferences,
+            1014,
+            "&Lat-Cyr preprocessing\t" + keyS["PreLat-Cyr"],
+            "Uključi-Isključi procesovanje specijalnih znakova za 'toCyr' opciju",
+            wx.ITEM_CHECK,
+        )
+        self.preferences.Append(self.prelatin)
         self.preferences.AppendSeparator()
 
         self.fonts = wx.MenuItem(
@@ -630,6 +639,10 @@ class ConverterFrame(wx.Frame):
         self.frame_toolbar.AddControl(self.comboBox1)
         self.comboBox1.SetSelection(0)
         
+        self.frame_toolbar.SetToolBitmapSize((24, 24))
+        self.frame_toolbar.SetMargins((3, 3))
+        self.frame_toolbar.SetToolPacking(1)
+        self.frame_toolbar.SetToolSeparation(8)
         self.SetToolBar(self.frame_toolbar)
         self.frame_toolbar.Realize()
         # Tool Bar end
@@ -666,6 +679,10 @@ class ConverterFrame(wx.Frame):
             ch = pickle.load(f)
         if ch == True:
             self.preferences.Check(1013, check=True)
+        with open(filePath("resources", "var", "obs1.pkl"), "rb") as f:
+            lch = pickle.load(f)
+        if lch == True:
+            self.preferences.Check(1014, check=True)
 
         self.Layout()
 
