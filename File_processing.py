@@ -259,7 +259,7 @@ def writeToFile(text, path, enc, multi):
     else:
         error = 'replace'
     if multi ==False:
-        if os.path.isfile(path):
+        if os.path.isfile(path) and not os.path.dirname(path) == "tmp":
             dlg = wx.MessageBox(
                 f"{os.path.basename(path)}\nFile already exists! Proceed?",
                 "Overwrite the file?",
@@ -275,7 +275,7 @@ def writeToFile(text, path, enc, multi):
         ) as n_File:
             n_File.write(text)
             logger.debug(
-                f"Write file: {os.path.basename(path)}, encoding: {enc}"
+                f"Write file: {path}; {enc}"
             )
     except IOError as e:
         logger.debug(f"changeEncoding IOError: {e}")
