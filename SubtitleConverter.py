@@ -38,8 +38,8 @@ from text_processing import (
     cleanUp,
     cleanLine,
     rm_dash,
-    poravnLine, 
-    writeTempStr
+    writeTempStr,
+    preLatin, 
 )
 import logging
 from File_processing import FileOpened, newName, nameDialog, writeToFile
@@ -1215,6 +1215,9 @@ class MyFrame(ConverterFrame):
 
             utf_name, suffix = newName(path, value2_s, multi=False)
             utf_path = os.path.join(self.real_dir, (utf_name + suffix))
+            
+            if self.preferences.IsChecked(1014):
+                text = preLatin(text_in=text)
             
             text, msg = changeLetters(text, utf8_enc, reversed_action=False)
             cyr_path = path
@@ -2909,6 +2912,13 @@ class MyFrame(ConverterFrame):
             item = 'NotChecked'
         with open(filePath('resources', 'var', 'bcf.pkl'), 'wb') as fb:
             pickle.dump(item, fb)
+            
+        if self.preferences.IsChecked(1014):
+            val = True
+        else:
+            val = False
+        with open(filePath("resources", "var", "obs1.pkl"), "wb") as f:
+            pickle.dump(val, f)
 
         event.Skip()
         
@@ -3178,7 +3188,18 @@ class MyApp(wx.App):
 
     def m_files(self):
 
-        v_list = ["m_extensions.pkl", "file_ext.pkl"]
+        v_list = [
+            "m_extensions.pkl",
+            "file_ext.pkl",
+            "bcf.pkl",
+            "bcp.pkl",
+            "obsE.pkl",
+            "set_size.pkl",
+            "tcf.pkl",
+            "txt0.pkl",
+            "fixer_cb3.data",
+            "obs1.pkl", 
+        ]
         r_list = ["shortcut_keys.cfg", "Regex_def.config"]
 
         v_paths = [os.path.join("resources", "var", x) for x in v_list]
