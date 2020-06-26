@@ -67,6 +67,7 @@ class FileDrop(wx.FileDropTarget):
             text = normalizeText(enc, infile)
             bufferText(text, WORK_TEXT)
             FileDrop.nlist = checkErrors(WORK_TEXT.getvalue())
+            PREVIOUS.clear()
             addPrevious("Open", enc, text, "")
             logger.debug(f"FileDrop: {os.path.basename(infile)}")
             self.window.SetValue(text)
