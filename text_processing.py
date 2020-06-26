@@ -264,7 +264,7 @@ def changeLetters(text, enc, reversed_action):
 
             ## reverse translate ##############################################
             f_reg = re.compile(
-                "<.*?>|www\.\w+\.\w+",(re.I | re.M))
+                "<[^<]*?>|www\.\w+\.\w+",(re.I | re.M))
             
             cf = f_reg.findall(text_ch)
             
@@ -308,7 +308,7 @@ def remTag(text_in):
 
     taglist = ["<i>", "</i>", "<b>", "</b>", "<u>", "</u>", "</font>"]
 
-    n_reg = re.compile(r"<.*?>", re.I)
+    n_reg = re.compile(r"<[^<]*?>", re.I)
 
     nf = n_reg.findall(text_in)
     
