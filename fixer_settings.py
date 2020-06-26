@@ -263,13 +263,13 @@ class FixerSettings(wx.Dialog):
         self.sizer_8.Add(
             self.button_2,
             0,
-            wx.ALIGN_BOTTOM | wx.ALIGN_RIGHT | wx.LEFT | wx.RIGHT | wx.TOP,
+            wx.ALIGN_BOTTOM | wx.LEFT | wx.RIGHT | wx.TOP,
             1,
         )
         self.sizer_8.Add(
             self.button_1,
             0,
-            wx.ALIGN_BOTTOM | wx.ALIGN_RIGHT | wx.LEFT | wx.RIGHT | wx.TOP,
+            wx.ALIGN_BOTTOM | wx.LEFT | wx.RIGHT | wx.TOP,
             1,
         )
         self.sizer_1.Add(self.sizer_8, 0, wx.ALIGN_RIGHT, 0)
