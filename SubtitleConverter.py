@@ -39,7 +39,8 @@ from text_processing import (
     cleanLine,
     rm_dash,
     writeTempStr,
-    preLatin, 
+    preLatin,
+    remTag, 
 )
 import logging
 from File_processing import FileOpened, newName, nameDialog, writeToFile
@@ -626,11 +627,9 @@ class MyFrame(ConverterFrame):
     def onSave(self, event):
         
         tpath, enc = self.PathEnc()
-        print("enc1=", enc)
         if tpath and enc:
             enc = self.enchistory[tpath]
-            print("enc=", enc)
-
+        
             fname, nsuffix = newName(tpath, self.pre_suffix, multi=False)
             # Puna putanja sa imenom novog fajla
             outpath = nameDialog(fname, nsuffix, self.real_dir)
@@ -1164,7 +1163,10 @@ class MyFrame(ConverterFrame):
             self.newEnc = 'windows-1251'
             self.pre_suffix = value1_s
             
-            self.utf8_latText = text.encode(encoding="utf-8", errors="surrogatepass").replace(b"\n", b"\r\n")
+            utf8_text = remTag(text)
+            self.utf8_latText = utf8_text.encode(
+                encoding="utf-8", errors="surrogatepass"
+            ).replace(b"\n", b"\r\n")
             
             if text:
                 text = text.replace('?', '¬')
@@ -2016,6 +2018,11 @@ class MyFrame(ConverterFrame):
                     info1 = os.path.basename(fpath) # latFile original
                     izbor = [cyr_file, info2, info1, utf8_lat]
                     
+                    f_enc = PREVIOUS[0].enc
+                    text = open(fpath, "r", encoding=f_enc).read()
+                    text = remTag(text)
+                    writeToFile(text, fpath, f_enc, False)
+                    
                     dlg = wx.MultiChoiceDialog(
                         self, 'Pick files:', os.path.basename(name), izbor
                     )
@@ -2195,7 +2202,6 @@ class MyFrame(ConverterFrame):
                     sDlg.ShowModal()
                     # Dodaje putanju i enkoding u recnik
                     self.saved_file[path] = self.newEnc
-                    self.open_next.Enable(True)
                     # self.saved += 1
                     # self.resetTool()
             else:
@@ -2386,7 +2392,6 @@ class MyFrame(ConverterFrame):
                 sDlg.ShowModal()
                 # Dodaje putanju i enkoding u recnik
                 self.saved_file[path] = self.newEnc
-                # self.open_next.Enable(True)
         else:
             dlg.Destroy()
     
