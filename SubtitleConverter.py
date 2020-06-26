@@ -161,12 +161,10 @@ class MyFrame(ConverterFrame):
             self.to_cyrillic,
             self.to_utf8,
             self.transcrib,
-            self.open_next,
         ]
 
         ## MENU EVENTS ##############################################################################
         self.Bind(wx.EVT_MENU, self.onOpen, id=self.fopen.GetId())
-        self.Bind(wx.EVT_MENU, self.onOpenNext, id=self.open_next.GetId())
         self.Bind(wx.EVT_MENU, self.onReload, id=self.reload.GetId())
         self.Bind(wx.EVT_MENU, self.onSave, id=self.save.GetId())
         self.Bind(wx.EVT_MENU, self.onSaveAs, id=self.save_as.GetId())
@@ -545,7 +543,6 @@ class MyFrame(ConverterFrame):
                 self.real_dir = os.path.dirname(self.real_path[-1])
             self.handleFile(filepath)
             self.enableTool()
-            # self.open_next.Enable(False)
             dlgOpen.Destroy()
 
         event.Skip()
@@ -626,45 +623,6 @@ class MyFrame(ConverterFrame):
 
         event.Skip()
 
-    def onOpenNext(self, event):
-        
-        open_next, enc = self.saved_file.popitem()
-
-        _path = os.path.join("tmp", os.path.basename(open_next))
-
-        ask = 'Open this file:\n{}'.format(os.path.basename(open_next))
-        askDlg = wx.MessageDialog(
-            self,
-            ask,
-            caption="SubtitleConverter",
-            style=wx.OK_DEFAULT | wx.CANCEL | wx.ICON_QUESTION,
-        )
-        if askDlg.ShowModal() == wx.ID_OK:
-            try:
-                shutil.copy(open_next, _path)
-                self.text_1.SetValue("")
-                
-                text = self.textToBuffer(open_next, enc)
-                self.text_1.SetValue(text)
-                logger.debug(
-                    f"Open_next: {os.path.basename(open_next)}, encoding: {enc}"
-                )
-                bufferText(text, self.workText)
-                bufferText(text, WORK_TEXT)
-                self.SetStatusText(os.path.basename(open_next))
-                self.SetStatusText(enc, 1)
-                if enc == "utf-8-sig":
-                    enc = "UTF-8 BOM"
-                elif enc == "utf-8":
-                    enc = "UTF-8"
-                self.SetStatusText(enc, 1)
-                self.open_next.Enable(False)
-            except Exception as e:
-                logger.debug(f"OpenNext error: {e}")
-        else:
-            askDlg.Destroy()
-        event.Skip()
-
     def onSave(self, event):
         
         tpath, enc = self.PathEnc()
@@ -695,7 +653,6 @@ class MyFrame(ConverterFrame):
                 self.MenuBar.Enable(wx.ID_SAVE, False)
                 self.MenuBar.Enable(wx.ID_SAVEAS, False)
                 self.frame_toolbar.EnableTool(1010, False)
-                self.open_next.Enable(True)
                 self.reload.Enable(True)
                 
         event.Skip()
@@ -749,7 +706,6 @@ class MyFrame(ConverterFrame):
                 self.MenuBar.Enable(wx.ID_SAVE, False)
                 self.MenuBar.Enable(wx.ID_SAVEAS, False)
                 self.frame_toolbar.EnableTool(1010, False)
-                self.open_next.Enable(True)
                 self.reload.Enable(True)
                 # self.saved += 1
                 # self.resetTool()
