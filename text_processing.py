@@ -203,20 +203,12 @@ def fixI(in_text, enc):
 
 def changeLetters(text, enc, reversed_action):
     '''Funkction used for transliteration'''
-    # pLatin_rpl je rečnik iz cp1250.replace.cfg
+    ## pre_cyr je rečnik iz preLatCyr.map.cfg
     text = text
     enc = enc
     
     text = fixI(text, enc)
     
-    ## PreLatin ################################################################
-    robjLatin = re.compile(
-        '(%s)' % '|'.join(map(re.escape, pLatin_rpl.keys()))
-    )
-    try:
-        text = robjLatin.sub(lambda m: pLatin_rpl[m.group(0)], text)
-    except Exception as e:
-        logger.debug(f"PreLatin, unexpected error: {e}")
     ## Preprocessing ###########################################################
     try:
         if reversed_action == False:
@@ -249,7 +241,7 @@ def changeLetters(text, enc, reversed_action):
     transltab = str.maketrans(intab, outab)
     
     rd = {"Љ": "Lj", "Њ": "Nj", "Џ": "Dž", "љ": "lj", "њ": "nj", "џ": "dž"}
-    ##taglist = ["<и>", "</и>", "<б>", "</б>", "<у>", "</у>", "</фонт>"]
+    
     ## preslovljavanje ########################################################
     if text:
         try:
@@ -287,14 +279,50 @@ def changeLetters(text, enc, reversed_action):
             dok = dict(zip(cf, lj))
             
             for key, value in dok.items():
-                text_ch = text_ch.replace(key, value)   # Replace list items 
+                text_ch = text_ch.replace(key, value)   # Replace list items
+                
+            text_ch = remTag(text_in=text_ch)
+                
             return text_ch, msg
         except Exception as e:
             logger.debug(f"Preslovljavanje, unexpected error: {e}")
     else:
         logger.debug(f"Preslovljavanje, no text found!")
 
+def preLatin(text_in):
+    """"""
+    ## pLatin_rpl je rečnik iz cp1250.replace.cfg
+    ## PreLatin ################################################################
+    robjLatin = re.compile(
+        '(%s)' % '|'.join(map(re.escape, pLatin_rpl.keys()))
+    )
+    try:
+        text = robjLatin.sub(lambda m: pLatin_rpl[m.group(0)], text_in)
+    except Exception as e:
+        logger.debug(f"PreLatin, unexpected error: {e}")
+        
+    return text    
+        
+def remTag(text_in):
+    '''Remove unnecessary tags'''
 
+    taglist = ["<i>", "</i>", "<b>", "</b>", "<u>", "</u>", "</font>"]
+
+    n_reg = re.compile(r"<.*?>", re.I)
+
+    nf = n_reg.findall(text_in)
+    
+    new_f = [x for x in nf if x not in taglist and not x.startswith("<font ")]
+    
+    new_r = [re.sub(r"[<>]", "", x) for x in new_f]
+
+    fdok = dict(zip(new_f, new_r))
+
+    for k, v in fdok.items():
+        text_in = text_in.replace(k, v)
+
+    return text_in
+        
 def zameniImena(text_in):
 
     subs = pysrt.from_string(text_in)
