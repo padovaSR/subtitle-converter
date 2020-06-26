@@ -167,9 +167,13 @@ def checkChars(text):
 def displayError(text, tctrl, rdir, path, new_enc, multi):
     """"""
     nlist = w_position(r"\?", text)
-    
     epath = os.path.basename(path)
-    outf = os.path.join(rdir, os.path.splitext(epath)[0]+'_error.log')
+    
+    if type(rdir) == list:
+        rdir = [x for rdir[0] in rdir for x in rdir[0]]
+        outf = os.path.join(rdir[0], os.path.splitext(epath)[0]+"_error.log")
+    else:
+        outf = os.path.join(rdir, os.path.splitext(epath)[0]+'_error.log')
     
     showMeError(path, text, outf, new_enc)
     text = text.replace('¬', '?')
