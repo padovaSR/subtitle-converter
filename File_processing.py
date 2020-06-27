@@ -10,6 +10,13 @@ import shelve
 import logging
 from text_processing import codelist
 from settings import chreg
+from codecs import (
+    BOM_UTF8,
+    BOM_UTF16_BE,
+    BOM_UTF16_LE,
+    BOM_UTF32_BE,
+    BOM_UTF32_LE,
+)
 
 import wx
 
@@ -24,6 +31,14 @@ handler = logging.FileHandler(
 )
 handler.setFormatter(formatter)
 logger.addHandler(handler)
+
+BOMS = (
+    (BOM_UTF8, "UTF-8_BOM"),
+    (BOM_UTF32_BE, "UTF-32-BE"),
+    (BOM_UTF32_LE, "UTF-32-LE"),
+    (BOM_UTF16_BE, "UTF-16-BE"),
+    (BOM_UTF16_LE, "UTF-16-LE"),
+)
 
 class FileOpened:
     def __init__(self, path):
@@ -68,43 +83,53 @@ class FileOpened:
                     logger.debug(f'{self.putanja}: Canceled.')
 
     def findCode(self):
-
-        with open(os.path.join('resources', 'var', 'obsE.pkl'), 'rb') as f:
-            kodek = pickle.load(f).strip()
-        if kodek != 'auto':
-            ukode = kodek
-        else:
-            ukode = 'utf-8-sig'
-
-        kodiranja = [
-            ukode,
-            'utf-8',
-            'windows-1250',
-            'windows-1251',
-            'windows-1252',
-            'UTF-16LE',
-            "UTF-16BE",
-            'utf-8-sig',
-            'iso-8859-1',
-            'iso-8859-2',
-            'utf-16',
-            'ascii',
-        ]
-
-        for enc in kodiranja:
-            try:
-                with codecs.open(self.putanja, 'r', encoding=enc) as fh:
-                    fh.readlines()
-                    fh.seek(0)
-            except:
-                pass
+        ''''''
+        
+        f = open(self.putanja, "rb")
+        data = f.read(4)
+        f.close()
+        encoding = [encoding for bom, encoding in BOMS if data.startswith(bom)]
+        if encoding and encoding[0] == "UTF-8_BOM":
+            enc = "utf-8-sig"
+            return enc
+        else:        
+            with open(os.path.join('resources', 'var', 'obsE.pkl'), 'rb') as f:
+                kodek = pickle.load(f).strip()
+            if kodek != 'auto':
+                ukode = kodek
             else:
-                logger.debug(
-                    f' {os.path.basename(self.putanja)}, encoding: {enc}'
-                )
-                break
-
-        return enc
+                ukode = 'utf-8'
+    
+            kodiranja = [
+                ukode,
+                'utf-8',
+                'windows-1250',
+                'windows-1251',
+                'windows-1252',
+                'UTF-16LE',
+                "UTF-16BE",
+                'utf-8-sig',
+                'iso-8859-1',
+                'iso-8859-2',
+                'utf-16',
+                'ascii',
+            ]
+            if kodiranja[0] == kodiranja[1]:
+                kodiranja = kodiranja[1:]
+            for enc in kodiranja:
+                try:
+                    with codecs.open(self.putanja, 'r', encoding=enc) as fh:
+                        fh.readlines()
+                        fh.seek(0)
+                except:
+                    pass
+                else:
+                    logger.debug(
+                        f' {os.path.basename(self.putanja)}, encoding: {enc}'
+                    )
+                    break
+    
+            return enc
 
 
 def newName(path, pre_suffix, multi):
