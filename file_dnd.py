@@ -71,6 +71,8 @@ class FileDrop(wx.FileDropTarget):
             addPrevious("Open", enc, text, "")
             logger.debug(f"FileDrop: {os.path.basename(infile)}")
             self.window.SetValue(text)
+            with open(filePath('resources', 'var', 'r_text0.pkl'), 'wb') as t:
+                pickle.dump(text, t)
             return enc, text
 
         if len(lfiles) > 1:
