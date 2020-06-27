@@ -52,7 +52,7 @@ https://support.avast.com/en-ww/article/168/</br>
 <h2><font color="#777F95">Actions</font></h2>
 <p>Akcije iz menija <b>Actions</b> se nastavjaju jedna na drugu. Bilo kojim redom<br>
 Promene će biti sačuvane kao što su prikazane u prozoru programa.<br>
-Postoje opcije u meniju <b>Edit</b> Undo i Redo akcije.</br></p>
+Postoje opcije u meniju <b>Edit</b>, Undo i Redo akcije.</br></p>
 
 <br>&nbsp;
 
@@ -60,9 +60,10 @@ Postoje opcije u meniju <b>Edit</b> Undo i Redo akcije.</br></p>
 <p>Tekst titla se preslovljava iz Latinice u Ćirilicu i obratno.<br>
 Predviđeno je da tekst unutar izlomljenih zagrada: <b>&lt; &gt;</b> ostaje u latinici.<br>
 Stavljanjem nekih delova teksta unutar zagrada <b>&lt; &gt;</b> postiže se selektivno preslovljavanje iz Latinice u Ćirilicu.<br>
-Primer: <b>&lt;signe spécial&gt;</b>. Sadržaj unutar zagrada se neće preslovljavati u ćirilicu.<br>
 <br>
-Slova unutar zagrada, &lt; &gt;, kojih nema u kodnom rasporedu <b>windows-1251: <font color="#7fb3d5">ŠšđĐĆćČčŽž</font></b>, kao i specijalni znakovi će se sačuvati samo u UTF-8 tekstu,<br>
+Primer: <b>&lt;signe spécial&gt;</b>. Sadržaj u zagradama neće biti preslovljen u ćirilicu.<br>
+<br>
+Slova u zagradama, &lt; &gt;, kojih nema u kodnom rasporedu <b>windows-1251: <font color="#7fb3d5">ŠšđĐĆćČčŽž</font></b>, kao i specijalni znakovi će se sačuvati samo u UTF-8 tekstu,<br>
 Ove zagrade, sve osim samih tagova za tekst (italik, bold, font...), će tokom preslovljavanja biti obrisane i u novom i u originalnom tekstu.<br>
 <br>
 U meniju <b>Preferences</b> označavanjem opcije <b>Lat-Cyr preprocessing</b> uključuje se odnosno isključuje "peglanje" specijalnih znakova<br>
