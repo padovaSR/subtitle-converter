@@ -588,8 +588,9 @@ class MyFrame(ConverterFrame):
             if self.ShowDialog() == False:
                 return
         path = self.tmpPath[-1]
-        enc = self.enchistory[path]
-        
+        if PREVIOUS:
+            enc = PREVIOUS[0].enc
+                
         if os.path.isfile(os.path.join('resources', 'var', 'r_text0.pkl')):
             
             with open(
@@ -612,8 +613,7 @@ class MyFrame(ConverterFrame):
             self.reloaded += 1
         undo_redo = [
             self.UNDO,
-            self.REDO,
-            PREVIOUS, 
+            self.REDO, 
         ]
         for i in undo_redo:
             i.clear()        
@@ -623,7 +623,8 @@ class MyFrame(ConverterFrame):
         elif enc == "utf-8":
             enc = enc.upper()
         self.SetStatusText(enc, 1)
-
+        self.undo.Enable(False)
+        
         event.Skip()
 
     def onSave(self, event):
@@ -3027,8 +3028,10 @@ class MyFrame(ConverterFrame):
         
         path = self.tmpPath[0]
         actions = [x.action for x in PREVIOUS]
-        
-        self.REDO.append(PREVIOUS[-1])
+        if PREVIOUS:
+            self.REDO.append(PREVIOUS[-1])
+        else:
+            return
         if not "Open" in actions:
             prev_items = PREVIOUS.pop(len(PREVIOUS)-2)
         else:
