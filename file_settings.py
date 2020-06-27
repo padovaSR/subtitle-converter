@@ -136,7 +136,7 @@ class FileSettings(wx.Dialog):
         self.sizer_1.Add(self.sizer_2, 0, wx.EXPAND, 0)
         self.sizer_3.Add(self.button_3, 1, wx.ALL, 2)
         self.sizer_3.Add(self.button_4, 1, wx.ALIGN_BOTTOM | wx.ALL, 2)
-        self.sizer_1.Add(self.sizer_3, 1, wx.ALIGN_BOTTOM | wx.ALIGN_RIGHT | wx.TOP, 3)
+        self.sizer_1.Add(self.sizer_3, 1, wx.ALIGN_RIGHT | wx.TOP, 3)
         self.SetSizer(self.sizer_1)
         self.Layout()
         # end wxGlade
