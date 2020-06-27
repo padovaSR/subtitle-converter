@@ -253,6 +253,8 @@ class MyFrame(ConverterFrame):
             enc = msg[1]
             if enc == "utf-8-sig":
                 enc = "UTF-8 BOM"
+            elif enc == "utf-8":
+                enc = "UTF-8"            
             if type(path) == list:
                 path = path[-1]
             self.SetStatusText(os.path.basename(path))
@@ -390,6 +392,8 @@ class MyFrame(ConverterFrame):
             
             if enc == "utf-8-sig":
                 enc = "UTF-8 BOM"
+            elif enc == "utf-8":
+                enc = "UTF-8"            
             return enc
 
         def multiple(self, inpath, tmppath):
@@ -572,6 +576,8 @@ class MyFrame(ConverterFrame):
         logger.debug(f'Reloaded {os.path.basename(path)}, encoding: {enc}')
         if enc == "utf-8-sig":
             enc = "UTF-8 BOM"
+        elif enc == "utf-8":
+            enc = "UTF-8"        
         elif enc == "utf-8":
             enc = enc.upper()
         self.SetStatusText(enc, 1)
