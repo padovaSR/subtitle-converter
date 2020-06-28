@@ -63,6 +63,7 @@ Predviđeno je da tekst unutar izlomljenih zagrada: <b>&lt; &gt;</b> ostaje u la
 Stavljanjem nekih delova teksta unutar zagrada <b>&lt; &gt;</b> postiže se selektivno preslovljavanje iz Latinice u Ćirilicu.<br>
 <br>
 Primer: <b>&lt;signe spécial&gt;</b>. Sadržaj u zagradama neće biti preslovljen u ćirilicu.<br>
+&emsp;&emsp;&emsp;&ensp;<b>&lt;i&gt;&lt;signe spécial&gt;&lt;/i&gt;</b>. Kombinacija sa italik tagovima.<br>
 <br>
 Slova u zagradama, &lt; &gt;, kojih nema u kodnom rasporedu <b>windows-1251: <font color="#7fb3d5">ŠšđĐĆćČčŽž</font></b>, kao i specijalni znakovi će se sačuvati samo u UTF-8 tekstu,<br>
 Ove zagrade, sve osim samih tagova za tekst (italik, bold, font...), će tokom preslovljavanja biti obrisane i u novom i u originalnom tekstu.<br>
