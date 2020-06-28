@@ -347,7 +347,8 @@ class MyFrame(ConverterFrame):
     def postAction(self, path):
         
         path = self.fStatus(path)
-        self.SetStatusText(path)        
+        self.SetStatusText(path)
+        
         self.menubar1.Enable(wx.ID_SAVE, True)
         self.menubar1.Enable(wx.ID_SAVEAS, True)
         self.menubar1.Enable(wx.ID_CLOSE, True)
@@ -2632,7 +2633,7 @@ class MyFrame(ConverterFrame):
         self.addHistory(self.enchistory, path, enc)
         self.pre_suffix = PREVIOUS[0].psuffix
         self.clearUndoRedo()
-        self.addPrevious("Open", enc, "", self.pre_suffix)
+        self.addPrevious("Open", enc, text, self.pre_suffix)
         self.enableTool()
         enc = printEncoding(self.enchistory[path])
         
