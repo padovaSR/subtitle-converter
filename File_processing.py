@@ -9,7 +9,7 @@ import pickle
 import shelve
 import logging
 from text_processing import codelist
-from settings import chreg
+from settings import chreg, kodek
 from codecs import (
     BOM_UTF8,
     BOM_UTF16_BE,
@@ -51,8 +51,7 @@ class FileOpened:
         imeFajla = os.path.basename(self.putanja)
 
         with zipfile.ZipFile(self.putanja, 'r') as zf:
-            singlefajl = len(zf.namelist())
-            if singlefajl == 1:
+            if len(zf.namelist()) == 1:
                 jedanFajl = zf.namelist()[0]
                 outfile = [os.path.join(basepath, jedanFajl)]
                 with open(outfile[0], 'wb') as f:
@@ -61,7 +60,9 @@ class FileOpened:
                     os.path.dirname(self.putanja), jedanFajl
                 )
                 return outfile, outfile1
-            elif singlefajl >= 2:
+            elif not zf.namelist():
+                logger.debug(f"{imeFajla} is empty")
+            elif len(zf.namelist()) >= 2:
                 izbor = [x for x in zf.namelist() if not x.endswith('/')]
                 dlg = wx.MultiChoiceDialog(
                     None, 'Pick files:', imeFajla, izbor
@@ -84,7 +85,6 @@ class FileOpened:
 
     def findCode(self):
         ''''''
-        
         f = open(self.putanja, "rb")
         data = f.read(4)
         f.close()
@@ -93,8 +93,6 @@ class FileOpened:
             enc = "utf-8-sig"
             return enc
         else:        
-            with open(os.path.join('resources', 'var', 'obsE.pkl'), 'rb') as f:
-                kodek = pickle.load(f).strip()
             if kodek != 'auto':
                 ukode = kodek
             else:
@@ -130,7 +128,6 @@ class FileOpened:
                     break
     
             return enc
-
 
 def newName(path, pre_suffix, multi):
 
