@@ -31,8 +31,9 @@ if not os.path.exists(page):
 <H2>
 <FONT COLOR="#777F95">Prečice:</FONT></H2>
 
-<P><B><FONT COLOR="#777F95">Ctrl+Shift+F</B></FONT>
-: FileSettings dijalog, predefinisani "pre presufiks" novih fajlova(lat,cyr,utf8...)<br>
+<P><B><FONT COLOR="#777F95">Ctrl+Shift+F</B></FONT>: FileSettings dijalog, predefinisani "pre presufiks" novih fajlova(lat,cyr,utf8...)<br>
+<br>
+<B><FONT COLOR="#777F95">Ctrl+Shift+Y</B></FONT>: Latinica u Ćirilicu UTF-8<br>
 <br>
 Ostale prečice se mogu uređivati u <b>ShortcutEditoru</b> u meniju <b>Preferences</b></br><P>
 
