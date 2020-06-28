@@ -614,11 +614,8 @@ class MyFrame(ConverterFrame):
         for i in undo_redo:
             i.clear()        
         logger.debug(f'Reloaded {os.path.basename(path)}, encoding: {enc}')
-        if enc == "utf-8-sig":
-            enc = "UTF-8 BOM"
-        elif enc == "utf-8":
-            enc = enc.upper()
-        self.SetStatusText(enc, 1)
+        
+        self.SetStatusText(printEncoding(enc), 1)
         self.undo.Enable(False)
         
         event.Skip()
@@ -652,6 +649,7 @@ class MyFrame(ConverterFrame):
                 self.MenuBar.Enable(wx.ID_SAVEAS, False)
                 self.frame_toolbar.EnableTool(1010, False)
                 self.reload.Enable(True)
+                self.reloadtext.Enable(True)
                 
         event.Skip()
 
@@ -3263,7 +3261,7 @@ class MyFrame(ConverterFrame):
         self.postAction(path)
         self.SetStatusText(printEncoding(prev.enc), 1)
         self.pre_suffix = prev.psuffix
-        self.addHistory(self.enchistory, path, enc)
+        self.addHistory(self.enchistory, path, prev.enc)
         self.addPrevious(prev.action, prev.enc, text, self.pre_suffix)
         
         event.Skip()
