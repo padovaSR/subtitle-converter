@@ -71,8 +71,10 @@ class FileDrop(wx.FileDropTarget):
             addPrevious("Open", enc, text, "")
             logger.debug(f"FileDrop: {os.path.basename(infile)}")
             self.window.SetValue(text)
+            d_text = {}
+            d_text[text] = enc            
             with open(filePath('resources', 'var', 'r_text0.pkl'), 'wb') as t:
-                pickle.dump(text, t)
+                pickle.dump(d_text, t)
             return enc, text
 
         if len(lfiles) > 1:
@@ -145,8 +147,8 @@ class FileDrop(wx.FileDropTarget):
                     fop = FileOpened(name)
                     outfile, rfile = fop.isCompressed()
                     rpath = [rfile]
-                except:
-                    logger.debug('No files selected.')
+                except Exception as e:
+                    logger.debug(f'ZIP; {e}.')
                 else:
                     if len(outfile) == 1:
                         enc, t = file_go(outfile[0], rfile)
