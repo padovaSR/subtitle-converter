@@ -8,6 +8,14 @@ import re
 
 def filePath(*args): return os.path.join(*args)
 
+def printEncoding(entered_enc):
+    ''''''
+    if entered_enc == "utf-8-sig":
+        entered_enc = "UTF-8 BOM"
+    elif entered_enc == "utf-8":
+        entered_enc = "UTF-8"
+    return entered_enc
+
 chreg = re.compile("¬")
 
 PREVIOUS = []
