@@ -131,7 +131,7 @@ class MyFrame(ConverterFrame):
         self.real_dir = r""
         self.cyrUTFmulti = []
         
-        self.reloadText = r""
+        self.reloadText = {}
         self.reloaded = 0
         
         ## Undo-Redo ######################
@@ -252,9 +252,9 @@ class MyFrame(ConverterFrame):
         else:
             path = message
             enc = printEncoding(msg[1])
-            
             if type(path) == list:
                 path = path[-1]
+            self.filehistory.AddFileToHistory(path)
             self.SetStatusText(os.path.basename(path))
             self.SetStatusText(enc, 1)
             self.tmpPath = [path]
@@ -273,6 +273,9 @@ class MyFrame(ConverterFrame):
         
         self.addHistory(self.enchistory, tpath, enc)
         self.real_path = [rlPath]
+        if enc == "windows-1251":
+            self.to_ansi.Enable(False)
+            self.frame_toolbar.EnableTool(1003, False)        
         
     def dropedFiles(self, msg):
         self.droped = msg
@@ -297,7 +300,7 @@ class MyFrame(ConverterFrame):
         self.text_1.SetForegroundColour(self.curClr)    
         
     def enableTool(self):
-        
+                    
         self.frame_toolbar.EnableTool(wx.ID_CLOSE, True)
         self.frame_toolbar.EnableTool(1002, True)   # toCyrillic
         self.frame_toolbar.EnableTool(1003, True)   # toANSI
@@ -308,6 +311,9 @@ class MyFrame(ConverterFrame):
         
         for i in self.menu_items: i.Enable(True)
         
+        if PREVIOUS[0].enc == "windows-1251":
+            self.to_ansi.Enable(False)
+            self.frame_toolbar.EnableTool(1003, False)        
     
     def disableTool(self):
         
@@ -379,7 +385,7 @@ class MyFrame(ConverterFrame):
             logger.debug(f'File opened: {os.path.basename(infile)}')
             self.filehistory.AddFileToHistory(infile)
             self.addHistory(self.enchistory, infile, enc)
-            self.reloadText = text
+            self.reloadText[text] = enc
             bufferText(text, self.workText)
             
             undo_redo = [self.UNDO, self.REDO, PREVIOUS]
@@ -586,22 +592,24 @@ class MyFrame(ConverterFrame):
         path = self.tmpPath[-1]
         if PREVIOUS:
             enc = PREVIOUS[0].enc
+            self.pre_suffix = PREVIOUS[0].psuffix
                 
         if os.path.isfile(os.path.join('resources', 'var', 'r_text0.pkl')):
             
             with open(
                 os.path.join('resources', 'var', 'r_text0.pkl'), 'rb'
             ) as f:
-                text = pickle.load(f)
-            self.reloadText = text
+                d = pickle.load(f)
+            text = list(d.items())[0][0]
+            enc = list(d.items())[0][1]
             self.text_1.SetValue(text)
             writeTempStr(path, text, enc)
-            os.remove(os.path.join('resources', 'var', 'r_text0.pkl'))
             bufferText(text, WORK_TEXT)
             bufferText(text, self.workText)
             self.reloaded += 1
         else:
-            text = self.reloadText
+            text = list(self.reloadText.items())[0][0]
+            enc = list(self.reloadText.items())[0][1]            
             self.text_1.SetValue(text)
             writeTempStr(path, text, enc)
             bufferText(text, WORK_TEXT)
@@ -616,8 +624,13 @@ class MyFrame(ConverterFrame):
         logger.debug(f'Reloaded {os.path.basename(path)}, encoding: {enc}')
         
         self.SetStatusText(printEncoding(enc), 1)
-        self.undo.Enable(False)
-        
+        self.clearUndoRedo()
+        self.addHistory(self.enchistory, path, enc)
+        self.addPrevious("Open", enc, text, self.pre_suffix)
+        self.enableTool()
+        #if enc == "windows-1251":
+            #self.to_ansi.Enable(False)
+            #self.frame_toolbar.EnableTool(1003, False)        
         event.Skip()
 
     def onSave(self, event):
@@ -741,7 +754,7 @@ class MyFrame(ConverterFrame):
             self.Destroy()
         event.Skip()
 
-    def clearUndoRedo(self, event):
+    def clearUndoRedo(self):
         '''CLear Undo-Redo history'''
         self.UNDO.clear()
         self.REDO.clear()
@@ -749,8 +762,6 @@ class MyFrame(ConverterFrame):
         self.undo.Enable(False)
         self.redo.Enable(False)
         self.clear.Enable(False)
-        
-        event.Skip()
         
     def toANSI(self, event):
         
@@ -2131,7 +2142,7 @@ class MyFrame(ConverterFrame):
             enc = self.newEnc
             sas_wildcard = "ZipArchive (*.zip)|*.zip|All Files (*.*)|*.*"
             
-            if not PREVIOUS:
+            if len(PREVIOUS) == 1:
                 logger.debug(f"Export Zip: Nothing to do.")
                 return
             
@@ -2179,12 +2190,18 @@ class MyFrame(ConverterFrame):
                         self.text_1.SetValue("ERROR\n\nTry different options.")
                         return
 
-                    cyr_file = fname + os.path.splitext(tpath)[-1] # info1 dodaje cyr pre_suffix i file se pise u ZIP pod tim imenom
-                    utf8_lat = tpath.replace("srt", "") + "utf8" + os.path.splitext(tpath)[-1]
+                    cyr_file = (
+                        fname + os.path.splitext(tpath)[-1]
+                    )  # info1 dodaje cyr pre_suffix i file se pise u ZIP pod tim imenom
+                    utf8_lat = (
+                        os.path.splitext(tpath)[0]
+                        + ".utf8"
+                        + os.path.splitext(tpath)[-1]
+                    )
                     cyr_file = cyr_file.strip('/')
                     utf8_lat = utf8_lat.strip("/")
                     info2 = os.path.basename(tUTF)  # cyrUTF-8
-                    info1 = os.path.basename(fpath) # latFile original
+                    info1 = os.path.basename(fpath)  # latFile original
                     izbor = [cyr_file, info2, info1, utf8_lat]
                     
                     f_enc = PREVIOUS[0].enc
@@ -2599,23 +2616,30 @@ class MyFrame(ConverterFrame):
         # get the file based on the menu ID
         fileNum = event.GetId() - wx.ID_FILE1
         path = self.filehistory.GetHistoryFile(fileNum)
-        enc = self.enchistory[path]
         # add it back to the history so it will be moved up the list
         self.filehistory.AddFileToHistory(path)
-        self.enchistory[path] = enc
+        enc = self.enchistory[path]
+        f_error = 'strict'
+        if enc in codelist:
+            f_error = 'surrogatepass'
+        try:
+            with open(path, 'r', encoding=enc, errors=f_error) as f:
+                text = f.read()
+            self.text_1.SetValue(text)
+        except Exception as e:
+            logger.debug(f"FileHistory: {e}")
         
-        with open(path, 'r', encoding=enc, errors='replace') as f:
-            text = f.read()
-        self.text_1.SetValue(text)
-        
+        self.addHistory(self.enchistory, path, enc)
+        self.pre_suffix = PREVIOUS[0].psuffix
+        self.clearUndoRedo()
+        self.addPrevious("Open", enc, "", self.pre_suffix)
         self.enableTool()
-
-        if enc == "utf-8-sig":
-            enc = "UTF-8 BOM"
+        enc = printEncoding(self.enchistory[path])
         
         logger.debug(f'From fileHistory: {os.path.basename(path)} encoding: {enc}')
         self.SetStatusText(os.path.basename(path))
         self.SetStatusText(enc, 1)
+        
         event.Skip()
         
     def onCyrToANSI(self, event):
