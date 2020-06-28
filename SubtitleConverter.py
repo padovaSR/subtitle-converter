@@ -17,7 +17,7 @@ import glob
 from collections import namedtuple 
 from io import StringIO, BytesIO
 from file_dnd import FileDrop 
-from settings import filePath, WORK_TEXT, PREVIOUS
+from settings import filePath, WORK_TEXT, PREVIOUS, printEncoding
 from errors_check import checkErrors, checkChars, displayError, checkFile
 from merge import myMerger,fixGaps
 from fixer_settings import FixerSettings
@@ -50,7 +50,7 @@ import wx
 
 from subtitle_converter_gui import ConverterFrame
 
-VERSION = "v0.5.8_test2"
+VERSION = "v0.5.8_test3"
 
 
 logger = logging.getLogger(__name__)
@@ -251,11 +251,8 @@ class MyFrame(ConverterFrame):
             self.SetStatusText("", 1)
         else:
             path = message
-            enc = msg[1]
-            if enc == "utf-8-sig":
-                enc = "UTF-8 BOM"
-            elif enc == "utf-8":
-                enc = "UTF-8"            
+            enc = printEncoding(msg[1])
+            
             if type(path) == list:
                 path = path[-1]
             self.SetStatusText(os.path.basename(path))
@@ -390,11 +387,7 @@ class MyFrame(ConverterFrame):
                 i.clear()
             
             self.addPrevious("Open", enc, text, self.pre_suffix)
-            
-            if enc == "utf-8-sig":
-                enc = "UTF-8 BOM"
-            elif enc == "utf-8":
-                enc = "UTF-8"            
+            enc =printEncoding(enc)
             return enc
 
         def multiple(self, inpath, tmppath):
@@ -575,12 +568,8 @@ class MyFrame(ConverterFrame):
         enc = self.enchistory[path]            
         
         logger.debug(f'Reloaded {os.path.basename(path)}, encoding: {enc}')
-        if enc == "utf-8-sig":
-            enc = "UTF-8 BOM"
-        elif enc == "utf-8":
-            enc = "UTF-8"        
-        elif enc == "utf-8":
-            enc = enc.upper()
+        
+        enc = printEncoding(enc)
         self.SetStatusText(enc, 1)
 
         event.Skip()
@@ -1408,7 +1397,8 @@ class MyFrame(ConverterFrame):
                 ErrorDlg.ShowModal()
                 
             self.SetStatusText(os.path.basename(path))
-            self.SetStatusText(self.newEnc, 1)
+            enc = printEncoding(self.newEnc)
+            self.SetStatusText(enc, 1)
             
             self.postAction(path)
             self.frame_toolbar.EnableTool(1003, False)   # toANSI
@@ -1500,7 +1490,8 @@ class MyFrame(ConverterFrame):
         
         for item in f_text:
             self.text_1.WriteText(item)
-
+        
+        self.SetStatusText(printEncoding(self.newEnc), 1)
         self.addPrevious("toCyrUTF8_multiple", self.newEnc, "", file_suffix)
         self.reloaded = 0
         self.SetStatusText('Multiple files done.')
@@ -1529,7 +1520,7 @@ class MyFrame(ConverterFrame):
                 return
 
         path, entered_enc = self.PathEnc()
-
+        
         if len(self.multiFile) >= 1:
             self.multipleTools()
             self.toUTF_multiple()
@@ -1550,9 +1541,7 @@ class MyFrame(ConverterFrame):
                 or entered_enc == "utf-8-sig"
                 and cyr_utf != "toCYR"
             ):
-                code = "UTF-8"
-                if entered_enc == "utf-8-sig":
-                    code = "BOM_UTF-8"
+                code = printEncoding(entered_enc)
                 logger.debug(f"toUTF: Encoding is {entered_enc}.")
                 
             text = WORK_TEXT.getvalue()
@@ -1563,10 +1552,7 @@ class MyFrame(ConverterFrame):
             self.text_1.SetValue(text)
             
             if text:
-                if self.newEnc == "utf-8-sig":
-                    code = "BOM_UTF-8"
-                else:
-                    code = self.newEnc.upper()
+                code = printEncoding(self.newEnc)
                 
                 bufferText(text, WORK_TEXT)
                 self.bytesToBuffer(text, self.newEnc)
@@ -1662,6 +1648,7 @@ class MyFrame(ConverterFrame):
             )
             msginfo.ShowModal()
         self.reloaded = 0
+        self.SetStatusText(printEncoding(self.newEnc), 1)
         self.addPrevious("toUTF_multiple", self.newEnc, "", self.pre_suffix)
         self.SetStatusText('Multiple files done.')
         
@@ -1720,7 +1707,7 @@ class MyFrame(ConverterFrame):
         bufferText(text, self.workText)
         self.bytesToBuffer(text, self.newEnc)
         
-        self.SetStatusText(self.newEnc.upper(), 1)
+        self.SetStatusText(printEncoding(self.newEnc), 1)
 
         self.postAction(path)
 
@@ -1785,11 +1772,8 @@ class MyFrame(ConverterFrame):
             )
             ErrorDlg.ShowModal()
             self.Error_Text = error_text
-        if entered_enc == "utf-8-sig":
-            entered_enc = "UTF-8 BOM"
-        else:
-            entered_enc = self.newEnc.upper()
-        self.SetStatusText(entered_enc, 1)
+        
+        self.SetStatusText(printEncoding(entered_enc), 1)
 
         self.postAction(path)
         self.addPrevious("repSpec", self.newEnc, text_s, self.pre_suffix)
@@ -1875,6 +1859,7 @@ class MyFrame(ConverterFrame):
         self.bytesToBuffer(text, entered_enc)
         
         self.SetStatusText(os.path.basename(path))
+        self.SetStatusText(printEncoding(entered_enc), 1)
 
         self.postAction(path)
 
@@ -2020,11 +2005,7 @@ class MyFrame(ConverterFrame):
                 )
                 msginfo.ShowModal()
             
-            kod = self.newEnc
-            if kod == "utf-8-sig":
-                kod = "BOM_UTF-8"
-            else: kod = self.newEnc.upper()
-            self.SetStatusText(kod, 1)
+            self.SetStatusText(printEncoding(self.newEnc), 1)
             self.addPrevious("Cleanup", self.newEnc, text_s, self.pre_suffix)
             self.addHistory(self.enchistory, path, self.newEnc)
             self.postAction(path)
@@ -2128,11 +2109,8 @@ class MyFrame(ConverterFrame):
                     wx.OK | wx.ICON_INFORMATION,
                 )
                 sDlg.ShowModal()
-            enc = self.newEnc
-            if enc == "utf-8-sig":
-                enc = "UTF-8 BOM"
-            elif enc == "utf-8":
-                enc = enc.upper()
+            
+            enc = printEncoding(self.newEnc)
             self.SetStatusText(enc, 1)
             self.postAction(path)
             self.addPrevious("Merger", self.newEnc, text, self.pre_suffix)
@@ -2834,11 +2812,7 @@ class MyFrame(ConverterFrame):
             if os.path.exists(self.cyrUTF):
                 os.remove(self.cyrUTF)
             
-            enc = self.newEnc.upper()
-            if self.newEnc == "utf-8-sig":
-                enc = "UTF-8 BOM"
-            
-            self.SetStatusText(enc, 1)
+            self.SetStatusText(printEncoding(self.newEnc), 1)
 
             self.postAction(path)            
             self.addPrevious("cyrToUTF", self.newEnc, text, self.pre_suffix)
@@ -2914,6 +2888,7 @@ class MyFrame(ConverterFrame):
             self.text_1.WriteText(item)
         self.multipleTools()
         self.reloaded = 0
+        self.SetStatusText(printEncoding(self.newEnc), 1)
         self.addPrevious("cyrToUTF_multiple", self.newEnc, "", self.pre_suffix)
         self.SetStatusText('Multiple files done.')
         
@@ -3030,7 +3005,7 @@ class MyFrame(ConverterFrame):
 
         self.addPrevious("FixSubtitle", self.newEnc, text, self.pre_suffix)
         self.addHistory(self.enchistory, path, self.newEnc)
-        self.SetStatusText(self.newEnc, 1)
+        self.SetStatusText(printEncoding(self.newEnc), 1)
 
         self.postAction(path)
         
@@ -3250,11 +3225,7 @@ class MyFrame(ConverterFrame):
         if len(self.REDO) >= 6:
             self.REDO = self.REDO[1:]
         
-        enc = entered_enc
-        if entered_enc == "utf-8-sig":
-            enc = "UTF-8 BOM"
-        elif entered_enc == "utf-8":
-            enc = "UTF-8"
+        enc = printEncoding(entered_enc)
             
         self.postAction(path)
         self.SetStatusText(enc, 1)
@@ -3289,13 +3260,8 @@ class MyFrame(ConverterFrame):
             self.frame_toolbar.EnableTool(1003, True)   # toANSI
             self.to_ansi.Enable(True)
 
-        enc = prev.enc
-        if enc == "utf-8-sig":
-            enc = "UTF-8 BOM"
-        elif enc == "utf-8":
-            enc = "UTF-8"
         self.postAction(path)
-        self.SetStatusText(enc, 1)
+        self.SetStatusText(printEncoding(prev.enc), 1)
         self.pre_suffix = prev.psuffix
         self.addHistory(self.enchistory, path, enc)
         self.addPrevious(prev.action, prev.enc, text, self.pre_suffix)
