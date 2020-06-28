@@ -216,14 +216,15 @@ class MyFrame(ConverterFrame):
             id2=wx.ID_FILE9,
         )
         self.comboBox1.Bind(wx.EVT_COMBOBOX, self.onChoice, id=-1, id2=wx.ID_ANY)
+        self.Bind(wx.EVT_MENU, self.toCyrUTF8, id=82)
         self.Bind(wx.EVT_MENU, self.onFileSettings, id=83)
         # self.Bind(wx.EVT_MENU, self.ShowDialog, id=84)
         self.Bind(wx.EVT_SIZE, self.size_frame, id=-1)
         self.Bind(wx.EVT_CLOSE, self.onClose, id=wx.ID_ANY)
         #############################################################################################
-        entries = [wx.AcceleratorEntry() for i in range(1)]
-        # entries[0].Set(wx.ACCEL_CTRL | wx.ACCEL_SHIFT, ord('Y'), 82)
-        entries[0].Set(wx.ACCEL_CTRL | wx.ACCEL_SHIFT, ord('F'), 83)
+        entries = [wx.AcceleratorEntry() for i in range(2)]
+        entries[0].Set(wx.ACCEL_CTRL | wx.ACCEL_SHIFT, ord('Y'), 82)
+        entries[1].Set(wx.ACCEL_CTRL | wx.ACCEL_SHIFT, ord('F'), 83)
 
         accel_tbl = wx.AcceleratorTable(entries)
         self.SetAcceleratorTable(accel_tbl)
@@ -999,8 +1000,7 @@ class MyFrame(ConverterFrame):
                 return newF, text
 
             def postAnsi():
-                self.SetStatusText('Processing multiple files.')
-                self.addPrevious("toANSI_multiple", self.newEnc, "", self.pre_suffix)
+                self.SetStatusText(os.path.basename(newF))
                 
             def dialog1(text_1):
                 ErrorDlg = wx.MessageDialog(
@@ -1133,6 +1133,7 @@ class MyFrame(ConverterFrame):
                     postAnsi()
         for item in f_text:
             self.text_1.WriteText(item)
+        self.addPrevious("toANSI_multiple", self.newEnc, "", self.pre_suffix)
         self.SetStatusText('Multiple files done.')
         self.multipleTools()
         
@@ -1242,6 +1243,11 @@ class MyFrame(ConverterFrame):
 
         self.text_1.SetValue("")
         
+        if self.preferences.IsChecked(1011):
+            utf8_enc = 'utf-8-sig'
+        else:
+            utf8_enc = 'utf-8'        
+        
         self.newEnc = 'windows-1251'
         self.pre_suffix = value1_s
         f_text = ["Files Processed:\n"]
@@ -1261,11 +1267,6 @@ class MyFrame(ConverterFrame):
             text = normalizeText(entered_enc, path)
             if text:
                 text = text.replace('?', '¬')
-
-            if self.preferences.IsChecked(1011):
-                utf8_enc = 'utf-8-sig'
-            else:
-                utf8_enc = 'utf-8'
 
             utfText, suffix = newName(path, value2_s, multi=True)
 
@@ -1313,17 +1314,200 @@ class MyFrame(ConverterFrame):
                 self.Error_Text = error_text
 
             self.enc = self.newEnc
-            self.SetStatusText('Processing multiple files')
-            self.addPrevious("toCYR_multiple", self.newEnc, "", file_suffix)
-        
+            self.SetStatusText(os.path.basename(cyr_path))
+            
         for item in f_text:
             self.text_1.WriteText(item)
-
+    
+        self.addPrevious("toCYR_multiple", self.newEnc, "", file_suffix)
         self.reloaded = 0
         self.SetStatusText('Multiple files done.')
         self.multipleTools()
         self.frame_toolbar.EnableTool(1003, False)
         self.to_ansi.Enable(False)
+    
+    def toCyrUTF8(self, event):
+        ''''''
+        with shelve.open(
+            os.path.join("resources", "var", "dialog_settings.db"),
+            flag='writeback',
+        ) as sp:
+            ex = sp['key5']
+            value_s = ex["cyr_utf8_srt"]
+
+        tval = self.text_1.GetValue()
+        if (
+            not tval.startswith('Files ')
+            and len(tval) > 0
+            and self.save.IsEnabled()
+        ):
+            if self.ShowDialog() == False:
+                return
+
+        path, entered_enc = self.PathEnc()
+        
+        if self.preferences.IsChecked(1011):  
+            utf8_enc = 'utf-8-sig'
+        else:
+            utf8_enc = 'utf-8'        
+        
+        if len(self.multiFile) >= 1:
+            self.multipleTools()
+            self.toCyrUTF8_multiple()
+
+        else:
+            text = WORK_TEXT.getvalue()
+            
+            self.newEnc = utf8_enc
+            self.pre_suffix = value_s
+            
+            utf8_text = remTag(text)
+            self.utf8_latText = utf8_text.encode(
+                encoding="utf-8", errors="surrogatepass"
+            ).replace(b"\n", b"\r\n")
+            
+            if text:
+                text = text.replace('?', '¬')
+
+            utf_name, suffix = newName(path, value_s, multi=False)
+            utf_path = os.path.join(self.real_dir, (utf_name + suffix))
+            
+            if self.preferences.IsChecked(1014):
+                text = preLatin(text_in=text)
+            
+            text, msg = changeLetters(text, self.newEnc, reversed_action=False)
+            cyr_path = path
+            self.cyrUTF = utf_path
+            
+            text = bufferCode(text, self.newEnc)
+            
+            error_text = checkFile(path, cyr_path, text, multi=False)
+            text = displayError(
+                text,
+                self.text_1,
+                self.real_dir,
+                path,
+                self.newEnc,
+                multi=False
+            )
+            
+            bufferText(text, self.workText)
+            bufferText(text, WORK_TEXT)
+            
+            self.bytesToBuffer(text, self.newEnc)
+
+            writeToFile(text, utf_path, utf8_enc, multi=False)
+            
+            if error_text:
+                ErrorDlg = wx.MessageDialog(
+                    self,
+                    error_text,
+                    "SubtitleConverter",
+                    wx.OK | wx.ICON_ERROR,
+                )
+                ErrorDlg.ShowModal()
+                
+            self.SetStatusText(os.path.basename(path))
+            self.SetStatusText(self.newEnc, 1)
+            
+            self.postAction(path)
+            self.frame_toolbar.EnableTool(1003, False)   # toANSI
+            self.to_ansi.Enable(False)
+            
+            self.addHistory(self.enchistory, path, self.newEnc)
+            self.addPrevious("toCyrUTF8", self.newEnc, text, self.pre_suffix)
+            self.reloaded = 0            
+                
+        event.Skip()
+        
+    def toCyrUTF8_multiple(self):
+        """"""
+        with open(
+            os.path.join("resources", "var", "file_ext.pkl"), "rb"
+        ) as f:
+            ex = pickle.load(f)  # ["key5"]
+            value_s = ex["cyr_utf8_srt"]
+
+        self.text_1.SetValue("")
+        
+        if self.preferences.IsChecked(1011):  
+            utf8_enc = 'utf-8-sig'
+        else:
+            utf8_enc = 'utf-8'        
+        
+        self.newEnc = utf8_enc
+        self.pre_suffix = value_s
+        f_text = ["Files Processed:\n"]
+
+        self.PathEnc()
+
+        self.tmpPath.clear()
+        self.cyrUTFmulti.clear()
+        
+        for key, value in self.multiFile.items():
+
+            path = key
+            entered_enc = value
+
+            file_suffix = os.path.splitext(path)[-1]
+
+            text = normalizeText(entered_enc, path)
+            
+            if text:
+                text = text.replace('?', '¬')
+
+            utfText, suffix = newName(path, value_s, multi=True)
+
+            utf_path = os.path.join(self.real_dir, utfText + suffix)
+            self.cyrUTFmulti.append(utf_path)
+
+            text,msg = changeLetters(text, self.newEnc, reversed_action=False)
+            
+            text = bufferCode(text, self.newEnc)
+            
+            cyr_name, cyr_suffix = newName(path, value_s, multi=True)
+            cyr_path = os.path.join(self.real_dir, cyr_name + file_suffix)
+
+            self.tmpPath.append(cyr_path)
+            
+            error_text = checkFile(utf_path, cyr_path, text, multi=True)
+            text = displayError(
+                text,
+                self.text_1,
+                self.real_path,
+                cyr_path,
+                self.newEnc,
+                multi=True,
+            )
+            
+            writeToFile(text, utf_path, self.newEnc, multi=True)
+            
+            f_text.append("\n")
+            f_text.append(os.path.basename(cyr_path))
+
+            if error_text:
+                ErrorDlg = wx.MessageDialog(
+                    self,
+                    error_text,
+                    "SubtitleConverter",
+                    wx.OK | wx.ICON_ERROR,
+                )
+                ErrorDlg.ShowModal()
+                self.Error_Text = error_text
+
+            self.enc = self.newEnc
+            self.SetStatusText(os.path.basename(cyr_path))
+        
+        for item in f_text:
+            self.text_1.WriteText(item)
+
+        self.addPrevious("toCyrUTF8_multiple", self.newEnc, "", file_suffix)
+        self.reloaded = 0
+        self.SetStatusText('Multiple files done.')
+        self.multipleTools()
+        self.frame_toolbar.EnableTool(1003, False)
+        self.to_ansi.Enable(False)        
+        
         
     def toUTF(self, event):
 
@@ -1462,7 +1646,7 @@ class MyFrame(ConverterFrame):
                     wx.OK | wx.ICON_ERROR,
                 )
                 ErrorDlg.ShowModal()
-            self.SetStatusText('Processing multiple files.')
+            self.SetStatusText(os.path.basename(newF))
         
         for item in f_text:
             self.text_1.WriteText(item)
@@ -2155,7 +2339,7 @@ class MyFrame(ConverterFrame):
                 else:
                     zip_data = []
                     previous_action = PREVIOUS[-1].action
-                    if previous_action == 'toCyrSRTutf8':
+                    if previous_action == 'toCyrUTF8':
                         zdata = data_out(None, self.cyrUTF)
                         zip_data.append(zdata)
                         info1 = os.path.basename(self.cyrUTF).strip('/')
@@ -2368,6 +2552,10 @@ class MyFrame(ConverterFrame):
                     logger.debug(
                         "ExportZIP_A error, {}".format(sys.exc_info())
                     )
+            if PREVIOUS[-1].action == 'toCyrUTF8_multiple':
+                files = izbor
+                zlist = [data_out(x) for x in files]
+                info = [os.path.basename(x) for x in files]            
             try:
                 with zipfile.ZipFile(name, 'w') as fzip:
                     for i, x in zip(info, zlist):
