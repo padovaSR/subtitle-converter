@@ -9,7 +9,7 @@ import pickle
 import shelve
 import logging
 from text_processing import codelist
-from settings import chreg, kodek, added, value2_s, value5_s, value_m, oformat, ex
+from settings import chreg, kodek, preSuffix
 from codecs import (
     BOM_UTF8,
     BOM_UTF16_BE,
@@ -131,6 +131,8 @@ class FileOpened:
 
 def newName(path, pre_suffix, multi):
     ''''''
+    added, ex, value2_s, value5_s, value_m, oformat = preSuffix()
+    
     spattern = re.compile(r"(?:\.srt){2,3}", re.I)
     tpattern = re.compile(r"(?:\.txt){2,3}", re.I)
     upattern = re.compile(r"\s*" + value_m + r"\d*", re.I)
