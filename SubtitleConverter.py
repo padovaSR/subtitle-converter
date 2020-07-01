@@ -754,7 +754,7 @@ class MyFrame(ConverterFrame):
             not tval.startswith('Files ')
             and len(tval) > 0
             and self.save.IsEnabled()
-            and not prev == 'toCyrSRTutf8'
+            and not PREVIOUS[-1].action == "toCyrUTF8"
         ):
             dl1 = wx.MessageBox(
                 "Current content has not been saved! Proceed?",
