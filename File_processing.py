@@ -9,7 +9,7 @@ import pickle
 import shelve
 import logging
 from text_processing import codelist
-from settings import chreg, kodek
+from settings import chreg, kodek, added, value2_s, value5_s, value_m, oformat, ex
 from codecs import (
     BOM_UTF8,
     BOM_UTF16_BE,
@@ -130,24 +130,7 @@ class FileOpened:
             return enc
 
 def newName(path, pre_suffix, multi):
-
-    presuffix_l = os.path.join("resources", "var", "presuffix_list.bak")
-
-    with open(
-        os.path.join("resources", "var", "file_ext.pkl"), "rb"
-    ) as f:
-        ex = pickle.load(f)
-        value2_s = ex['cyr_utf8_txt']
-        value5_s = ex['lat_utf8_srt']
-
-    with open(
-        os.path.join("resources", "var", "m_extensions.pkl"), "rb"
-    ) as f:
-        value_m = pickle.load(f)  #  Merger suffix
-
-    with open(os.path.join('resources', 'var', 'tcf.pkl'), 'rb') as tf:
-        oformat = pickle.load(tf)  # TXT suffix
-
+    ''''''
     spattern = re.compile(r"(?:\.srt){2,3}", re.I)
     tpattern = re.compile(r"(?:\.txt){2,3}", re.I)
     upattern = re.compile(r"\s*" + value_m + r"\d*", re.I)
@@ -178,12 +161,6 @@ def newName(path, pre_suffix, multi):
         sufix = os.path.splitext(path)[
             -1
         ]  # srt,txt ili neki drugi koji je otvoren
-
-    if not os.path.exists(presuffix_l):
-        open(presuffix_l, "a").close()
-
-    with open(presuffix_l, 'r', encoding='utf-8') as l_file:
-        added = [line.strip("\n") for line in l_file if line]
 
     suffix_list = [
         "." + x if not x.startswith("_") else x for x in ex.values()
