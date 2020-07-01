@@ -446,6 +446,10 @@ class MyFrame(ConverterFrame):
                     outfile, rfile = fop.isCompressed()  # U tmp/ folderu
                 except:
                     logger.debug(f'{path}: No files selected.')
+                    FILE_HISTORY.pop()
+                    self.real_path.clear()
+                    self.real_path.append(FILE_HISTORY[-1])
+                    return
                 else:
                     if len(outfile) == 1:  # Jedan fajl u ZIP-u
                         enc = file_go(outfile[0], rfile)
@@ -521,7 +525,7 @@ class MyFrame(ConverterFrame):
                     self.text_1.AppendText(name)
                     self.enchistory[fpath] = enc
                     self.multiFile[fpath] = enc
-                    self.reloadText = name
+                    self.reloadText[name] = enc
 
             self.multipleTools()
             logger.debug('FileHandler: Ready for multiple files')
@@ -582,17 +586,17 @@ class MyFrame(ConverterFrame):
         ):
             if self.ShowDialog() == False:
                 return
-        try:
-            self.handleFile(self.real_path)
-        except Exception as e:
-            logger.debug(f"Reload file: {e}")
-            return
         
+        if self.real_path:
+            self.handleFile(self.real_path)
+        else:
+            self.reload.Enable(False)
+            return
         path = self.tmpPath[-1]
         enc = self.enchistory[path]            
         
         logger.debug(f'Reloaded {os.path.basename(path)}, encoding: {enc}')
-        
+        self.clearUndoRedo()
         enc = printEncoding(enc)
         self.SetStatusText(enc, 1)
 
@@ -747,9 +751,7 @@ class MyFrame(ConverterFrame):
         self.rwFileHistory(FILE_HISTORY)
         
         tval = self.text_1.GetValue()
-        prev = ""
-        if self.previous_action:
-            prev = list(self.previous_action.keys())[0]
+        
         if (
             not tval.startswith('Files ')
             and len(tval) > 0
@@ -2643,20 +2645,17 @@ class MyFrame(ConverterFrame):
         self.filehistory.AddFileToHistory(path)
         self.real_path.append(path)
         self.real_dir = os.path.dirname(path)
-        try:
-            self.handleFile([path])
-        except Exception as e:
-            logger.debug(f"FileHistory: {e}")
-            return
         
-        self.pre_suffix = PREVIOUS[0].psuffix
-        enc = PREVIOUS[0].enc
-        self.enableTool()
-        self.clearUndoRedo()
-        logger.debug(f"From FileHistory: {os.path.basename(path)}; {enc}")
-        self.SetStatusText(os.path.splitext(os.path.basename(path))[0])
-        self.SetStatusText(printEncoding(enc), 1)
-        
+        self.handleFile([path])
+
+        if PREVIOUS:
+            self.pre_suffix = PREVIOUS[0].psuffix
+            enc = PREVIOUS[0].enc
+            self.enableTool()
+            self.clearUndoRedo()
+            logger.debug(f"From FileHistory: {os.path.basename(path)}; {enc}")
+            self.SetStatusText(os.path.splitext(os.path.basename(path))[0])
+            self.SetStatusText(printEncoding(enc), 1)
         event.Skip()
 
     def rwFileHistory(self, hfile):
@@ -3381,7 +3380,8 @@ class MyApp(wx.App):
 
         v_paths = [os.path.join("resources", "var", x) for x in v_list]
         r_paths = [os.path.join("resources", x) for x in r_list]
-
+        logs = os.path.join("resources","var","log","file.history.log")
+        v_list.append(logs)
         m_list = [x for x in (v_paths + r_paths) if not os.path.isfile(x)]
 
         if m_list:
