@@ -58,7 +58,7 @@ import wx
 
 from subtitle_converter_gui import ConverterFrame
 
-VERSION = "v0.5.8_test3"
+VERSION = "v0.5.8_test4"
 
 
 logger = logging.getLogger(__name__)
@@ -243,7 +243,7 @@ class MyFrame(ConverterFrame):
         
         for i in FILE_HISTORY:
             self.filehistory.AddFileToHistory(i)        
-        self.rwFileHistory(FILE_HISTORY)
+        # self.rwFileHistory(FILE_HISTORY)
         
         self.disableTool()
 
@@ -324,7 +324,7 @@ class MyFrame(ConverterFrame):
         
         for i in self.menu_items: i.Enable(True)
         
-        if PREVIOUS[0].enc == "windows-1251":
+        if PREVIOUS and PREVIOUS[0].enc == "windows-1251":
             self.to_ansi.Enable(False)
             self.frame_toolbar.EnableTool(1003, False)        
     
@@ -2654,7 +2654,7 @@ class MyFrame(ConverterFrame):
         self.enableTool()
         self.clearUndoRedo()
         logger.debug(f"From FileHistory: {os.path.basename(path)}; {enc}")
-        self.SetStatusText(os.path.basename(path))
+        self.SetStatusText(os.path.splitext(os.path.basename(path))[0])
         self.SetStatusText(printEncoding(enc), 1)
         
         event.Skip()
@@ -3374,7 +3374,8 @@ class MyApp(wx.App):
             "tcf.pkl",
             "txt0.pkl",
             "fixer_cb3.data",
-            "obs1.pkl", 
+            "obs1.pkl",
+            "presuffix_list.bak", 
         ]
         r_list = ["shortcut_keys.cfg", "Regex_def.config"]
 
