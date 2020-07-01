@@ -398,7 +398,10 @@ class MyFrame(ConverterFrame):
                     self.text_1.SetInsertionPoint(i[1])
             logger.debug(f'File opened: {os.path.basename(infile)}')
             self.addHistory(self.enchistory, infile, enc)
-            self.reloadText[text] = enc
+            try:
+                self.reloadText[text] = enc
+            except Exception as e:
+                logger.debug(f"file_go: {e}")
             bufferText(text, self.workText)
             
             undo_redo = [self.UNDO, self.REDO, PREVIOUS]
@@ -610,7 +613,6 @@ class MyFrame(ConverterFrame):
             self.pre_suffix = PREVIOUS[0].psuffix
                 
         if os.path.isfile(os.path.join('resources', 'var', 'r_text0.pkl')):
-            
             with open(
                 os.path.join('resources', 'var', 'r_text0.pkl'), 'rb'
             ) as f:
@@ -630,12 +632,8 @@ class MyFrame(ConverterFrame):
             bufferText(text, WORK_TEXT)
             bufferText(text, self.workText)
             self.reloaded += 1
-        undo_redo = [
-            self.UNDO,
-            self.REDO, 
-        ]
-        for i in undo_redo:
-            i.clear()        
+        
+        self.REDO.clear() 
         logger.debug(f'Reloaded {os.path.basename(path)}, encoding: {enc}')
         
         self.SetStatusText(printEncoding(enc), 1)
@@ -643,9 +641,6 @@ class MyFrame(ConverterFrame):
         self.addHistory(self.enchistory, path, enc)
         self.addPrevious("Open", enc, text, self.pre_suffix)
         self.enableTool()
-        #if enc == "windows-1251":
-            #self.to_ansi.Enable(False)
-            #self.frame_toolbar.EnableTool(1003, False)        
         event.Skip()
 
     def onSave(self, event):
@@ -660,7 +655,7 @@ class MyFrame(ConverterFrame):
             if outpath:
                 text = self.workText.getvalue()
                 writeToFile(text, outpath, enc, multi=False)
-                self.reloadText = text
+                self.reloadText[text] = enc
                 if os.path.isfile(outpath):
                     logger.debug(f"File saved: {outpath}")
                     fpath = os.path.basename(outpath)
@@ -713,7 +708,7 @@ class MyFrame(ConverterFrame):
             else:
                 text = self.text_1.GetValue()
             writeToFile(text, path, self.newEnc, multi=False)
-            self.reloadText = text
+            self.reloadText[text] = self.newEnc
             if os.path.isfile(path):
                 logger.debug(f"File saved sucessfully. {path}")
                 sDlg = wx.MessageDialog(
@@ -917,9 +912,7 @@ class MyFrame(ConverterFrame):
             # ---------------------------------------------------------------------------------------#
             elif procent > 0:
                 self.SetStatusText(u'Greška u ulaznom fajlu.')
-                f_procent = 'Najmanje {} % teksta.\nIli najmanje [ {} ] znakova.'.format(
-                    procent, zbir_slova
-                )
+                f_procent = f'Najmanje {procent} % teksta.\nIli najmanje [ {zbir_slova} ] znakova.'
                 ErrorText = "Greška:\n\nUlazni fajl sadrži ćiriliči alfabet.\n\n{}\n{}\n\nNastavljate?\n".format(
                     f_procent, ",".join(chars)
                 )
