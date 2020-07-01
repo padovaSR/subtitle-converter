@@ -11,13 +11,21 @@ import shutil
 import pickle
 import pysrt
 import srt
+from more_itertools import unique_everseen
 from pydispatch import dispatcher
 from operator import itemgetter
 import glob
 from collections import namedtuple 
 from io import StringIO, BytesIO
 from file_dnd import FileDrop 
-from settings import filePath, WORK_TEXT, PREVIOUS, printEncoding
+from settings import (
+    filePath,
+    WORK_TEXT,
+    PREVIOUS,
+    FILE_HISTORY,
+    log_file_history,
+    printEncoding,
+)
 from errors_check import checkErrors, checkChars, displayError, checkFile
 from merge import myMerger,fixGaps
 from fixer_settings import FixerSettings
@@ -233,6 +241,10 @@ class MyFrame(ConverterFrame):
         dt = FileDrop(self.text_1)
         self.text_1.SetDropTarget(dt)
         
+        for i in FILE_HISTORY:
+            self.filehistory.AddFileToHistory(i)        
+        self.rwFileHistory(FILE_HISTORY)
+        
         self.disableTool()
 
         dispatcher.connect(self.updateStatus, "TMP_PATH", sender=dispatcher.Any)
@@ -240,11 +252,12 @@ class MyFrame(ConverterFrame):
         dispatcher.connect(self.dropedFiles, "droped", sender=dispatcher.Any)
         
     def updateStatus(self, message, msg):
+        ''''''
         nlist = FileDrop.nlist
         if nlist:
             for i in nlist:
-                self.text_1.SetStyle(i[0], i[1], wx.TextAttr("YELLOW","BLUE"))
-                self.text_1.SetInsertionPoint(i[1])        
+                self.text_1.SetStyle(i[0], i[1], wx.TextAttr("YELLOW", "BLUE"))
+                self.text_1.SetInsertionPoint(i[1])
 
         if msg[2] == True:
             self.SetStatusText('Multiple files ready for processing')
@@ -254,7 +267,7 @@ class MyFrame(ConverterFrame):
             enc = printEncoding(msg[1])
             if type(path) == list:
                 path = path[-1]
-            self.filehistory.AddFileToHistory(path)
+            self.filehistory.AddFileToHistory(FILE_HISTORY[len(FILE_HISTORY) - 1])
             self.SetStatusText(os.path.basename(path))
             self.SetStatusText(enc, 1)
             self.tmpPath = [path]
@@ -384,7 +397,6 @@ class MyFrame(ConverterFrame):
                     )
                     self.text_1.SetInsertionPoint(i[1])
             logger.debug(f'File opened: {os.path.basename(infile)}')
-            self.filehistory.AddFileToHistory(infile)
             self.addHistory(self.enchistory, infile, enc)
             self.reloadText[text] = enc
             bufferText(text, self.workText)
@@ -416,6 +428,8 @@ class MyFrame(ConverterFrame):
         if len(inpaths) == 1:  # Jedan ulazni fajl, ZIP ili TXT,SRT
             path = inpaths[0]
             tpath = tmp_path[0]
+            FILE_HISTORY.append(path)
+            self.filehistory.AddFileToHistory(path)
             if not zipfile.is_zipfile(path):
                 shutil.copy(path, tpath)
                 enc = file_go(tpath, path)  # U tmp/ folderu
@@ -724,13 +738,19 @@ class MyFrame(ConverterFrame):
         event.Skip()
 
     def onClose(self, event):  
+        ''''''
         with open(filePath("resources", "var", "set_size.pkl"), "wb") as wf:
             pickle.dump(self.fsize, wf)
+        self.rwFileHistory(FILE_HISTORY)
+        
         self.Destroy()
 
-    def onQuit(self, event):  
+    def onQuit(self, event):
+        ''''''
         with open(filePath("resources", "var", "set_size.pkl"), "wb") as wf:
             pickle.dump(self.fsize, wf)
+        self.rwFileHistory(FILE_HISTORY)
+        
         tval = self.text_1.GetValue()
         prev = ""
         if self.previous_action:
@@ -759,7 +779,7 @@ class MyFrame(ConverterFrame):
         '''CLear Undo-Redo history'''
         self.UNDO.clear()
         self.REDO.clear()
-        PREVIOUS.clear()
+        # PREVIOUS.clear()
         self.undo.Enable(False)
         self.redo.Enable(False)
         self.clear.Enable(False)
@@ -2614,34 +2634,48 @@ class MyFrame(ConverterFrame):
         event.Skip()
         
     def onFileHistory(self, event):
+        ''''''
+        tval = self.text_1.GetValue()
+        if (
+            not tval.startswith('Files ')
+            and len(tval) > 0
+            and self.save.IsEnabled()
+        ):
+            if self.ShowDialog() == False:
+                return
         # get the file based on the menu ID
         fileNum = event.GetId() - wx.ID_FILE1
         path = self.filehistory.GetHistoryFile(fileNum)
         # add it back to the history so it will be moved up the list
         self.filehistory.AddFileToHistory(path)
-        enc = self.enchistory[path]
-        f_error = 'strict'
-        if enc in codelist:
-            f_error = 'surrogatepass'
+        self.real_path.append(path)
+        self.real_dir = os.path.dirname(path)
         try:
-            with open(path, 'r', encoding=enc, errors=f_error) as f:
-                text = f.read()
-            self.text_1.SetValue(text)
+            self.handleFile([path])
         except Exception as e:
             logger.debug(f"FileHistory: {e}")
+            return
         
-        self.addHistory(self.enchistory, path, enc)
         self.pre_suffix = PREVIOUS[0].psuffix
-        self.clearUndoRedo()
-        self.addPrevious("Open", enc, text, self.pre_suffix)
+        enc = PREVIOUS[0].enc
         self.enableTool()
-        enc = printEncoding(self.enchistory[path])
-        
-        logger.debug(f'From fileHistory: {os.path.basename(path)} encoding: {enc}')
+        self.clearUndoRedo()
+        logger.debug(f"From FileHistory: {os.path.basename(path)}; {enc}")
         self.SetStatusText(os.path.basename(path))
-        self.SetStatusText(enc, 1)
+        self.SetStatusText(printEncoding(enc), 1)
         
         event.Skip()
+
+    def rwFileHistory(self, hfile):
+        """"""
+        logfile = open(log_file_history, "w", encoding="utf-8", newline="\r\n")
+        if len(hfile) > 9:
+            hfile = hfile[-9:]
+        file_set = list(unique_everseen(hfile))
+        for paths in file_set:
+            if os.path.exists(paths):
+                logfile.write(paths + "\n")
+        logfile.close()
         
     def onCyrToANSI(self, event):
         
