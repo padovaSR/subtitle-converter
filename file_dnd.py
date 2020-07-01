@@ -25,7 +25,7 @@ import logging
 from pydispatch import dispatcher
 from collections import namedtuple 
 
-from settings import filePath, WORK_TEXT, PREVIOUS
+from settings import filePath, WORK_TEXT, PREVIOUS, FILE_HISTORY
 from File_processing import FileOpened
 from text_processing import normalizeText,bufferText
 from errors_check import checkErrors 
@@ -151,6 +151,7 @@ class FileDrop(wx.FileDropTarget):
                     logger.debug(f'ZIP; {e}.')
                 else:
                     if len(outfile) == 1:
+                        FILE_HISTORY.append(name)
                         enc, t = file_go(outfile[0], rfile)
                         nam = [outfile[0]]
                         droped += 1
@@ -182,6 +183,7 @@ class FileDrop(wx.FileDropTarget):
                         dispatcher.send("droped", msg=new_d)
                         logger.debug('FileDrop: Ready for multiple files.')
             elif zipfile.is_zipfile(name) == False:
+                FILE_HISTORY.append(name)
                 tmp_path = [filePath('tmp', os.path.basename(name))]
                 shutil.copy(name, tmp_path[-1])
                 enc, txt1 = file_go(tmp_path[-1], name)
