@@ -41,7 +41,7 @@ class ConverterFrame(wx.Frame):
         )
         self.SetIcon(_icon)
 
-        # Menu Bar
+        ## Menu Bar ###############################################################################
         keyS = shortcutsKey
         self.menubar1 = wx.MenuBar()
         self.file = wx.Menu()
@@ -130,7 +130,7 @@ class ConverterFrame(wx.Frame):
         self.file.Append(self.quit_program)
 
         self.menubar1.Append(self.file, "File")
-        ## EDIT MENU #######################################################################
+        ## EDIT MENU ##############################################################################
         self.edit = wx.Menu()
         self.undo = wx.MenuItem(self.edit, wx.ID_ANY, "&Undo Action\t" + keyS["Undo"], "Undo text")
         self.undo.SetBitmap(
@@ -173,7 +173,7 @@ class ConverterFrame(wx.Frame):
 
         self.menubar1.Append(self.edit, "Edit")
 
-        # Actions   ---------------------------------------------------------
+        ## Actions ################################################################################
         self.action = wx.Menu()
         self.to_cyrillic = wx.MenuItem(
             self.action,
@@ -345,7 +345,7 @@ class ConverterFrame(wx.Frame):
 
         self.menubar1.Append(self.action, u"Actions")
 
-        # Preferences menu --------------------------------------------------
+        ## Preferences menu #######################################################################
         self.preferences = wx.Menu()
         self.bom_utf8 = wx.MenuItem(
             self.preferences,
@@ -437,7 +437,7 @@ class ConverterFrame(wx.Frame):
         
         self.menubar1.Append(self.preferences, u"Preferences")
         
-        ## Help menu
+        ## Help menu ##############################################################################
         self.help = wx.Menu()
         self.about = wx.MenuItem(
             self.help,
@@ -477,12 +477,13 @@ class ConverterFrame(wx.Frame):
 
         self.frame_statusbar = self.CreateStatusBar(2)
         self.frame_statusbar.SetStatusWidths([-4, -1])
+        
         # statusbar fields
         frame_statusbar_fields = ["SubtitleConverter is ready", "Encoding"]
         for i in range(len(frame_statusbar_fields)):
             self.frame_statusbar.SetStatusText(frame_statusbar_fields[i], i)
 
-        # Tool Bar
+        ## Tool Bar ###############################################################################
         self.frame_toolbar = wx.ToolBar(self, -1, style=wx.TB_DEFAULT_STYLE)
         self.frame_toolbar.AddTool(
             1001,
@@ -633,7 +634,7 @@ class ConverterFrame(wx.Frame):
         self.frame_toolbar.SetToolSeparation(8)
         self.SetToolBar(self.frame_toolbar)
         self.frame_toolbar.Realize()
-        # Tool Bar end
+        ## Tool Bar end ###########################################################################
 
         self.panel_1 = wx.Panel(self, wx.ID_ANY)
         sizer_1 = wx.BoxSizer(wx.VERTICAL)
