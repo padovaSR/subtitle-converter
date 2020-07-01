@@ -435,7 +435,10 @@ class MyFrame(ConverterFrame):
             self.filehistory.AddFileToHistory(path)
             if not zipfile.is_zipfile(path):
                 shutil.copy(path, tpath)
+                self.tmpPath.clear()
+                self.real_path.clear()                
                 enc = file_go(tpath, path)  # U tmp/ folderu
+                self.real_path.append(path)
                 self.tmpPath.append(tpath)
                 self.SetStatusText(os.path.basename(tpath))
                 self.SetStatusText(enc, 1)
@@ -448,11 +451,16 @@ class MyFrame(ConverterFrame):
                     logger.debug(f'{path}: No files selected.')
                     FILE_HISTORY.pop()
                     self.real_path.clear()
+                    if zipfile.is_zipfile(tpath):
+                        self.tmpPath.clear()
                     self.real_path.append(FILE_HISTORY[-1])
                     return
                 else:
                     if len(outfile) == 1:  # Jedan fajl u ZIP-u
+                        self.real_path.clear()
+                        self.tmpPath.clear()
                         enc = file_go(outfile[0], rfile)
+                        self.real_path.append(path)
                         self.tmpPath.append(outfile[0])
                         self.SetStatusText(os.path.basename(outfile[0]))
                         self.SetStatusText(enc, 1)
@@ -470,6 +478,9 @@ class MyFrame(ConverterFrame):
                         logger.debug(
                             'FileHandler: Ready for multiple files.'
                         )
+                        self.enableTool()
+                        self.tmpPath.clear()
+                        self.real_path.clear()
                         self.SetStatusText('Files ready for processing')
 
         elif len(inpaths) > 1:  # Više selektovanih ulaznih fajlova
@@ -586,7 +597,7 @@ class MyFrame(ConverterFrame):
         ):
             if self.ShowDialog() == False:
                 return
-        
+        # path, enc =self.PathEnc()
         if self.real_path:
             self.handleFile(self.real_path)
         else:
@@ -594,7 +605,7 @@ class MyFrame(ConverterFrame):
             return
         path = self.tmpPath[-1]
         enc = self.enchistory[path]            
-        
+                
         logger.debug(f'Reloaded {os.path.basename(path)}, encoding: {enc}')
         self.clearUndoRedo()
         enc = printEncoding(enc)
@@ -2646,6 +2657,9 @@ class MyFrame(ConverterFrame):
         self.real_path.append(path)
         self.real_dir = os.path.dirname(path)
         
+        if self.multiFile:
+            self.multiFile.clear()
+        self.tmpPath.clear()
         self.handleFile([path])
 
         if PREVIOUS:
