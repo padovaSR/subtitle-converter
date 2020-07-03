@@ -423,14 +423,15 @@ class MyFrame(ConverterFrame):
             return path, n_path
 
         inpaths = [x for x in filepaths]
+        
         tmp_path = [
             os.path.join(self.location, os.path.basename(item))
             for item in inpaths
         ]  # sef.locatin is tmp/
-        
         if len(inpaths) == 1:  # Jedan ulazni fajl, ZIP ili TXT,SRT
             path = inpaths[0]
             tpath = tmp_path[0]
+            self.tmpPath.append(tpath)
             FILE_HISTORY.append(path)
             self.filehistory.AddFileToHistory(path)
             if not zipfile.is_zipfile(path):
@@ -449,11 +450,22 @@ class MyFrame(ConverterFrame):
                     outfile, rfile = fop.isCompressed()  # U tmp/ folderu
                 except:
                     logger.debug(f'{path}: No files selected.')
+                    if not PREVIOUS:
+                        return
                     FILE_HISTORY.pop()
                     self.real_path.clear()
-                    if zipfile.is_zipfile(tpath):
-                        self.tmpPath.clear()
-                    self.real_path.append(FILE_HISTORY[-1])
+                    self.tmpPath.clear()
+                    FH = FILE_HISTORY[-1]
+                    fop = FileOpened(FH)
+                    if zipfile.is_zipfile(FH):
+                        o, u = fop.isCompressed()
+                        file_go(o[0], u[0])
+                        self.tmpPath.append(o[0])
+                    else:
+                        file_go(os.path.join(self.location, FH), FH)
+                        self.tmpPath.append(os.path.join(self.location, FH))
+                    self.real_path.append(FH)
+                    self.reloadtext.Enable(False)
                     return
                 else:
                     if len(outfile) == 1:  # Jedan fajl u ZIP-u
@@ -597,7 +609,13 @@ class MyFrame(ConverterFrame):
         ):
             if self.ShowDialog() == False:
                 return
-        # path, enc =self.PathEnc()
+        if zipfile.is_zipfile(self.real_path[0]):
+            with zipfile.ZipFile(self.real_path[0], 'r') as zf:
+                if len(zf.namelist()) >= 2:
+                    self.clearUndoRedo()
+                    self.reload.Enable(False)
+                    self.reloadtext.Enable(False)
+                    return
         if self.real_path:
             self.handleFile(self.real_path)
         else:
@@ -2668,7 +2686,10 @@ class MyFrame(ConverterFrame):
             self.enableTool()
             self.clearUndoRedo()
             logger.debug(f"From FileHistory: {os.path.basename(path)}; {enc}")
-            self.SetStatusText(os.path.splitext(os.path.basename(path))[0])
+            if zipfile.is_zipfile(self.tmpPath[0]):
+                self.SetStatusText(os.path.basename(self.tmpPath[0]))
+            else:
+                self.SetStatusText(os.path.splitext(os.path.basename(self.tmpPath[0]))[0])
             self.SetStatusText(printEncoding(enc), 1)
         event.Skip()
 
