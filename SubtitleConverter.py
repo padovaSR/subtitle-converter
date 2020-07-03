@@ -1183,6 +1183,7 @@ class MyFrame(ConverterFrame):
             self.text_1.WriteText(item)
         self.addPrevious("toANSI_multiple", self.newEnc, "", self.pre_suffix)
         self.SetStatusText('Multiple files done.')
+        self.SetStatusText(self.newEnc, 1)
         self.multipleTools()
         
     def toCyrillic(self, event):
@@ -1340,7 +1341,7 @@ class MyFrame(ConverterFrame):
             text = displayError(
                 text_ansi,
                 self.text_1,
-                self.real_path,
+                self.real_dir,
                 cyr_path,
                 self.newEnc,
                 multi=True,
@@ -1370,6 +1371,7 @@ class MyFrame(ConverterFrame):
         self.addPrevious("toCYR_multiple", self.newEnc, "", file_suffix)
         self.reloaded = 0
         self.SetStatusText('Multiple files done.')
+        self.SetStatusText(self.newEnc, 1)
         self.multipleTools()
         self.frame_toolbar.EnableTool(1003, False)
         self.to_ansi.Enable(False)
@@ -1523,7 +1525,7 @@ class MyFrame(ConverterFrame):
             text = displayError(
                 text,
                 self.text_1,
-                self.real_path,
+                self.real_dir,
                 cyr_path,
                 self.newEnc,
                 multi=True,
@@ -2596,7 +2598,7 @@ class MyFrame(ConverterFrame):
                         "ExportZIP_A error, {}".format(sys.exc_info())
                     )
             if PREVIOUS[-1].action == 'toCyrUTF8_multiple':
-                files = izbor
+                files = self.cyrUTFmulti
                 zlist = [data_out(x) for x in files]
                 info = [os.path.basename(x) for x in files]            
             try:
@@ -2843,6 +2845,7 @@ class MyFrame(ConverterFrame):
         self.reloaded = 0
         self.addPrevious("cyrToANSI_multiple", self.newEnc, "", self.pre_suffix)
         self.SetStatusText('Multiple files done.')
+        self.SetStatusText(self.newEnc, 1)
         
     def onCyrToUTF(self, event):
         
