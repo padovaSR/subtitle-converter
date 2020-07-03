@@ -20,6 +20,7 @@ def printEncoding(entered_enc):
 chreg = re.compile("¬")
 
 log_file_history = os.path.join("resources","var","log","file.history.log")
+droppedText = os.path.join('resources', 'var', 'r_text0.pkl')
 
 FILE_HISTORY = []
 
@@ -28,9 +29,6 @@ PREVIOUS = []
 WORK_TEXT = StringIO()
     
 WORK_SUBS = StringIO()
-
-with open(os.path.join('resources', 'var', 'obsE.pkl'), 'rb') as f:
-    kodek = pickle.load(f).strip()
 
 with open(log_file_history, encoding="utf-8") as f:
     for line in f:
