@@ -25,6 +25,7 @@ from settings import (
     FILE_HISTORY,
     log_file_history,
     printEncoding,
+    droppedText, 
 )
 from errors_check import checkErrors, checkChars, displayError, checkFile
 from merge import myMerger,fixGaps
@@ -400,6 +401,8 @@ class MyFrame(ConverterFrame):
             self.addHistory(self.enchistory, infile, enc)
             try:
                 self.reloadText[text] = enc
+                if os.path.exists(droppedText):
+                    os.remove(droppedText)
             except Exception as e:
                 logger.debug(f"file_go: {e}")
             bufferText(text, self.workText)
@@ -457,14 +460,18 @@ class MyFrame(ConverterFrame):
                     self.tmpPath.clear()
                     FH = FILE_HISTORY[-1]
                     fop = FileOpened(FH)
+                    self.pre_suffix = ""
                     if zipfile.is_zipfile(FH):
                         o, u = fop.isCompressed()
-                        file_go(o[0], u[0])
+                        enc = file_go(o[0], u[0])
                         self.tmpPath.append(o[0])
                     else:
-                        file_go(os.path.join(self.location, FH), FH)
+                        enc = file_go(os.path.join(self.location, FH), FH)
                         self.tmpPath.append(os.path.join(self.location, FH))
                     self.real_path.append(FH)
+                    self.SetStatusText(enc, 1)
+                    # PREVIOUS.pop()
+                    self.clearUndoRedo()
                     self.reloadtext.Enable(False)
                     return
                 else:
@@ -548,8 +555,7 @@ class MyFrame(ConverterFrame):
                     self.text_1.AppendText(name)
                     self.enchistory[fpath] = enc
                     self.multiFile[fpath] = enc
-                    self.reloadText[name] = enc
-
+                    
             self.multipleTools()
             logger.debug('FileHandler: Ready for multiple files')
             self.SetStatusText('Files ready for processing')
@@ -642,13 +648,12 @@ class MyFrame(ConverterFrame):
                 return
         path = self.tmpPath[-1]
         if PREVIOUS:
-            enc = PREVIOUS[0].enc
+            ## Početni tekst
+            enc = PREVIOUS[0].enc       
             self.pre_suffix = PREVIOUS[0].psuffix
                 
-        if os.path.isfile(os.path.join('resources', 'var', 'r_text0.pkl')):
-            with open(
-                os.path.join('resources', 'var', 'r_text0.pkl'), 'rb'
-            ) as f:
+        if os.path.isfile(droppedText):
+            with open(droppedText, 'rb') as f:
                 d = pickle.load(f)
             text = list(d.items())[0][0]
             enc = list(d.items())[0][1]
@@ -667,7 +672,7 @@ class MyFrame(ConverterFrame):
             self.reloaded += 1
         
         self.REDO.clear() 
-        logger.debug(f'Reloaded {os.path.basename(path)}, encoding: {enc}')
+        logger.debug(f'Text reloaded from: {os.path.basename(path)}; {enc}')
         
         self.SetStatusText(printEncoding(enc), 1)
         self.clearUndoRedo()
@@ -3313,6 +3318,7 @@ class MyFrame(ConverterFrame):
             
         self.postAction(path)
         self.SetStatusText(enc, 1)
+        ## None pre_suffix za početni tekst 
         self.pre_suffix = prev_items.psuffix
         self.addHistory(self.enchistory, path, entered_enc)
         self.addPrevious(prev_items.action, entered_enc, text, self.pre_suffix)
