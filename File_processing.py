@@ -9,7 +9,7 @@ import pickle
 import shelve
 import logging
 from text_processing import codelist
-from settings import chreg, kodek, preSuffix
+from settings import chreg, preSuffix
 from codecs import (
     BOM_UTF8,
     BOM_UTF16_BE,
@@ -41,6 +41,7 @@ BOMS = (
 )
 
 class FileOpened:
+    ''''''
     def __init__(self, path):
 
         self.putanja = path
@@ -85,6 +86,9 @@ class FileOpened:
 
     def findCode(self):
         ''''''
+        with open(os.path.join('resources', 'var', 'obsE.pkl'), 'rb') as f:
+            kodek = pickle.load(f).strip()        
+        
         f = open(self.putanja, "rb")
         data = f.read(4)
         f.close()
