@@ -380,7 +380,7 @@ class ConverterFrame(wx.Frame):
             self.preferences,
             1014,
             "&Lat-Cyr preprocessing\t" + keyS["PreLat-Cyr"],
-            "Uključi-Isključi procesovanje specijalnih znakova za 'toCyr' opciju",
+            "Uključi-Isključi procesovanje specijalnih znakova za 'ToCyrillic' opciju",
             wx.ITEM_CHECK,
         )
         self.preferences.Append(self.prelatin)
