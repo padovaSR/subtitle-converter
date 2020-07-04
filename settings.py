@@ -6,6 +6,8 @@ from io import StringIO
 import os
 import re
 import pickle
+from more_itertools import unique_everseen
+import zipfile
 
 def filePath(*args): return os.path.join(*args)
 
@@ -16,6 +18,20 @@ def printEncoding(entered_enc):
     elif entered_enc == "utf-8":
         entered_enc = "UTF-8"
     return entered_enc
+
+def lenZip(infile):
+    lfile = ""
+    if zipfile.is_zipfile(infile):
+        f = zipfile.ZipFile(infile)
+        if not len(f.namelist()) >= 2:
+            lfile += infile
+    else:
+        lfile += infile
+    return lfile
+        
+def sortList(inlist):
+    """"""
+    return list(unique_everseen(inlist))
 
 chreg = re.compile("¬")
 
