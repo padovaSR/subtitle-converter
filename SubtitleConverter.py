@@ -25,7 +25,9 @@ from settings import (
     FILE_HISTORY,
     log_file_history,
     printEncoding,
-    droppedText, 
+    droppedText,
+    lenZip,
+    sortList, 
 )
 from errors_check import checkErrors, checkChars, displayError, checkFile
 from merge import myMerger,fixGaps
@@ -412,7 +414,7 @@ class MyFrame(ConverterFrame):
                 i.clear()
             
             self.addPrevious("Open", enc, text, self.pre_suffix)
-            enc =printEncoding(enc)
+            enc = printEncoding(enc)
             return enc
 
         def multiple(self, inpath, tmppath):
@@ -426,7 +428,6 @@ class MyFrame(ConverterFrame):
             return path, n_path
 
         inpaths = [x for x in filepaths]
-        
         tmp_path = [
             os.path.join(self.location, os.path.basename(item))
             for item in inpaths
@@ -435,8 +436,8 @@ class MyFrame(ConverterFrame):
             path = inpaths[0]
             tpath = tmp_path[0]
             self.tmpPath.append(tpath)
-            FILE_HISTORY.append(path)
-            self.filehistory.AddFileToHistory(path)
+            FILE_HISTORY.append(lenZip(path))
+            self.filehistory.AddFileToHistory(lenZip(path))
             if not zipfile.is_zipfile(path):
                 shutil.copy(path, tpath)
                 self.tmpPath.clear()
@@ -453,26 +454,6 @@ class MyFrame(ConverterFrame):
                     outfile, rfile = fop.isCompressed()  # U tmp/ folderu
                 except:
                     logger.debug(f'{path}: No files selected.')
-                    if not PREVIOUS:
-                        return
-                    FILE_HISTORY.pop()
-                    self.real_path.clear()
-                    self.tmpPath.clear()
-                    FH = FILE_HISTORY[-1]
-                    fop = FileOpened(FH)
-                    self.pre_suffix = ""
-                    if zipfile.is_zipfile(FH):
-                        o, u = fop.isCompressed()
-                        enc = file_go(o[0], u[0])
-                        self.tmpPath.append(o[0])
-                    else:
-                        enc = file_go(os.path.join(self.location, FH), FH)
-                        self.tmpPath.append(os.path.join(self.location, FH))
-                    self.real_path.append(FH)
-                    self.SetStatusText(enc, 1)
-                    # PREVIOUS.pop()
-                    self.clearUndoRedo()
-                    self.reloadtext.Enable(False)
                     return
                 else:
                     if len(outfile) == 1:  # Jedan fajl u ZIP-u
@@ -616,12 +597,12 @@ class MyFrame(ConverterFrame):
             if self.ShowDialog() == False:
                 return
         if zipfile.is_zipfile(self.real_path[0]):
-            with zipfile.ZipFile(self.real_path[0], 'r') as zf:
-                if len(zf.namelist()) >= 2:
-                    self.clearUndoRedo()
-                    self.reload.Enable(False)
-                    self.reloadtext.Enable(False)
-                    return
+            zfile = zipfile.ZipFile(self.real_path[0])
+            if len(zfile.namelist()) >= 2:
+                self.clearUndoRedo()
+                self.reload.Enable(False)
+                self.reloadtext.Enable(False)
+                return
         if self.real_path:
             self.handleFile(self.real_path)
         else:
@@ -2189,6 +2170,12 @@ class MyFrame(ConverterFrame):
             if self.droped:
                 if len(self.droped) > 1:
                     return
+            with shelve.open(
+                os.path.join("resources", "var", "dialog_settings.db"),
+                flag='writeback',
+            ) as sp:
+                ex = sp['key5']
+                value_s = ex["lat_utf8_srt"]            
             fpath, e = self.PathEnc()
             tpath = os.path.basename(fpath)
             enc = self.newEnc
@@ -2245,15 +2232,14 @@ class MyFrame(ConverterFrame):
                     cyr_file = (
                         fname + os.path.splitext(tpath)[-1]
                     )  # info1 dodaje cyr pre_suffix i file se pise u ZIP pod tim imenom
-                    utf8_lat = (
-                        os.path.splitext(tpath)[0]
-                        + ".utf8"
-                        + os.path.splitext(tpath)[-1]
-                    )
+                    
+                    utf8_name, s = newName(tpath, value_s, multi=False)
+                    utf8_lat = utf8_name + os.path.splitext(tpath)[-1]
                     cyr_file = cyr_file.strip('/')
                     utf8_lat = utf8_lat.strip("/")
                     info2 = os.path.basename(tUTF)  # cyrUTF-8
-                    info1 = os.path.basename(fpath)  # latFile original
+                    nname, s = newName(fpath, "", False)
+                    info1 = nname + s       # latFile original
                     izbor = [cyr_file, info2, info1, utf8_lat]
                     
                     f_enc = PREVIOUS[0].enc
@@ -2393,21 +2379,21 @@ class MyFrame(ConverterFrame):
                     elif previous_action == "toUTF":
                         tzdata = data_out(self.bytesText, None)
                         zip_data.append(tzdata)
-                        suffix = fpath[-4:]
+                        # suffix = fpath[-4:]
+                        suffix = os.path.splitext(fpath)[1]
                         if self.preferences.IsChecked(1012):
                             suffix = '.txt'
-                        presuffix = self.pre_suffix
                         info2 = (
-                            os.path.basename(fpath)[:-3] + presuffix + suffix
+                            os.path.basename(fpath)[:-3] + self.pre_suffix + suffix
                         )
                         files = [info2]
                     else:
                         tzdata = data_out(self.bytesText, None)
                         zip_data.append(tzdata)
-                        suffix = fpath[-4:]
-                        presuffix = self.pre_suffix
+                        # suffix = fpath[-4:]
+                        suffix = os.path.splitext(fpath)[1]
                         info2 = (
-                            os.path.basename(fpath)[:-3] + presuffix + suffix
+                            os.path.basename(fpath)[:-3] + self.pre_suffix + suffix
                         )
                         files = [info2]
                 try:
@@ -2686,7 +2672,7 @@ class MyFrame(ConverterFrame):
             self.multiFile.clear()
         self.tmpPath.clear()
         self.handleFile([path])
-
+        
         if PREVIOUS:
             self.pre_suffix = PREVIOUS[0].psuffix
             enc = PREVIOUS[0].enc
