@@ -402,6 +402,7 @@ class MyFrame(ConverterFrame):
             logger.debug(f'File opened: {os.path.basename(infile)}')
             self.addHistory(self.enchistory, infile, enc)
             try:
+                self.reloadText.clear()
                 self.reloadText[text] = enc
                 if os.path.exists(droppedText):
                     os.remove(droppedText)
