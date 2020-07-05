@@ -2012,17 +2012,20 @@ class MyFrame(ConverterFrame):
 
         try:
             subs = list(srt.parse(text))
-
             subs = srt.compose(subs)
-
-            if "repSpec" or "Cleanup" in self.previous_action.keys():
-                arg1 = False
-            else:
-                arg1 = True
-
+            
+            arg1 = True
+            if PREVIOUS:
+                if PREVIOUS[-1].action == "repSpec" or PREVIOUS[-1].action == "Cleanup":
+                    arg1 = False
+            
             text = cleanUp(subs, arg1)
 
             deleted, trimmed, text_s = cleanLine(text)
+            
+            text = cleanUp(text_s, False)
+            
+            d, t, text_s = cleanLine(text)            
 
             bufferText(text_s, WORK_TEXT)
             bufferText(text_s, self.workText)
@@ -2042,7 +2045,7 @@ class MyFrame(ConverterFrame):
             else:
                 msginfo = wx.MessageDialog(
                     self,
-                    f'Subtitles deleted: [{deleted} ]\nSubtitles trimmed: [{trimmed} ]',
+                    f'Subtitles deleted: [{deleted+d} ]\nSubtitles trimmed: [{trimmed+t} ]',
                     'SubtitleConverter',
                     wx.OK | wx.ICON_INFORMATION,
                 )
