@@ -457,16 +457,15 @@ def cleanUp(text_in, parse):
     reg_S9 = re.compile("(?<=,\d\d\d)\n\n(?=\w)|(?<=,\d\d\d)\n\n(?=\s*\S*?)", re.M)
     reg8a = re.compile(r'^\s*(?<=.)|^-(?<=$)', re.M)             # Spejs na pocetku linije, i crtica na početku prazne linije
     regN = re.compile(r'(?<=^-)\:\s*', re.M)                     # dve tacke iza crtice
+    regColon = re.compile(r"^\s*: *", re.M)
     
-    def opFile(in_text):
-        return in_text.replace(']:', ']').replace('):', ')').replace('}:', '}').replace('  ', ' ')
+    #def opFile(in_text):
+        #return in_text.replace(']:', ']').replace('):', ')').replace('}:', '}').replace('  ', ' ')
 
     if parse == True:
         try:
             textis = srt.parse(text_in)
             outf = srt.compose(textis)
-        except IOError as e:
-            logger.debug("CleanSubtitle_srt, I/O error({0}): {1}".format(e.errno, e.strerror))
         except Exception as e:
             logger.debug(f"CleanSubtitle_srt, unexpected error: {e}")
         else:
@@ -479,7 +478,8 @@ def cleanUp(text_in, parse):
     
         fp5 = reg_P6.sub("", fp3)
         
-        rf1 = opFile(fp5)
+        # rf1 = opFile(fp5)
+        rf1 = regColon.sub("", fp5)
 
         fp11 = reg_P8.sub("", rf1)
         fp13 = reg_S9.sub("\n", fp11)
@@ -488,8 +488,6 @@ def cleanUp(text_in, parse):
         
         return fp15
             
-    except IOError as e:
-        logger.debug(f"CleanSubtitle proc, I/O error({e.errno}): {e.strerror}")
     except Exception as e:
         logger.debug(f"CleanSubtitle proc, unexpected error: {e}")
         
