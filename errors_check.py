@@ -22,6 +22,7 @@ handler = logging.FileHandler(
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
+
 def w_position(_pattern, intext):
     intext = intext.replace('\r', '')
     l1 = []

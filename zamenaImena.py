@@ -21,13 +21,6 @@ import codecs
 
 from collections import defaultdict
 
-
-fDict = os.path.join('dictionaries', 'Dictionary-1.txt')
-fDict1 = os.path.join('dictionaries', 'Dictionary-2.txt')
-fDict0 = os.path.join('dictionaries', 'Dictionary-0.txt')
-fDict_special = os.path.join('dictionaries', 'Special-Replace.txt')
-
-
 def remBom(infile):
     _BOM = codecs.BOM_UTF8
     buffer_size = 4096
@@ -113,6 +106,10 @@ def new_dict2(indict):
                 newDict[key] = value
         return newDict
 
+fDict = os.path.join('dictionaries', 'Dictionary-1.txt')
+fDict1 = os.path.join('dictionaries', 'Dictionary-2.txt')
+fDict0 = os.path.join('dictionaries', 'Dictionary-0.txt')
+fDict_special = os.path.join('dictionaries', 'Special-Replace.txt')
 
 remBom(fDict)
 remBom(fDict1)

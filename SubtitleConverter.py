@@ -33,7 +33,7 @@ from errors_check import checkErrors, checkChars, displayError, checkFile
 from merge import myMerger,fixGaps
 from fixer_settings import FixerSettings
 from file_settings import FileSettings 
-from zamenaImena import shortcutsKey
+from zamenaImena import shortcutsKey, dictionary_1
 from merger_settings import Settings
 from Manual import MyManual 
 from text_processing import (
@@ -1733,7 +1733,7 @@ class MyFrame(ConverterFrame):
         text = fixI(text, self.newEnc)
 
         num, text = zameniImena(text)
-
+        
         if num > 28 or num < 28 and num > 2:
             msginfo = wx.MessageDialog(
                 self,
@@ -1746,6 +1746,7 @@ class MyFrame(ConverterFrame):
         text,msg = rplStr(text, self.newEnc)
 
         self.text_1.SetValue(text)
+        
         bufferText(text, WORK_TEXT)
         bufferText(text, self.workText)
         self.bytesToBuffer(text, self.newEnc)

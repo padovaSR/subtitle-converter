@@ -325,18 +325,12 @@ def remTag(text_in):
         
 def zameniImena(text_in):
 
-    subs = pysrt.from_string(text_in)
-
-    if len(subs) > 0:
-        new_s = pysrt.SubRipFile()
-        for i in subs:
-            sub = pysrt.SubRipItem(i.index, i.start, i.end, i.text)
-            new_s.append(sub)
-        new_s.clean_indexes()
-        subs = new_s
-    else:
+    if len(pysrt.from_string(text_in)) == 0:
         logger.debug(f"Transkrib, No subtitles found.")
-
+    else:
+        subs = srt.parse(text_in)
+        text_in = srt.compose(subs)
+    
     robj1 = re.compile(
         r'\b(' + '|'.join(map(re.escape, dictionary_1.keys())) + r')\b'
     )
@@ -374,13 +368,9 @@ def zameniImena(text_in):
         t_out4 = robjN1.subn(lambda x: dict1_n[x.group(0)], t_out3[0])
         t_out5 = robjN2.subn(lambda x: dict2_n[x.group(0)], t_out4[0])
         t_out6 = robjN0.subn(lambda x: dict0_n[x.group(0)], t_out5[0])
-    except IOError as e:
-        logger.debug(
-            "Transkripcija, I/O error({0}): {1}".format(e.errno, e.strerror)
-        )
     except Exception as e:
         logger.debug(
-            F"Transkripcija, unexpected error: {e}"
+            F"Transkripcija, error: {e}"
         )
 
     def doRepl(inobj, indict, text):
