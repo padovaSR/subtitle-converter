@@ -245,7 +245,10 @@ class MyFrame(ConverterFrame):
         self.text_1.SetDropTarget(dt)
         
         for i in FILE_HISTORY:
-            self.filehistory.AddFileToHistory(i)        
+            if os.path.isfile(i):
+                self.filehistory.AddFileToHistory(i)
+            else:
+                FILE_HISTORY.remove(i)
         # self.rwFileHistory(FILE_HISTORY)
         
         self.disableTool()
@@ -438,7 +441,10 @@ class MyFrame(ConverterFrame):
             tpath = tmp_path[0]
             self.tmpPath.append(tpath)
             FILE_HISTORY.append(lenZip(path))
-            self.filehistory.AddFileToHistory(lenZip(path))
+            if not FILE_HISTORY[-1]:
+                FILE_HISTORY.remove(FILE_HISTORY[-1])
+            else:
+                self.filehistory.AddFileToHistory(lenZip(path))
             if not zipfile.is_zipfile(path):
                 shutil.copy(path, tpath)
                 self.tmpPath.clear()
@@ -2694,9 +2700,9 @@ class MyFrame(ConverterFrame):
     def rwFileHistory(self, hfile):
         """"""
         logfile = open(log_file_history, "w", encoding="utf-8", newline="\r\n")
-        if len(hfile) > 9:
-            hfile = hfile[-9:]
         file_set = list(unique_everseen(hfile))
+        if len(file_set) > 9:
+            file_set = file_set[-9:]
         for paths in file_set:
             if os.path.exists(paths):
                 logfile.write(paths + "\n")
