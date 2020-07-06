@@ -33,7 +33,7 @@ from errors_check import checkErrors, checkChars, displayError, checkFile
 from merge import myMerger,fixGaps
 from fixer_settings import FixerSettings
 from file_settings import FileSettings 
-from zamenaImena import shortcutsKey, dictionary_1
+from zamenaImena import shortcutsKey
 from merger_settings import Settings
 from Manual import MyManual 
 from text_processing import (
@@ -61,7 +61,7 @@ import wx
 
 from subtitle_converter_gui import ConverterFrame
 
-VERSION = "v0.5.8_test4"
+VERSION = "v0.5.8_test5"
 
 
 logger = logging.getLogger(__name__)
@@ -1008,8 +1008,8 @@ class MyFrame(ConverterFrame):
                     f"------------------------------------------------------\n\
                 Encoding is windows-1251! {fpath}"
                 )
-                self.text_1.AppendText("\n")
-                self.text_1.AppendText(fpath + " __skipped_")
+                f_text.append("\n")
+                f_text.append(fpath + " __skipped_")
                 continue
 
             text = normalizeText(entered_enc, path)
