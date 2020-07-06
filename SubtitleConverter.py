@@ -440,13 +440,12 @@ class MyFrame(ConverterFrame):
             path = inpaths[0]
             tpath = tmp_path[0]
             self.tmpPath.append(tpath)
-            FILE_HISTORY.append(lenZip(path))
-            if not FILE_HISTORY[-1]:
-                FILE_HISTORY.remove(FILE_HISTORY[-1])
-            else:
+            if lenZip(path):
+                FILE_HISTORY.append(lenZip(path))
                 self.filehistory.AddFileToHistory(lenZip(path))
             if not zipfile.is_zipfile(path):
-                shutil.copy(path, tpath)
+                if not os.path.exists(tpath):
+                    shutil.copy(path, tpath)
                 self.tmpPath.clear()
                 self.real_path.clear()                
                 enc = file_go(tpath, path)  # U tmp/ folderu
@@ -464,6 +463,8 @@ class MyFrame(ConverterFrame):
                     return
                 else:
                     if len(outfile) == 1:  # Jedan fajl u ZIP-u
+                        FILE_HISTORY.append(outfile[0])
+                        self.filehistory.AddFileToHistory(outfile[0])                        
                         self.real_path.clear()
                         self.tmpPath.clear()
                         enc = file_go(outfile[0], rfile)
