@@ -27,7 +27,7 @@ def lenZip(infile):
             lfile += infile
     else:
         lfile += infile
-    return lfile
+    if lfile: return lfile
         
 def sortList(inlist):
     """"""
