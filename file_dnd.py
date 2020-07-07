@@ -25,7 +25,7 @@ import logging
 from pydispatch import dispatcher
 from collections import namedtuple 
 
-from settings import filePath, WORK_TEXT, PREVIOUS, FILE_HISTORY
+from settings import filePath, WORK_TEXT, PREVIOUS, FILE_HISTORY, lenZip
 from File_processing import FileOpened
 from text_processing import normalizeText,bufferText
 from errors_check import checkErrors 
@@ -151,7 +151,8 @@ class FileDrop(wx.FileDropTarget):
                     logger.debug(f'ZIP; {e}.')
                 else:
                     if len(outfile) == 1:
-                        FILE_HISTORY.append(name)
+                        if lenZip(name):
+                            FILE_HISTORY.append(lenZip(name))                        
                         enc, t = file_go(outfile[0], rfile)
                         nam = [outfile[0]]
                         droped += 1
