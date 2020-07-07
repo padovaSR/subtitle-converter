@@ -479,7 +479,7 @@ class ConverterFrame(wx.Frame):
         self.frame_statusbar.SetStatusWidths([-4, -1])
         
         # statusbar fields
-        frame_statusbar_fields = ["SubtitleConverter is ready", "Encoding"]
+        frame_statusbar_fields = ["SubtitleConverter is ready", ""]
         for i in range(len(frame_statusbar_fields)):
             self.frame_statusbar.SetStatusText(frame_statusbar_fields[i], i)
 
