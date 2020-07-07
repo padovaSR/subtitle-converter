@@ -463,8 +463,6 @@ class MyFrame(ConverterFrame):
                     return
                 else:
                     if len(outfile) == 1:  # Jedan fajl u ZIP-u
-                        FILE_HISTORY.append(outfile[0])
-                        self.filehistory.AddFileToHistory(outfile[0])                        
                         self.real_path.clear()
                         self.tmpPath.clear()
                         enc = file_go(outfile[0], rfile)
