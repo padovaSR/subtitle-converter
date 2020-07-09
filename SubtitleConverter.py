@@ -936,7 +936,7 @@ class MyFrame(ConverterFrame):
                     self.frame_toolbar.EnableTool(1003, False)
                     return            
 
-            # ---------------------------------------------------------------------------------------#
+            ## ---------------------------------------------------------------------------------------##
             if zbir_slova == 0 and procent == 0:
                 text, error_text = ansiAction(path)
                 if error_text:
@@ -949,7 +949,7 @@ class MyFrame(ConverterFrame):
                     ErrorDlg.ShowModal()
                     self.Error_Text = error_text
                 postAnsi()
-            # ---------------------------------------------------------------------------------------#
+            ## ---------------------------------------------------------------------------------------##
             elif procent > 0:
                 self.SetStatusText(u'Greška u tekstu.')
                 f_procent = f'Najmanje {procent} % teksta.\nIli najmanje [ {zbir_slova} ] znakova.'
@@ -981,7 +981,7 @@ class MyFrame(ConverterFrame):
                         ErrorDlg.ShowModal()
                         self.Error_Text = error_text
                     postAnsi()
-            # ---------------------------------------------------------------------------------------#
+            ## ---------------------------------------------------------------------------------------##
             elif zbir_slova > 0:
                 f_zbir = 'Najmanje [ {} ] znakova.'.format(zbir_slova)
                 ErrorText = "Greška:\n\nTekst sadrži ćiriliči alfabet.\n{}\n{}\n\nNastavljate?\n".format(
@@ -2690,6 +2690,8 @@ class MyFrame(ConverterFrame):
         # get the file based on the menu ID
         fileNum = event.GetId() - wx.ID_FILE1
         path = self.filehistory.GetHistoryFile(fileNum)
+        if not os.path.exists(path):
+            return
         # add it back to the history so it will be moved up the list
         self.filehistory.AddFileToHistory(path)
         self.real_path.append(path)
