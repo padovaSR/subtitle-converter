@@ -61,7 +61,7 @@ import wx
 
 from subtitle_converter_gui import ConverterFrame
 
-VERSION = "v0.5.8_test5"
+VERSION = "v0.5.8.0"
 
 
 logger = logging.getLogger(__name__)
@@ -256,7 +256,7 @@ class MyFrame(ConverterFrame):
         dispatcher.connect(self.updateStatus, "TMP_PATH", sender=dispatcher.Any)
         dispatcher.connect(self.enKode, "TMP_PATH", sender=dispatcher.Any)
         dispatcher.connect(self.dropedFiles, "droped", sender=dispatcher.Any)
-        
+    
     def updateStatus(self, message, msg):
         ''''''
         nlist = FileDrop.nlist
@@ -273,7 +273,7 @@ class MyFrame(ConverterFrame):
             enc = printEncoding(msg[1])
             if type(path) == list:
                 path = path[-1]
-            self.filehistory.AddFileToHistory(FILE_HISTORY[len(FILE_HISTORY) - 1])
+            self.filehistory.AddFileToHistory(FILE_HISTORY[len(FILE_HISTORY)-1])
             self.SetStatusText(os.path.basename(path))
             self.SetStatusText(enc, 1)
             self.tmpPath = [path]
@@ -762,7 +762,8 @@ class MyFrame(ConverterFrame):
         with open(filePath("resources", "var", "set_size.pkl"), "wb") as wf:
             pickle.dump(self.fsize, wf)
         self.rwFileHistory(FILE_HISTORY)
-        
+        if os.path.isfile(droppedText):
+            os.remove(droppedText)
         self.Destroy()
 
     def onQuit(self, event):
@@ -770,6 +771,8 @@ class MyFrame(ConverterFrame):
         with open(filePath("resources", "var", "set_size.pkl"), "wb") as wf:
             pickle.dump(self.fsize, wf)
         self.rwFileHistory(FILE_HISTORY)
+        if os.path.isfile(droppedText):
+            os.remove(droppedText)
         
         tval = self.text_1.GetValue()
         
@@ -918,6 +921,20 @@ class MyFrame(ConverterFrame):
 
             text = self.workText.getvalue()
             zbir_slova, procent, chars = checkChars(text)
+            
+            if zbir_slova > 1000 and procent >= 90:
+                ''''''
+                err_text = "Greška:\n\nTekst sadrži ćiriliči alfabet.\n\n{0} procenta teksta:\n[ {1} ]\n\n".format(
+                    procent, ",".join(chars)
+                )
+                ErrorDlg = wx.MessageDialog(
+                    self, err_text, "SubtitleConverter", style=wx.OK | wx.ICON_ERROR,
+                )
+                if ErrorDlg.ShowModal() == wx.ID_OK:
+                    ErrorDlg.Destroy()
+                    self.to_ansi.Enable(False)
+                    self.frame_toolbar.EnableTool(1003, False)
+                    return            
 
             # ---------------------------------------------------------------------------------------#
             if zbir_slova == 0 and procent == 0:
@@ -934,9 +951,9 @@ class MyFrame(ConverterFrame):
                 postAnsi()
             # ---------------------------------------------------------------------------------------#
             elif procent > 0:
-                self.SetStatusText(u'Greška u ulaznom fajlu.')
+                self.SetStatusText(u'Greška u tekstu.')
                 f_procent = f'Najmanje {procent} % teksta.\nIli najmanje [ {zbir_slova} ] znakova.'
-                ErrorText = "Greška:\n\nUlazni fajl sadrži ćiriliči alfabet.\n\n{}\n{}\n\nNastavljate?\n".format(
+                ErrorText = "Greška:\n\nTekst sadrži ćiriliči alfabet.\n\n{}\n{}\n\nNastavljate?\n".format(
                     f_procent, ",".join(chars)
                 )
                 dlg = dialog1(ErrorText)
@@ -967,10 +984,10 @@ class MyFrame(ConverterFrame):
             # ---------------------------------------------------------------------------------------#
             elif zbir_slova > 0:
                 f_zbir = 'Najmanje [ {} ] znakova.'.format(zbir_slova)
-                ErrorText = "Greška:\n\nUlazni fajl sadrži ćiriliči alfabet.\n{}\n{}\n\nNastavljate?\n".format(
+                ErrorText = "Greška:\n\nTekst sadrži ćiriliči alfabet.\n{}\n{}\n\nNastavljate?\n".format(
                     f_zbir, ",".join(chars)
                 )
-                self.SetStatusText(u'Greška u ulaznom fajlu.')
+                self.SetStatusText(u'Greška u tekstu.')
                 dlg = dialog1(ErrorText)
                 if dlg == True:
                     text, error_text = ansiAction(path)
