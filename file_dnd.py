@@ -23,12 +23,12 @@ import zipfile
 import shutil
 import logging
 from pydispatch import dispatcher
-from collections import namedtuple 
+from collections import namedtuple
 
 from settings import filePath, WORK_TEXT, PREVIOUS, FILE_HISTORY, lenZip
 from File_processing import FileOpened
-from text_processing import normalizeText,bufferText
-from errors_check import checkErrors 
+from text_processing import normalizeText, bufferText
+from errors_check import checkErrors
 
 import wx
 
@@ -44,13 +44,16 @@ handler = logging.FileHandler(
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
+
 def addPrevious(action, enc, content, psuffix):
     '''This function creates namedtuple'''
     prev = namedtuple("prev", ["action", "enc", "content", "psuffix"])
     PREVIOUS.append(prev(action, enc, content, psuffix))
-    
+
+
 class FileDrop(wx.FileDropTarget):
     nlist = []
+
     def __init__(self, window):
         wx.FileDropTarget.__init__(self)
         self.window = window
@@ -72,7 +75,7 @@ class FileDrop(wx.FileDropTarget):
             logger.debug(f"FileDrop: {os.path.basename(infile)}")
             self.window.SetValue(text)
             d_text = {}
-            d_text[text] = enc            
+            d_text[text] = enc
             with open(filePath('resources', 'var', 'r_text0.pkl'), 'wb') as t:
                 pickle.dump(d_text, t)
             return enc, text
@@ -81,9 +84,7 @@ class FileDrop(wx.FileDropTarget):
             new_d = {}
             rpath = [lfiles[-1]]
             self.window.SetValue('Files List:\n')
-            dispatcher.send(
-                "TMP_PATH", message=lfiles, msg=[rpath, enc, True]
-            )
+            dispatcher.send("TMP_PATH", message=lfiles, msg=[rpath, enc, True])
             for i in range(len(lfiles)):
                 if not zipfile.is_zipfile(lfiles[i]):
                     try:
@@ -99,8 +100,12 @@ class FileDrop(wx.FileDropTarget):
                         logger.debug(f'FileDrop: {e}')
                     else:
                         if not os.path.exists(tmp_path):
-                            logger.debug(f"FileDrop: Skipping {os.path.basename(tmp_path)}")
-                            self.window.AppendText(f"\n_SKIPP_:{os.path.basename(tmp_path)}")
+                            logger.debug(
+                                f"FileDrop: Skipping {os.path.basename(tmp_path)}"
+                            )
+                            self.window.AppendText(
+                                f"\n_SKIPP_:{os.path.basename(tmp_path)}"
+                            )
                             continue
                         fop = FileOpened(tmp_path)
                         enc = fop.findCode()
@@ -152,16 +157,15 @@ class FileDrop(wx.FileDropTarget):
                 else:
                     if len(outfile) == 1:
                         if lenZip(name):
-                            FILE_HISTORY.append(lenZip(name))                        
+                            ## Append if not multiple
+                            FILE_HISTORY.append(lenZip(name))
                         enc, t = file_go(outfile[0], rfile)
                         nam = [outfile[0]]
                         droped += 1
                         empty = {}
                         self.window.SetValue(t)
                         dispatcher.send(
-                            "TMP_PATH",
-                            message=outfile,
-                            msg=[rpath, enc, False],
+                            "TMP_PATH", message=outfile, msg=[rpath, enc, False],
                         )
                         dispatcher.send("droped", msg=empty)
                     elif len(outfile) > 1:
@@ -177,9 +181,7 @@ class FileDrop(wx.FileDropTarget):
                             self.window.AppendText("\n")
                             self.window.AppendText(text)
                         dispatcher.send(
-                            "TMP_PATH",
-                            message=outfile,
-                            msg=[rpath, enc, True],
+                            "TMP_PATH", message=outfile, msg=[rpath, enc, True],
                         )
                         dispatcher.send("droped", msg=new_d)
                         logger.debug('FileDrop: Ready for multiple files.')
@@ -193,8 +195,6 @@ class FileDrop(wx.FileDropTarget):
                 empty = {}
                 self.window.SetValue(txt1)
                 dispatcher.send("droped", msg=empty)
-                dispatcher.send(
-                    "TMP_PATH", message=tmp_path, msg=[rpath, enc, False]
-                )
+                dispatcher.send("TMP_PATH", message=tmp_path, msg=[rpath, enc, False])
 
         return True
