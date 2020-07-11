@@ -2250,7 +2250,7 @@ class MyFrame(ConverterFrame):
                 f_enc = PREVIOUS[0].enc
                 plat = 0
                 if len(PREVIOUS) >= 2:
-                    if PREVIOUS[-2].action == "toANSI":
+                    if PREVIOUS[-2].action == "toANSI" or PREVIOUS[-2].enc == "windows-1250":
                         text = PREVIOUS[-2].content
                         text = remTag(text)
                         writeToFile(text, fpath, PREVIOUS[-2].enc, False)
