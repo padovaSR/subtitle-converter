@@ -2247,17 +2247,20 @@ class MyFrame(ConverterFrame):
                         buffer.seek(0)
                         return a_data
                     
-                f_enc = PREVIOUS[0].enc
-                plat = 0
-                if len(PREVIOUS) >= 2:
-                    if PREVIOUS[-2].action == "toANSI" or PREVIOUS[-2].enc == "windows-1250":
-                        text = PREVIOUS[-2].content
-                        text = remTag(text)
-                        writeToFile(text, fpath, PREVIOUS[-2].enc, False)
-                        f_enc = PREVIOUS[-2].enc
-                        plat += 1
-
                 if PREVIOUS[-1].action == "toCYR":
+                    
+                    f_enc = PREVIOUS[0].enc
+                    if len(PREVIOUS) >= 2:
+                        if PREVIOUS[-2].action == "toANSI" or PREVIOUS[-2].enc == "windows-1250":
+                            text = PREVIOUS[-2].content
+                            text = remTag(text)
+                            writeToFile(text, fpath, PREVIOUS[-2].enc, False)
+                            f_enc = PREVIOUS[-2].enc
+                        else:
+                            text = open(fpath, "r", encoding=f_enc).read()
+                            text = remTag(text)
+                            writeToFile(text, fpath, f_enc, False)
+                            
                     tUTF = os.path.join("tmp", os.path.basename(self.cyrUTF)) # cyr_UTF-8
                     try:
                         shutil.copy(self.cyrUTF, tUTF)
@@ -2278,11 +2281,6 @@ class MyFrame(ConverterFrame):
                     nname, s = newName(fpath, "", False)
                     info1 = nname + s       # latFile original
                     izbor = [cyr_file, info2, info1, utf8_lat]
-                    
-                    if plat == 0:
-                        text = open(fpath, "r", encoding=f_enc).read()
-                        text = remTag(text)
-                        writeToFile(text, fpath, f_enc, False)
                     
                     dlg = wx.MultiChoiceDialog(
                         self, 'Pick files:', os.path.basename(name), izbor
