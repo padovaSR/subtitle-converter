@@ -11,7 +11,7 @@ import shutil
 import pickle
 import pysrt
 import srt
-from more_itertools import unique_everseen
+from more_itertools import unique_justseen
 from pydispatch import dispatcher
 from operator import itemgetter
 import glob
@@ -2718,9 +2718,9 @@ class MyFrame(ConverterFrame):
     def rwFileHistory(self, hfile):
         """"""
         logfile = open(log_file_history, "w", encoding="utf-8", newline="\r\n")
-        file_set = list(unique_everseen(hfile))
-        if len(file_set) > 9:
-            file_set = file_set[-9:]
+        file_set = list(unique_justseen(hfile))
+        if len(file_set) > 12:
+            file_set = file_set[-12:]
         for paths in file_set:
             if os.path.exists(paths):
                 logfile.write(paths + "\n")
