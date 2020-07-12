@@ -2255,11 +2255,13 @@ class MyFrame(ConverterFrame):
                             text = PREVIOUS[-2].content
                             text = remTag(text)
                             writeToFile(text, fpath, PREVIOUS[-2].enc, False)
-                            f_enc = PREVIOUS[-2].enc
                         else:
+                            if f_enc in ["utf-8", "utf-8-sig"]:
+                                    n_enc = "windows-1250"
+                            else: n_enc = f_enc
                             text = open(fpath, "r", encoding=f_enc).read()
                             text = remTag(text)
-                            writeToFile(text, fpath, f_enc, False)
+                            writeToFile(text, fpath, n_enc, False)                            
                             
                     tUTF = os.path.join("tmp", os.path.basename(self.cyrUTF)) # cyr_UTF-8
                     try:
