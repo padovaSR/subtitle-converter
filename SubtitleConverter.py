@@ -2249,7 +2249,20 @@ class MyFrame(ConverterFrame):
                     
                 if PREVIOUS[-1].action == "toCYR":
                     
-                    f_enc = PREVIOUS[0].enc
+                    f_enc = self.fromPrevious(PREVIOUS, "Open").enc
+
+                    a, p, l = checkChars(
+                        self.fromPrevious(PREVIOUS, "Open").content[0:1000]
+                    )
+                    if p > 80:
+                        dlg = wx.MessageDialog(
+                            self,
+                            f"Originalni tekst je Ćirilica: {f_enc.upper()}\n{tpath}",
+                            'SubtitleConverter',
+                            wx.OK | wx.ICON_ERROR,
+                        )
+                        dlg.ShowModal()
+                    
                     if len(PREVIOUS) >= 2:
                         if PREVIOUS[-2].action == "toANSI" or PREVIOUS[-2].enc == "windows-1250":
                             text = PREVIOUS[-2].content
@@ -2268,7 +2281,7 @@ class MyFrame(ConverterFrame):
                         shutil.copy(self.cyrUTF, tUTF)
                     except Exception as e:
                         logger.debug(f"exportZIP error: {e}")
-                        self.text_1.SetValue("ERROR\n\nTry different options.")
+                        self.text_1.SetValue(f"ERROR\n\nTry different options.\n{e}")
                         return
 
                     cyr_file = (
@@ -2283,7 +2296,11 @@ class MyFrame(ConverterFrame):
                     nname, s = newName(fpath, "", False)
                     info1 = nname + s       # latFile original
                     izbor = [cyr_file, info2, info1, utf8_lat]
-                    
+                    l = [i for i, x in enumerate(izbor) if izbor.count(x) > 1]
+                    if l:
+                        n, s = os.path.splitext(izbor[l[1]])
+                        izbor[l[1]] = n + "_1_" + s
+                        
                     dlg = wx.MultiChoiceDialog(
                         self, 'Pick files:', os.path.basename(name), izbor
                     )
@@ -2735,7 +2752,7 @@ class MyFrame(ConverterFrame):
             if os.path.exists(paths):
                 logfile.write(paths + "\n")
         logfile.close()
-        
+
     def onCyrToANSI(self, event):
         
         with shelve.open(
@@ -3308,7 +3325,14 @@ class MyFrame(ConverterFrame):
                 return
         prev = namedtuple("prev", ["action", "enc", "content", "psuffix"])
         PREVIOUS.append(prev(action, enc, content, psuffix))
-        
+    
+    def fromPrevious(self, inlist, action):
+        """"""
+        try:
+            return next(x for x in inlist if x.action == action)
+        except StopIteration as e:
+            logger.debug(f"fromPrevious: {e}")
+            
     def undoAction(self, event):
         '''Undo text'''
         
