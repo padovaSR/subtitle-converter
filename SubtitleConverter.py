@@ -381,6 +381,10 @@ class MyFrame(ConverterFrame):
             self.redo.Enable(False)
         if not self.UNDO and not self.REDO:
             self.clear.Enable(False)
+            
+        if not PREVIOUS[-1].action == "toCYR":
+            self.frame_toolbar.EnableTool(1003, True)
+            self.to_ansi.Enable(True)
         
         self.reloaded = 0
         
@@ -2202,7 +2206,8 @@ class MyFrame(ConverterFrame):
                 flag='writeback',
             ) as sp:
                 ex = sp['key5']
-                value_s = ex["lat_utf8_srt"]            
+                value_s = ex["lat_utf8_srt"]
+                value_c = ex["cyr_ansi_srt"]
             fpath, e = self.PathEnc()
             tpath = os.path.basename(fpath)
             enc = self.newEnc
@@ -2270,7 +2275,7 @@ class MyFrame(ConverterFrame):
                             writeToFile(text, fpath, PREVIOUS[-2].enc, False)
                         else:
                             if f_enc in ["utf-8", "utf-8-sig"]:
-                                    n_enc = "windows-1250"
+                                n_enc = "windows-1250"
                             else: n_enc = f_enc
                             text = open(fpath, "r", encoding=f_enc).read()
                             text = remTag(text)
@@ -2284,14 +2289,10 @@ class MyFrame(ConverterFrame):
                         self.text_1.SetValue(f"ERROR\n\nTry different options.\n{e}")
                         return
 
-                    cyr_file = (
-                        fname + os.path.splitext(tpath)[-1]
-                    )  # info1 dodaje cyr pre_suffix i file se pise u ZIP pod tim imenom
-                    
+                    c_name, s = newName(tpath, value_c, False)
+                    cyr_file = c_name + s
                     utf8_name, s = newName(tpath, value_s, multi=False)
-                    utf8_lat = utf8_name + os.path.splitext(tpath)[-1]
-                    cyr_file = cyr_file.strip('/')
-                    utf8_lat = utf8_lat.strip("/")
+                    utf8_lat = utf8_name + s
                     info2 = os.path.basename(tUTF)  # cyrUTF-8
                     nname, s = newName(fpath, "", False)
                     info1 = nname + s       # latFile original
@@ -2307,115 +2308,14 @@ class MyFrame(ConverterFrame):
                     if dlg.ShowModal() == wx.ID_OK:
                         response = dlg.GetSelections()
                         files = [izbor[x] for x in response]
-                        zip_data = []
-                        zdata = None        # latFile original
-                        tzdata = None       # cyrUTF-8
-                        cyrdata = None      # cyrillic text binary
-                        utf8ldata = None    # latFile utf-8
+                        zdata = data_out(None, fpath)                       ## latFile original
+                        tzdata = data_out(None, tUTF)                       ## cyrUTF-8
+                        cyrdata = data_out(self.bytesText, None)            ## cyrillic text binary
+                        utf8ldata = self.utf8_latText                       ## latFile utf-8
+                        data_v = [cyrdata, tzdata, zdata, utf8ldata]
+                        zip_data = [data_v[x] for x in response]
                         if not files:
                             return
-                        if len(files) == 1:
-                            try:
-                                if info2 in files:
-                                    tzdata = data_out(None, tUTF)
-                                    zip_data.append(tzdata)
-                                
-                                elif info1 in files:
-                                    zdata = data_out(None, fpath)
-                                    zip_data.append(zdata)
-                                
-                                elif cyr_file in files:
-                                    cyrdata = data_out(self.bytesText, None)
-                                    zip_data.append(cyrdata)
-                                
-                                elif utf8_lat in files:
-                                    utf8ldata = self.utf8_latText
-                                    zip_data.append(utf8ldata)
-                                logger.debug(f"Remove {self.cyrUTF}")
-                                os.remove(self.cyrUTF)                                
-                            except Exception as e:
-                                logger.debug(f"Export ZIP error: {e}")
-
-                        elif len(files) == 2:
-                            try:
-                                if info1 in files and info2 in files:
-                                    tzdata = data_out(None, tUTF)
-                                    zdata = data_out(None, fpath)
-                                    zip_data.extend((zdata, tzdata))
-                                    
-                                elif info1 in files and cyr_file in files:
-                                    cyrdata = data_out(self.bytesText, None)
-                                    zdata = data_out(None, fpath)
-                                    zip_data.extend((cyrdata, zdata))
-                                
-                                elif info1 in files and utf8_lat in files:
-                                    zdata = data_out(None, fpath)
-                                    utf8ldata = self.utf8_latText
-                                    zip_data.extend((zdata, utf8ldata))
-                                
-                                elif cyr_file in files and info2 in files:
-                                    cyrdata = data_out(self.bytesText, None)
-                                    tzdata = data_out(None, tUTF)
-                                    zip_data.extend((cyrdata, tzdata))
-                                
-                                elif info2 in files and utf8_lat in files:
-                                    tzdata = data_out(None, tUTF)
-                                    utf8ldata = self.utf8_latText
-                                    zip_data.extend((tzdata, utf8ldata))
-                                
-                                elif cyr_file in files and utf8_lat in files:
-                                    cyrdata = data_out(self.bytesText, None)
-                                    utf8ldata = self.utf8_latText
-                                    zip_data.extend((cyrdata, utf8ldata))
-                                    
-                                logger.debug(f"Remove {self.cyrUTF}")
-                                os.remove(self.cyrUTF)
-                            except Exception as e:
-                                logger.debug(f"Export ZIP error: {e}")                            
-
-                        elif len(files) == 3:   # izbor = [cyr_file, info2(tzdata), info1(zdata), utf8_lat]
-                            try:
-                                if not utf8_lat in files:
-                                    zdata = data_out(None, fpath)
-                                    tzdata = data_out(None, tUTF)
-                                    cyrdata = data_out(self.bytesText, None)
-                                    zip_data.extend((cyrdata, tzdata, zdata))
-                                
-                                elif not cyr_file in files:
-                                    tzdata = data_out(None, tUTF)
-                                    zdata = data_out(None, fpath)
-                                    utf8ldata = self.utf8_latText
-                                    zip_data.extend((tzdata, zdata, utf8ldata))
-                                
-                                elif not info1 in files:
-                                    cyrdata = data_out(self.bytesText, None)
-                                    tzdata = data_out(None, tUTF)
-                                    utf8ldata = self.utf8_latText
-                                    zip_data.extend((cyrdata, tzdata, utf8ldata))
-                                
-                                elif not info2 in files:
-                                    zdata = data_out(None, fpath)
-                                    cyrdata = data_out(self.bytesText, None)
-                                    utf8ldata = self.utf8_latText
-                                    zip_data.extend((cyrdata, zdata, utf8ldata))
-                                logger.debug(f"Remove {self.cyrUTF}")
-                                os.remove(self.cyrUTF)
-                            except Exception as e:
-                                logger.debug(f"Export ZIP error: {e}")                            
-
-                        elif len(files) == 4:
-                            try:
-                                utf8ldata = self.utf8_latText
-                                zdata = data_out(None, fpath)
-                                tzdata = data_out(None, tUTF)
-                                cyrdata = data_out(self.bytesText, None)
-                                zip_data.extend(
-                                    (cyrdata, tzdata, zdata, utf8ldata)
-                                )
-                                logger.debug(f"Remove {self.cyrUTF}")
-                                os.remove(self.cyrUTF)                                
-                            except Exception as e:
-                                logger.debug(f"Export ZIP error: {e}")                            
                     else:
                         zip_data = []
                         files = []
@@ -2433,7 +2333,6 @@ class MyFrame(ConverterFrame):
                     elif previous_action == "toUTF":
                         tzdata = data_out(self.bytesText, None)
                         zip_data.append(tzdata)
-                        # suffix = fpath[-4:]
                         suffix = os.path.splitext(fpath)[1]
                         if self.preferences.IsChecked(1012):
                             suffix = '.txt'
@@ -2444,7 +2343,6 @@ class MyFrame(ConverterFrame):
                     else:
                         tzdata = data_out(self.bytesText, None)
                         zip_data.append(tzdata)
-                        # suffix = fpath[-4:]
                         suffix = os.path.splitext(fpath)[1]
                         info2 = (
                             os.path.basename(fpath)[:-3] + self.pre_suffix + suffix
@@ -2465,9 +2363,10 @@ class MyFrame(ConverterFrame):
                     logger.debug(f" Export ZIP error: {e}")
                 
                 shutil.move(name, os.path.join(dirname, name))
-
-                if os.path.isfile(tpath):
-                    os.remove(tpath)
+                r_files = [tpath, self.cyrUTF, tUTF]
+                for i in r_files:
+                    if os.path.isfile(i):
+                        os.remove(i)
                 if os.path.isfile(path):
                     logger.debug(
                         f"ZIP file saved sucessfully: {path}")
