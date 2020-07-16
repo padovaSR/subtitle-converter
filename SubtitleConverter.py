@@ -26,8 +26,7 @@ from settings import (
     log_file_history,
     printEncoding,
     droppedText,
-    lenZip,
-    sortList, 
+    lenZip, 
 )
 from errors_check import checkErrors, checkChars, displayError, checkFile
 from merge import myMerger,fixGaps
@@ -53,6 +52,7 @@ from text_processing import (
     preLatin,
     remTag, 
 )
+import subprocess
 import logging
 from File_processing import FileOpened, newName, nameDialog, writeToFile
 
@@ -2365,7 +2365,22 @@ class MyFrame(ConverterFrame):
                     logger.debug(
                         f"ZIP file saved sucessfully: {path}")
                     try:
-                        os.popen(cmd)
+                        subprocess.Popen(cmd, bufsize=-1, executable=None, 
+                                        stdin=None, 
+                                        stdout=None, 
+                                        stderr=None, 
+                                        preexec_fn=None, 
+                                        shell=True, 
+                                        cwd=None, 
+                                        env=None, 
+                                        universal_newlines=False, 
+                                        startupinfo=None, 
+                                        creationflags=0, 
+                                        restore_signals=True, 
+                                        start_new_session=False, 
+                                        pass_fds=(), 
+                                        encoding=None, 
+                                        errors=None)
                     except Exception as e:
                         logger.debug(f"Open Zip: {e}")
                         sDlg = wx.MessageDialog(
