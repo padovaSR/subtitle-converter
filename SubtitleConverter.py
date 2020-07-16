@@ -61,7 +61,7 @@ import wx
 
 from subtitle_converter_gui import ConverterFrame
 
-VERSION = "v0.5.8.1"
+VERSION = "v0.5.8.2"
 
 
 logger = logging.getLogger(__name__)
@@ -2322,6 +2322,7 @@ class MyFrame(ConverterFrame):
                         logger.debug("ZIP export: None selected")
                         return
                 else:
+                    tUTF = ""
                     zip_data = []
                     previous_action = PREVIOUS[-1].action
                     if previous_action == 'toCyrUTF8':
@@ -2333,21 +2334,13 @@ class MyFrame(ConverterFrame):
                     elif previous_action == "toUTF":
                         tzdata = data_out(self.bytesText, None)
                         zip_data.append(tzdata)
-                        suffix = os.path.splitext(fpath)[1]
-                        if self.preferences.IsChecked(1012):
-                            suffix = '.txt'
-                        info2 = (
-                            os.path.basename(fpath)[:-3] + self.pre_suffix + suffix
-                        )
-                        files = [info2]
+                        nname, s = newName(fpath, self.pre_suffix, False)
+                        files = [nname + s]
                     else:
                         tzdata = data_out(self.bytesText, None)
                         zip_data.append(tzdata)
-                        suffix = os.path.splitext(fpath)[1]
-                        info2 = (
-                            os.path.basename(fpath)[:-3] + self.pre_suffix + suffix
-                        )
-                        files = [info2]
+                        nname, s = newName(fpath, self.pre_suffix, False)
+                        files = [nname + s]
                 try:
                     with zipfile.ZipFile(name, 'w') as fzip:
                         for i, x in zip(
@@ -2367,20 +2360,23 @@ class MyFrame(ConverterFrame):
                 for i in r_files:
                     if os.path.isfile(i):
                         os.remove(i)
+                cmd = f'"C:\Program Files"\WinRAR\WinRAR.exe {path}'
                 if os.path.isfile(path):
                     logger.debug(
                         f"ZIP file saved sucessfully: {path}")
-                    sDlg = wx.MessageDialog(
-                        self,
-                        f'Fajl je uspešno sačuvan\n{os.path.basename(path)}', 
-                        'SubtitleConverter',
-                        wx.OK | wx.ICON_INFORMATION,
-                    )
-                    sDlg.ShowModal()
+                    try:
+                        os.popen(cmd)
+                    except Exception as e:
+                        logger.debug(f"Open Zip: {e}")
+                        sDlg = wx.MessageDialog(
+                            self,
+                            f'Fajl je uspešno sačuvan\n{os.path.basename(path)}', 
+                            'SubtitleConverter',
+                            wx.OK | wx.ICON_INFORMATION,
+                        )
+                        sDlg.ShowModal()
                     # Dodaje putanju i enkoding u recnik
                     self.saved_file[path] = self.newEnc
-                    # self.saved += 1
-                    # self.resetTool()
             else:
                 logger.debug(f"Export ZIP: None selected")
                 return
