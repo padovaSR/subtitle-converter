@@ -150,9 +150,6 @@ class MyFrame(ConverterFrame):
         self.REDO = []
         ###################################
         
-        self.findData = wx.FindReplaceData()
-        self.pos = []
-        
         self.sc = {}
         self.fsize = {}        
         
@@ -492,6 +489,7 @@ class MyFrame(ConverterFrame):
                         self.tmpPath.clear()
                         self.real_path.clear()
                         self.SetStatusText('Files ready for processing')
+                        self.SetStatusText(enc, 1)
 
         elif len(inpaths) > 1:  # Više selektovanih ulaznih fajlova
             paths_in, paths_out = multiple(self, inpaths, tmp_path)
@@ -550,6 +548,7 @@ class MyFrame(ConverterFrame):
             self.multipleTools()
             logger.debug('FileHandler: Ready for multiple files')
             self.SetStatusText('Files ready for processing')
+            self.SetStatusText(enc, 1)
     
 
     def onOpen(self, event):
@@ -2365,24 +2364,21 @@ class MyFrame(ConverterFrame):
                     logger.debug(
                         f"ZIP file saved sucessfully: {path}")
                     try:
-                        subprocess.Popen(cmd, bufsize=-1, executable=None, 
-                                        stdin=None, 
-                                        stdout=None, 
-                                        stderr=None, 
-                                        preexec_fn=None, 
-                                        shell=True, 
-                                        cwd=None, 
-                                        env=None, 
-                                        universal_newlines=False, 
-                                        startupinfo=None, 
-                                        creationflags=0, 
-                                        restore_signals=True, 
-                                        start_new_session=False, 
-                                        pass_fds=(), 
-                                        encoding=None, 
-                                        errors=None)
+                        subprocess.Popen(
+                            cmd,
+                            bufsize=-1,
+                            executable=None,
+                            stdin=None,
+                            stdout=None,
+                            stderr=None,
+                            preexec_fn=None,
+                            shell=True,
+                            cwd=None,
+                            env=None,
+                        )
                     except Exception as e:
                         logger.debug(f"Open Zip: {e}")
+                    else:
                         sDlg = wx.MessageDialog(
                             self,
                             f'Fajl je uspešno sačuvan\n{os.path.basename(path)}', 
@@ -2390,7 +2386,7 @@ class MyFrame(ConverterFrame):
                             wx.OK | wx.ICON_INFORMATION,
                         )
                         sDlg.ShowModal()
-                    # Dodaje putanju i enkoding u recnik
+                    ## Putanja i enkoding u recnik
                     self.saved_file[path] = self.newEnc
             else:
                 logger.debug(f"Export ZIP: None selected")
@@ -2425,7 +2421,7 @@ class MyFrame(ConverterFrame):
         def t_out(textin):
             tout = ""
             for i in textin:
-                tout += i + "\n"
+                tout += f" {i} \n"
             return tout
 
         def data_out(filein):
@@ -2481,10 +2477,9 @@ class MyFrame(ConverterFrame):
                 elif len(lat_srt) < 16:
                     l_srt_list = [x for x in lat_srt]
 
-                text1 =\
-                f"Include original latin?\n\nPostojeći *latin fajlovi:\n\n{t_out(l_srt_list)}"
-                
-                text = f"Include utf-8?\n\nPostojeći *utf-8* fajlovi:\n\n{t_out(p_txt_list)}"
+                text1 = f"Include original latin?\n\n*latin:\n\n{t_out(l_srt_list)}"
+
+                text = f"Include utf-8?\n\n*utf-8:\n\n{t_out(p_txt_list)}"
                 
                 dlg = wx.RichMessageDialog(
                     self,
@@ -2540,13 +2535,9 @@ class MyFrame(ConverterFrame):
                     zlist = [data_out(x) for x in izbor]
                 except IOError as e:
                     logger.debug(f"ExportZIP IOError: {e}")
-                    logger.debug(
-                        "exportZIP IOError {}: ".format(sys.exc_info()[1:])
-                    )
-                except Exception:
-                    logger.debug(
-                        "ExportZIP_A error, {}".format(sys.exc_info())
-                    )
+                except Exception as e:
+                    logger.debug(f"ExportZIP_A error, {e}")
+                    
             if PREVIOUS[-1].action == 'toCyrUTF8_multiple':
                 files = self.cyrUTFmulti
                 zlist = [data_out(x) for x in files]
@@ -2564,25 +2555,36 @@ class MyFrame(ConverterFrame):
                 for i in self.cyrUTFmulti:
                     os.remove(i)
                     logger.debug("Removed {}".format(i))
-            except IOError as e:
-                logger.debug(
-                    "Export ZIP_final, IOError({0}{1}):".format(tpath, e)
-                )
             except Exception as e:
                 logger.debug(f"Export ZIP_final error: {e}")
-
+                
+            cmd = f'"C:\Program Files"\WinRAR\WinRAR.exe {path}'
+            
             if os.path.isfile(path):
-                logger.debug("ZIP file saved sucessfully: {}".format(path))
-                sDlg = wx.MessageDialog(
-                    self,
-                    'Fajl je uspešno sačuvan\n{}'.format(
-                        os.path.basename(path)
-                    ),
-                    'SubtitleConverter',
-                    wx.OK | wx.ICON_INFORMATION,
-                )
-                sDlg.ShowModal()
-                # Dodaje putanju i enkoding u recnik
+                logger.debug(f"ZIP file saved sucessfully: {path}")
+                try:
+                    subprocess.Popen(
+                        cmd,
+                        bufsize=-1,
+                        executable=None,
+                        stdin=None,
+                        stdout=None,
+                        stderr=None,
+                        preexec_fn=None,
+                        shell=True,
+                        cwd=None,
+                        env=None,
+                    )
+                except Exception as e:
+                    logger.debug(f"Open Zip: {e}")
+                else:
+                    sDlg = wx.MessageDialog(
+                        self,
+                        f'Fajl je uspešno sačuvan\n{os.path.basename(path)}',
+                        'SubtitleConverter',
+                        wx.OK | wx.ICON_INFORMATION,
+                    )
+                    sDlg.ShowModal()
                 self.saved_file[path] = self.newEnc
         else:
             dlg.Destroy()
