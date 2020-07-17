@@ -622,7 +622,7 @@ def poravnLine(intext):
     def proCent(percent, whole):
         return (percent * whole) // 100        
     def myWrapper(intext):
-        f_rpl = re.compile(r'^((.*?\n.*?){1})\n')
+        f_rpl = re.compile(r'^((.*?\n.*?){1})\n', re.I)
         # n = len(intext) // 2
         n = proCent(51, len(intext))
         wrapper = TextWrapper(break_long_words=False, break_on_hyphens=False, width=n)
@@ -652,20 +652,23 @@ def poravnLine(intext):
         return newText
     
     n = intext
-    f_rpl = re.compile(r'^((.*?\n.*?){1})\n')
+    # f_rpl = re.compile(r'^((.*?\n.*?){1})\n')
     s_rpl = re.compile(' +')
     tag_rpl = re.compile(r'<[^<]*>')
-    new_s = pysrt.SubRipFile()        
+    
     n = n.replace('\r', '').replace('\n', ' ')
+    
     n = s_rpl.sub(' ', n)  # vise spejseva u jedan
-    ln = n.replace(',', '').replace('.', '').replace('!', '').replace("'", "").replace('-', '')
+    
+    ln = re.sub(r"[\.\,\!\'\-]", "", n)
     ln = tag_rpl.sub(' ', ln)
     ln = s_rpl.sub(' ', ln)
+    
     if len(ln) >= 30 and not n.startswith('<font'):
         s1 = myWrapper(n)
         prva = s1.split('\n')[0]
         druga = s1.split('\n')[-1]
-        druga = druga.replace('.', '').replace(',', '').replace('!', '').replace("'", "").replace('-', '')
+        druga = re.sub(r"[\.\,\!\'\-]", "", druga)
         druga = tag_rpl.sub(' ', druga)
         druga = s_rpl.sub(' ', druga)                
         len_prva = len("".join(prva)); len_druga = len("".join(druga))
@@ -681,36 +684,18 @@ def poravnLine(intext):
                 fls1 = tag_rpl.sub(' ', s1)
                 fls1 = s_rpl.sub(' ', fls1)
                 lw = fls1.split('\n')[-1].split()
-                lw = [i.replace('.', '').replace('!', '').replace(',', '').replace("'", "").replace('-', '').replace('i', '') for i in lw]
+                lw = [re.sub(r"[\.\!\,\'\-i]", "", i) for i in lw]
                 dw = [len(x) for x in lw]           # duzine reci u listi
                 c1 = s1.split('\n')[0].count(' ') + 1
                 if len(lw) >= 1:
                     if (dw[0] + prvaS) <= (drugaS - dw[0]) + 2:
                         c = c1 + 1
                         s1 = movPos(s1, c)
-                        c1 = s1.split('\n')[0].count(' ') + 1
-                        fls1 = tag_rpl.sub(' ', s1)
-                        fls1 = s_rpl.sub(' ', fls1)                                 
-                        drugaS = len("".join(s1.split('\n')[-1]))
-                        prvaS = len("".join(s1.split('\n')[0]))
-                        lw = s1.split('\n')[-1].split()
-                        lw = [i.replace('.', '').replace('!', '').replace(',', '').replace("'", "").replace('-', '').replace('i', '') for i in lw]
-                        dw = [len(x) for x in lw]                            
-                        if len(lw) >= 1:
-                            if (dw[0] + prvaS) <= (drugaS - dw[0]) + 1:
-                                c = c1 + 1
-                                s1 = movPos(s1, c)
-                                c1 = s1.split('\n')[0].count(' ') + 1
-                                fls1 = tag_rpl.sub(' ', s1)
-                                fls1 = s_rpl.sub(' ', fls1)                                         
-                                drugaS = len("".join(fls1.split('\n')[-1]))
-                                prvaS = len("".join(fls1.split('\n')[0]))
-                                lw = s1.split('\n')[-1].split()
-                                lw = [i.replace('.', '').replace('!', '').replace(',', '').replace("'", "").replace('-', '') for i in lw]
-                                dw = [len(x) for x in lw]                                    
-            sub = s1
-        else:
-            sub = s1
-    else:
-        sub = n
-    return sub    
+                                                            
+                    sub = s1
+                else: sub = s1
+            else: sub = s1
+        else: sub = s1
+    else: sub = n
+    
+    return sub
