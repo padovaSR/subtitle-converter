@@ -2360,6 +2360,7 @@ class MyFrame(ConverterFrame):
                     if os.path.isfile(i):
                         os.remove(i)
                 cmd = f'"C:\Program Files"\WinRAR\WinRAR.exe {path}'
+                ## cmd=f"xarchiver {path}"
                 if os.path.isfile(path):
                     logger.debug(
                         f"ZIP file saved sucessfully: {path}")
@@ -2371,7 +2372,6 @@ class MyFrame(ConverterFrame):
                             stdin=None,
                             stdout=None,
                             stderr=None,
-                            preexec_fn=None,
                             shell=True,
                             cwd=None,
                             env=None,
@@ -2559,7 +2559,7 @@ class MyFrame(ConverterFrame):
                 logger.debug(f"Export ZIP_final error: {e}")
                 
             cmd = f'"C:\Program Files"\WinRAR\WinRAR.exe {path}'
-            
+            ## cmd=f"xarchiver {path}"
             if os.path.isfile(path):
                 logger.debug(f"ZIP file saved sucessfully: {path}")
                 try:
@@ -2570,7 +2570,6 @@ class MyFrame(ConverterFrame):
                         stdin=None,
                         stdout=None,
                         stderr=None,
-                        preexec_fn=None,
                         shell=True,
                         cwd=None,
                         env=None,
