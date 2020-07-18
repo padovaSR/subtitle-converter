@@ -202,7 +202,7 @@ def fixI(in_text, enc):
 
 
 def changeLetters(text, enc, reversed_action):
-    '''Funkction used for transliteration'''
+    '''Function used for transliteration'''
     ## pre_cyr je rečnik iz preLatCyr.map.cfg
     text = text
     enc = enc
@@ -624,7 +624,7 @@ def poravnLine(intext):
     def myWrapper(intext):
         f_rpl = re.compile(r'^((.*?\n.*?){1})\n', re.I)
         # n = len(intext) // 2
-        n = proCent(51, len(intext))
+        n = proCent(50, len(intext))
         wrapper = TextWrapper(break_long_words=False, break_on_hyphens=False, width=n)
         te = wrapper.fill(intext)
         if te.count('\n') >= 2:
@@ -667,8 +667,9 @@ def poravnLine(intext):
     if len(ln) >= 30 and not n.startswith('<font'):
         s1 = myWrapper(n)
         prva = s1.split('\n')[0]
+        prva = re.sub(r"[\.\,\!\-\?]", "", prva)
         druga = s1.split('\n')[-1]
-        druga = re.sub(r"[\.\,\!\'\-]", "", druga)
+        druga = re.sub(r"[\.\,\!\'\-\?]", "", druga)
         druga = tag_rpl.sub(' ', druga)
         druga = s_rpl.sub(' ', druga)                
         len_prva = len("".join(prva)); len_druga = len("".join(druga))
@@ -684,14 +685,14 @@ def poravnLine(intext):
                 fls1 = tag_rpl.sub(' ', s1)
                 fls1 = s_rpl.sub(' ', fls1)
                 lw = fls1.split('\n')[-1].split()
-                lw = [re.sub(r"[\.\!\,\'\-i]", "", i) for i in lw]
+                lw = [re.sub(r"[\.\!\,\'\-\?ijl]", "", i) for i in lw]
                 dw = [len(x) for x in lw]           # duzine reci u listi
                 c1 = s1.split('\n')[0].count(' ') + 1
                 if len(lw) >= 1:
                     if (dw[0] + prvaS) <= (drugaS - dw[0]) + 2:
                         c = c1 + 1
                         s1 = movPos(s1, c)
-                                                            
+                       
                     sub = s1
                 else: sub = s1
             else: sub = s1
