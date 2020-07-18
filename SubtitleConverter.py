@@ -694,7 +694,8 @@ class MyFrame(ConverterFrame):
                         wx.OK | wx.ICON_INFORMATION
                     )
                     sDlg.ShowModal()
-                # Dodaje putanju i enkoding u recnik
+                FILE_HISTORY.append(outpath)
+                self.filehistory.AddFileToHistory(outpath)                
                 self.saved_file[outpath] = self.newEnc
                 self.MenuBar.Enable(wx.ID_SAVE, False)
                 self.MenuBar.Enable(wx.ID_SAVEAS, False)
@@ -748,7 +749,8 @@ class MyFrame(ConverterFrame):
                     wx.OK | wx.ICON_INFORMATION,
                 )
                 sDlg.ShowModal()
-                # Dodaje putanju i enkoding u recnik
+                FILE_HISTORY.append(path)
+                self.filehistory.AddFileToHistory(path)
                 self.saved_file[path] = self.newEnc
                 self.MenuBar.Enable(wx.ID_SAVE, False)
                 self.MenuBar.Enable(wx.ID_SAVEAS, False)
