@@ -147,7 +147,7 @@ with open(rplS, 'r', encoding='utf-8') as rplS_fyle:
         b = x[-1]
         drep[a] = b
 
-rplSmap = drep
+rplSmap = drep  ## LATIN_chars ########################
 
 #######################################################
 
