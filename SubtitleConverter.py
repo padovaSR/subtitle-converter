@@ -61,7 +61,7 @@ import wx
 
 from subtitle_converter_gui import ConverterFrame
 
-VERSION = "v0.5.8.2"
+VERSION = "v0.5.8.3"
 
 
 logger = logging.getLogger(__name__)
@@ -246,7 +246,6 @@ class MyFrame(ConverterFrame):
                 self.filehistory.AddFileToHistory(i)
             else:
                 FILE_HISTORY.remove(i)
-        # self.rwFileHistory(FILE_HISTORY)
         
         self.disableTool()
 
@@ -1243,9 +1242,13 @@ class MyFrame(ConverterFrame):
             utf_path = os.path.join(self.real_dir, (utf_name + suffix))
             
             if self.preferences.IsChecked(1014):
+                pvalue = True
                 text = preLatin(text_in=text)
+            else:
+                pvalue = False
+                text = text
             
-            text, msg = changeLetters(text, utf8_enc, reversed_action=False)
+            text, msg = changeLetters(text, utf8_enc, preLatin=pvalue, reversed_action=False)
             cyr_path = path
             self.cyrUTF = utf_path
             
@@ -3310,6 +3313,8 @@ class MyFrame(ConverterFrame):
             bufferText(text, WORK_TEXT)
             bufferText(text, self.workText)
             self.text_1.SetValue(text)
+        else:
+            return
             
         if not prev.action == "toCYR":
             self.frame_toolbar.EnableTool(1003, True)   # toANSI
