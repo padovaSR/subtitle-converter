@@ -121,7 +121,8 @@ def normalizeText(code_in, path):
             
 def rplStr(in_text, enc):
 
-    # Rečnik je 'rplSmap'. Lista ključeva(keys) je 'rplsList'.
+    ## Rečnik je 'rplSmap' - LATIN_chars. 
+    ## Lista ključeva(keys) je 'rplsList'.
 
     p = in_text
     n_pattern = re.compile("|".join(list(rplSmap.keys())))
@@ -201,7 +202,7 @@ def fixI(in_text, enc):
         logger.debug(f"fixI unexpected error, {e}")
 
 
-def changeLetters(text, enc, reversed_action):
+def changeLetters(text, enc, preLatin, reversed_action):
     '''Function used for transliteration'''
     ## pre_cyr je rečnik iz preLatCyr.map.cfg
     text = text
@@ -254,7 +255,9 @@ def changeLetters(text, enc, reversed_action):
                     text_ch += c
 
             ## Fix string #####################################################
-            text_ch,msg = rplStr(text_ch, enc)
+            if preLatin == True:
+                text_ch,msg = rplStr(text_ch, enc)
+            else: msg = "0"
 
             ## Fine tune ######################################################
             robjCyr = re.compile(
