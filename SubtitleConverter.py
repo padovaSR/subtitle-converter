@@ -61,7 +61,7 @@ import wx
 
 from subtitle_converter_gui import ConverterFrame
 
-VERSION = "v0.5.8.3"
+VERSION = "v0.5.8.4"
 
 
 logger = logging.getLogger(__name__)
@@ -1314,6 +1314,8 @@ class MyFrame(ConverterFrame):
         self.tmpPath.clear()
         self.cyrUTFmulti.clear()
         
+        pvalue = self.preferences.IsChecked(1014)
+        
         for key, value in self.multiFile.items():
 
             path = key
@@ -1334,7 +1336,7 @@ class MyFrame(ConverterFrame):
             # nnm = fproc.nameCheck(os.path.basename(utf_path), self.real_dir, suffix)
             # utf_path = '{0}_{1}{2}'.format(utf_path, nnm, suffix)
 
-            text,msg = changeLetters(text, utf8_enc, reversed_action=False)
+            text,msg = changeLetters(text, utf8_enc, preLatin=pvalue, reversed_action=False)
             
             writeToFile(text, utf_path, utf8_enc, multi=True)
             
@@ -1430,10 +1432,10 @@ class MyFrame(ConverterFrame):
             utf_name, suffix = newName(path, value_s, multi=False)
             utf_path = os.path.join(self.real_dir, (utf_name + suffix))
             
-            if self.preferences.IsChecked(1014):
-                text = preLatin(text_in=text)
+            pvalue = self.preferences.IsChecked(1014)
+            if pvalue == True: text = preLatin(text_in=text)
             
-            text, msg = changeLetters(text, self.newEnc, reversed_action=False)
+            text, msg = changeLetters(text, self.newEnc, preLatin=pvalue, reversed_action=False)
             cyr_path = path
             self.cyrUTF = utf_path
             
@@ -1503,6 +1505,8 @@ class MyFrame(ConverterFrame):
         self.tmpPath.clear()
         self.cyrUTFmulti.clear()
         
+        pvalue = self.preferences.IsChecked(1014)
+        
         for key, value in self.multiFile.items():
 
             path = key
@@ -1520,7 +1524,7 @@ class MyFrame(ConverterFrame):
             utf_path = os.path.join(self.real_dir, utfText + suffix)
             self.cyrUTFmulti.append(utf_path)
 
-            text,msg = changeLetters(text, self.newEnc, reversed_action=False)
+            text,msg = changeLetters(text, self.newEnc, preLatin=pvalue, reversed_action=False)
             
             text = bufferCode(text, self.newEnc)
             
@@ -2690,8 +2694,10 @@ class MyFrame(ConverterFrame):
 
             if text:
                 text = text.replace('?', '¬')
+                
+            pvalue = self.preferences.IsChecked(1014)
 
-            text, msg = changeLetters(text, t_enc, reversed_action=True)
+            text, msg = changeLetters(text, t_enc, preLatin=pvalue, reversed_action=True)
             cyr_path = path
             
             text = bufferCode(text, self.newEnc)
@@ -2747,6 +2753,8 @@ class MyFrame(ConverterFrame):
         self.newEnc = 'windows-1250'
         t_enc = 'utf-8'
         f_text = ["Files Processed:\n"]
+        
+        pvalue = self.preferences.IsChecked(1014)
 
         for key, value in self.multiFile.items():
             path = key
@@ -2757,7 +2765,7 @@ class MyFrame(ConverterFrame):
                 if text:
                     text = text.replace('?', '¬')
 
-                text, msg = changeLetters(text, t_enc, reversed_action=True)
+                text, msg = changeLetters(text, t_enc, preLatin=pvalue, reversed_action=True)
 
                 nam, b = newName(path, self.pre_suffix, True)
                 newF = '{0}{1}'.format(os.path.join(self.real_dir, nam), b)
@@ -2825,8 +2833,10 @@ class MyFrame(ConverterFrame):
             text = self.text_1.GetValue()
             
             if text: text = text.replace('?', '¬')
+            
+            pvalue = self.preferences.IsChecked(1014)
                     
-            text, msg = changeLetters(text, self.newEnc, reversed_action=True)
+            text, msg = changeLetters(text, self.newEnc, preLatin=pvalue, reversed_action=True)
             cyr_path = path
             
             text = bufferCode(text, self.newEnc)
@@ -2886,6 +2896,8 @@ class MyFrame(ConverterFrame):
         else:
             self.newEnc = 'utf-8'
 
+        pvalue = self.preferences.IsChecked(1014)
+        
         for key, value in self.multiFile.items():
             path = key
             entered_enc = value
@@ -2898,7 +2910,7 @@ class MyFrame(ConverterFrame):
             newF = '{0}{1}'.format(os.path.join(self.real_dir, nam), b)
 
             text, msg = changeLetters(
-                text, self.newEnc, reversed_action=True
+                text, self.newEnc, preLatin=pvalue, reversed_action=True
             )
             
             text = bufferCode(text, self.newEnc)
