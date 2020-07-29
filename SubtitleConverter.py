@@ -1241,12 +1241,8 @@ class MyFrame(ConverterFrame):
             utf_name, suffix = newName(path, value2_s, multi=False)
             utf_path = os.path.join(self.real_dir, (utf_name + suffix))
             
-            if self.preferences.IsChecked(1014):
-                pvalue = True
-                text = preLatin(text_in=text)
-            else:
-                pvalue = False
-                text = text
+            pvalue = self.preferences.IsChecked(1014)
+            if pvalue == True: text = preLatin(text_in=text)
             
             text, msg = changeLetters(text, utf8_enc, preLatin=pvalue, reversed_action=False)
             cyr_path = path
