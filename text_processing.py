@@ -510,13 +510,13 @@ def cleanLine(text_in):
 
             if not text_stripped and not to_delete:
                 logger.debug("CleanLine, Subtitle clean. No changes made.")
-                return 0, 0, srt.compose(subs)
+                return 0, srt.compose(subs)
                 
             else:
                 logger.debug("Index of subtitles deleted: {0}".format([i + 1 for i in to_delete]))
                 logger.debug("Index of subtitles trimmed: {0}".format(text_stripped))
                 logger.debug('{0} deleted, {1} trimmed'.format(len(to_delete), len(text_stripped)))
-                return len(to_delete), len(text_stripped), srt.compose(subs) 
+                return len(subs), srt.compose(subs)
         else:
             logger.debug('No subtitles found.')
     except Exception as e:
