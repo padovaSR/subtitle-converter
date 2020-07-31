@@ -2045,16 +2045,11 @@ class MyFrame(ConverterFrame):
             subs = list(srt.parse(text))
             subs = srt.compose(subs)
             
-            arg1 = True
-            if PREVIOUS:
-                if PREVIOUS[-1].action == "repSpec" or PREVIOUS[-1].action == "Cleanup":
-                    arg1 = False
-            
-            text = cleanUp(subs, arg1)
+            text = cleanUp(subs)
 
             deleted, trimmed, text_s = cleanLine(text)
             
-            text = cleanUp(text_s, False)
+            text = cleanUp(text_s)
             
             d, t, text_s = cleanLine(text)            
 
