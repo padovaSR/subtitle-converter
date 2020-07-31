@@ -447,7 +447,7 @@ def cleanUp(text_in):
     reg8a = re.compile(r'^\s*(?<=.)|^-(?<=$)', re.M)             # Spejs na pocetku linije, i crtica na početku prazne linije
     regN = re.compile(r'(?<=^-)\:\s*', re.M)                     # dve tacke iza crtice
     regColon = re.compile(r"^\s*: *", re.M)
-    RL = re.compile(r"\d\n\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}(?=\n\s*\d+\n*?)")
+    RL = re.compile(r"\d+\n\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}(?=\n\s*\d+\n*?)")
     
     #def opFile(in_text):
         #return in_text.replace(']:', ']').replace('):', ')').replace('}:', '}').replace('  ', ' ')
