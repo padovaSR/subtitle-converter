@@ -20,14 +20,11 @@ def printEncoding(entered_enc):
     return entered_enc
 
 def lenZip(infile):
-    lfile = ""
     if zipfile.is_zipfile(infile):
         f = zipfile.ZipFile(infile)
         if not len(f.namelist()) >= 2:
-            lfile += infile
-    else:
-        lfile += infile
-    if lfile: return lfile
+            return infile
+    else: return infile
         
 def sortList(inlist):
     """"""
