@@ -40,8 +40,6 @@ handler = logging.FileHandler(
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
-work_text = StringIO()
-
 
 codelist = [
     'utf-8',
@@ -422,13 +420,11 @@ def doReplace(text_in):
     except Exception as e:
         logger.debug(f"DoReplace, unexpected error: {e}")
     else:
-        bufferText(t_out[0], work_text)
         much = t_out[1]
-
         logger.debug(f'DoReplace, zamenjeno [{much}] objekata')
-        return much, work_text.getvalue()
+        return much, t_out[0]
     
-def cleanUp(text_in, parse):
+def cleanUp(text_in):
     
     # okrugle zagrade                     '(\([^\)]*\))' 
     # kockaste zagrade                    '(\[[^]]*\])'
@@ -451,22 +447,16 @@ def cleanUp(text_in, parse):
     reg8a = re.compile(r'^\s*(?<=.)|^-(?<=$)', re.M)             # Spejs na pocetku linije, i crtica na početku prazne linije
     regN = re.compile(r'(?<=^-)\:\s*', re.M)                     # dve tacke iza crtice
     regColon = re.compile(r"^\s*: *", re.M)
+    RL = re.compile(r"\d\n\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}(?=\n\d)")
     
     #def opFile(in_text):
         #return in_text.replace(']:', ']').replace('):', ')').replace('}:', '}').replace('  ', ' ')
 
-    if parse == True:
-        try:
-            textis = srt.parse(text_in)
-            outf = srt.compose(textis)
-        except Exception as e:
-            logger.debug(f"CleanSubtitle_srt, unexpected error: {e}")
-        else:
-            if len(outf) > 0: bufferText(outf, work_text)
-    else: bufferText(text_in, work_text)
-            
+
+    textis = srt.parse(text_in)
+    text_subs = srt.compose(textis)
+    
     try:
-        text_subs = work_text.getvalue()
         fp3 = reg_4.sub("", text_subs)
     
         fp5 = reg_P6.sub("", fp3)
@@ -476,6 +466,7 @@ def cleanUp(text_in, parse):
 
         fp11 = reg_P8.sub("", rf1)
         fp13 = reg_S9.sub("\n", fp11)
+        fp13 = RL.sub("\n", fp13)
         fp14 = regN.sub('', fp13)
         fp15 = reg8a.sub('', fp14)            
         
