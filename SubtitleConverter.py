@@ -61,7 +61,7 @@ import wx
 
 from subtitle_converter_gui import ConverterFrame
 
-VERSION = "v0.5.8.4b"
+VERSION = "v0.5.8.4c"
 
 
 logger = logging.getLogger(__name__)
@@ -2043,15 +2043,16 @@ class MyFrame(ConverterFrame):
 
         try:
             subs = list(srt.parse(text))
+            NUM1 = len(subs)
             subs = srt.compose(subs)
             
             text = cleanUp(subs)
 
-            deleted, trimmed, text_s = cleanLine(text)
+            N2, text_s = cleanLine(text)
             
             text = cleanUp(text_s)
             
-            d, t, text_s = cleanLine(text)            
+            D2, text_s = cleanLine(text)            
 
             bufferText(text_s, WORK_TEXT)
             bufferText(text_s, self.workText)
@@ -2060,7 +2061,7 @@ class MyFrame(ConverterFrame):
 
             self.bytesToBuffer(text_s, entered_enc)
             
-            if (deleted + trimmed) == 0:
+            if D2 or N2 == 0:
                 msginfo = wx.MessageDialog(
                     self,
                     'Subtitle clean\nno changes made.',
@@ -2071,7 +2072,7 @@ class MyFrame(ConverterFrame):
             else:
                 msginfo = wx.MessageDialog(
                     self,
-                    f'Subtitles deleted: [{deleted+d} ]\nSubtitles trimmed: [{trimmed+t} ]',
+                    f'Subtitles deleted: [{NUM1-(N2+D2)} ]',
                     'SubtitleConverter',
                     wx.OK | wx.ICON_INFORMATION,
                 )
