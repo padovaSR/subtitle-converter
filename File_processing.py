@@ -94,8 +94,7 @@ class FileOpened:
         f.close()
         encoding = [encoding for bom, encoding in BOMS if data.startswith(bom)]
         if encoding and encoding[0] == "UTF-8_BOM":
-            enc = "utf-8-sig"
-            return enc
+            return "utf-8-sig"
         else:        
             if kodek != 'auto':
                 ukode = kodek
