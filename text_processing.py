@@ -99,23 +99,16 @@ def bufferText(intext, buffer):
     buffer.seek(0)
 
 def normalizeText(code_in, path):
+    '''text normalization'''
     error = 'strict'
-    if code_in in codelist:
-        error = 'surrogatepass'
+    if code_in in codelist: error = 'surrogatepass'
     try:
         with open(path, 'r', encoding=code_in, errors=error) as f:
-            ucitan = f.read()
-            text_normalized = unicodedata.normalize('NFKC', ucitan)
+            text_normalized = unicodedata.normalize('NFKC', f.read())
     except Exception as e:
         logger.exception(f"NormalizeText error: ({path} {e})")
-
     else:
-        try:
-            #self.bufferText(text_normalized, self.work_text)
-            #text = self.work_text.getvalue()
-            return text_normalized
-        except Exception as e:
-            logger.debug(f"NormalizeText Error: ({e})")
+        return text_normalized
             
 def rplStr(in_text, enc):
 
