@@ -551,21 +551,8 @@ class MyFrame(ConverterFrame):
     
 
     def onOpen(self, event):
-        tval = self.text_1.GetValue()
-        if (
-            not tval.startswith('Files ')
-            and len(tval) > 0
-            and self.save.IsEnabled()
-            and not self.previous_action
-        ):
-            dl1 = wx.MessageBox(
-                "Current content has not been saved! Proceed?",
-                "Please confirm",
-                wx.ICON_QUESTION | wx.YES_NO,
-                self,
-            )
-            if dl1 == wx.NO:
-                return
+        ''''''
+        self.preStart()
 
         dlgOpen = wx.FileDialog(
             self,
@@ -596,14 +583,8 @@ class MyFrame(ConverterFrame):
         
     def onReload(self, event):
         
-        tval = self.text_1.GetValue()
-        if (
-            not tval.startswith('Files ')
-            and len(tval) > 0
-            and self.save.IsEnabled()
-        ):
-            if self.ShowDialog() == False:
-                return
+        self.preStart()
+        
         if zipfile.is_zipfile(self.real_path[0]):
             zfile = zipfile.ZipFile(self.real_path[0])
             if len(zfile.namelist()) >= 2:
@@ -627,14 +608,9 @@ class MyFrame(ConverterFrame):
         event.Skip()
         
     def onReloadText(self, event):
-        tval = self.text_1.GetValue()
-        if (
-            not tval.startswith('Files ')
-            and len(tval) > 0
-            and self.save.IsEnabled()
-        ):
-            if self.ShowDialog() == False:
-                return
+        ''''''
+        self.preStart()
+        
         path = self.tmpPath[-1]
         if PREVIOUS:
             ## Početni tekst
@@ -818,15 +794,8 @@ class MyFrame(ConverterFrame):
             ex = sp['key5']
             value4_s = ex['lat_ansi_srt']
 
-        tval = self.text_1.GetValue()
-        if (
-            not tval.startswith('Files ')
-            and len(tval) > 0
-            and self.save.IsEnabled()
-        ):
-            if self.ShowDialog() == False:
-                return
-
+        self.preStart()
+        
         path, entered_enc = self.PathEnc()
         
         if len(self.multiFile) >= 1:
@@ -1203,16 +1172,9 @@ class MyFrame(ConverterFrame):
             ex = sp['key5']
             value1_s = ex['cyr_ansi_srt']
             value2_s = ex['cyr_utf8_txt']
-
-        tval = self.text_1.GetValue()
-        if (
-            not tval.startswith('Files ')
-            and len(tval) > 0
-            and self.save.IsEnabled()
-        ):
-            if self.ShowDialog() == False:
-                return
-
+        
+        self.preStart()
+        
         path, entered_enc = self.PathEnc()
         
         if self.preferences.IsChecked(1011):  
@@ -1324,8 +1286,7 @@ class MyFrame(ConverterFrame):
             file_suffix = os.path.splitext(path)[-1]
 
             text = normalizeText(entered_enc, path)
-            if text:
-                text = text.replace('?', '¬')
+            if text: text = text.replace('?', '¬')
 
             utfText, suffix = newName(path, value2_s, multi=True)
 
@@ -1395,14 +1356,7 @@ class MyFrame(ConverterFrame):
             ex = sp['key5']
             value_s = ex["cyr_utf8_srt"]
 
-        tval = self.text_1.GetValue()
-        if (
-            not tval.startswith('Files ')
-            and len(tval) > 0
-            and self.save.IsEnabled()
-        ):
-            if self.ShowDialog() == False:
-                return
+        self.preStart()
 
         path, entered_enc = self.PathEnc()
         
@@ -1426,8 +1380,7 @@ class MyFrame(ConverterFrame):
                 encoding="utf-8", errors="surrogatepass"
             ).replace(b"\n", b"\r\n")
             
-            if text:
-                text = text.replace('?', '¬')
+            if text: text = text.replace('?', '¬')
 
             utf_name, suffix = newName(path, value_s, multi=False)
             utf_path = os.path.join(self.real_dir, (utf_name + suffix))
@@ -1435,11 +1388,10 @@ class MyFrame(ConverterFrame):
             pvalue = self.preferences.IsChecked(1014)
             if pvalue == True: text = preLatin(text_in=text)
             
+            text = bufferCode(text, self.newEnc)
             text, msg = changeLetters(text, self.newEnc, preLatin=pvalue, reversed_action=False)
             cyr_path = path
             self.cyrUTF = utf_path
-            
-            text = bufferCode(text, self.newEnc)
             
             error_text = checkFile(path, cyr_path, text, multi=False)
             text = displayError(
@@ -1516,17 +1468,15 @@ class MyFrame(ConverterFrame):
 
             text = normalizeText(entered_enc, path)
             
-            if text:
-                text = text.replace('?', '¬')
+            if text: text = text.replace('?', '¬')
 
             utfText, suffix = newName(path, value_s, multi=True)
 
             utf_path = os.path.join(self.real_dir, utfText + suffix)
             self.cyrUTFmulti.append(utf_path)
 
-            text,msg = changeLetters(text, self.newEnc, preLatin=pvalue, reversed_action=False)
-            
             text = bufferCode(text, self.newEnc)
+            text,msg = changeLetters(text, self.newEnc, preLatin=pvalue, reversed_action=False)
             
             cyr_name, cyr_suffix = newName(path, value_s, multi=True)
             cyr_path = os.path.join(self.real_dir, cyr_name + file_suffix)
@@ -1582,15 +1532,7 @@ class MyFrame(ConverterFrame):
             ex = sp['key5']
             value1_s = ex['lat_utf8_srt']
 
-        tval = self.text_1.GetValue()
-        if (
-            not tval.startswith('Files ')
-            and len(tval) > 0
-            and self.save.IsEnabled()
-            and self.reloaded == 0
-        ):
-            if self.ShowDialog() == False:
-                return
+        self.preStart()
 
         path, entered_enc = self.PathEnc()
         
@@ -1734,16 +1676,8 @@ class MyFrame(ConverterFrame):
             ex = sp['key5']
             value1_s = ex['transcribe']
 
-        tval = self.text_1.GetValue()
-        if (
-            not tval.startswith('Files ')
-            and len(tval) > 0
-            and self.save.IsEnabled()
-            and self.reloaded == 0
-        ):
-            if self.ShowDialog() == False:
-                return
-
+        self.preStart()
+        
         path, entered_enc = self.PathEnc()
 
         if len(self.multiFile) >= 1:
@@ -1759,7 +1693,7 @@ class MyFrame(ConverterFrame):
         text = WORK_TEXT.getvalue()
         # text = self.text_1.GetValue()
 
-        # text = bufferCode(text, self.newEnc)
+        text = bufferCode(text, self.newEnc)
         text = fixI(text, self.newEnc)
 
         num, text = zameniImena(text)
@@ -1792,16 +1726,8 @@ class MyFrame(ConverterFrame):
         
     def onRepSpecial(self, event):
         
-        tval = self.text_1.GetValue()
-        if (
-            not tval.startswith('Files ')
-            and len(tval) > 0
-            and self.save.IsEnabled()
-            and self.reloaded == 0
-        ):
-            if self.ShowDialog() == False:
-                return
-
+        self.preStart()
+       
         path, entered_enc = self.PathEnc()
 
         if len(self.multiFile) >= 1:
@@ -1857,16 +1783,8 @@ class MyFrame(ConverterFrame):
         
     def applyRegex(self, event):
         
-        tval = self.text_1.GetValue()
-        if (
-            not tval.startswith('Files ')
-            and len(tval) > 0
-            and self.save.IsEnabled()
-            and self.reloaded == 0
-        ):
-            if self.ShowDialog() == False:
-                return
-
+        self.preStart()
+        
         path, entered_enc = self.PathEnc()
 
         if len(self.multiFile) >= 1:
@@ -2091,16 +2009,8 @@ class MyFrame(ConverterFrame):
     
     def onMergeLines(self, event):
         
-        tval = self.text_1.GetValue()
-        if (
-            not tval.startswith('Files ')
-            and len(tval) > 0
-            and self.save.IsEnabled()
-            and self.reloaded == 0
-        ):
-            if self.ShowDialog() == False:
-                return
-
+        self.preStart()
+        
         path, entered_enc = self.PathEnc()
 
         if len(self.multiFile) >= 1:
@@ -2688,8 +2598,7 @@ class MyFrame(ConverterFrame):
             text = WORK_TEXT.getvalue()
             # text = self.text_1.GetValue()
 
-            if text:
-                text = text.replace('?', '¬')
+            if text: text = text.replace('?', '¬')
                 
             pvalue = self.preferences.IsChecked(1014)
 
@@ -2948,16 +2857,8 @@ class MyFrame(ConverterFrame):
         
     def onFixSubs(self):
 
-        tval = self.text_1.GetValue()
-        if (
-            not tval.startswith('Files ')
-            and len(tval) > 0
-            and self.save.IsEnabled()
-            and self.reloaded == 0
-        ):
-            if self.ShowDialog() == False:
-                return
-
+        self.preStart()
+        
         path, entered_enc = self.PathEnc()
 
         if len(self.multiFile) >= 1:
@@ -3341,6 +3242,17 @@ class MyFrame(ConverterFrame):
             pickle.dump(value, f)
             
         event.Skip()
+        
+    def preStart(self):
+        """"""
+        tval = self.text_1.GetValue()
+        if (
+            not tval.startswith('Files ')
+            and len(tval) > 0
+            and self.save.IsEnabled()
+        ):
+            if self.ShowDialog() == False:
+                return    
         
 class MyApp(wx.App):
     
