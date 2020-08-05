@@ -1938,16 +1938,8 @@ class MyFrame(ConverterFrame):
             cb8_s = ef["state8"]
             value1_s = ex['cleanup']
 
-        tval = self.text_1.GetValue()
-        if (
-            not tval.startswith('Files ')
-            and len(tval) > 0
-            and self.save.IsEnabled()
-            and self.reloaded == 0
-        ):
-            if self.ShowDialog() == False:
-                return
-
+        self.preStart()
+        
         path, entered_enc = self.PathEnc()
 
         if len(self.multiFile) >= 1:
@@ -1979,7 +1971,7 @@ class MyFrame(ConverterFrame):
 
             self.bytesToBuffer(text_s, entered_enc)
             
-            if D2 or N2 == 0:
+            if D2 ==0 and N2 == 0:
                 msginfo = wx.MessageDialog(
                     self,
                     'Subtitle clean\nno changes made.',
@@ -1988,9 +1980,10 @@ class MyFrame(ConverterFrame):
                 )
                 msginfo.ShowModal()
             else:
+                if D2 == 0 and N2 > 0: D2 = N2
                 msginfo = wx.MessageDialog(
                     self,
-                    f'Subtitles deleted: [{NUM1-(N2+D2)} ]',
+                    f'Subtitles deleted: [{NUM1-D2} ]',
                     'SubtitleConverter',
                     wx.OK | wx.ICON_INFORMATION,
                 )
