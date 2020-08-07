@@ -61,7 +61,7 @@ import wx
 
 from subtitle_converter_gui import ConverterFrame
 
-VERSION = "v0.5.8.4e"
+VERSION = "v0.5.8.4f"
 
 
 logger = logging.getLogger(__name__)
@@ -405,6 +405,8 @@ class MyFrame(ConverterFrame):
             logger.debug(f'File opened: {os.path.basename(infile)}')
             self.addHistory(self.enchistory, infile, enc)
             try:
+                self.droped.clear()
+                self.multiFile.clear()
                 self.reloadText.clear()
                 self.reloadText[text] = enc
                 if os.path.exists(droppedText):
@@ -1943,6 +1945,8 @@ class MyFrame(ConverterFrame):
         path, entered_enc = self.PathEnc()
 
         if len(self.multiFile) >= 1:
+            print("BINGO!")
+            print(self.multiFile)
             return
 
         self.newEnc = entered_enc
@@ -2539,8 +2543,6 @@ class MyFrame(ConverterFrame):
         self.real_path.append(path)
         self.real_dir = os.path.dirname(path)
         
-        if self.multiFile:
-            self.multiFile.clear()
         self.tmpPath.clear()
         self.handleFile([path])
         
