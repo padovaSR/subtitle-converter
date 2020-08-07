@@ -1945,8 +1945,6 @@ class MyFrame(ConverterFrame):
         path, entered_enc = self.PathEnc()
 
         if len(self.multiFile) >= 1:
-            print("BINGO!")
-            print(self.multiFile)
             return
 
         self.newEnc = entered_enc
