@@ -9,19 +9,21 @@ import wx
 
 class MultiChoice(wx.Dialog):
     def __init__(self, parent, message, caption, choices=[]):
-        wx.Dialog.__init__(self, parent, -1)    
-    
+        wx.Dialog.__init__(self, parent, -1)
+
         self.SetTitle(caption)
         self.message = wx.StaticText(self, -1, message)
-        
+
         sizer_1 = wx.BoxSizer(wx.VERTICAL)
         sizer_1.Add(self.message, 0, wx.ALL | wx.EXPAND, 4)
-        self.check_list_box_1 = wx.CheckListBox(self, wx.ID_ANY, choices=choices, style=wx.LB_MULTIPLE| wx.LB_NEEDED_SB)
+        self.check_list_box_1 = wx.CheckListBox(
+            self, wx.ID_ANY, choices=choices, style=wx.LB_MULTIPLE | wx.LB_NEEDED_SB
+        )
         self.chbox = wx.CheckBox(self, -1, 'Select all')
         self.check_list_box_1.SetMinSize((200, 70))
-        sizer_1.Add(self.check_list_box_1, 0, wx.ALL | wx.EXPAND|wx.FIXED_MINSIZE, 4)
+        sizer_1.Add(self.check_list_box_1, 0, wx.ALL | wx.EXPAND | wx.FIXED_MINSIZE, 4)
         sizer_1.Add(self.chbox, 0, wx.ALL | wx.ALIGN_LEFT, 4)
-        
+
         sizer_2 = wx.StdDialogButtonSizer()
         sizer_1.Add(sizer_2, 0, wx.ALIGN_RIGHT | wx.ALL, 4)
 
@@ -35,7 +37,7 @@ class MultiChoice(wx.Dialog):
 
         self.SetSizer(sizer_1)
         sizer_1.SetSizeHints(self)
-        
+
         self.Bind(wx.EVT_CHECKBOX, self.EvtChBox, self.chbox)
         self.Bind(wx.EVT_CLOSE, self.onCancel, id=wx.ID_ANY)
 
@@ -45,7 +47,7 @@ class MultiChoice(wx.Dialog):
         self.Layout()
         # self.Fit()
         # end wxGlade
-        
+
     def GetSelections(self):
         return self.check_list_box_1.GetCheckedItems()
 
@@ -53,13 +55,13 @@ class MultiChoice(wx.Dialog):
         state = self.chbox.IsChecked()
         for i in range(self.check_list_box_1.GetCount()):
             self.check_list_box_1.Check(i, state)
-            
+
     def onCancel(self, event):
         self.Destroy()
-        
-        
+
 
 # end of class MyDialog
+
 
 class MyApp(wx.App):
     def OnInit(self):
@@ -68,6 +70,7 @@ class MyApp(wx.App):
         self.dialog.ShowModal()
         # self.dialog.Destroy()
         return True
+
 
 # end of class MyApp
 
