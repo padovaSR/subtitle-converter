@@ -52,7 +52,6 @@ from text_processing import (
     preLatin,
     remTag, 
 )
-from choice_dialog import MultiChoice 
 import subprocess
 import logging
 from File_processing import FileOpened, newName, nameDialog, writeToFile
