@@ -62,7 +62,7 @@ import wx
 
 from subtitle_converter_gui import ConverterFrame
 
-VERSION = "v0.5.8.4f"
+VERSION = "v0.5.8.5"
 
 
 logger = logging.getLogger(__name__)
