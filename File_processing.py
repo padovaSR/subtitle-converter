@@ -10,6 +10,7 @@ import shelve
 import logging
 from text_processing import codelist
 from settings import chreg, preSuffix
+from choice_dialog import MultiChoice
 from codecs import (
     BOM_UTF8,
     BOM_UTF16_BE,
@@ -65,9 +66,10 @@ class FileOpened:
                 logger.debug(f"{imeFajla} is empty")
             elif len(zf.namelist()) >= 2:
                 izbor = [x for x in zf.namelist() if not x.endswith('/')]
-                dlg = wx.MultiChoiceDialog(
-                    None, 'Pick files:', imeFajla, izbor
-                )
+                if len(zf.namelist()) > 9:
+                    dlg = MultiChoice(None, "Pick files:", imeFajla, choices=izbor)
+                else:
+                    dlg = wx.MultiChoiceDialog(None, 'Pick files:', imeFajla, izbor)
                 if dlg.ShowModal() == wx.ID_OK:
                     response = dlg.GetSelections()
                     files = [izbor[x] for x in response]
@@ -83,6 +85,7 @@ class FileOpened:
                     return outfiles, single
                 else:
                     logger.debug(f'{self.putanja}: Canceled.')
+                    dlg.Destroy()
 
     def findCode(self):
         ''''''
