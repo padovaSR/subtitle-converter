@@ -41,7 +41,7 @@ def myMerger(subs_in, max_time, max_char, _gap):
 
     subs = subs_in
 
-    if not len(subs) % 2 == 0:
+    if not len(subs)-1 % 2 == 0:
         dsub = SubRipItem(
             subs[-1].index + 1,
             subs[-1].start + 6000,
@@ -54,6 +54,7 @@ def myMerger(subs_in, max_time, max_char, _gap):
 
     parni = [x for x in subs[1::2]]
     neparni = [x for x in subs[0::2]]
+    first = subs[0]
 
     def merge_lines(inPar, inNepar):
         re_pattern = re.compile(r'<[^<]*>')
@@ -111,7 +112,9 @@ def myMerger(subs_in, max_time, max_char, _gap):
     out_f, par2, nep2 = merge_lines(par1, nep1)
     out_f, par3, nep3 = merge_lines(par2, nep2)
     out_f, par4, nep4 = merge_lines(par3, nep3)
-
+    
+    out_f.insert(0, first)
+    
     WORK_TEXT.truncate(0)
     WORK_TEXT.seek(0)
     SubRipFile(out_f).write_into(WORK_TEXT)
