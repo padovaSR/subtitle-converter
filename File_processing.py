@@ -10,7 +10,7 @@ import shelve
 import logging
 from text_processing import codelist
 from settings import chreg, preSuffix
-from choice_dialog import MultiChoice
+
 from codecs import (
     BOM_UTF8,
     BOM_UTF16_BE,
