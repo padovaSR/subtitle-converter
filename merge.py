@@ -52,8 +52,8 @@ def myMerger(subs_in, max_time, max_char, _gap):
     else:
         dsub = None
 
-    parni = [x for x in subs[1::2]]
-    neparni = [x for x in subs[0::2]]
+    parni = [x for x in subs[2::2]]
+    neparni = [x for x in subs[1::2]]
     first = subs[0]
 
     def merge_lines(inPar, inNepar):
