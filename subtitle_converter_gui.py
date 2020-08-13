@@ -88,7 +88,7 @@ class ConverterFrame(wx.Frame):
         self.file.Append(self.save_as)
 
         self.export_zip = wx.MenuItem(
-            self.file, wx.NewId(), "&Export as ZIP\t" + keyS["Export as ZIP"], "Export as ZIP"
+            self.file, wx.ID_ANY, "&Export as ZIP\t" + keyS["Export as ZIP"], "Export as ZIP"
         )
         self.export_zip.SetBitmap(
             wx.Bitmap(
@@ -113,20 +113,14 @@ class ConverterFrame(wx.Frame):
         # Submenu
         self.file_sub = wx.Menu()
         self.file_sub.Append(-1, "Recent files", "")
-        self.file.Append(-1, "Recent", self.file_sub, "")
+        # self.file.Append(-1, "Recent", self.file_sub, "")
+        self.file.AppendSubMenu(self.file_sub, "Recent", "")
         
         self.file.AppendSeparator()
         # Submenu end        
 
-        self.quit_program = wx.MenuItem(
-            self.file, wx.NewId(), "&Quit\t" + keyS["Quit"], "Quit program"
-        )
-        self.quit_program.SetBitmap(
-            wx.Bitmap(
-                filePath("resources", "icons", "application-exit.png"),
-                wx.BITMAP_TYPE_ANY,
-            )
-        )
+        self.quit_program = wx.MenuItem(self.file, wx.ID_ANY, "&Quit\t"+keyS["Quit"], "Quit program")
+        self.quit_program.SetBitmap(wx.Bitmap(filePath("resources", "icons", "application-exit.png"), wx.BITMAP_TYPE_ANY,))
         self.file.Append(self.quit_program)
 
         self.menubar1.Append(self.file, "File")
