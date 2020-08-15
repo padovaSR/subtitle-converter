@@ -270,7 +270,7 @@ class MyFrame(ConverterFrame):
                 path = path[-1]
             self.filehistory.AddFileToHistory(FILE_HISTORY[len(FILE_HISTORY)-1])
             self.SetStatusText(os.path.basename(path))
-            self.SetStatusText(enc, 1)
+            self.SetStatusText(printEncoding(enc), 1)
             self.tmpPath = [path]
             self.real_dir = os.path.dirname(msg[0][0])
             
@@ -448,7 +448,7 @@ class MyFrame(ConverterFrame):
                 self.real_path.append(path)
                 self.tmpPath.append(tpath)
                 self.SetStatusText(os.path.basename(tpath))
-                self.SetStatusText(enc, 1)
+                self.SetStatusText(printEncoding(enc), 1)
             elif zipfile.is_zipfile(path):
 
                 fop = FileOpened(path)
@@ -465,7 +465,7 @@ class MyFrame(ConverterFrame):
                         self.real_path.append(path)
                         self.tmpPath.append(outfile[0])
                         self.SetStatusText(os.path.basename(outfile[0]))
-                        self.SetStatusText(enc, 1)
+                        self.SetStatusText(printEncoding(enc), 1)
                     elif len(outfile) > 1:  # Više fajlova u ZIP-u
                         self.text_1.SetValue('Files List:\n')
                         for i in range(len(outfile)):
@@ -484,7 +484,7 @@ class MyFrame(ConverterFrame):
                         self.tmpPath.clear()
                         self.real_path.clear()
                         self.SetStatusText('Files ready for processing')
-                        self.SetStatusText(enc, 1)
+                        self.SetStatusText(printEncoding(enc), 1)
 
         elif len(inpaths) > 1:  # Više selektovanih ulaznih fajlova
             paths_in, paths_out = multiple(self, inpaths, tmp_path)
@@ -542,7 +542,7 @@ class MyFrame(ConverterFrame):
             self.multipleTools()
             logger.debug('FileHandler: Ready for multiple files')
             self.SetStatusText('Files ready for processing')
-            self.SetStatusText(enc, 1)
+            self.SetStatusText(printEncoding(enc), 1)
     
 
     def onOpen(self, event):
@@ -604,7 +604,7 @@ class MyFrame(ConverterFrame):
         logger.debug(f'Reloaded {os.path.basename(path)}, encoding: {enc}')
         self.clearUndoRedo()
         enc = printEncoding(enc)
-        self.SetStatusText(enc, 1)
+        self.SetStatusText(printEncoding(enc), 1)
 
         event.Skip()
         
@@ -1429,7 +1429,7 @@ class MyFrame(ConverterFrame):
                 
             self.SetStatusText(os.path.basename(path))
             enc = printEncoding(self.newEnc)
-            self.SetStatusText(enc, 1)
+            self.SetStatusText(printEncoding(enc), 1)
             
             self.postAction(path)
             self.frame_toolbar.EnableTool(1003, False)   # toANSI
@@ -2113,7 +2113,7 @@ class MyFrame(ConverterFrame):
                 sDlg.ShowModal()
             
             enc = printEncoding(self.newEnc)
-            self.SetStatusText(enc, 1)
+            self.SetStatusText(printEncoding(enc), 1)
             self.postAction(path)
             self.addPrevious("Merger", self.newEnc, text, self.pre_suffix)
             
@@ -3173,7 +3173,7 @@ class MyFrame(ConverterFrame):
         enc = printEncoding(entered_enc)
             
         self.postAction(path)
-        self.SetStatusText(enc, 1)
+        self.SetStatusText(printEncoding(enc), 1)
         ## None pre_suffix za početni tekst 
         self.pre_suffix = prev_items.psuffix
         self.addHistory(self.enchistory, path, entered_enc)
