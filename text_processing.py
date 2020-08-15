@@ -100,7 +100,8 @@ def bufferText(intext, buffer):
 
 def normalizeText(code_in, path):
     '''text normalization'''
-    error = 'strict'
+    error = "strict"
+    # error = 'surrogateescape'
     if code_in in codelist: error = 'surrogatepass'
     try:
         with open(path, 'r', encoding=code_in, errors=error) as f:
