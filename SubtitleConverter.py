@@ -60,7 +60,7 @@ import wx
 
 from subtitle_converter_gui import ConverterFrame
 
-VERSION = "v0.5.8.6"
+VERSION = "v0.5.8.6a"
 
 
 logger = logging.getLogger(__name__)
@@ -373,10 +373,8 @@ class MyFrame(ConverterFrame):
             
         self.frame_toolbar.EnableTool(1010, True)  # Save
         
-        if not self.REDO:
-            self.redo.Enable(False)
-        if not self.UNDO and not self.REDO:
-            self.clear.Enable(False)
+        if not self.REDO: self.redo.Enable(False)
+        if not self.UNDO and not self.REDO: self.clear.Enable(False)
             
         if not PREVIOUS[-1].action == "toCYR":
             self.frame_toolbar.EnableTool(1003, True)
@@ -405,9 +403,8 @@ class MyFrame(ConverterFrame):
             logger.debug(f'File opened: {os.path.basename(infile)}')
             self.addHistory(self.enchistory, infile, enc)
             try:
-                self.droped.clear()
-                self.multiFile.clear()
-                self.reloadText.clear()
+                for i in [self.droped, self.multiFile, self.reloadtext]:
+                    i.clear()
                 self.reloadText[text] = enc
                 if os.path.exists(droppedText):
                     os.remove(droppedText)
@@ -493,7 +490,6 @@ class MyFrame(ConverterFrame):
         elif len(inpaths) > 1:  # Više selektovanih ulaznih fajlova
             paths_in, paths_out = multiple(self, inpaths, tmp_path)
             self.real_path = paths_in[-1]
-            # if not any(zipfile.is_zipfile(x) for x in paths_in):
             self.text_1.SetValue('Files List:\n')
             self.multipleTools()
 
@@ -552,7 +548,10 @@ class MyFrame(ConverterFrame):
 
     def onOpen(self, event):
         ''''''
-        self.preStart()
+        tval = self.text_1.GetValue()
+        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
+            if self.ShowDialog() == False:
+                return
 
         dlgOpen = wx.FileDialog(
             self,
@@ -583,7 +582,10 @@ class MyFrame(ConverterFrame):
         
     def onReload(self, event):
         
-        self.preStart()
+        tval = self.text_1.GetValue()
+        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
+            if self.ShowDialog() == False:
+                return
         
         if zipfile.is_zipfile(self.real_path[0]):
             zfile = zipfile.ZipFile(self.real_path[0])
@@ -609,7 +611,10 @@ class MyFrame(ConverterFrame):
         
     def onReloadText(self, event):
         ''''''
-        self.preStart()
+        tval = self.text_1.GetValue()
+        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
+            if self.ShowDialog() == False:
+                return
         
         path = self.tmpPath[-1]
         if PREVIOUS:
@@ -779,7 +784,6 @@ class MyFrame(ConverterFrame):
         '''CLear Undo-Redo history'''
         self.UNDO.clear()
         self.REDO.clear()
-        # PREVIOUS.clear()
         self.undo.Enable(False)
         self.redo.Enable(False)
         self.clear.Enable(False)
@@ -793,7 +797,10 @@ class MyFrame(ConverterFrame):
             ex = sp['key5']
             value4_s = ex['lat_ansi_srt']
 
-        self.preStart()
+        tval = self.text_1.GetValue()
+        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
+            if self.ShowDialog() == False:
+                return
         
         path, entered_enc = self.PathEnc()
         
@@ -864,16 +871,12 @@ class MyFrame(ConverterFrame):
                 p = self.fStatus(path)
                 self.SetStatusText(p)
                 self.SetStatusText(self.newEnc, 1)
-                self.menubar1.Enable(wx.ID_SAVE, True)
-                self.menubar1.Enable(wx.ID_SAVEAS, True)
-                self.menubar1.Enable(wx.ID_CLOSE, True)
-                self.reload.Enable(True)
+                for i in [wx.ID_SAVE, wx.ID_SAVEAS, wx.ID_CLOSE]:
+                    self.menubar1.Enable(i, True)
+                for i in [self.reload, self.undo, self.redo, self.reloadtext]:
+                    i.Enable(True)
                 self.frame_toolbar.EnableTool(1010, True)  # Save
-                self.frame_toolbar.EnableTool(101, True)
-                self.undo.Enable(True)
-                self.redo.Enable(True)
-                self.reloadtext.Enable(True)
-                self.reload.Enable(True)
+                self.frame_toolbar.EnableTool(1001, True)
                 self.addPrevious("toANSI", self.newEnc, text, self.pre_suffix)
                 self.addHistory(self.enchistory, path, self.newEnc)
                 self.reloaded = 0
@@ -1172,7 +1175,10 @@ class MyFrame(ConverterFrame):
             value1_s = ex['cyr_ansi_srt']
             value2_s = ex['cyr_utf8_txt']
         
-        self.preStart()
+        tval = self.text_1.GetValue()
+        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
+            if self.ShowDialog() == False:
+                return
         
         path, entered_enc = self.PathEnc()
         
@@ -1361,7 +1367,10 @@ class MyFrame(ConverterFrame):
             ex = sp['key5']
             value_s = ex["cyr_utf8_srt"]
 
-        self.preStart()
+        tval = self.text_1.GetValue()
+        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
+            if self.ShowDialog() == False:
+                return
 
         path, entered_enc = self.PathEnc()
         
@@ -1532,7 +1541,10 @@ class MyFrame(ConverterFrame):
             ex = sp['key5']
             value1_s = ex['lat_utf8_srt']
 
-        self.preStart()
+        tval = self.text_1.GetValue()
+        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
+            if self.ShowDialog() == False:
+                return
 
         path, entered_enc = self.PathEnc()
         
@@ -1676,7 +1688,10 @@ class MyFrame(ConverterFrame):
             ex = sp['key5']
             value1_s = ex['transcribe']
 
-        self.preStart()
+        tval = self.text_1.GetValue()
+        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
+            if self.ShowDialog() == False:
+                return
         
         path, entered_enc = self.PathEnc()
 
@@ -1726,7 +1741,10 @@ class MyFrame(ConverterFrame):
         
     def onRepSpecial(self, event):
         
-        self.preStart()
+        tval = self.text_1.GetValue()
+        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
+            if self.ShowDialog() == False:
+                return
        
         path, entered_enc = self.PathEnc()
 
@@ -1783,7 +1801,10 @@ class MyFrame(ConverterFrame):
         
     def applyRegex(self, event):
         
-        self.preStart()
+        tval = self.text_1.GetValue()
+        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
+            if self.ShowDialog() == False:
+                return
         
         path, entered_enc = self.PathEnc()
 
@@ -1938,7 +1959,10 @@ class MyFrame(ConverterFrame):
             cb8_s = ef["state8"]
             value1_s = ex['cleanup']
 
-        self.preStart()
+        tval = self.text_1.GetValue()
+        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
+            if self.ShowDialog() == False:
+                return
         
         path, entered_enc = self.PathEnc()
 
@@ -2002,7 +2026,10 @@ class MyFrame(ConverterFrame):
     
     def onMergeLines(self, event):
         
-        self.preStart()
+        tval = self.text_1.GetValue()
+        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
+            if self.ShowDialog() == False:
+                return
         
         path, entered_enc = self.PathEnc()
 
@@ -2811,7 +2838,10 @@ class MyFrame(ConverterFrame):
         
     def onFixSubs(self):
 
-        self.preStart()
+        tval = self.text_1.GetValue()
+        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
+            if self.ShowDialog() == False:
+                return
         
         path, entered_enc = self.PathEnc()
 
@@ -3196,18 +3226,7 @@ class MyFrame(ConverterFrame):
             pickle.dump(value, f)
             
         event.Skip()
-        
-    def preStart(self):
-        """"""
-        tval = self.text_1.GetValue()
-        if (
-            not tval.startswith('Files ')
-            and len(tval) > 0
-            and self.save.IsEnabled()
-        ):
-            if self.ShowDialog() == False:
-                return    
-        
+
 class MyApp(wx.App):
     
     def remOnstart(self):
