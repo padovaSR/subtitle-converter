@@ -2390,6 +2390,9 @@ class MyFrame(ConverterFrame):
                     info2 = [os.path.join("Cyr-utf8", os.path.basename(x)) for x in izbor_utf8]
                     info = info1 + info2
                     zlist = zlist_a + zlist_b
+                else:
+                    info = [os.path.join("Cyr-ansi", os.path.basename(x)) for x in izbor_ansi]
+                    zlist = [data_out(x) for x in izbor_ansi]                
 
                 if dlg1.ShowModal() == wx.ID_YES:
                     zlist_c = [data_out(x) for x in lat_files]
