@@ -407,7 +407,6 @@ class MyFrame(ConverterFrame):
                 self.droped.clear()
                 self.multiFile.clear()
                 self.reloadText.clear()
-                self.utf8_latText.clear()
                 self.reloadText[text] = enc
                 if os.path.exists(droppedText):
                     os.remove(droppedText)
@@ -1280,6 +1279,7 @@ class MyFrame(ConverterFrame):
         self.cyrUTFmulti.clear()
         
         pvalue = self.preferences.IsChecked(1014)
+        self.utf8_latText.clear()
         
         for key, value in self.multiFile.items():
 
@@ -1290,7 +1290,6 @@ class MyFrame(ConverterFrame):
 
             text = normalizeText(entered_enc, path)
             
-            self.utf8_latText.clear()
             self.utf8_latText[os.path.basename(path)] = (
                 remTag(text)
                 .encode(encoding="utf-8", errors="surrogatepass")
@@ -2121,6 +2120,8 @@ class MyFrame(ConverterFrame):
             if len(PREVIOUS) == 1:
                 logger.debug(f"Export Zip: Nothing to do.")
                 return
+            if PREVIOUS[-1].action == "exportZIP":
+                return
             
             dlg = wx.FileDialog(
                 self,
@@ -2219,6 +2220,7 @@ class MyFrame(ConverterFrame):
                         utf8ldata = self.utf8_latText[tpath]                ## latFile utf-8
                         data_v = [cyrdata, tzdata, zdata, utf8ldata]
                         zip_data = [data_v[x] for x in response]
+                        self.utf8_latText.clear()
                         if not files:
                             return
                     else:
@@ -2275,6 +2277,7 @@ class MyFrame(ConverterFrame):
                     sDlg.ShowModal()
                     ## Putanja i enkoding u recnik
                     self.saved_file[path] = self.newEnc
+                self.addPrevious("exportZIP", "", "", "")
             else:
                 logger.debug(f"Export ZIP: None selected")
                 return
@@ -2293,6 +2296,9 @@ class MyFrame(ConverterFrame):
         )
 
         sas_wildcard = "ZipArchive (*.zip)|*.zip|All Files (*.*)|*.*"
+
+        if PREVIOUS[-1].action == "exportZIPmultiple":
+            return
 
         dlg = wx.FileDialog(
             self,
@@ -2426,12 +2432,11 @@ class MyFrame(ConverterFrame):
                             continue
                         fzip.writestr(i, x, zipfile.ZIP_DEFLATED)
                 for i in self.tmpPath:
-                    if os.path.exists(i):
-                        os.remove(i)
+                    if os.path.exists(i): os.remove(i)
                     logger.debug("Removed {}".format(i))
-                for i in self.cyrUTFmulti:
-                    os.remove(i)
-                    logger.debug("Removed {}".format(i))
+                for i in self.cyrUTFmulti: os.remove(i)
+                logger.debug("Removed {}".format(i))
+                
             except Exception as e:
                 logger.debug(f"Export ZIP_final error: {e}")
 
@@ -2444,6 +2449,7 @@ class MyFrame(ConverterFrame):
                     wx.OK | wx.ICON_INFORMATION,
                 )
                 sDlg.ShowModal()
+            self.addPrevious("exportZIPmultiple", "", "", "")
         else:
             dlg.Destroy()
     
