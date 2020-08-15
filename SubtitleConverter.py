@@ -60,7 +60,7 @@ import wx
 
 from subtitle_converter_gui import ConverterFrame
 
-VERSION = "v0.5.8.6a"
+VERSION = "v0.5.8.6b"
 
 
 logger = logging.getLogger(__name__)
@@ -356,10 +356,9 @@ class MyFrame(ConverterFrame):
             self.to_utf8,
             self.cyr_to_ansi,
             self.cyr_to_utf,
-            self.exportZIP,
-        ]:
-            i.Enable(True)
-    
+            self.export_zip,
+        ]: i.Enable(True)
+
     def postAction(self, path):
         
         path = self.fStatus(path)
