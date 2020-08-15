@@ -52,7 +52,6 @@ from text_processing import (
     preLatin,
     remTag, 
 )
-import subprocess
 import logging
 from File_processing import FileOpened, newName, nameDialog, writeToFile
 
@@ -124,7 +123,7 @@ class MyFrame(ConverterFrame):
         self.workText = StringIO()
         self.bytesText = BytesIO()
         
-        self.utf8_latText = ""
+        self.utf8_latText = {}
         
         self.location = "tmp"
         self.cyrUTF = r""        
@@ -237,7 +236,7 @@ class MyFrame(ConverterFrame):
         accel_tbl = wx.AcceleratorTable(entries)
         self.SetAcceleratorTable(accel_tbl)
         #############################################################################################
-        # drop target
+        ## drop target
         dt = FileDrop(self.text_1)
         self.text_1.SetDropTarget(dt)
         
@@ -744,8 +743,7 @@ class MyFrame(ConverterFrame):
         with open(filePath("resources", "var", "set_size.pkl"), "wb") as wf:
             pickle.dump(self.fsize, wf)
         self.rwFileHistory(FILE_HISTORY)
-        if os.path.isfile(droppedText):
-            os.remove(droppedText)
+        if os.path.isfile(droppedText): os.remove(droppedText)
         self.Destroy()
 
     def onQuit(self, event):
@@ -755,7 +753,7 @@ class MyFrame(ConverterFrame):
         self.rwFileHistory(FILE_HISTORY)
         if os.path.isfile(droppedText):
             os.remove(droppedText)
-        
+
         tval = self.text_1.GetValue()
         
         if (
@@ -1194,10 +1192,11 @@ class MyFrame(ConverterFrame):
             self.newEnc = 'windows-1251'
             self.pre_suffix = value1_s
             
-            utf8_text = remTag(text)
-            self.utf8_latText = utf8_text.encode(
-                encoding="utf-8", errors="surrogatepass"
-            ).replace(b"\n", b"\r\n")
+            self.utf8_latText[os.path.basename(path)] = (
+                remTag(text)
+                .encode(encoding="utf-8", errors="surrogatepass")
+                .replace(b"\n", b"\r\n")
+            )
             
             if text:
                 text = text.replace('?', '¬')
@@ -1288,16 +1287,19 @@ class MyFrame(ConverterFrame):
             file_suffix = os.path.splitext(path)[-1]
 
             text = normalizeText(entered_enc, path)
+            
+            self.utf8_latText[os.path.basename(path)] = (
+                remTag(text)
+                .encode(encoding="utf-8", errors="surrogatepass")
+                .replace(b"\n", b"\r\n")
+            )            
+            
             if text: text = text.replace('?', '¬')
 
             utfText, suffix = newName(path, value2_s, multi=True)
 
             utf_path = os.path.join(self.real_dir, utfText + suffix)
             self.cyrUTFmulti.append(utf_path)
-
-            # if os.path.exists(utf_path):
-            # nnm = fproc.nameCheck(os.path.basename(utf_path), self.real_dir, suffix)
-            # utf_path = '{0}_{1}{2}'.format(utf_path, nnm, suffix)
 
             text,msg = changeLetters(text, utf8_enc, preLatin=pvalue, reversed_action=False)
             
@@ -2216,7 +2218,7 @@ class MyFrame(ConverterFrame):
                         zdata = data_out(None, fpath)                       ## latFile original
                         tzdata = data_out(None, tUTF)                       ## cyrUTF-8
                         cyrdata = data_out(self.bytesText, None)            ## cyrillic text binary
-                        utf8ldata = self.utf8_latText                       ## latFile utf-8
+                        utf8ldata = self.utf8_latText[tpath]                ## latFile utf-8
                         data_v = [cyrdata, tzdata, zdata, utf8ldata]
                         zip_data = [data_v[x] for x in response]
                         if not files:
@@ -2265,40 +2267,23 @@ class MyFrame(ConverterFrame):
                 for i in r_files:
                     if os.path.isfile(i):
                         os.remove(i)
-                cmd = f'"C:\Program Files"\WinRAR\WinRAR.exe {path}'
-                ## cmd=f"xarchiver {path}"
                 if os.path.isfile(path):
                     logger.debug(
                         f"ZIP file saved sucessfully: {path}")
-                    try:
-                        subprocess.Popen(
-                            cmd,
-                            bufsize=-1,
-                            executable=None,
-                            stdin=None,
-                            stdout=None,
-                            stderr=None,
-                            shell=True,
-                            cwd=None,
-                            env=None,
-                        )
-                    except Exception as e:
-                        logger.debug(f"Open Zip: {e}")
-                    else:
-                        sDlg = wx.MessageDialog(
-                            self,
-                            f'Fajl je uspešno sačuvan\n{os.path.basename(path)}', 
-                            'SubtitleConverter',
-                            wx.OK | wx.ICON_INFORMATION,
-                        )
-                        sDlg.ShowModal()
+                    sDlg = wx.MessageDialog(
+                        self,
+                        f'Fajl je uspešno sačuvan\n{os.path.basename(path)}', 
+                        'SubtitleConverter',
+                        wx.OK | wx.ICON_INFORMATION,
+                    )
+                    sDlg.ShowModal()
                     ## Putanja i enkoding u recnik
                     self.saved_file[path] = self.newEnc
             else:
                 logger.debug(f"Export ZIP: None selected")
                 return
         event.Skip()
-        
+
     def exportZIPmultiple(self):
 
         self.PathEnc()
@@ -2337,41 +2322,37 @@ class MyFrame(ConverterFrame):
             return _data
 
         if dlg.ShowModal() == wx.ID_OK:
-            path = dlg.GetPath()
-            # dirname = os.path.dirname(path)
-            name = path
-
+            name = dlg.GetPath()    ## Zip file name
+            
             if PREVIOUS[-1].action == 'toCYR_multiple':
-
+                info = []
+                zlist = []
                 izbor_ansi = []
-                izbor_txt = []
-                _txt_list = []
-
+                izbor_utf8 = []
+                utf8_list = []
+                lat_utf8 = [
+                    os.path.join("Lat-utf8", os.path.basename(x))
+                    for x in self.utf8_latText.keys()
+                ]
                 for i, x in zip(self.tmpPath, self.cyrUTFmulti):
 
-                    tANSI = os.path.join(
-                        "tmp", os.path.basename(i)
-                    )  # ansi cirilica
-                    tUTF = os.path.join(
-                        "tmp", os.path.basename(x)
-                    )  # utf_txt fajlovi
+                    tANSI = os.path.join("tmp", os.path.basename(i))  ## ansi cirilica
+                    tUTF = os.path.join("tmp", os.path.basename(x))   ## cyr_utf8 file
                     if not os.path.exists(tANSI):
                         shutil.copy(i, tANSI)
                     if not os.path.exists(tUTF):
                         shutil.copy(x, tUTF)
 
-                    info2 = os.path.basename(tUTF)
                     izbor_ansi.append(tANSI)
-                    izbor_txt.append(x)
-                    _txt_list.append(info2)
-                izbor = izbor_ansi + izbor_txt
-
-                l_txt = len(_txt_list)
+                    izbor_utf8.append(x)
+                    utf8_list.append(os.path.basename(tUTF))    ## List for display
+                
+                l_txt = len(utf8_list)
                 if l_txt > 16:
-                    p_txt_list = [x for x in _txt_list[:12]]
+                    p_txt_list = [x for x in utf8_list[:12]]
                     p_txt_list.append("...\n...\nUkupno [{}]".format(l_txt))
                 elif l_txt < 16:
-                    p_txt_list = [x for x in _txt_list]
+                    p_txt_list = [x for x in utf8_list]
 
                 lat_files = [x for x in self.multiFile.keys()]
                 lat_srt = [os.path.basename(x) for x in lat_files]
@@ -2386,7 +2367,7 @@ class MyFrame(ConverterFrame):
                 text1 = f"Include original latin?\n\n*latin:\n\n{t_out(l_srt_list)}"
 
                 text = f"Include utf-8?\n\n*utf-8:\n\n{t_out(p_txt_list)}"
-                
+
                 dlg = wx.RichMessageDialog(
                     self,
                     text,
@@ -2401,25 +2382,21 @@ class MyFrame(ConverterFrame):
                 )
 
                 if dlg.ShowModal() == wx.ID_YES:
-
-                    files = izbor
-                    zlist_a = [
-                        data_out(x) for x in files if x.endswith('.txt')
-                    ]
-                    zlist_b = [
-                        data_out(x) for x in files if x.endswith('.srt')
-                    ]
-                    info = [os.path.basename(x) for x in izbor]
-                    zlist = zlist_b + zlist_a
+                    zlist_a = [data_out(x) for x in izbor_ansi]
+                    zlist_b = [data_out(x) for x in izbor_utf8]
+                    info1 = [os.path.join("Cyr-ansi", os.path.basename(x)) for x in izbor_ansi]
+                    info2 = [os.path.join("Cyr-utf8", os.path.basename(x)) for x in izbor_utf8]
+                    info = info1 + info2
+                    zlist = zlist_a + zlist_b
 
                 if dlg1.ShowModal() == wx.ID_YES:
-
-                    files = lat_files
-                    zlist_c = [
-                        data_out(x) for x in files if i.endswith('.srt')
-                    ]
-                    info = info + lat_srt
+                    zlist_c = [data_out(x) for x in lat_files]
+                    info3 = [os.path.join("Lat", os.path.basename(x)) for x in lat_srt]
+                    info = info + info3
                     zlist = zlist + zlist_c
+                zlist_utf = [x for x in self.utf8_latText.values()]
+                info = info + lat_utf8
+                zlist = zlist + zlist_utf
             else:
                 zlist = []
                 try:
@@ -2439,15 +2416,13 @@ class MyFrame(ConverterFrame):
                         if not os.path.exists(x) and not i.endswith(".zip"):
                             shutil.copy(i, x)
                     zlist = [data_out(x) for x in izbor]
-                except IOError as e:
-                    logger.debug(f"ExportZIP IOError: {e}")
                 except Exception as e:
                     logger.debug(f"ExportZIP_A error, {e}")
-                    
+
             if PREVIOUS[-1].action == 'toCyrUTF8_multiple':
                 files = self.cyrUTFmulti
                 zlist = [data_out(x) for x in files]
-                info = [os.path.basename(x) for x in files]            
+                info = [os.path.join("Cyr-utf8", os.path.basename(x)) for x in files]
             try:
                 with zipfile.ZipFile(name, 'w') as fzip:
                     for i, x in zip(info, zlist):
@@ -2463,34 +2438,16 @@ class MyFrame(ConverterFrame):
                     logger.debug("Removed {}".format(i))
             except Exception as e:
                 logger.debug(f"Export ZIP_final error: {e}")
-                
-            cmd = f'"C:\Program Files"\WinRAR\WinRAR.exe {path}'
-            ## cmd=f"xarchiver {path}"
-            if os.path.isfile(path):
-                logger.debug(f"ZIP file saved sucessfully: {path}")
-                try:
-                    subprocess.Popen(
-                        cmd,
-                        bufsize=-1,
-                        executable=None,
-                        stdin=None,
-                        stdout=None,
-                        stderr=None,
-                        shell=True,
-                        cwd=None,
-                        env=None,
-                    )
-                except Exception as e:
-                    logger.debug(f"Open Zip: {e}")
-                else:
-                    sDlg = wx.MessageDialog(
-                        self,
-                        f'Fajl je uspešno sačuvan\n{os.path.basename(path)}',
-                        'SubtitleConverter',
-                        wx.OK | wx.ICON_INFORMATION,
-                    )
-                    sDlg.ShowModal()
-                self.saved_file[path] = self.newEnc
+
+            if os.path.isfile(name):
+                logger.debug(f"ZIP file saved sucessfully: {name}")
+                sDlg = wx.MessageDialog(
+                    self,
+                    f'Fajl je uspešno sačuvan\n{os.path.basename(name)}',
+                    'SubtitleConverter',
+                    wx.OK | wx.ICON_INFORMATION,
+                )
+                sDlg.ShowModal()
         else:
             dlg.Destroy()
     
@@ -3250,11 +3207,6 @@ class MyFrame(ConverterFrame):
 class MyApp(wx.App):
     
     def remOnstart(self):
-        
-        for i in os.listdir(filePath("resources","var","log")):
-            fsize = os.path.getsize(filePath("resources","var","log",i))
-            if fsize >= 1048576:
-                os.remove(i)
         
         f_list = [
             "r_text0.pkl",
