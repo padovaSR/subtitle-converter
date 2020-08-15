@@ -416,7 +416,6 @@ class MyFrame(ConverterFrame):
             self.addPrevious("Open", enc, text, self.pre_suffix)
             enc = printEncoding(enc)
             return enc
-
         def multiple(self, inpath, tmppath):
             path = []
             n_path = []
@@ -443,7 +442,7 @@ class MyFrame(ConverterFrame):
                 if not os.path.exists(tpath):
                     shutil.copy(path, tpath)
                 self.tmpPath.clear()
-                self.real_path.clear()                
+                self.real_path.clear()
                 enc = file_go(tpath, path)  # U tmp/ folderu
                 self.real_path.append(path)
                 self.tmpPath.append(tpath)
@@ -491,7 +490,7 @@ class MyFrame(ConverterFrame):
             self.real_path = paths_in[-1]
             self.text_1.SetValue('Files List:\n')
             self.multipleTools()
-
+            
             for i in range(len(paths_in)):
 
                 fpath = paths_out[i]
@@ -551,7 +550,7 @@ class MyFrame(ConverterFrame):
         if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
             if self.ShowDialog() == False:
                 return
-
+        
         dlgOpen = wx.FileDialog(
             self,
             "Otvori novi fajl",
@@ -566,6 +565,8 @@ class MyFrame(ConverterFrame):
                 self.enchistory.clear()
             filepath = dlgOpen.GetPaths()  # Get the file location
             if len(filepath) == 1:
+                self.droped.clear()
+                self.multiFile.clear()
                 real_path = filepath[-1]
                 self.real_path = [real_path]
                 self.real_dir = os.path.dirname(real_path)
@@ -1883,7 +1884,8 @@ class MyFrame(ConverterFrame):
     def PathEnc(self):
         '''This function returns path and entered_enc'''
         if self.droped:
-            self.multiFile.clear()
+            if len(self.multiFile) >= 1:
+                self.multiFile.clear()
             self.multiFile.update(self.droped)
             
         path = ""; entered_enc = ""
