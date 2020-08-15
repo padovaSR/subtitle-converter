@@ -11,13 +11,7 @@ import logging
 from text_processing import codelist
 from settings import chreg, preSuffix
 from choice_dialog import MultiChoice
-from codecs import (
-    BOM_UTF8,
-    BOM_UTF16_BE,
-    BOM_UTF16_LE,
-    BOM_UTF32_BE,
-    BOM_UTF32_LE,
-)
+from codecs import BOM_UTF8
 
 import wx
 
@@ -32,14 +26,6 @@ handler = logging.FileHandler(
 )
 handler.setFormatter(formatter)
 logger.addHandler(handler)
-
-BOMS = (
-    (BOM_UTF8, "UTF-8_BOM"),
-    (BOM_UTF32_BE, "UTF-32-BE"),
-    (BOM_UTF32_LE, "UTF-32-LE"),
-    (BOM_UTF16_BE, "UTF-16-BE"),
-    (BOM_UTF16_LE, "UTF-16-LE"),
-)
 
 class FileOpened:
     ''''''
@@ -95,8 +81,7 @@ class FileOpened:
         f = open(self.putanja, "rb")
         data = f.read(4)
         f.close()
-        encoding = [encoding for bom, encoding in BOMS if data.startswith(bom)]
-        if encoding and encoding[0] == "UTF-8_BOM":
+        if data.startswith(BOM_UTF8):
             return "utf-8-sig"
         else:        
             if kodek != 'auto':
@@ -118,8 +103,6 @@ class FileOpened:
                 'utf-16',
                 'ascii',
             ]
-            if kodiranja[0] == kodiranja[1]:
-                kodiranja = kodiranja[1:]
             for enc in kodiranja:
                 try:
                     with codecs.open(self.putanja, 'r', encoding=enc) as fh:
