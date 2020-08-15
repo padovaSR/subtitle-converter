@@ -407,6 +407,7 @@ class MyFrame(ConverterFrame):
                 self.droped.clear()
                 self.multiFile.clear()
                 self.reloadText.clear()
+                self.utf8_latText.clear()
                 self.reloadText[text] = enc
                 if os.path.exists(droppedText):
                     os.remove(droppedText)
@@ -1192,6 +1193,7 @@ class MyFrame(ConverterFrame):
             self.newEnc = 'windows-1251'
             self.pre_suffix = value1_s
             
+            self.utf8_latText.clear()
             self.utf8_latText[os.path.basename(path)] = (
                 remTag(text)
                 .encode(encoding="utf-8", errors="surrogatepass")
@@ -1288,6 +1290,7 @@ class MyFrame(ConverterFrame):
 
             text = normalizeText(entered_enc, path)
             
+            self.utf8_latText.clear()
             self.utf8_latText[os.path.basename(path)] = (
                 remTag(text)
                 .encode(encoding="utf-8", errors="surrogatepass")
@@ -1378,11 +1381,6 @@ class MyFrame(ConverterFrame):
             
             self.newEnc = utf8_enc
             self.pre_suffix = value_s
-            
-            utf8_text = remTag(text)
-            self.utf8_latText = utf8_text.encode(
-                encoding="utf-8", errors="surrogatepass"
-            ).replace(b"\n", b"\r\n")
             
             if text: text = text.replace('?', '¬')
 
@@ -2263,10 +2261,8 @@ class MyFrame(ConverterFrame):
                     logger.debug(f" Export ZIP error: {e}")
                 
                 shutil.move(name, os.path.join(dirname, name))
-                r_files = [tpath, self.cyrUTF, tUTF]
-                for i in r_files:
-                    if os.path.isfile(i):
-                        os.remove(i)
+                for i in [tpath, self.cyrUTF, tUTF]:
+                    if os.path.isfile(i): os.remove(i)
                 if os.path.isfile(path):
                     logger.debug(
                         f"ZIP file saved sucessfully: {path}")
