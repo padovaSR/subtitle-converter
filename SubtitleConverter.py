@@ -315,13 +315,11 @@ class MyFrame(ConverterFrame):
         
     def enableTool(self):
                     
-        self.frame_toolbar.EnableTool(wx.ID_CLOSE, True)
-        self.frame_toolbar.EnableTool(1002, True)   # toCyrillic
-        self.frame_toolbar.EnableTool(1003, True)   # toANSI
-        self.frame_toolbar.EnableTool(1004, True)   # toUTF
-        self.frame_toolbar.EnableTool(1005, True)   # Transcribe
-        self.frame_toolbar.EnableTool(1006, True)   # Special
-        self.frame_toolbar.EnableTool(1007, True)   # Cleanup
+        ## 1002=toCyrillic, 1003=toANSI, 1004=toUTF
+        ## 1005=Transcribe, 1006=Special, 1007=Cleanup
+        
+        for i in [1002, 1003, 1004, 1005, 1006, 1007]:
+            self.frame_toolbar.EnableTool(i, True)
         
         for i in self.menu_items: i.Enable(True)
         
@@ -332,46 +330,49 @@ class MyFrame(ConverterFrame):
     def disableTool(self):
         
         self.frame_toolbar.EnableTool(wx.ID_CLOSE, False)
-        self.frame_toolbar.EnableTool(1010, False)   # Save
-        self.frame_toolbar.EnableTool(1002, False)   # toCyrillic
-        self.frame_toolbar.EnableTool(1003, False)   # toANSI
-        self.frame_toolbar.EnableTool(1004, False)   # toUTF
-        self.frame_toolbar.EnableTool(1005, False)   # Transcribe
-        self.frame_toolbar.EnableTool(1006, False)   # Special
-        self.frame_toolbar.EnableTool(1007, False)   # Cleanup
         
-        new_items = [self.save, self.save_as, self.reload, self.clear, self.undo, self.redo, self.reloadtext]
+        for i in [1010, 1002, 1003, 1004, 1005, 1006, 1007]:
+            self.frame_toolbar.EnableTool(i, False)
         
+        new_items = [
+            self.save,
+            self.save_as,
+            self.reload,
+            self.clear,
+            self.undo,
+            self.redo,
+            self.reloadtext,
+        ]
         for i in new_items: i.Enable(False)
         for t in self.menu_items: t.Enable(False)
         
     def multipleTools(self):
         
         self.disableTool()
-        self.frame_toolbar.EnableTool(1002, True)   # toCyrillic
-        self.frame_toolbar.EnableTool(1003, True)   # toANSI
-        self.frame_toolbar.EnableTool(1004, True)   # toUTF
-        
-        self.to_cyrillic.Enable(True)
-        self.to_utf8.Enable(True)
-        self.cyr_to_ansi.Enable(True)
-        self.cyr_to_utf.Enable(True)
-        self.export_zip.Enable(True)
-
+        for i in [1002, 1003, 1004]:
+            self.frame_toolbar.EnableTool(i, True)
+        for i in [
+            self.to_cyrillic,
+            self.to_utf8,
+            self.cyr_to_ansi,
+            self.cyr_to_utf,
+            self.exportZIP,
+        ]:
+            i.Enable(True)
+    
     def postAction(self, path):
         
         path = self.fStatus(path)
         self.SetStatusText(path)
         
-        self.menubar1.Enable(wx.ID_SAVE, True)
-        self.menubar1.Enable(wx.ID_SAVEAS, True)
-        self.menubar1.Enable(wx.ID_CLOSE, True)
-        self.reload.Enable(True)
-        self.undo.Enable(True)
-        self.redo.Enable(True)
-        self.reloadtext.Enable(True)
+        for i in [wx.ID_SAVE, wx.ID_SAVEAS, wx.ID_CLOSE]:
+            self.menubar1.Enable(i, True)
+
+        for i in [self.reload, self.undo, self.redo, self.reloadtext, self.clear]:
+            i.Enable(True)
+            
         self.frame_toolbar.EnableTool(1010, True)  # Save
-        self.clear.Enable(True)
+        
         if not self.REDO:
             self.redo.Enable(False)
         if not self.UNDO and not self.REDO:
@@ -414,9 +415,7 @@ class MyFrame(ConverterFrame):
                 logger.debug(f"file_go: {e}")
             bufferText(text, self.workText)
             
-            undo_redo = [self.UNDO, self.REDO, PREVIOUS]
-            for i in undo_redo:
-                i.clear()
+            for i in [self.UNDO, self.REDO, PREVIOUS]: i.clear()
             
             self.addPrevious("Open", enc, text, self.pre_suffix)
             enc = printEncoding(enc)
