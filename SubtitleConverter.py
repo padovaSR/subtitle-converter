@@ -60,7 +60,7 @@ import wx
 
 from subtitle_converter_gui import ConverterFrame
 
-VERSION = "v0.5.8.6b"
+VERSION = "v0.5.8.7"
 
 
 logger = logging.getLogger(__name__)
@@ -403,7 +403,7 @@ class MyFrame(ConverterFrame):
             self.addHistory(self.enchistory, infile, enc)
             try:
                 for i in [self.droped, self.multiFile, self.reloadtext]:
-                    i.clear()
+                    if i: i.clear()
                 self.reloadText[text] = enc
                 if os.path.exists(droppedText):
                     os.remove(droppedText)
@@ -411,7 +411,8 @@ class MyFrame(ConverterFrame):
                 logger.debug(f"file_go: {e}")
             bufferText(text, self.workText)
             
-            for i in [self.UNDO, self.REDO, PREVIOUS]: i.clear()
+            for i in [self.UNDO, self.REDO, PREVIOUS]:
+                if i: i.clear()
             
             self.addPrevious("Open", enc, text, self.pre_suffix)
             enc = printEncoding(enc)
