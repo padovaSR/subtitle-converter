@@ -1,7 +1,7 @@
 #!/bin/sh
 
 default=updated
-if	[	-z "$1"	];	then
+if	[ -z "$1" ];	then
   echo -e "\nUsage $0 file1 file2 ...\n"
   exit
 else
@@ -23,5 +23,10 @@ else
   echo ""
   echo Push
   echo ""
+  echo "Done"
   git push
 fi
+echo""
+git status
+echo ""
+
