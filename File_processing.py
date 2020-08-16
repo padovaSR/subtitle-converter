@@ -56,21 +56,24 @@ class FileOpened:
                     dlg = MultiChoice(None, "Pick files:", imeFajla, choices=izbor)
                 else:
                     dlg = wx.MultiChoiceDialog(None, 'Pick files:', imeFajla, izbor)
-                if dlg.ShowModal() == wx.ID_OK:
-                    response = dlg.GetSelections()
-                    files = [izbor[x] for x in response]
-                    names = [os.path.basename(i) for i in files]
-                    outfiles = [os.path.join(basepath, x) for x in names]
-                    single = os.path.join(
-                        os.path.dirname(self.putanja),
-                        os.path.basename(files[-1]),
-                    )
-                    for i, x in zip(files, outfiles):
-                        with open(x, 'wb') as f:
-                            f.write(zf.read(i))
-                    return outfiles, single
-                else:
-                    logger.debug(f'{self.putanja}: Canceled.')
+                try:
+                    if dlg.ShowModal() == wx.ID_OK:
+                        response = dlg.GetSelections()
+                        files = [izbor[x] for x in response]
+                        names = [os.path.basename(i) for i in files]
+                        outfiles = [os.path.join(basepath, x) for x in names]
+                        single = os.path.join(
+                            os.path.dirname(self.putanja),
+                            os.path.basename(files[-1]),
+                        )
+                        for i, x in zip(files, outfiles):
+                            with open(x, 'wb') as f:
+                                f.write(zf.read(i))
+                        return outfiles, single
+                    else:
+                        logger.debug(f'{self.putanja}: Canceled.')
+                        dlg.Destroy()
+                finally:
                     dlg.Destroy()
 
     def findCode(self):
