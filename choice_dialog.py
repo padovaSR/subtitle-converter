@@ -9,66 +9,76 @@ import wx
 
 class MultiChoice(wx.Dialog):
     def __init__(self, parent, message, caption, choices=[]):
-        wx.Dialog.__init__(self, parent, -1)
-
+        wx.Dialog.__init__(
+            self, parent, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
+        )
+        self.SetSize((469, 321))
         self.SetTitle(caption)
+
         self.message = wx.StaticText(self, -1, message)
 
-        sizer_1 = wx.BoxSizer(wx.VERTICAL)
-        sizer_1.Add(self.message, 0, wx.ALL | wx.EXPAND, 4)
-        self.check_list_box_1 = wx.CheckListBox(
-            self, wx.ID_ANY, choices=choices, style=wx.LB_MULTIPLE | wx.LB_NEEDED_SB
-        )
+        self.sizer_1 = wx.BoxSizer(wx.VERTICAL)
+        self.sizer_1.Add(self.message, 0, wx.ALL | wx.EXPAND, 4)
         self.chbox = wx.CheckBox(self, -1, 'Select all')
-        self.check_list_box_1.SetMinSize((200, 70))
-        sizer_1.Add(self.check_list_box_1, 0, wx.ALL | wx.EXPAND | wx.FIXED_MINSIZE, 4)
-        sizer_1.Add(self.chbox, 0, wx.ALL | wx.ALIGN_LEFT, 4)
+        self.check_list_box_1 = wx.CheckListBox(
+            self, wx.ID_ANY, choices=choices, style=wx.LB_MULTIPLE
+        )
+        self.check_list_box_1.SetMinSize((300, 125))
+        self.check_list_box_1.SetFont(
+            wx.Font(
+                9,
+                wx.FONTFAMILY_DEFAULT,
+                wx.FONTSTYLE_NORMAL,
+                wx.FONTWEIGHT_NORMAL,
+                0,
+                "Segoe UI",
+            )
+        )
+        self.sizer_1.Add(
+            self.check_list_box_1, 1, wx.ALL | wx.EXPAND | wx.FIXED_MINSIZE, 3
+        )
+        self.sizer_1.Add(self.chbox, 0, wx.ALL | wx.ALIGN_LEFT, 3)
 
-        sizer_2 = wx.StdDialogButtonSizer()
-        sizer_1.Add(sizer_2, 0, wx.ALIGN_RIGHT | wx.ALL, 4)
+        self.sizer_2 = wx.StdDialogButtonSizer()
+        self.sizer_1.Add(self.sizer_2, 0, wx.ALIGN_RIGHT | wx.ALL, 4)
 
         self.button_OK = wx.Button(self, wx.ID_OK, "")
-        sizer_2.AddButton(self.button_OK)
+        self.sizer_2.AddButton(self.button_OK)
 
         self.button_CANCEL = wx.Button(self, wx.ID_CANCEL, "")
-        sizer_2.AddButton(self.button_CANCEL)
+        self.sizer_2.AddButton(self.button_CANCEL)
 
-        sizer_2.Realize()
+        self.sizer_2.Realize()
 
-        self.SetSizer(sizer_1)
-        sizer_1.SetSizeHints(self)
-
-        self.Bind(wx.EVT_CHECKBOX, self.EvtChBox, self.chbox)
-        self.Bind(wx.EVT_CLOSE, self.onCancel, id=wx.ID_ANY)
+        self.SetSizer(self.sizer_1)
+        self.sizer_1.SetSizeHints(self)
 
         self.SetAffirmativeId(self.button_OK.GetId())
         self.SetEscapeId(self.button_CANCEL.GetId())
 
+        self.Bind(wx.EVT_CHECKBOX, self.EvtChBox, self.chbox)
+        self.Bind(wx.EVT_CLOSE, self.onCancel, id=wx.ID_ANY)
         self.Layout()
-        # self.Fit()
-        # end wxGlade
 
     def GetSelections(self):
         return self.check_list_box_1.GetCheckedItems()
+        
 
     def EvtChBox(self, event):
         state = self.chbox.IsChecked()
         for i in range(self.check_list_box_1.GetCount()):
             self.check_list_box_1.Check(i, state)
+        event.Skip()
 
     def onCancel(self, event):
         self.Destroy()
-
-
-# end of class MyDialog
-
-
+        
 class MyApp(wx.App):
     def OnInit(self):
         self.dialog = MultiChoice(None, wx.ID_ANY, "")
-        self.SetTopWindow(self.dialog)
+        # self.SetTopWindow(self.dialog)
         self.dialog.ShowModal()
-        # self.dialog.Destroy()
+        self.dialog.Destroy()
         return True
 
 
