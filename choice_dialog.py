@@ -5,6 +5,7 @@
 #
 
 import wx
+import os
 
 
 class MultiChoice(wx.Dialog):
@@ -14,14 +15,21 @@ class MultiChoice(wx.Dialog):
         )
         self.SetSize((469, 321))
         self.SetTitle(caption)
+        _icon = wx.NullIcon
+        _icon.CopyFromBitmap(
+            wx.Bitmap(
+                os.path.join("resources", "icons", "subConvert.ico"), wx.BITMAP_TYPE_ANY
+            )
+        )
+        self.SetIcon(_icon)
 
         self.message = wx.StaticText(self, -1, message)
 
         self.sizer_1 = wx.BoxSizer(wx.VERTICAL)
-        self.sizer_1.Add(self.message, 0, wx.ALL | wx.EXPAND, 4)
+        self.sizer_1.Add(self.message, 0, wx.ALL | wx.EXPAND, 10)
         self.chbox = wx.CheckBox(self, -1, 'Select all')
         self.check_list_box_1 = wx.CheckListBox(
-            self, wx.ID_ANY, choices=choices, style=wx.LB_MULTIPLE
+            self, wx.ID_ANY, choices=choices, style=wx.LB_EXTENDED
         )
         self.check_list_box_1.SetMinSize((300, 125))
         self.check_list_box_1.SetFont(
@@ -35,12 +43,16 @@ class MultiChoice(wx.Dialog):
             )
         )
         self.sizer_1.Add(
-            self.check_list_box_1, 1, wx.ALL | wx.EXPAND | wx.FIXED_MINSIZE, 3
+            self.check_list_box_1, 1, wx.LEFT|wx.RIGHT | wx.EXPAND | wx.FIXED_MINSIZE, 10
         )
-        self.sizer_1.Add(self.chbox, 0, wx.ALL | wx.ALIGN_LEFT, 3)
+        self.sizer_1.Add(self.chbox, 0, wx.ALL | wx.ALIGN_LEFT, 10)
+        self.staticline1 = wx.StaticLine(
+            self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL
+        )
+        self.sizer_1.Add(self.staticline1, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
 
         self.sizer_2 = wx.StdDialogButtonSizer()
-        self.sizer_1.Add(self.sizer_2, 0, wx.ALIGN_RIGHT | wx.ALL, 4)
+        self.sizer_1.Add(self.sizer_2, 0, wx.ALIGN_RIGHT | wx.ALL, 10)
 
         self.button_OK = wx.Button(self, wx.ID_OK, "")
         self.sizer_2.AddButton(self.button_OK)
@@ -62,7 +74,6 @@ class MultiChoice(wx.Dialog):
 
     def GetSelections(self):
         return self.check_list_box_1.GetCheckedItems()
-        
 
     def EvtChBox(self, event):
         state = self.chbox.IsChecked()
@@ -72,17 +83,17 @@ class MultiChoice(wx.Dialog):
 
     def onCancel(self, event):
         self.Destroy()
-        
+
+        # end wxGlade
+
 class MyApp(wx.App):
     def OnInit(self):
         self.dialog = MultiChoice(None, wx.ID_ANY, "")
-        # self.SetTopWindow(self.dialog)
+        self.SetTopWindow(self.dialog)
         self.dialog.ShowModal()
         self.dialog.Destroy()
         return True
 
-
-# end of class MyApp
 
 if __name__ == "__main__":
     app = MyApp(0)
