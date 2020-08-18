@@ -389,8 +389,7 @@ class MyFrame(ConverterFrame):
             text = text.replace("\r\n", "\n")
             bufferText(text, WORK_TEXT)
             nlist = checkErrors(text)
-            self.text_1.SetValue("")
-            self.text_1.WriteText(text)
+            self.text_1.SetValue(text)
             self.text_1.SetInsertionPoint(0)
             if nlist:
                 for i in nlist:
@@ -401,8 +400,8 @@ class MyFrame(ConverterFrame):
             logger.debug(f'File opened: {os.path.basename(infile)}')
             self.addHistory(self.enchistory, infile, enc)
             try:
-                for i in [self.droped, self.multiFile, self.reloadtext]:
-                    if i: i.clear()
+                for i in [self.droped, self.multiFile, self.reloadText]:
+                    i.clear()
                 self.reloadText[text] = enc
                 if os.path.exists(droppedText):
                     os.remove(droppedText)
@@ -439,8 +438,8 @@ class MyFrame(ConverterFrame):
                 FILE_HISTORY.append(lenZip(path))
                 self.filehistory.AddFileToHistory(lenZip(path))
             if not zipfile.is_zipfile(path):
-                if not os.path.exists(tpath):
-                    shutil.copy(path, tpath)
+                if os.path.isfile(tpath): os.remove(tpath)                
+                shutil.copy(path, tpath)
                 self.tmpPath.clear()
                 self.real_path.clear()
                 enc = file_go(tpath, path)  # U tmp/ folderu
@@ -662,9 +661,9 @@ class MyFrame(ConverterFrame):
             outpath = nameDialog(fname, nsuffix, self.real_dir)
             if outpath:
                 text = self.workText.getvalue()
-                writeToFile(text, outpath, enc, multi=False)
+                v = writeToFile(text, outpath, enc, multi=False)
                 self.reloadText[text] = enc
-                if os.path.isfile(outpath):
+                if os.path.isfile(outpath) and v == True:
                     logger.debug(f"File saved: {outpath}")
                     fpath = os.path.basename(outpath)
                     sDlg = wx.MessageDialog(
