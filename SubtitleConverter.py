@@ -14,7 +14,6 @@ import srt
 from more_itertools import unique_justseen
 from pydispatch import dispatcher
 from operator import itemgetter
-import glob
 from collections import namedtuple 
 from io import StringIO, BytesIO
 from file_dnd import FileDrop 
@@ -2497,18 +2496,22 @@ class MyFrame(ConverterFrame):
         event.Skip()
 
     def removeFiles(self, event):
-        if os.listdir('tmp'):
-            file_paths = glob.glob('tmp\*.*')
-            fileData = {}
-            for fname in file_paths:
-                fileData[fname] = os.stat(fname).st_mtime
-
-            sortedFiles = sorted(fileData.items(), key=itemgetter(1))
-
-            delete = len(sortedFiles) - 34
-            if not len(self.multiFile) > 10:
-                for x in range(0, delete):
-                    os.remove(sortedFiles[x][0])
+        ''''''
+        try:
+            if os.listdir('tmp'):
+                # file_paths = glob.glob('tmp\*.*')
+                file_paths = [filePath("tmp", x) for x in os.listdir("tmp")]
+                fileData = {}
+                for fname in file_paths:
+                    fileData[fname] = os.stat(fname).st_mtime
+                sortedFiles = sorted(fileData.items(), key=itemgetter(1))
+                delete = len(sortedFiles) - 34
+                if not len(self.multiFile) > 10:
+                    for x in range(0, delete):
+                        os.remove(sortedFiles[x][0])
+                        logger.debug(f"removed: {sortedFiles[x][0]}")
+        except Exception as e:
+            logger.debug(f"removeFiles: {e}")
         event.Skip()
         
     def onFileHistory(self, event):
