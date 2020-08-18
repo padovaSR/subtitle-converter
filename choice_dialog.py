@@ -13,7 +13,7 @@ class MultiChoice(wx.Dialog):
         wx.Dialog.__init__(
             self, parent, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
         )
-        self.SetSize((469, 321))
+        self.SetSize((385, 278))
         self.SetTitle(caption)
         _icon = wx.NullIcon
         _icon.CopyFromBitmap(
@@ -23,44 +23,36 @@ class MultiChoice(wx.Dialog):
         )
         self.SetIcon(_icon)
 
-        self.message = wx.StaticText(self, -1, message)
-
         self.sizer_1 = wx.BoxSizer(wx.VERTICAL)
-        self.sizer_1.Add(self.message, 0, wx.ALL | wx.EXPAND, 10)
-        self.chbox = wx.CheckBox(self, -1, 'Select all')
+
+        label_1 = wx.StaticText(self, wx.ID_ANY, message)
+        self.sizer_1.Add(label_1, 0, wx.ALL, 10)
+
         self.check_list_box_1 = wx.CheckListBox(
             self, wx.ID_ANY, choices=choices, style=wx.LB_EXTENDED
         )
-        self.check_list_box_1.SetMinSize((300, 125))
-        self.check_list_box_1.SetFont(
-            wx.Font(
-                9,
-                wx.FONTFAMILY_DEFAULT,
-                wx.FONTSTYLE_NORMAL,
-                wx.FONTWEIGHT_NORMAL,
-                0,
-                "Segoe UI",
-            )
-        )
         self.sizer_1.Add(
-            self.check_list_box_1, 1, wx.LEFT|wx.RIGHT | wx.EXPAND | wx.FIXED_MINSIZE, 10
+            self.check_list_box_1, 1, wx.BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT, 10
         )
-        self.sizer_1.Add(self.chbox, 0, wx.ALL | wx.ALIGN_LEFT, 10)
-        self.staticline1 = wx.StaticLine(
-            self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL
-        )
-        self.sizer_1.Add(self.staticline1, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
 
-        self.sizer_2 = wx.StdDialogButtonSizer()
-        self.sizer_1.Add(self.sizer_2, 0, wx.ALIGN_RIGHT | wx.ALL, 10)
+        static_line_1 = wx.StaticLine(self, wx.ID_ANY)
+        self.sizer_1.Add(static_line_1, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
+
+        sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
+        self.sizer_1.Add(sizer_2, 0, wx.ALL | wx.EXPAND, 5)
+
+        self.checkbox_1 = wx.CheckBox(
+            self, wx.ID_ANY, "Select all", style=wx.CHK_2STATE
+        )
+        sizer_2.Add(self.checkbox_1, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 5)
+
+        sizer_2.Add((20, 20), 1, wx.EXPAND, 0)
 
         self.button_OK = wx.Button(self, wx.ID_OK, "")
-        self.sizer_2.AddButton(self.button_OK)
+        sizer_2.Add(self.button_OK, 0, wx.BOTTOM | wx.TOP, 5)
 
         self.button_CANCEL = wx.Button(self, wx.ID_CANCEL, "")
-        self.sizer_2.AddButton(self.button_CANCEL)
-
-        self.sizer_2.Realize()
+        sizer_2.Add(self.button_CANCEL, 0, wx.ALL, 5)
 
         self.SetSizer(self.sizer_1)
         self.sizer_1.SetSizeHints(self)
@@ -68,15 +60,17 @@ class MultiChoice(wx.Dialog):
         self.SetAffirmativeId(self.button_OK.GetId())
         self.SetEscapeId(self.button_CANCEL.GetId())
 
-        self.Bind(wx.EVT_CHECKBOX, self.EvtChBox, self.chbox)
-        self.Bind(wx.EVT_CLOSE, self.onCancel, id=wx.ID_ANY)
         self.Layout()
+
+        self.Bind(wx.EVT_CHECKBOX, self.EvtChBox, self.checkbox_1)
+        self.Bind(wx.EVT_CLOSE, self.onCancel, id=wx.ID_ANY)
+        # end wxGlade
 
     def GetSelections(self):
         return self.check_list_box_1.GetCheckedItems()
 
     def EvtChBox(self, event):
-        state = self.chbox.IsChecked()
+        state = self.checkbox_1.IsChecked()
         for i in range(self.check_list_box_1.GetCount()):
             self.check_list_box_1.Check(i, state)
         event.Skip()
@@ -84,7 +78,9 @@ class MultiChoice(wx.Dialog):
     def onCancel(self, event):
         self.Destroy()
 
-        # end wxGlade
+
+# end of class MyDialog
+
 
 class MyApp(wx.App):
     def OnInit(self):
@@ -94,6 +90,8 @@ class MyApp(wx.App):
         self.dialog.Destroy()
         return True
 
+
+# end of class MyApp
 
 if __name__ == "__main__":
     app = MyApp(0)
