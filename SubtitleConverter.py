@@ -59,7 +59,7 @@ import wx
 
 from subtitle_converter_gui import ConverterFrame
 
-VERSION = "v0.5.8.7"
+VERSION = "v0.5.8.7c"
 
 
 logger = logging.getLogger(__name__)
@@ -442,7 +442,7 @@ class MyFrame(ConverterFrame):
                 shutil.copy(path, tpath)
                 self.tmpPath.clear()
                 self.real_path.clear()
-                enc = file_go(tpath, path)  # U tmp/ folderu
+                enc = file_go(tpath, path)  # path = tmp/
                 self.real_path.append(path)
                 self.tmpPath.append(tpath)
                 self.SetStatusText(os.path.basename(tpath))
@@ -673,14 +673,14 @@ class MyFrame(ConverterFrame):
                         wx.OK | wx.ICON_INFORMATION
                     )
                     sDlg.ShowModal()
-                FILE_HISTORY.append(outpath)
-                self.filehistory.AddFileToHistory(outpath)                
-                self.saved_file[outpath] = self.newEnc
-                self.MenuBar.Enable(wx.ID_SAVE, False)
-                self.MenuBar.Enable(wx.ID_SAVEAS, False)
-                self.frame_toolbar.EnableTool(1010, False)
-                self.reload.Enable(True)
-                self.reloadtext.Enable(True)
+                    FILE_HISTORY.append(outpath)
+                    self.filehistory.AddFileToHistory(outpath)                
+                    self.saved_file[outpath] = self.newEnc
+                    self.MenuBar.Enable(wx.ID_SAVE, False)
+                    self.MenuBar.Enable(wx.ID_SAVEAS, False)
+                    self.frame_toolbar.EnableTool(1010, False)
+                    self.reload.Enable(True)
+                    self.reloadtext.Enable(True)
                 
         event.Skip()
 
