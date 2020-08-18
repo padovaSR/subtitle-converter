@@ -249,8 +249,8 @@ def writeToFile(text, path, enc, multi):
     
     if enc in codelist:
         error = 'surrogatepass'
-    else:
-        error = 'replace'
+    else: error = 'replace'
+    
     if multi ==False:
         if os.path.isfile(path) and os.path.dirname(path) != "tmp":
             dlg = wx.MessageBox(
