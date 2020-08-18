@@ -764,7 +764,7 @@ class MyFrame(ConverterFrame):
             not tval.startswith('Files ')
             and len(tval) > 0
             and self.save.IsEnabled()
-            and not PREVIOUS[-1].action == "toCyrUTF8"
+            and PREVIOUS[-1].action != "toCyrUTF8"
         ):
             dl1 = wx.MessageBox(
                 "Current content has not been saved! Proceed?",
@@ -1901,7 +1901,7 @@ class MyFrame(ConverterFrame):
         if type(self.real_path[0]) == list:
             self.real_path = self.real_path[0]
         suffix = os.path.splitext(self.real_path[0])[-1]
-        if s != suffix and not suffix == ".zip":
+        if s != suffix and suffix != ".zip":
             return f"{os.path.basename(p)}{suffix}"
         else: return os.path.basename(path)    
     
