@@ -21,9 +21,9 @@ else
     fi
   done
   echo ""
-  echo Push
+  echo Done
   echo ""
-  echo "Done"
+  echo Push
   git push
 fi
 echo""
