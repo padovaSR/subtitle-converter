@@ -252,7 +252,7 @@ def writeToFile(text, path, enc, multi):
     else:
         error = 'replace'
     if multi ==False:
-        if os.path.isfile(path) and not os.path.dirname(path) == "tmp":
+        if os.path.isfile(path) and os.path.dirname(path) != "tmp":
             dlg = wx.MessageBox(
                 f"{os.path.basename(path)}\nFile already exists! Proceed?",
                 "Overwrite the file?",
