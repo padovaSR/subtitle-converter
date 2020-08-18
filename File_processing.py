@@ -263,13 +263,10 @@ def writeToFile(text, path, enc, multi):
                 return
     text = chreg.sub("?", text)
     try:
-        with open(
-            path, 'w', encoding=enc, errors=error, newline='\r\n'
-        ) as n_File:
+        with open(path, 'w', encoding=enc, errors=error, newline='\r\n') as n_File:
             n_File.write(text)
-            logger.debug(
-                f"Write file: {path}; {enc}"
-            )
+            logger.debug(f"Write file: {path}; {enc}")
+        return True
     except IOError as e:
         logger.debug(f"changeEncoding IOError: {e}")
     except AttributeError as e:
