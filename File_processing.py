@@ -84,13 +84,10 @@ class FileOpened:
         f = open(self.putanja, "rb")
         data = f.read(4)
         f.close()
-        if data.startswith(BOM_UTF8):
-            return "utf-8-sig"
+        if data.startswith(BOM_UTF8): return "utf-8-sig"
         else:        
-            if kodek != 'auto':
-                ukode = kodek
-            else:
-                ukode = 'utf-8'
+            if kodek != 'auto': ukode = kodek
+            else: ukode = 'utf-8'
     
             kodiranja = [
                 ukode,
@@ -114,17 +111,14 @@ class FileOpened:
                 except:
                     pass
                 else:
-                    logger.debug(
-                        f' {os.path.basename(self.putanja)}, encoding: {enc}'
-                    )
+                    logger.debug(f' {os.path.basename(self.putanja)}, encoding: {enc}')
                     break
-    
             return enc
 
 def newName(path, pre_suffix, multi):
     ''''''
     added, ex, value2_s, value5_s, value_m, oformat = preSuffix()
-    
+
     spattern = re.compile(r"(?:\.srt){2,3}", re.I)
     tpattern = re.compile(r"(?:\.txt){2,3}", re.I)
     upattern = re.compile(r"\s*" + value_m + r"\d*", re.I)
@@ -152,28 +146,18 @@ def newName(path, pre_suffix, multi):
     elif oformat == "txt" and pre_suffix == value2_s:
         sufix = ".txt"
     else:
-        sufix = os.path.splitext(path)[
-            -1
-        ]  # srt,txt ili neki drugi koji je otvoren
+        sufix = os.path.splitext(path)[-1]  # srt,txt ili neki drugi koji je otvoren
 
-    suffix_list = [
-        "." + x if not x.startswith("_") else x for x in ex.values()
-    ] + added
+    suffix_list = ["." + x if not x.startswith("_") else x for x in ex.values()] + added
     suffix_list.append(value_m)
-    suffix_list = [
-        x.strip(".") if x.startswith(r".(") else x for x in suffix_list
-    ]
+    suffix_list = [x.strip(".") if x.startswith(r".(") else x for x in suffix_list]
 
-    _d = (
-        "." + pre_suffix
-    )  # pre_suffix je unet u funkciji koja poziva newName
+    _d = "." + pre_suffix  # pre_suffix je unet u funkciji koja poziva newName
     if pre_suffix.startswith("_") or pre_suffix.startswith(r"("):
         _d = pre_suffix
 
     if psufix in suffix_list:
-        name1 = '{0}{1}'.format(
-            os.path.splitext(n)[0], _d
-        )  # fajl u tmp/ folderu
+        name1 = '{0}{1}'.format(os.path.splitext(n)[0], _d)  # fajl u tmp/ folderu
     else:
         name1 = '{0}{1}'.format(n, _d)
 
@@ -195,8 +179,7 @@ def newName(path, pre_suffix, multi):
 def nameDialog(name_entry, sufix_entry, dir_entry):
 
     with shelve.open(
-        os.path.join("resources", "var", "dialog_settings.db"),
-        flag='writeback',
+        os.path.join("resources", "var", "dialog_settings.db"), flag='writeback',
     ) as sp:
         ex = sp['key5']
 
@@ -222,23 +205,17 @@ def nameDialog(name_entry, sufix_entry, dir_entry):
         if nameO.endswith("."):
             nameO = nameO[:-1]
         dlg.Destroy()
-        
+
         with open(presuffix_l, 'a', encoding='utf-8') as f:
             if not '' in list(ex.values()):
-                presuffix_x = (
-                    os.path.splitext(os.path.splitext(nameO)[0])[-1]
-                    + "\n"
-                )
+                presuffix_x = os.path.splitext(os.path.splitext(nameO)[0])[-1] + "\n"
                 if "_" in presuffix_x:
                     presuffix_ = "_" + presuffix_x.split("_")[-1] + "\n"
                 else:
                     presuffix_ = ""
             else:
                 presuffix_x = ""
-                presuffix_ = (
-                    os.path.splitext(os.path.splitext(nameO)[0])[-1]
-                    + "\n"
-                )
+                presuffix_ = os.path.splitext(os.path.splitext(nameO)[0])[-1] + "\n"
             f.write(presuffix_)
         return nameO
     else:
@@ -251,7 +228,7 @@ def writeToFile(text, path, enc, multi):
         error = 'surrogatepass'
     else: error = 'replace'
     
-    if multi ==False:
+    if multi == False:
         if os.path.isfile(path) and os.path.dirname(path) != "tmp":
             dlg = wx.MessageBox(
                 f"{os.path.basename(path)}\nFile already exists! Proceed?",
