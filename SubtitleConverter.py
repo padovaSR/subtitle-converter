@@ -59,7 +59,7 @@ import wx
 
 from subtitle_converter_gui import ConverterFrame
 
-VERSION = "v0.5.8.7c"
+VERSION = "v0.5.8.9"
 
 
 logger = logging.getLogger(__name__)
@@ -2497,7 +2497,6 @@ class MyFrame(ConverterFrame):
     def removeFiles(self, event):
         ''''''
         try:
-            # file_paths = glob.glob('tmp\*.*')
             file_paths = [filePath("tmp", x) for x in os.listdir("tmp")]
             fileData = {}
             for fname in file_paths:
