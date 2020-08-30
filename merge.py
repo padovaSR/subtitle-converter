@@ -20,7 +20,6 @@ import re
 import os
 import pysrt
 from pysrt import SubRipFile, SubRipItem
-from itertools import zip_longest
 import logging
 
 from settings import WORK_TEXT
