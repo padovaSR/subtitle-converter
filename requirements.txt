@@ -1,4 +1,3 @@
-python
 wxPython
 more_itertools
 pysrt
