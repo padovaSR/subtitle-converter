@@ -7,19 +7,16 @@ from settings import filePath
 from zamenaImena import shortcutsKey
 import pickle
 import os
-import logging
+import logging.config
 
 import wx
-# import wx.richtext
-
 
 logger = logging.getLogger(__name__)
 
+
 class ConverterFrame(wx.Frame):
-    def __init__(self, *args, **kwds):
-        # begin wxGlade: ConverterFrame.__init__
-        kwds["style"] = kwds.get("style", 0) | wx.DEFAULT_FRAME_STYLE
-        wx.Frame.__init__(self, *args, **kwds)
+    def __init__(self, *args):
+        wx.Frame.__init__(self, *args, style=wx.DEFAULT_FRAME_STYLE)
         try:
             with open(
                 filePath("resources", "var", "set_size.pkl"), "rb"
@@ -30,8 +27,8 @@ class ConverterFrame(wx.Frame):
             self.SetSize((w, h))
         except Exception as e:
             logger.debug(f"SetSize error: {e}")
-            self.SetSize((622, 573))        
-        
+            self.SetSize((622, 573))
+
         _icon = wx.NullIcon
         _icon.CopyFromBitmap(
             wx.Bitmap(
@@ -45,16 +42,16 @@ class ConverterFrame(wx.Frame):
         keyS = shortcutsKey
         self.menubar1 = wx.MenuBar()
         self.file = wx.Menu()
-        
+
         self.fopen = wx.MenuItem(
             self.file, wx.ID_OPEN, "&Open\t" + keyS["Open"], "Otvori fajl"
         )
         self.fopen.SetBitmap(
             wx.ArtProvider.GetBitmap(wx.ART_FILE_OPEN, wx.ART_MENU)
         )
-        
+
         self.file.Append(self.fopen)
-        
+
         self.file.AppendSeparator()
         self.reload = wx.MenuItem(
             self.file,
@@ -73,14 +70,19 @@ class ConverterFrame(wx.Frame):
 
         self.file.AppendSeparator()
 
-        self.save = wx.MenuItem(self.file, wx.ID_SAVE, "&Save\t" + keyS["Save"], "Save file")
+        self.save = wx.MenuItem(
+            self.file, wx.ID_SAVE, "&Save\t" + keyS["Save"], "Save file"
+        )
         self.save.SetBitmap(
             wx.ArtProvider.GetBitmap(wx.ART_FILE_SAVE, wx.ART_MENU)
         )
         self.file.Append(self.save)
 
         self.save_as = wx.MenuItem(
-            self.file, wx.ID_SAVEAS, "&Save as\t" + keyS["Save as"], "Save as"
+            self.file,
+            wx.ID_SAVEAS,
+            "&Save as\t" + keyS["Save as"],
+            "Save as",
         )
         self.save_as.SetBitmap(
             wx.ArtProvider.GetBitmap(wx.ART_FILE_SAVE_AS, wx.ART_MENU)
@@ -88,7 +90,10 @@ class ConverterFrame(wx.Frame):
         self.file.Append(self.save_as)
 
         self.export_zip = wx.MenuItem(
-            self.file, wx.ID_ANY, "&Export as ZIP\t" + keyS["Export as ZIP"], "Export as ZIP"
+            self.file,
+            wx.ID_ANY,
+            "&Export as ZIP\t" + keyS["Export as ZIP"],
+            "Export as ZIP",
         )
         self.export_zip.SetBitmap(
             wx.Bitmap(
@@ -109,47 +114,58 @@ class ConverterFrame(wx.Frame):
         self.file.Append(self.close)
 
         self.file.AppendSeparator()
-        
+
         # Submenu
         self.file_sub = wx.Menu()
         self.file_sub.Append(-1, "Recent files", "")
         # self.file.Append(-1, "Recent", self.file_sub, "")
         self.file.AppendSubMenu(self.file_sub, "Recent", "")
-        
-        self.file.AppendSeparator()
-        # Submenu end        
 
-        self.quit_program = wx.MenuItem(self.file, wx.ID_ANY, "&Quit\t"+keyS["Quit"], "Quit program")
-        self.quit_program.SetBitmap(wx.Bitmap(filePath("resources", "icons", "application-exit.png"), wx.BITMAP_TYPE_ANY,))
+        self.file.AppendSeparator()
+        # Submenu end
+
+        self.quit_program = wx.MenuItem(
+            self.file, wx.ID_ANY, "&Quit\t" + keyS["Quit"], "Quit program"
+        )
+        self.quit_program.SetBitmap(
+            wx.Bitmap(
+                filePath("resources", "icons", "application-exit.png"),
+                wx.BITMAP_TYPE_ANY,
+            )
+        )
         self.file.Append(self.quit_program)
 
         self.menubar1.Append(self.file, "File")
         ## EDIT MENU ##############################################################################
         self.edit = wx.Menu()
-        self.undo = wx.MenuItem(self.edit, wx.ID_ANY, "&Undo Action\t" + keyS["Undo"], "Undo text")
+        self.undo = wx.MenuItem(
+            self.edit, wx.ID_ANY, "&Undo\t" + keyS["Undo"], "Undo text"
+        )
         self.undo.SetBitmap(
             wx.ArtProvider.GetBitmap(wx.ART_UNDO, wx.ART_MENU)
         )
         self.edit.Append(self.undo)
 
-        self.redo = wx.MenuItem(self.edit, wx.ID_ANY, "&Redo Action\t" + keyS["Redo"], "Redo text")
+        self.redo = wx.MenuItem(
+            self.edit, wx.ID_ANY, "&Redo\t" + keyS["Redo"], "Redo text"
+        )
         self.redo.SetBitmap(
             wx.ArtProvider.GetBitmap(wx.ART_REDO, wx.ART_MENU)
         )
         self.edit.Append(self.redo)
 
         self.edit.AppendSeparator()
-        self.clear = wx.MenuItem(
-            self.edit,
-            wx.ID_ANY,
-            "&Clear Undo-Redo\t" + keyS["Clear Undo-Redo"],
-            "Clear Undo-Redo history",
-        )
-        self.clear.SetBitmap(
-            wx.ArtProvider.GetBitmap(wx.ART_CROSS_MARK, wx.ART_MENU)
-        )
-        self.edit.Append(self.clear)
-        self.edit.AppendSeparator()
+        #self.clear = wx.MenuItem(
+            #self.edit,
+            #wx.ID_ANY,
+            #"&Clear Undo-Redo\t" + keyS["Clear Undo-Redo"],
+            #"Clear Undo-Redo history",
+        #)
+        #self.clear.SetBitmap(
+            #wx.ArtProvider.GetBitmap(wx.ART_CROSS_MARK, wx.ART_MENU)
+        #)
+        #self.edit.Append(self.clear)
+        #self.edit.AppendSeparator()
 
         self.reloadtext = wx.MenuItem(
             self.edit,
@@ -159,7 +175,7 @@ class ConverterFrame(wx.Frame):
         )
         self.reloadtext.SetBitmap(
             wx.Bitmap(
-                filePath("resources", "icons", "edit-undo.png"),
+                filePath("resources", "icons", "doc-revert.png"),
                 wx.BITMAP_TYPE_ANY,
             )
         )
@@ -169,6 +185,31 @@ class ConverterFrame(wx.Frame):
 
         ## Actions ################################################################################
         self.action = wx.Menu()
+        self.undo_action = wx.MenuItem(
+            self.action,
+            wx.ID_ANY,
+            "&Undo Action\t" + keyS["Undo_A"],
+            "Undo prethodne akcije",
+        )
+        self.undo_action.SetBitmap(
+            wx.Bitmap(
+                filePath("resources", "icons", "edit-undo.png"), wx.BITMAP_TYPE_ANY
+            )
+        )
+        self.action.Append(self.undo_action)
+        self.redo_action = wx.MenuItem(
+            self.action,
+            wx.ID_ANY,
+            "&Redo Action\t" + keyS["Redo_A"],
+            "Redo prethodne akcije",
+        )
+        self.redo_action.SetBitmap(
+            wx.Bitmap(
+                filePath("resources", "icons", "edit-redo.png"), wx.BITMAP_TYPE_ANY
+            )
+        )
+        self.action.Append(self.redo_action)
+        self.action.AppendSeparator()
         self.to_cyrillic = wx.MenuItem(
             self.action,
             wx.ID_ANY,
@@ -359,7 +400,7 @@ class ConverterFrame(wx.Frame):
         )
         self.preferences.Append(self.txt_utf8)
         self.preferences.AppendSeparator()
-        
+
         self.show = wx.MenuItem(
             self.preferences,
             1013,
@@ -369,7 +410,7 @@ class ConverterFrame(wx.Frame):
         )
         self.preferences.Append(self.show)
         self.preferences.AppendSeparator()
-        
+
         self.prelatin = wx.MenuItem(
             self.preferences,
             1014,
@@ -428,9 +469,9 @@ class ConverterFrame(wx.Frame):
             )
         )
         self.preferences.Append(self.merger_pref)
-        
+
         self.menubar1.Append(self.preferences, u"Preferences")
-        
+
         ## Help menu ##############################################################################
         self.help = wx.Menu()
         self.about = wx.MenuItem(
@@ -471,7 +512,7 @@ class ConverterFrame(wx.Frame):
 
         self.frame_statusbar = self.CreateStatusBar(2)
         self.frame_statusbar.SetStatusWidths([-4, -1])
-        
+
         # statusbar fields
         frame_statusbar_fields = ["SubtitleConverter is ready", ""]
         for i in range(len(frame_statusbar_fields)):
@@ -616,12 +657,12 @@ class ConverterFrame(wx.Frame):
             comboBox1Choices,
             wx.CB_DROPDOWN | wx.BORDER_DEFAULT,
         )
-            
+
         self.comboBox1.SetToolTip("Kodiranja")
         self.comboBox1.SetMinSize((118, 18))
         self.frame_toolbar.AddControl(self.comboBox1)
         self.comboBox1.SetSelection(0)
-        
+
         self.frame_toolbar.SetToolBitmapSize((24, 24))
         self.frame_toolbar.SetMargins((3, 3))
         self.frame_toolbar.SetToolPacking(1)
@@ -632,19 +673,18 @@ class ConverterFrame(wx.Frame):
 
         self.panel_1 = wx.Panel(self, wx.ID_ANY)
         sizer_1 = wx.BoxSizer(wx.VERTICAL)
-
         self.text_1 = wx.TextCtrl(
             self.panel_1,
             wx.ID_ANY,
             "",
             style=wx.TE_MULTILINE
-            | wx.TE_READONLY
+            | wx.TE_PROCESS_ENTER
+            | wx.TE_PROCESS_TAB
             | wx.TE_RICH2
-            | wx.TE_WORDWRAP, 
+            | wx.TE_WORDWRAP,
         )
-        
         wx.CallAfter(self.text_1.SetFocus)
-        
+
         sizer_1.Add(self.text_1, 1, wx.ALL | wx.EXPAND, 3)
 
         self.panel_1.SetSizer(sizer_1)

@@ -24,7 +24,7 @@ if not os.path.exists(page):
 
 <BODY TEXT="#808080" BGCOLOR="#ebf5fb" LINK="#0000FF" VLINK="#FF0000" ALINK="#000088">
 
-<H1><FONT COLOR="#616B87">Subtitle Converter v-0.5.8</FONT></H1>
+<H1><FONT COLOR="#616B87">Subtitle Converter v-0.5.9</FONT></H1>
 
 <BR>&nbsp;
 

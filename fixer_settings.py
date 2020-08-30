@@ -6,24 +6,13 @@
 
 import wx
 
-# begin wxGlade: dependencies
-# end wxGlade
-import shelve
+
 import pickle
 import os
-import logging
-from settings import filePath
+import logging.config
+from settings import filePath, FILE_SETTINGS
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
-handler = logging.FileHandler(
-    filename=filePath("resources", "var", "log", "subtitle_converter.log"),
-    mode="a",
-    encoding="utf-8",
-)
-handler.setFormatter(formatter)
-logger.addHandler(handler)
 
 
 class FixerSettings(wx.Dialog):
@@ -112,29 +101,22 @@ class FixerSettings(wx.Dialog):
 
         if os.path.exists(t1):
             try:
-                with shelve.open(
-                    os.path.join('resources', 'var', 'dialog_settings.db'),
-                    flag='writeback',
-                ) as sp:
-                    ex = sp['key1']
-                    cb1_s = ex['state1']
-                    cb2_s = ex['state2']
-                    cb3_s = ex['state3']
-                    cb4_s = ex['state4']
-                    cb5_s = ex['state5']
-                    cb6_s = ex['state6']
-                    cb7_s = ex['state7']
-                    cb8_s = ex['state8']
+                with open(filePath('resources', 'var', 'dialog_settings.db.dat'), "rb") as sp:
+                    data = pickle.load(sp)
+                ex = data['key1']
+                cb1_s = ex['state1']
+                cb2_s = ex['state2']
+                cb3_s = ex['state3']
+                cb4_s = ex['state4']
+                cb5_s = ex['state5']
+                cb6_s = ex['state6']
+                cb7_s = ex['state7']
+                cb8_s = ex['state8']
             except IOError as e:
-                logger.debug(
-                    "fixerSettings, I/O error({0}): {1}".format(
-                        e.errno, e.strerror
-                    )
-                )
-            except Exception as e:  # handle other exceptions such as attribute errors
+                logger.debug(f"fixerSettings, I/O error({e.errno}): {e.strerror}")
+            except Exception as e:
                 logger.debug(f"fixerSetting, unexpected error: {e}")
             else:
-
                 self.cb1.SetValue(cb1_s)
                 self.cb2.SetValue(cb2_s)
                 self.cb3.SetValue(cb3_s)
@@ -301,21 +283,25 @@ class FixerSettings(wx.Dialog):
         f = konf[5]
         g = konf[6]
         h = konf[7]
-        with shelve.open(
-            os.path.join('resources', 'var', 'dialog_settings.db'),
-            flag='writeback',
-        ) as s:
-            s['key1'] = {
-                'state1': a,
-                'state2': b,
-                'state3': c,
-                'state4': d,
-                'state5': e,
-                'state6': f,
-                'state7': g,
-                'state8': h,
-            }
         
+        sdict = {
+            'state1': a,
+            'state2': b,
+            'state3': c,
+            'state4': d,
+            'state5': e,
+            'state6': f,
+            'state7': g,
+            'state8': h,
+        }
+
+        FILE_SETTINGS["key1"]=sdict
+
+        with open(
+            os.path.join('resources', 'var', 'dialog_settings.db.dat'), "wb"
+        ) as s:
+            pickle.dump(FILE_SETTINGS, s)
+
         self.EndModal(True)
         
     def onClose(self, event):

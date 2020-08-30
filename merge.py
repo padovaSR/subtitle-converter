@@ -20,26 +20,15 @@ import re
 import os
 import pysrt
 from pysrt import SubRipFile, SubRipItem
-import logging
+import logging.config
 
 from settings import WORK_TEXT
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
-handler = logging.FileHandler(
-    filename=os.path.join("resources", "var", "log", "FileProcessing.log"),
-    mode="a",
-    encoding="utf-8",
-)
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-
 
 def myMerger(subs_in, max_time, max_char, _gap):
 
     subs = subs_in
-
 
     dsub = SubRipItem(
         subs[-1].index + 1,
@@ -47,8 +36,7 @@ def myMerger(subs_in, max_time, max_char, _gap):
         subs[-1].end + 11000,
         'Darkstar test appliance',
     )
-    if len(subs)-1 % 2 != 0:
-        subs.append(dsub)
+    if len(subs)-1 % 2 != 0: subs.append(dsub)
     
     parni = [x for x in subs[2::2]]
     neparni = [x for x in subs[1::2]]
@@ -57,11 +45,12 @@ def myMerger(subs_in, max_time, max_char, _gap):
     def merge_lines(inPar, inNepar):
         re_pattern = re.compile(r'<[^<]*>')
         new_j = SubRipFile()
-        for first, second, in zip(inNepar, inPar):
+        for first, second, in zip(
+            inNepar, inPar
+        ):
+            ## ordinal je vreme u milisekundama
             gap = second.start.ordinal - first.end.ordinal
-            trajanje = (
-                second.end.ordinal - first.start.ordinal
-            )  # ordinal je vreme u milisekundama
+            trajanje = second.end.ordinal - first.start.ordinal
             tekst1 = re.sub(re_pattern, '', first.text)  # convert to string
             tekst2 = re.sub(re_pattern, '', second.text)
             text_len = len(tekst1) + len(tekst2)
@@ -83,23 +72,27 @@ def myMerger(subs_in, max_time, max_char, _gap):
                     )
                     new_j.append(sub)
             else:
-                # dodaj originalne linije kao string
+                ## dodaj originalne linije kao string
                 sub1 = SubRipItem(first.index, first.start, first.end, first.text)
                 sub2 = SubRipItem(second.index, second.start, second.end, second.text)
                 new_j.append(sub1)
                 new_j.append(sub2)
 
+        if dsub in new_j:
+            new_j.remove(dsub)
+        new_j.clean_indexes()
+
         parni = [x for x in new_j[1::2]]
         neparni = [x for x in new_j[0::2]]
 
         return new_j, parni, neparni
-
     out_f, par1, nep1 = merge_lines(parni, neparni)
     out_f, par2, nep2 = merge_lines(par1, nep1)
     out_f, par3, nep3 = merge_lines(par2, nep2)
     out_f, par4, nep4 = merge_lines(par3, nep3)
     
     out_f.insert(0, first)
+    
     for i in out_f:
         if i.text == "Darkstar test appliance":
             out_f.remove(i)

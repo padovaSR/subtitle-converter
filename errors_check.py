@@ -9,19 +9,9 @@ from showError import showMeError
 
 import wx
 
-import logging
+import logging.config
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
-handler = logging.FileHandler(
-    filename=filePath("resources", "var", "log", "FileProcessing.log"),
-    mode="a",
-    encoding="utf-8",
-)
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-
 
 def w_position(_pattern, intext):
     intext = intext.replace('\r', '')
@@ -37,7 +27,7 @@ def w_position(_pattern, intext):
     f_list = [(x, y) for x, y in zip(l1, l2)]
     return f_list
 
-def checkFile(path, newfile, text_s, multi):
+def checkFile(path, newfile, text_s, multi=False):
     file1_name = path
     try:
         n_sign = text_s.count(r"\?")
@@ -165,7 +155,7 @@ def checkChars(text):
 
     return all_values, procenat, list(set(im))
 
-def displayError(text, tctrl, rdir, path, new_enc, multi):
+def displayError(text, tctrl, rdir, path, new_enc, multi=False):
     """"""
     nlist = w_position(r"\?", text)
     epath = os.path.basename(path)

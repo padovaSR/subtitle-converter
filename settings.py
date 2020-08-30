@@ -8,6 +8,9 @@ import re
 import pickle
 from more_itertools import unique_everseen
 import zipfile
+from collections import defaultdict 
+
+log_file = os.path.join("resources","var","log","subtitle_converter.log")
 
 def filePath(*args): return os.path.join(*args)
 
@@ -68,7 +71,15 @@ def preSuffix():
     with open(os.path.join('resources', 'var', 'tcf.pkl'), 'rb') as tf:
         oformat = pickle.load(tf)  # TXT suffix
 
-    return added, ex, value2_s, value5_s, value_m, oformat
+    return [added, value2_s, value5_s, value_m, oformat, ex]
+
+name_data = preSuffix()
 
 # shelve : key1=fixer, key2=merger, key3=PATHs, key4=font_data, key5=files_settings
 
+FILE_SETTINGS=defaultdict(str)
+
+with open(os.path.join("resources", "var", "dialog_settings.db.dat"), "rb") as f:
+    data = pickle.load(f)
+    
+FILE_SETTINGS.update(data)

@@ -22,19 +22,9 @@ import os
 import pysrt
 import webbrowser
 import pickle
-import logging
+import logging.config
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
-handler = logging.FileHandler(
-    filename=os.path.join("resources", "var", "log", "File_Errors.log"),
-    mode="a",
-    encoding="utf-8",
-)
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-
 
 def showMeError(infile, in_text, outfile, kode):
 

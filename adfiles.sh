@@ -18,15 +18,17 @@ else
       var=${var:-$default}
       echo $var
       git commit -m "$var"
+      echo ""
     fi
   done
   echo ""
-  echo Done
-  echo ""
   echo Push
+  echo ""
   git push
+  echo ""
 fi
-echo""
+echo "Done"
+echo ""
 git status
 echo ""
 

@@ -6,26 +6,17 @@ import codecs
 import re
 import zipfile
 import pickle
-import shelve
-import logging
 from text_processing import codelist
-from settings import chreg, preSuffix
 from choice_dialog import MultiChoice
+from settings import chreg, FILE_SETTINGS,  name_data
+import logging.config
+
 from codecs import BOM_UTF8
 
 import wx
 
-
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
-handler = logging.FileHandler(
-    filename=os.path.join("resources", "var", "log","FileProcessing.log"),
-    mode="a",
-    encoding="utf-8",
-)
-handler.setFormatter(formatter)
-logger.addHandler(handler)
+
 
 class FileOpened:
     ''''''
@@ -79,16 +70,19 @@ class FileOpened:
     def findCode(self):
         ''''''
         with open(os.path.join('resources', 'var', 'obsE.pkl'), 'rb') as f:
-            kodek = pickle.load(f).strip()        
-        
+            kodek = pickle.load(f).strip()
+
         f = open(self.putanja, "rb")
         data = f.read(4)
         f.close()
-        if data.startswith(BOM_UTF8): return "utf-8-sig"
-        else:        
-            if kodek != 'auto': ukode = kodek
-            else: ukode = 'utf-8'
-    
+        if data.startswith(BOM_UTF8):
+            return "utf-8-sig"
+        else:
+            if kodek != 'auto':
+                ukode = kodek
+            else:
+                ukode = 'utf-8'
+
             kodiranja = [
                 ukode,
                 'utf-8',
@@ -111,13 +105,19 @@ class FileOpened:
                 except:
                     pass
                 else:
-                    logger.debug(f' {os.path.basename(self.putanja)}, encoding: {enc}')
+                    logger.debug(f'{os.path.basename(self.putanja)}, encoding: {enc}')
                     break
+
             return enc
 
-def newName(path, pre_suffix, multi):
+def newName(path, pre_suffix, multi=False):
     ''''''
-    added, ex, value2_s, value5_s, value_m, oformat = preSuffix()
+    added = name_data[0]
+    value2_s = name_data[1]
+    value5_s = name_data[2]
+    value_m = name_data[3]
+    oformat = name_data[4]
+    ex = name_data[5]
 
     spattern = re.compile(r"(?:\.srt){2,3}", re.I)
     tpattern = re.compile(r"(?:\.txt){2,3}", re.I)
@@ -137,7 +137,7 @@ def newName(path, pre_suffix, multi):
     n = os.path.splitext(fprint)[0]
 
     if not "" in list(ex.values()):
-        psufix = os.path.splitext(n)[-1]  # presufix ispred sufixa
+        psufix = os.path.splitext(n)[-1]  ## presufix ispred sufixa
     else:
         psufix = n
 
@@ -146,18 +146,18 @@ def newName(path, pre_suffix, multi):
     elif oformat == "txt" and pre_suffix == value2_s:
         sufix = ".txt"
     else:
-        sufix = os.path.splitext(path)[-1]  # srt,txt ili neki drugi koji je otvoren
+        sufix = os.path.splitext(path)[-1]  ## srt,txt ili neki drugi otvoren
 
     suffix_list = ["." + x if not x.startswith("_") else x for x in ex.values()] + added
     suffix_list.append(value_m)
     suffix_list = [x.strip(".") if x.startswith(r".(") else x for x in suffix_list]
 
-    _d = "." + pre_suffix  # pre_suffix je unet u funkciji koja poziva newName
+    _d = "." + pre_suffix  ## pre_suffix je unet u funkciji koja poziva newName
     if pre_suffix.startswith("_") or pre_suffix.startswith(r"("):
         _d = pre_suffix
 
     if psufix in suffix_list:
-        name1 = '{0}{1}'.format(os.path.splitext(n)[0], _d)  # fajl u tmp/ folderu
+        name1 = '{0}{1}'.format(os.path.splitext(n)[0], _d)  ## fajl u tmp/ folderu
     else:
         name1 = '{0}{1}'.format(n, _d)
 
@@ -173,15 +173,11 @@ def newName(path, pre_suffix, multi):
             name1 = "".join(name1.rsplit(i, count_s))
             if not name1.endswith(i):
                 name1 = name1 + i
-    # print(name1, sufix)
-    return name1, sufix  # Vraca samo ime fajla bez putanje
+    return name1, sufix  ## Vraca samo ime fajla bez putanje
 
 def nameDialog(name_entry, sufix_entry, dir_entry):
 
-    with shelve.open(
-        os.path.join("resources", "var", "dialog_settings.db"), flag='writeback',
-    ) as sp:
-        ex = sp['key5']
+    ex = FILE_SETTINGS['key5']
 
     presuffix_l = os.path.join("resources", "var", "presuffix_list.bak")
     real_dir = dir_entry
@@ -222,14 +218,13 @@ def nameDialog(name_entry, sufix_entry, dir_entry):
         dlg.Destroy()
         return None
 
-def writeToFile(text, path, enc, multi):
+def writeToFile(text, path, enc, multi=False, ask=False):
     
     if enc in codelist:
         error = 'surrogatepass'
     else: error = 'replace'
-    
     if multi == False:
-        if os.path.isfile(path) and os.path.dirname(path) != "tmp":
+        if os.path.isfile(path) and os.path.dirname(path) != "tmp" and ask == True:
             dlg = wx.MessageBox(
                 f"{os.path.basename(path)}\nFile already exists! Proceed?",
                 "Overwrite the file?",
@@ -242,17 +237,17 @@ def writeToFile(text, path, enc, multi):
     try:
         with open(path, 'w', encoding=enc, errors=error, newline='\r\n') as n_File:
             n_File.write(text)
-            logger.debug(f"Write file: {path}; {enc}")
+        logger.debug(f"Write: {path}; {enc}")
         return True
     except IOError as e:
-        logger.debug(f"changeEncoding IOError: {e}")
+        logger.debug(f"writeToFile IOError: {e}")
     except AttributeError as e:
-        logger.debug(f"changeEncoding, AttributeError: {e}")
+        logger.debug(f"writeToFile, AttributeError: {e}")
     except UnicodeEncodeError as e:
-        logger.debug(f"changeEncoding, UnicodeEncodeError: {e}")
+        logger.debug(f"writeToFile, UnicodeEncodeError: {e}")
     except UnicodeDecodeError as e:
-        logger.debug(f"changeEncoding, UnicodeDecodeError: {e}")
+        logger.debug(f"writeToFile, UnicodeDecodeError: {e}")
     except LookupError as e:
-        logger.debug(f"changeEncoding, LookupError: {e}")
+        logger.debug(f"writeToFile, LookupError: {e}")
     except Exception as e:
-        logger.debug(f"changeEncoding, Unexpected error: {e}")
+        logger.debug(f"writeToFile, Unexpected error: {e}")

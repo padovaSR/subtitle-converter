@@ -6,19 +6,10 @@
 import wx
 import os
 import pickle
-import shelve
-import logging
+import logging.config
+from settings import FILE_SETTINGS, name_data
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
-handler = logging.FileHandler(
-    filename=os.path.join("resources", "var", "log", "FileProcessing.log"),
-    mode="a",
-    encoding="utf-8",
-)
-handler.setFormatter(formatter)
-logger.addHandler(handler)
 
 
 class Settings(wx.Dialog):
@@ -69,21 +60,21 @@ class Settings(wx.Dialog):
         self.button_1 = wx.Button(self, wx.ID_CLOSE, "")
         self.button_2 = wx.Button(self, wx.ID_SAVE, "")
 
-        with shelve.open(
-            os.path.join('resources', 'var', 'dialog_settings.db'), flag='writeback',
-        ) as sp:
-            ex = sp['key2']
-            try:
-                lineLenght = ex['l_lenght']
-                maxChar = ex['m_char']
-                maxGap = ex['m_gap']
-                file_suffix = ex['f_suffix']
-                self.tctrl_1.SetValue(file_suffix)
-                self.spin_ctrl_3.SetValue(maxGap)
-                self.spin_ctrl_2.SetValue(maxChar)
-                self.spin_ctrl_1.SetValue(lineLenght)
-            except Exception as e:
-                logger.debug("MergerSettings: key error.")
+        # with open(os.path.join('resources','var','dialog_settings.db.dat'), "rb") as sp:
+        # p = pickle.load(sp)
+        # ex = p['key2']
+        try:
+            ex = FILE_SETTINGS["key2"]
+            lineLenght = ex['l_lenght']
+            maxChar = ex['m_char']
+            maxGap = ex['m_gap']
+            file_suffix = ex['f_suffix']
+            self.tctrl_1.SetValue(file_suffix)
+            self.spin_ctrl_3.SetValue(maxGap)
+            self.spin_ctrl_2.SetValue(maxChar)
+            self.spin_ctrl_1.SetValue(lineLenght)
+        except Exception as e:
+            logger.debug("MergerSettings: key error.")
 
         self.__set_properties()
         self.__do_layout()
@@ -106,7 +97,6 @@ class Settings(wx.Dialog):
         self.SetSize((301, 282))
         self.label_1.SetMinSize((123, 23))
         _fonts = wx.Font(9, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, "Segoe UI")
-
         self.label_1.SetFont(_fonts)
 
         self.spin_ctrl_1.SetMinSize((115, 23))
@@ -190,16 +180,15 @@ class Settings(wx.Dialog):
         a = konf[0]
         b = konf[1]
         c = konf[2]
-        d = konf[3]  # ; e = konf[4]; f = konf[5]; g = konf[6]; h = konf[7]
-        with shelve.open(
-            os.path.join('resources', 'var', 'dialog_settings.db'), flag='writeback',
-        ) as s:
-            s['key2'] = {
-                'l_lenght': a,
-                'm_char': b,
-                'm_gap': c,
-                'f_suffix': d,
-            }
+        d = konf[3]
+
+        FILE_SETTINGS["key2"].update(
+            {"l_lenght": a, "m_char": b, "m_gap": c, "f_suffix": d}
+        )
+        with open("os.path.join('resources', 'var', 'dialog_settings.db", "wb") as d:
+            pickle.dump(FILE_SETTINGS, d)
+
+        name_data[3] = file_suffix
 
         with open(os.path.join("resources", "var", "m_extensions.pkl"), "wb") as f:
             pickle.dump(file_suffix, f)
