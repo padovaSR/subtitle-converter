@@ -2649,9 +2649,7 @@ class MyFrame(ConverterFrame):
                 fileData[fname] = os.stat(fname).st_mtime
             sortedFiles = sorted(fileData.items(), key=itemgetter(1))
             
-            if len(self.multiFile) != 0:
-                delete = len(sortedFiles)-60
-            else: delete = len(sortedFiles)-10
+            delete = len(sortedFiles)-60
             for x in range(0, delete):
                 os.remove(sortedFiles[x][0])
                 logger.debug(f"removed: {sortedFiles[x][0]}")
