@@ -1,0 +1,6 @@
+python
+wxPython
+more_itertools
+pysrt
+srt
+PyDispatcher  
