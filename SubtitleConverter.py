@@ -324,8 +324,8 @@ class MyFrame(ConverterFrame):
         
         if PREVIOUS and PREVIOUS[0].enc == "windows-1251":
             self.to_ansi.Enable(False)
-            self.frame_toolbar.EnableTool(1003, False)        
-    
+            self.frame_toolbar.EnableTool(1003, False)
+        
     def disableTool(self):
         
         self.frame_toolbar.EnableTool(wx.ID_CLOSE, False)
@@ -2502,8 +2502,10 @@ class MyFrame(ConverterFrame):
             for fname in file_paths:
                 fileData[fname] = os.stat(fname).st_mtime
             sortedFiles = sorted(fileData.items(), key=itemgetter(1))
-            delete = len(sortedFiles) - 34
-            if not len(self.multiFile) > 10:
+            
+            delete = len(sortedFiles) - 60
+            
+            if len(self.multiFile) != 0:
                 for x in range(0, delete):
                     os.remove(sortedFiles[x][0])
                     logger.debug(f"removed: {sortedFiles[x][0]}")
