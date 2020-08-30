@@ -2649,7 +2649,7 @@ class MyFrame(ConverterFrame):
                 fileData[fname] = os.stat(fname).st_mtime
             sortedFiles = sorted(fileData.items(), key=itemgetter(1))
             
-            delete = len(sortedFiles)-60
+            delete = len(sortedFiles)-80
             for x in range(0, delete):
                 os.remove(sortedFiles[x][0])
                 logger.debug(f"removed: {sortedFiles[x][0]}")
@@ -3034,7 +3034,7 @@ class MyFrame(ConverterFrame):
     
     def displayText(self, intext=[]):
         """"""
-        if self.Hide == True:
+        if self.hideDialog == True:
             return
         dlg = wx.RichMessageDialog(
             self, "".join(intext), "SubtitleConverter", style=wx.OK
@@ -3043,7 +3043,7 @@ class MyFrame(ConverterFrame):
 
         if dlg.ShowModal() == wx.ID_OK:
             if dlg.IsCheckBoxChecked():
-                self.Hide = True
+                self.hideDialog = True
             dlg.Destroy()
             
     def onChoice(self, event):
