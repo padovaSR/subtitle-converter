@@ -13,6 +13,7 @@ class MultiChoice(wx.Dialog):
         wx.Dialog.__init__(
             self, parent, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
         )
+        self.choices = choices
         self.SetSize((385, 278))
         self.SetTitle(caption)
         _icon = wx.NullIcon
@@ -29,7 +30,7 @@ class MultiChoice(wx.Dialog):
         self.sizer_1.Add(label_1, 0, wx.ALL, 10)
 
         self.check_list_box_1 = wx.CheckListBox(
-            self, wx.ID_ANY, choices=choices, style=wx.LB_EXTENDED
+            self, wx.ID_ANY, choices=self.choices, style=wx.LB_EXTENDED
         )
         self.sizer_1.Add(
             self.check_list_box_1, 1, wx.BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT, 10
@@ -67,7 +68,8 @@ class MultiChoice(wx.Dialog):
         # end wxGlade
 
     def GetSelections(self):
-        return self.check_list_box_1.GetCheckedItems()
+        selections = self.check_list_box_1.GetCheckedItems()
+        return selections
 
     def EvtChBox(self, event):
         state = self.checkbox_1.IsChecked()
