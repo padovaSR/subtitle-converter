@@ -3097,11 +3097,11 @@ class MyFrame(ConverterFrame):
         #controlDown = event.CmdDown()
         #altDown = event.AltDown()
         #shiftDown = event.ShiftDown()
-        
-        self.addHistory(
-            self.text_1.GetInsertionPoint(), self.text_1.GetValue(), l=self.UndoText
-        )
-        self.undo.Enable()
+        if not self.text_1.GetValue().startswith("Files "):
+            self.addHistory(
+                self.text_1.GetInsertionPoint(), self.text_1.GetValue(), l=self.UndoText
+            )
+            self.undo.Enable()
         
         event.Skip()
         
