@@ -272,7 +272,7 @@ class MyFrame(ConverterFrame):
             enc = printEncoding(msg[1])
             if type(path) == list:
                 path = path[-1]
-            self.filehistory.AddFileToHistory(FILE_HISTORY[len(FILE_HISTORY) - 1])
+            self.filehistory.AddFileToHistory(FILE_HISTORY[len(FILE_HISTORY)-1])
             self.SetStatusText(os.path.basename(path))
             self.SetStatusText(enc, 1)
             self.tmpPath = [path]
@@ -2648,11 +2648,11 @@ class MyFrame(ConverterFrame):
             for fname in file_paths:
                 fileData[fname] = os.stat(fname).st_mtime
             sortedFiles = sorted(fileData.items(), key=itemgetter(1))
-            
-            delete = len(sortedFiles)-80
-            for x in range(0, delete):
-                os.remove(sortedFiles[x][0])
-                logger.debug(f"removed: {sortedFiles[x][0]}")
+            if sortedFiles:
+                delete = len(sortedFiles)-80
+                for x in range(0, delete):
+                    os.remove(sortedFiles[x][0])
+                    logger.debug(f"removed: {sortedFiles[x][0]}")
         except Exception as e:
             logger.debug(f"removeFiles: {e}")
         event.Skip()
