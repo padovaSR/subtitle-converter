@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-# 
+#
 #  Copyright (C) 2020  padovaSR
 #
 #   This program is free software: you can redistribute it and/or modify
@@ -21,20 +21,20 @@ import os
 import zipfile
 import pickle
 import shutil
-from collections import namedtuple 
+from collections import namedtuple
 from pydispatch import dispatcher
-from errors_check import checkErrors 
+from errors_check import checkErrors
 from File_processing import FileOpened
 from text_processing import normalizeText, bufferText
 from settings import WORK_TEXT, PREVIOUS, FILE_HISTORY, filePath, lenZip, droppedText
- 
+
 import logging.config
 
 import wx
 
 logger = logging.getLogger(__name__)
 
-    
+
 def addPrevious(action, enc=None, content=None, psuffix=None, tpath=None, rpath=None):
     '''This function creates namedtuple'''
     prev = namedtuple("prev", ["action", "enc", "content", "psuffix", "tpath", "rpath"])
@@ -43,9 +43,10 @@ def addPrevious(action, enc=None, content=None, psuffix=None, tpath=None, rpath=
 
 def fileHandle(infiles, text_control, fdrop=False):
     """"""
-    
-    if type(infiles) != list: infiles=[infiles]
-    
+
+    if type(infiles) != list:
+        infiles = [infiles]
+
     def file_go(infile, rfile):
         fop = FileOpened(infile)
         enc = fop.findCode()
@@ -55,7 +56,7 @@ def fileHandle(infiles, text_control, fdrop=False):
         text = WORK_TEXT.getvalue()
         nlist = checkErrors(text)
         text_control.SetValue(text)
-        text_control.SetInsertionPoint(0)        
+        text_control.SetInsertionPoint(0)
         if fdrop == False:
             if nlist:
                 for i in nlist:
@@ -64,7 +65,8 @@ def fileHandle(infiles, text_control, fdrop=False):
         PREVIOUS.clear()
         addPrevious("Open", enc, text, "", infile, rfile)
         logger.debug(f"Opened: {os.path.basename(infile)}, {enc}")
-        if os.path.exists(droppedText): os.remove(droppedText)        
+        if os.path.exists(droppedText):
+            os.remove(droppedText)
         d_text = {text: enc}
         with open(filePath('resources', 'var', 'r_text0.pkl'), 'wb') as t:
             pickle.dump(d_text, t)
@@ -82,13 +84,24 @@ def fileHandle(infiles, text_control, fdrop=False):
                 try:
                     name, suffix = os.path.splitext(infiles[i])
                     tmp_path = filePath('tmp', os.path.basename(name) + suffix.lower())
-                    if tmp_path.endswith(('zip', 'srt', 'txt', 'log', 'sub', 'dll',)):
+                    if tmp_path.endswith(
+                        (
+                            'zip',
+                            'srt',
+                            'txt',
+                            'log',
+                            'sub',
+                            'dll',
+                        )
+                    ):
                         shutil.copy(infiles[i], tmp_path)
                 except Exception as e:
                     logger.debug(f'FileHandler: {e}')
                 else:
                     if not os.path.exists(tmp_path):
-                        logger.debug(f"FileHandler: Skipping {os.path.basename(tmp_path)}")
+                        logger.debug(
+                            f"FileHandler: Skipping {os.path.basename(tmp_path)}"
+                        )
                         text_control.AppendText(
                             f"\n_SKIPP_:{os.path.basename(tmp_path)}"
                         )
@@ -135,7 +148,7 @@ def fileHandle(infiles, text_control, fdrop=False):
             logger.debug(f'ZIP archive: {os.path.basename(name)}')
             try:
                 fop = FileOpened(name)
-                outfile, rfile = fop.isCompressed() ## outfile located in tmp
+                outfile, rfile = fop.isCompressed()  ## outfile in tmp
             except Exception as e:
                 logger.debug(f'ZIP; {e}.')
             else:
@@ -147,7 +160,9 @@ def fileHandle(infiles, text_control, fdrop=False):
                     nam = [outfile[0]]
                     empty = {}
                     if fdrop == True:
-                        dispatcher.send("TMP_PATH", message=outfile, msg=[rfile, enc, False])
+                        dispatcher.send(
+                            "TMP_PATH", message=outfile, msg=[rfile, enc, False]
+                        )
                         dispatcher.send("droped", msg=empty)
                 elif len(outfile) > 1:
                     text_control.SetValue('Files List:\n')
@@ -162,14 +177,17 @@ def fileHandle(infiles, text_control, fdrop=False):
                         text_control.AppendText(text)
                     PREVIOUS.append(new_d)
                     if fdrop == True:
-                        dispatcher.send("TMP_PATH", message=outfile, msg=[rfile, enc, True])
+                        dispatcher.send(
+                            "TMP_PATH", message=outfile, msg=[rfile, enc, True]
+                        )
                         dispatcher.send("droped", msg=new_d)
                     logger.debug('FileHandler: Ready for multiple files.')
         elif not zipfile.is_zipfile(name):
             ## name = real path
             FILE_HISTORY.append(name)
             tmp_path = filePath('tmp', os.path.basename(name))
-            if os.path.isfile(tmp_path): os.remove(tmp_path)
+            if os.path.isfile(tmp_path):
+                os.remove(tmp_path)
             shutil.copy(name, tmp_path)
             enc = file_go(tmp_path, name)
             empty = {}
