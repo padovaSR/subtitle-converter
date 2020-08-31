@@ -34,7 +34,7 @@ class FileOpened:
                 jedanFajl = zf.namelist()[0]
                 outfile = [os.path.join(basepath, jedanFajl)]
                 with open(outfile[0], 'wb') as f:
-                    f.write(zf.read(jedanFajl))
+                    f.write(zf.read(jedanFajl))     ## zf.read() returns bytes  ########
                 outfile1 = os.path.join(
                     os.path.dirname(self.putanja), jedanFajl
                 )
