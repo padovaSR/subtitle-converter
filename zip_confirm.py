@@ -130,12 +130,9 @@ class TreeDialog(wx.Dialog):
 
         self.Layout()
 
-        self.Bind(wx.EVT_CHECKBOX, self.onChbox1, self.chbox_1)
-        self.Bind(wx.EVT_CHECKBOX, self.onChbox2, self.chbox_2)
-        self.Bind(wx.EVT_CHECKBOX, self.onChbox3, self.chbox_3)
-        self.Bind(wx.EVT_CHECKBOX, self.onChbox4, self.chbox_4)
         self.Bind(wx.EVT_BUTTON, self.onQuit, self.button_CANCEL)
         self.Bind(wx.EVT_CLOSE, self.onCancel, id=-1)
+        self.Bind(wx.EVT_CHECKBOX, self.rebuildItems, id=-1)
         # end wxGlade
 
         isz = (16, 16)
@@ -170,6 +167,7 @@ class TreeDialog(wx.Dialog):
         """"""
         l = [os.path.dirname(x) for x in items]
         folders = sorted(set(l), key=l.index)
+        
         cItems = [self.tree.AppendItem(self.root, x) for x in folders]
         for i in items:
             a = os.path.dirname(i)
@@ -193,42 +191,14 @@ class TreeDialog(wx.Dialog):
         t = [self.chbox_1, self.chbox_2, self.chbox_3, self.chbox_4]
         return [t.index(x) for x in t if x.IsChecked()]
 
-    def onChbox1(self, event):
+    def rebuildItems(self, event):
         ''''''
-        if self.chbox_1.IsChecked() == False:
-            self.tree.Delete(self.items[0][0])
-        else:
-            self.tree.DeleteChildren(self.root)
-            self.items = self.buildItems()
+        self.tree.DeleteChildren(self.root)
+        clist = self.GetSelections()
+        makef = [self.files[x] for x in clist]
+        self.items = [self.makeMenu(x) for x in makef]
         event.Skip()
-
-    def onChbox2(self, event):
-        ''''''
-        if self.chbox_2.IsChecked() == False:
-            self.tree.Delete(self.items[1][0])
-        else:
-            self.tree.DeleteChildren(self.root)
-            self.items = self.buildItems()
-        event.Skip()
-
-    def onChbox3(self, event):
-        ''''''
-        if self.chbox_3.IsChecked() == False:
-            self.tree.Delete(self.items[2][0])
-        else:
-            self.tree.DeleteChildren(self.root)
-            self.items = self.buildItems()
-        event.Skip()
-
-    def onChbox4(self, event):
-        ''''''
-        if self.chbox_4.IsChecked() == False:
-            self.tree.Delete(self.items[3][0])
-        else:
-            self.tree.DeleteChildren(self.root)
-            self.items = self.buildItems()
-        event.Skip()
-
+    
     def onCancel(self, event):
         self.Destroy()
 
