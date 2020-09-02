@@ -139,7 +139,7 @@ class TreeDialog(wx.Dialog):
         il = wx.ImageList(*isz)
         self.fldrix = il.Add(
             wx.Bitmap(
-                os.path.join("resources", "icons", "Archive.png"), wx.BITMAP_TYPE_ANY
+                os.path.join("resources", "icons", "a-zip-icon.png"), wx.BITMAP_TYPE_ANY
             )
         )
         self.fldridx = il.Add(
