@@ -8,7 +8,7 @@ import wx
 import wx.html as html
 import os
 
-page = os.path.join('resources','uputstvo.htm')
+page = os.path.join('resources','docs','uputstvo.htm')
 
 if not os.path.exists(page):
     # HTML String
@@ -26,13 +26,10 @@ if not os.path.exists(page):
 
 <H1><FONT COLOR="#616B87">Subtitle Converter v-0.5.9</FONT></H1>
 
-<BR>&nbsp;
-
 <H2>
 <FONT COLOR="#777F95">Prečice:</FONT></H2>
 
 <P><B><FONT COLOR="#777F95">Ctrl+Shift+F</B></FONT>: FileSettings dijalog, predefinisani "pre presufiks" novih fajlova(lat,cyr,utf8...)<br>
-<br>
 <B><FONT COLOR="#777F95">Ctrl+Shift+Y</B></FONT>: Latinica u Ćirilicu UTF-8<br>
 <br>
 Ostale prečice se mogu uređivati u <b>ShortcutEditoru</b> u meniju <b>Preferences</b></br><P>
@@ -83,9 +80,19 @@ U meniju <b>Edit</b> postoji opcija "Reload text", ova opcija samo ponovo učita
 
 <br>&nbsp;
 
+<h2><font color="#777F95">Selektovanje fajlova</font></h2>
+<p>Selektovanje više datoteka ili fajlova koji se nalaze u nizu vrši se mišem ili označavanjem prve datoteke<br>
+zatim držanjem tatera <b>Shift</b> i klikom na željene ikone u nizu.<br>
+<br></br>
+Selektovanje više datoteka koje nisu u nizu:<br>
+označiti prvu, držati pritisnut taster <b>Ctrl</b> i klikom na svaku sledeću datoteku koju želimo označiti.
+</br></p>
+
+<br>&nbsp;
+
 </BODY>
 </HTML>
-    """
+"""
     
     # Write HTML String to file.html
     with open(page, "w") as file:
