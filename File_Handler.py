@@ -73,7 +73,7 @@ def fileHandle(infiles, text_control, fdrop=False):
 
     if len(infiles) > 1:
         rpath = [infiles[-1]]
-        text_control.SetValue('Files List:\n')
+        text_control.SetValue('Files List:\n\n')
         if fdrop == True:
             dispatcher.send("TMP_PATH", message=infiles, msg=[rpath, "", True])
         for i in range(len(infiles)):
@@ -90,8 +90,7 @@ def fileHandle(infiles, text_control, fdrop=False):
                     enc = fop.findCode()
                     fop.addBytes(infiles[i], enc, fop.getByteText())
                     name = os.path.basename(infiles[i])
-                    text_control.AppendText("\n")
-                    text_control.AppendText(f"{c} - {name}")
+                    text_control.AppendText(f"{c} - {name}\n")
                 except Exception as e:
                     logger.debug(f'FileHandler: {e}')
             else:
@@ -108,8 +107,7 @@ def fileHandle(infiles, text_control, fdrop=False):
                         fop.addBytes(fop.path, enc, fop.internal[0])
                         nam = outfile[0]
                         text = os.path.basename(nam)
-                        text_control.AppendText("\n")
-                        text_control.AppendText(f"{c} - {text}")
+                        text_control.AppendText(f"{c} - {text}\n")
                         fop.internal.clear()
                     elif len(outfile) > 1:
                         for i in range(len(outfile)):
@@ -118,8 +116,7 @@ def fileHandle(infiles, text_control, fdrop=False):
                             enc = fop.findByteCode(n=i)
                             fop.addBytes(outfile[i], enc, fop.internal[i])
                             text = os.path.basename(outfile[i])
-                            text_control.AppendText("\n")
-                            text_control.AppendText(f"{c} - {text}")
+                            text_control.AppendText(f"{c} - {text}\n")
                         fop.internal.clear()
         logger.debug('FileHandler: Ready for multiple files.')
     else:
@@ -144,15 +141,14 @@ def fileHandle(infiles, text_control, fdrop=False):
                             "TMP_PATH", message=outfile, msg=[rfile, enc, False]
                         )
                 elif len(outfile) > 1:
-                    text_control.SetValue('Files List:\n')
+                    text_control.SetValue('Files List:\n\n')
                     for i in range(len(outfile)):
                         c += 1
-                        fop = FileOpened(outfile[i], data[i])
+                        fop = FileOpened(outfile[i], True)
                         enc = fop.findByteCode()
                         fop.addBytes(outfile[i], enc, data[i])
                         text = os.path.basename(outfile[i])
-                        text_control.AppendText("\n")
-                        text_control.AppendText(f"{c} - {text}")
+                        text_control.AppendText(f"{c} - {text}\n")
                     if fdrop == True:
                         dispatcher.send(
                             "TMP_PATH", message=outfile, msg=[rfile, enc, True]
