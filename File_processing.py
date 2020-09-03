@@ -42,7 +42,7 @@ class FileOpened:
                 outfile = [os.path.join(basepath, singleFile)]
                 if self.multi == False:
                     with open(outfile[0], 'wb') as f:
-                        f.write(zf.read(singleFile))     ## zf.read() => bytes  ##
+                        f.write(zf.read(singleFile))     ## zf.read() equaly bytes  ##
                 else: self.internal.append(zf.read(singleFile).replace(b"\r\n", b"\n"))
                 outfile1 = os.path.join(
                     os.path.dirname(self.path), singleFile
@@ -79,27 +79,27 @@ class FileOpened:
     @staticmethod
     def fCodeList():
         """"""
-        with open(os.path.join('resources', 'var', 'obsE.pkl'), 'rb') as f:
-            kodek = pickle.load(f).strip()
-                
-            if kodek != 'auto':
-                ukode = kodek
-            else:
-                ukode = 'utf-8'
-            return [
-                ukode,
-                'utf-8',
-                'windows-1250',
-                'windows-1251',
-                'windows-1252',
-                'UTF-16LE',
-                "UTF-16BE",
-                'utf-8-sig',
-                'iso-8859-1',
-                'iso-8859-2',
-                'utf-16',
-                'ascii',
-            ]        
+        kodek = FILE_SETTINGS["CB_value"]
+
+        if kodek != 'auto':
+            added = kodek
+        else:
+            added = 'utf-8'
+
+        return [
+            added,
+            'utf-8',
+            'windows-1250',
+            'windows-1251',
+            'windows-1252',
+            'UTF-16LE',
+            "UTF-16BE",
+            'utf-8-sig',
+            'iso-8859-1',
+            'iso-8859-2',
+            'utf-16',
+            'ascii',
+        ]
     
     def getByteText(self):
         """"""
