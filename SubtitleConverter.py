@@ -86,7 +86,7 @@ logging.config.fileConfig(
 logger = logging.getLogger(__name__)
 
 
-VERSION = "v0.5.9.0_test3"
+VERSION = "v0.5.9.0_test5"
 
 
 class MyFrame(ConverterFrame):
@@ -142,8 +142,7 @@ class MyFrame(ConverterFrame):
         self.cyrUTF = r""
         self.pre_suffix = r""
         self.newEnc = ""
-        self.previous_action = r""
-
+        
         self.tmpPath = []
         self.real_path = []
         self.real_dir = r""
@@ -391,7 +390,8 @@ class MyFrame(ConverterFrame):
             self.to_utf8,
             self.cyr_to_ansi,
             self.cyr_to_utf,
-            self.export_zip, 
+            self.export_zip,
+            self.to_ansi, 
         ]:
             i.Enable(True)
 
@@ -461,14 +461,12 @@ class MyFrame(ConverterFrame):
         )
         if dlgOpen.ShowModal() == wx.ID_OK:
             self.tmpPath.clear()
-            if len(BT) >= 1:
-                self.previous_action = ""
-                PREVIOUS.clear()
-                BT.clear()
+            self.real_path.clear()
+            PREVIOUS.clear()
+            BT.clear()
+            print(BT)
             filepath = dlgOpen.GetPaths()  # Get the file location
             if len(filepath) == 1:
-                BT.clear()
-                self.real_path.clear()
                 real_path = "".join(filepath)
                 self.real_path.append(real_path)
                 self.real_dir = os.path.dirname(real_path)
@@ -482,14 +480,12 @@ class MyFrame(ConverterFrame):
             
             ## If Open -> multiple files:
             if BT:
-                try:
-                    self.real_path.clear()
-                    self.tmpPath.clear()
-                    self.SetStatusText(f"Multiple files ready for processing")
-                    self.SetStatusText("", 1)
-                    self.enableTool()            
-                except:
-                    logger.debug(f"Open: No dictionary found")
+                self.real_path.clear()
+                self.tmpPath.clear()
+                self.SetStatusText(f"Multiple files ready for processing")
+                self.SetStatusText("", 1)
+                self.enableTool()
+                self.multipleTools()
             if PREVIOUS:
                 l = self.fromPrevious("Open")
                 self.tmpPath.append(l.tpath)
@@ -757,8 +753,6 @@ class MyFrame(ConverterFrame):
         self.pre_suffix = value1_s
         f_text = ["Files Processed:\n\n"]
 
-        self.PathEnc()
-
         self.tmpPath.clear()
         self.cyrUTFmulti.clear()
         
@@ -1009,13 +1003,14 @@ class MyFrame(ConverterFrame):
             ex = pickle.load(f)  # ["key5"]
             value4_s = ex['lat_ansi_srt']
 
+        self.tmpPath.clear()
         f_text = ["Files Processed:\n\n"]
-        self.PathEnc()
-
+        
         self.newEnc = 'windows-1250'
         self.pre_suffix = value4_s
-        self.tmpPath.clear()
+        
         ErTxt = "Greška:\n\n{0}\nsadrži ćiriliči alfabet.\n{1}\n{2}\n\nNastaviti?\n"
+        
         for i in range(len(BT)):
             path, entered_enc, text = self.getPathEnc(i)
             fpath = os.path.basename(path)
@@ -1251,8 +1246,6 @@ class MyFrame(ConverterFrame):
         self.pre_suffix = value_s
         f_text = ["Files Processed:\n\n"]
 
-        self.PathEnc()
-
         self.tmpPath.clear()
         self.cyrUTFmulti.clear()
         
@@ -1380,15 +1373,12 @@ class MyFrame(ConverterFrame):
             ex = pickle.load(f)  # ["key5"]
             value1_s = ex["lat_utf8_srt"]
 
-        self.PathEnc()
-
         self.tmpPath.clear()
         self.pre_suffix = value1_s
 
         if self.preferences.IsChecked(1011):
             self.newEnc = 'utf-8-sig'
-        else:
-            self.newEnc = 'utf-8'
+        else: self.newEnc = 'utf-8'
         entered_enc = ""
         f_text = ["Files Processed:\n\n"]
 
@@ -1527,8 +1517,6 @@ class MyFrame(ConverterFrame):
             ex = pickle.load(f)  # ["key5"]
             value1_s = ex["lat_ansi_srt"]
         
-        self.PathEnc()
-
         self.tmpPath.clear()
         self.pre_suffix = value1_s
         self.newEnc = 'windows-1250'
@@ -1669,15 +1657,13 @@ class MyFrame(ConverterFrame):
             value1_s = ex["lat_utf8_srt"]
 
         f_text = ["Files Processed:\n\n"]
-        self.PathEnc()
-
+        
         self.pre_suffix = value1_s
         self.tmpPath.clear()
 
         if self.preferences.IsChecked(1011):
             self.newEnc = 'utf-8-sig'
-        else:
-            self.newEnc = 'utf-8'
+        else: self.newEnc = 'utf-8'
 
         pvalue = self.preferences.IsChecked(1014)
         
@@ -2395,9 +2381,7 @@ class MyFrame(ConverterFrame):
         event.Skip()
 
     def exportZIPmultiple(self):
-
-        self.PathEnc()
-
+        ''''''
         tpath = os.path.basename(BT[0].path[:-4])
         epattern = re.compile(r"episode\s*-*\d*", re.I)
         tpath = epattern.sub("", tpath)
@@ -2432,7 +2416,7 @@ class MyFrame(ConverterFrame):
         def data_out(filein): return open(filein, 'rb').read()
             
         if dlg.ShowModal() == wx.ID_OK:
-            name = dlg.GetPath()    ## Zip file name ############################
+            name = dlg.GetPath()    ## Zip file name ##
             
             if PREVIOUS[-1].action == 'toCYR_multiple':
 
@@ -2469,7 +2453,6 @@ class MyFrame(ConverterFrame):
                         izbor_utf8.append(x)    ## CYR-UTF-8
                         
                     lat_files = [BT[x].path for x in range(len(BT))]
-                    
                     
                     zlist_a = [data_out(x) for x in izbor_ansi]
                     zlist_b = [data_out(x) for x in izbor_utf8]
@@ -2544,10 +2527,10 @@ class MyFrame(ConverterFrame):
                 for i in self.tmpPath:
                     if os.path.exists(i):
                         os.remove(i)
-                    logger.debug("Removed {}".format(i))
+                    logger.debug(f"Delete {i}")
                 for i in self.cyrUTFmulti:
                     os.remove(i)
-                    logger.debug("Removed {}".format(i))
+                    logger.debug(f"Delete {i}")
             except Exception as e:
                 logger.debug(f"Export ZIP_final error: {e}")
 
