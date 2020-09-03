@@ -160,30 +160,6 @@ class ConvertText:
         else:
             logger.debug(f"Preslovljavanje, no text found!")
             
-def writeTempStr(inFile, text, kode):
-
-    _error = 'strict'
-    if kode in codelist:
-        _error = 'surrogatepass'
-    try:
-        with tempfile.TemporaryFile() as tfile:
-            tfile.write(text.encode(encoding=kode, errors=_error))
-            tfile.seek(0)
-            content = tfile.read()
-            with open(inFile, 'wb') as out:
-                out.write(content)
-    except IOError as e:
-        logger.debug("WriteTempStr, I/O error({0}): {1}".format(e.errno, e.strerror))
-    except AttributeError as e:
-        logger.debug(f"writeTempStr AttributeError: {e}")
-    except UnicodeEncodeError as e:
-        logger.debug(f"WriteTempStr, UnicodeEncodeError: {e}")
-    except UnicodeDecodeError as e:
-        logger.debug(f"WriteTempStr, UnicodeDecodeError: {e}")
-    except Exception as e:
-        logger.debug(f"WriteTempStr, unexpected error: {e}")
-
-
 def bufferText(intext, buffer):
 
     buffer.truncate(0)
