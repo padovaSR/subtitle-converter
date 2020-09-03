@@ -113,12 +113,12 @@ def checkErrors(text_in):
         logger.debug("CheckErrors ({0}):".format(e))
         return []
     
-def checkChars(text):
+def checkChars(text, path=None):
     def percentage(part, whole):
         try:
             return int(100 * part / whole)
         except ZeroDivisionError:
-            logger.debug('FileCheck Error, file is empty')
+            logger.debug(f"File is empty: {os.path.basename(path)}")
             return 0
 
     def chars(*args):
