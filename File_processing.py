@@ -42,8 +42,8 @@ class FileOpened:
                 outfile = [os.path.join(basepath, singleFile)]
                 if self.multi == False:
                     with open(outfile[0], 'wb') as f:
-                        f.write(zf.read(singleFile))     ## zf.read() returns bytes  ##
-                else: self.internal.append(zf.read(singleFile))
+                        f.write(zf.read(singleFile))     ## zf.read() => bytes  ##
+                else: self.internal.append(zf.read(singleFile).replace(b"\r\n", b"\n"))
                 outfile1 = os.path.join(
                     os.path.dirname(self.path), singleFile
                 )
@@ -66,7 +66,8 @@ class FileOpened:
                             os.path.dirname(self.path),
                             os.path.basename(files[-1]),
                         )
-                        for i in files: self.internal.append(zf.read(i))
+                        for i in files:
+                            self.internal.append(zf.read(i).replace(b"\r\n", b"\n"))
                         self.internPath.extend((files))
                         return outfiles, single
                     else:
@@ -102,7 +103,7 @@ class FileOpened:
     
     def getByteText(self):
         """"""
-        return open(self.path, "rb").read()
+        return open(self.path, "rb").read().replace(b"\r\n", b"\n")
         
     def findCode(self):
         ''''''
