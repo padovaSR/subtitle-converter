@@ -6,9 +6,10 @@ import codecs
 import re
 import zipfile
 import pickle
+from collections import namedtuple 
 from text_processing import codelist
 from choice_dialog import MultiChoice
-from settings import chreg, FILE_SETTINGS,  name_data
+from settings import chreg, FILE_SETTINGS, BYTES_TEXT, name_data
 import logging.config
 
 from codecs import BOM_UTF8
@@ -20,33 +21,41 @@ logger = logging.getLogger(__name__)
 
 class FileOpened:
     ''''''
-    def __init__(self, path):
+    internal = []
+    internPath = []
+    internEnc = ""
+    
+    def __init__(self, path, multi=False):
 
-        self.putanja = path
+        self.path = path
+        self.multi = multi
 
     def isCompressed(self):
 
         basepath = 'tmp'
-        imeFajla = os.path.basename(self.putanja)
-
-        with zipfile.ZipFile(self.putanja, 'r') as zf:
+        # basepath = os.path.dirname(self.path)
+        fileName = os.path.basename(self.path)
+        
+        with zipfile.ZipFile(self.path, 'r') as zf:
             if len(zf.namelist()) == 1:
-                jedanFajl = zf.namelist()[0]
-                outfile = [os.path.join(basepath, jedanFajl)]
-                with open(outfile[0], 'wb') as f:
-                    f.write(zf.read(jedanFajl))     ## zf.read() returns bytes  ########
+                singleFile = zf.namelist()[0]
+                outfile = [os.path.join(basepath, singleFile)]
+                if self.multi == False:
+                    with open(outfile[0], 'wb') as f:
+                        f.write(zf.read(singleFile))     ## zf.read() returns bytes  ##
+                else: self.internal.append(zf.read(singleFile))
                 outfile1 = os.path.join(
-                    os.path.dirname(self.putanja), jedanFajl
+                    os.path.dirname(self.path), singleFile
                 )
                 return outfile, outfile1
             elif not zf.namelist():
-                logger.debug(f"{imeFajla} is empty")
+                logger.debug(f"{fileName} is empty")
             elif len(zf.namelist()) >= 2:
                 izbor = [x for x in zf.namelist() if not x.endswith('/')]
                 if len(zf.namelist()) > 9:
-                    dlg = MultiChoice(None, "Pick files:", imeFajla, choices=izbor)
+                    dlg = MultiChoice(None, "Pick files:", fileName, choices=izbor)
                 else:
-                    dlg = wx.MultiChoiceDialog(None, 'Pick files:', imeFajla, izbor)
+                    dlg = wx.MultiChoiceDialog(None, 'Pick files:', fileName, izbor)
                 try:
                     if dlg.ShowModal() == wx.ID_OK:
                         response = dlg.GetSelections()
@@ -54,36 +63,29 @@ class FileOpened:
                         names = [os.path.basename(i) for i in files]
                         outfiles = [os.path.join(basepath, x) for x in names]
                         single = os.path.join(
-                            os.path.dirname(self.putanja),
+                            os.path.dirname(self.path),
                             os.path.basename(files[-1]),
                         )
-                        for i, x in zip(files, outfiles):
-                            with open(x, 'wb') as f:
-                                f.write(zf.read(i))
+                        for i in files: self.internal.append(zf.read(i))
+                        self.internPath.extend((files))
                         return outfiles, single
                     else:
-                        logger.debug(f'{self.putanja}: Canceled.')
+                        logger.debug(f'{self.path}: Canceled.')
                         dlg.Destroy()
                 finally:
                     dlg.Destroy()
 
-    def findCode(self):
-        ''''''
+    @staticmethod
+    def fCodeList():
+        """"""
         with open(os.path.join('resources', 'var', 'obsE.pkl'), 'rb') as f:
             kodek = pickle.load(f).strip()
-
-        f = open(self.putanja, "rb")
-        data = f.read(4)
-        f.close()
-        if data.startswith(BOM_UTF8):
-            return "utf-8-sig"
-        else:
+                
             if kodek != 'auto':
                 ukode = kodek
             else:
                 ukode = 'utf-8'
-
-            kodiranja = [
+            return [
                 ukode,
                 'utf-8',
                 'windows-1250',
@@ -96,19 +98,56 @@ class FileOpened:
                 'iso-8859-2',
                 'utf-16',
                 'ascii',
-            ]
-            for enc in kodiranja:
+            ]        
+    
+    def getByteText(self):
+        """"""
+        return open(self.path, "rb").read()
+        
+    def findCode(self):
+        ''''''
+        f = open(self.path, "rb")
+        data = f.read(4)
+        f.close()
+        if data.startswith(BOM_UTF8):
+            return "utf-8-sig"
+        else:
+            for enc in self.fCodeList():
                 try:
-                    with codecs.open(self.putanja, 'r', encoding=enc) as fh:
+                    with codecs.open(self.path, 'r', encoding=enc) as fh:
                         fh.readlines()
                         fh.seek(0)
                 except:
                     pass
                 else:
-                    logger.debug(f'{os.path.basename(self.putanja)}, encoding: {enc}')
+                    logger.debug(f'{os.path.basename(self.path)}: {enc}')
                     break
-
+            self.internEnc = enc
             return enc
+    
+    def findByteCode(self, n=0):
+        """"""
+        dat = self.internal[n]
+        if dat[:4].startswith(BOM_UTF8):
+            return "utf-8-sig"
+        else:
+            for enc in self.fCodeList():
+                try:
+                    dat.decode(enc)
+                except:
+                    pass
+                else:
+                    logger.debug(f"{os.path.basename(self.path)}: {enc}")
+                    break        
+            self.internEnc = enc
+            return enc
+    
+    @staticmethod
+    def addBytes(path, enc, content):
+        """"""
+        multi = namedtuple("multi", ["path","enc", "content"])
+        BYTES_TEXT.append(multi(path, enc, content))
+        
 
 def newName(path, pre_suffix, multi=False):
     ''''''
