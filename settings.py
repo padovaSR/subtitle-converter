@@ -10,7 +10,21 @@ from more_itertools import unique_everseen
 import zipfile
 from collections import defaultdict 
 
+chreg = re.compile("¬")
+
 log_file = os.path.join("resources","var","log","subtitle_converter.log")
+log_file_history = os.path.join("resources","var","log","file.history.log")
+droppedText = os.path.join('resources', 'var', 'r_text0.pkl')
+
+FILE_HISTORY = []
+
+PREVIOUS = []
+
+WORK_TEXT = StringIO()
+    
+WORK_SUBS = []
+
+BYTES_TEXT = []
 
 def filePath(*args): return os.path.join(*args)
 
@@ -32,19 +46,6 @@ def lenZip(infile):
 def sortList(inlist):
     """"""
     return list(unique_everseen(inlist))
-
-chreg = re.compile("¬")
-
-log_file_history = os.path.join("resources","var","log","file.history.log")
-droppedText = os.path.join('resources', 'var', 'r_text0.pkl')
-
-FILE_HISTORY = []
-
-PREVIOUS = []
-
-WORK_TEXT = StringIO()
-    
-WORK_SUBS = StringIO()
 
 with open(log_file_history, encoding="utf-8") as f:
     for line in f:
