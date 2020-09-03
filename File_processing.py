@@ -198,11 +198,9 @@ def newName(path, pre_suffix, multi=False):
 
     if psufix in suffix_list:
         name1 = '{0}{1}'.format(os.path.splitext(n)[0], _d)  ## fajl u tmp/ folderu
-    else:
-        name1 = '{0}{1}'.format(n, _d)
+    else: name1 = '{0}{1}'.format(n, _d)
 
-    if name1.endswith("."):
-        name1 = name1[:-1]
+    if name1.endswith("."): name1 = name1[:-1]
 
     for i in suffix_list:
         if i == "." or not i:
