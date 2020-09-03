@@ -191,20 +191,22 @@ def bufferText(intext, buffer):
     buffer.write(intext)
     buffer.seek(0)
 
-def normalizeText(code_in, path):
+def normalizeText(code_in, path, data=None):
     '''text normalization'''
     error = 'strict'
     # error="surogateescape"
     if code_in in codelist:
         error = 'surrogatepass'
     try:
-        with open(path, 'r', encoding=code_in, errors=error) as f:
-            text_normalized = unicodedata.normalize('NFKC', f.read())
-    except Exception as e:
-        logger.exception(f"NormalizeText error: ({path} {e})")
-    else:
+        if path:
+            text = open(path, 'r', encoding=code_in, errors=error).read()
+        else:
+            text = data.decode(encoding=code_in, errors=error)
+        text_normalized = unicodedata.normalize('NFKC', text)
         return text_normalized
-
+    except Exception as e:
+        logger.exception(f"NormalizeText error: {e})")
+    
 def rplStr(in_text):
 
     ## Rečnik je 'rplSmap' - LATIN_chars.
@@ -699,3 +701,4 @@ def poravnLine(intext):
         sub = n
 
     return sub
+
