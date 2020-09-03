@@ -27,7 +27,6 @@ from errors_check import checkErrors
 from File_processing import FileOpened
 from text_processing import normalizeText, bufferText
 from settings import WORK_TEXT, PREVIOUS, FILE_HISTORY, filePath, lenZip, droppedText
-from settings import BYTES_TEXT as BT 
 import logging.config
 
 import wx
