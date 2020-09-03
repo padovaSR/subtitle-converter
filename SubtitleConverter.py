@@ -771,11 +771,6 @@ class MyFrame(ConverterFrame):
             file_suffix = os.path.splitext(path)[-1]
             
             text = normalizeText(entered_enc, None, text)
-            try:
-                text = srt.compose(srt.parse(text, True))
-            except Exception as e:
-                logger.debug(f"SRT_FIX: {e}")
-                pass
             
             self.utf8_latText[os.path.basename(path)] = (
                 remTag(text)
@@ -1035,12 +1030,6 @@ class MyFrame(ConverterFrame):
 
             text = normalizeText(entered_enc, None, text)
             
-            try:
-                text = srt.compose(srt.parse(text, True))
-            except Exception as e:
-                logger.debug(f"SRT_FIX: {e}")
-                pass
-            
             zbir_slova, procent, chars = checkChars(text, path)
 
             def ansiAction(path, text_in):
@@ -1275,12 +1264,6 @@ class MyFrame(ConverterFrame):
             file_suffix = os.path.splitext(path)[-1]
 
             text = normalizeText(entered_enc, None, text)
-            
-            try:
-                text = srt.compose(srt.parse(text, True))
-            except Exception as e:
-                logger.debug(f"SRT_FIX: {e}")
-                pass            
             if not text:
                 text = f"{path}\nText nije SRT format.\nPokušaj pojedinačni fajl."
             if text: text = text.replace('?', '¬')
@@ -1413,11 +1396,6 @@ class MyFrame(ConverterFrame):
             path, entered_enc, text = self.getPathEnc(i)
             
             text = normalizeText(entered_enc, None, text)
-            try:
-                text = srt.compose(srt.parse(text, True))
-            except Exception as e:
-                logger.debug(f"SRT_FIX: {e}")
-                pass
             if not text: text = f"{path}\nText is not SRT format.\nTry as single file."
             if text: text = text.replace('?', '¬')
 
@@ -1565,8 +1543,6 @@ class MyFrame(ConverterFrame):
             try:
                 text = normalizeText(entered_enc, None, text)
                 
-                text = srt.compose(srt.parse(text, True))
-                
                 if text: text = text.replace('?', '¬')
                 
                 text, msg = ConvertText(text).changeLetters(pvalue, True)
@@ -1709,10 +1685,6 @@ class MyFrame(ConverterFrame):
             path, entered_enc, text = self.getPathEnc(i)
             
             text = normalizeText(entered_enc, None, text)
-            try:
-                text = srt.compose(srt.parse(text, True))
-            except Exception as e:
-                logger.debug(f"SRT_FIX: {e}")
             if not text: text = f"{path}\nText is not SRT format.\nTry as single file." 
             if text: text = text.replace('?', '¬')
 
@@ -2501,7 +2473,7 @@ class MyFrame(ConverterFrame):
                     
                     zlist_a = [data_out(x) for x in izbor_ansi]
                     zlist_b = [data_out(x) for x in izbor_utf8]
-                    zlist_c = [BT[x].content for x in range(len(BT))]
+                    zlist_c = [BT[x].content.replace(b"\n", b"\r\n") for x in range(len(BT))]
                     zlist_utf = [x for x in self.utf8_latText.values()]
                     
                     info1 = [os.path.join(CyrANSI, os.path.basename(x)) for x in izbor_ansi]
