@@ -248,6 +248,8 @@ class MyFrame(ConverterFrame):
         dt = FileDrop(self.text_1)
         self.text_1.SetDropTarget(dt)
         
+        FILE_SETTINGS["CB_value"] = self.comboBox1.GetValue()
+        
         for i in FILE_HISTORY:
             if os.path.isfile(i):
                 self.filehistory.AddFileToHistory(i)
@@ -3042,10 +3044,13 @@ class MyFrame(ConverterFrame):
         ctrl = event.GetEventObject()
         value = ctrl.GetValue()
         
+        FILE_SETTINGS["CB_value"] = value
+        
         with open(filePath('resources', 'var', 'obsE.pkl'), 'wb') as f:
             pickle.dump(value, f)
             
-        event.Skip()    def onAbout(self, event):
+        event.Skip()
+            def onAbout(self, event):
         text = '''SubtitleConverter\n\n\
         Jednostavna wxPython aplikacija \n\
         za konvertovanje srt i txt fajlova\n\
