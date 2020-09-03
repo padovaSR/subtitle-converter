@@ -39,13 +39,14 @@ from settings import (
     filePath,
     PREVIOUS,
     FILE_HISTORY,
-    WORK_TEXT,
+    WORK_TEXT, 
     FILE_SETTINGS,
     name_data,
     log_file_history,
     printEncoding,
     droppedText, 
 )
+from settings import BYTES_TEXT as BT 
 from file_settings import FileSettings
 from merger_settings import Settings
 from fixer_settings import FixerSettings
@@ -85,7 +86,7 @@ logging.config.fileConfig(
 logger = logging.getLogger(__name__)
 
 
-VERSION = "v0.5.9.0_test2"
+VERSION = "v0.5.9.0_test3"
 
 
 class MyFrame(ConverterFrame):
@@ -131,6 +132,7 @@ class MyFrame(ConverterFrame):
 
         self.dont_show = False
         self.hideDialog = False
+        self.multiFile = False
 
         self.bytesText = BytesIO()
         
@@ -142,8 +144,6 @@ class MyFrame(ConverterFrame):
         self.newEnc = ""
         self.previous_action = r""
 
-        self.multiFile = {}
-        self.droped = {}
         self.tmpPath = []
         self.real_path = []
         self.real_dir = r""
@@ -227,9 +227,8 @@ class MyFrame(ConverterFrame):
         self.Bind(wx.EVT_TOOL, self.onQuit, id=1008)
         ## Events other #############################################################################
         self.text_1.Bind(wx.EVT_TEXT, self.removeFiles, id=-1, id2=wx.ID_ANY)
-        self.text_1.Bind(wx.EVT_LEFT_DOWN, self.newText, id=wx.ID_ANY)
+        # self.text_1.Bind(wx.EVT_LEFT_DOWN, self.newText, id=wx.ID_ANY)
         self.text_1.Bind(wx.EVT_TEXT_ENTER, self.newText, id=wx.ID_ANY)
-        # self.text_1.Bind(wx.EVT_LEFT_DOWN, self.newSubs, id=wx.ID_ANY)
         self.Bind(
             wx.EVT_MENU_RANGE, self.onFileHistory, id=wx.ID_FILE1, id2=wx.ID_FILE9,
         )
@@ -260,11 +259,11 @@ class MyFrame(ConverterFrame):
 
         dispatcher.connect(self.updateStatus, "TMP_PATH", sender=dispatcher.Any)
         dispatcher.connect(self.enKode, "TMP_PATH", sender=dispatcher.Any)
-        dispatcher.connect(self.dropedFiles, "droped", sender=dispatcher.Any)
-
+        
     def updateStatus(self, message, msg):
         ''''''
         if msg[2] == True:
+            self.multiFile = True
             self.SetStatusText('Multiple files ready for processing')
             self.SetStatusText("", 1)
         else:
@@ -300,11 +299,6 @@ class MyFrame(ConverterFrame):
         if enc == "windows-1251":
             self.to_ansi.Enable(False)
             self.frame_toolbar.EnableTool(1003, False)
-
-    def dropedFiles(self, msg):
-        self.droped = msg
-        if not self.droped:
-            self.multiFile.clear()
 
     def updateUI(self):
         self.curClr = wx.BLACK
@@ -467,14 +461,13 @@ class MyFrame(ConverterFrame):
         )
         if dlgOpen.ShowModal() == wx.ID_OK:
             self.tmpPath.clear()
-            if len(self.multiFile) >= 1:
-                self.multiFile.clear()
+            if len(BT) >= 1:
                 self.previous_action = ""
                 PREVIOUS.clear()
+                BT.clear()
             filepath = dlgOpen.GetPaths()  # Get the file location
             if len(filepath) == 1:
-                self.droped.clear()
-                self.multiFile.clear()
+                BT.clear()
                 self.real_path.clear()
                 real_path = "".join(filepath)
                 self.real_path.append(real_path)
@@ -488,17 +481,15 @@ class MyFrame(ConverterFrame):
             fileHandle(filepath, self.text_1)
             
             ## If Open -> multiple files:
-            try:
-                n = next(PREVIOUS.index(x) for x in PREVIOUS if type(x) == dict)
-                self.multiFile.update(PREVIOUS[n])                
-                PREVIOUS.remove(PREVIOUS[n])
-                self.real_path.clear()
-                self.tmpPath.clear()
-                self.SetStatusText(f"Multiple files ready for processing")
-                self.SetStatusText("", 1)
-                self.enableTool()            
-            except:
-                logger.debug(f"Open: No dictionary found")
+            if BT:
+                try:
+                    self.real_path.clear()
+                    self.tmpPath.clear()
+                    self.SetStatusText(f"Multiple files ready for processing")
+                    self.SetStatusText("", 1)
+                    self.enableTool()            
+                except:
+                    logger.debug(f"Open: No dictionary found")
             if PREVIOUS:
                 l = self.fromPrevious("Open")
                 self.tmpPath.append(l.tpath)
@@ -688,7 +679,7 @@ class MyFrame(ConverterFrame):
             utf8_enc = 'utf-8-sig'
         else: utf8_enc = 'utf-8'        
         
-        if len(self.multiFile) >= 1:
+        if len(BT) >= 1:
             self.multipleTools()
             self.toCyrillic_multiple()
 
@@ -773,16 +764,19 @@ class MyFrame(ConverterFrame):
         
         pvalue = self.preferences.IsChecked(1014)
         self.utf8_latText.clear()
-        ## multiFile = tmp
-        for key, value in self.multiFile.items():
-
-            path = key
-            entered_enc = value
-
+        
+        for i in range(len(BT)):
+            path, entered_enc, text = self.getPathEnc(i)
+            
             file_suffix = os.path.splitext(path)[-1]
-
-            text = normalizeText(entered_enc, path)
-
+            
+            text = normalizeText(entered_enc, None, text)
+            try:
+                text = srt.compose(srt.parse(text, True))
+            except Exception as e:
+                logger.debug(f"SRT_FIX: {e}")
+                pass
+            
             self.utf8_latText[os.path.basename(path)] = (
                 remTag(text)
                 .encode(encoding="utf-8", errors="surrogatepass")
@@ -801,7 +795,7 @@ class MyFrame(ConverterFrame):
             
             cyr_name, cyr_suffix = newName(path, value1_s, multi=True)
             cyr_path = os.path.join(self.real_dir, cyr_name + file_suffix)
-
+            
             self.tmpPath.append(cyr_path)
             
             text_ansi = ConvertText(text).toCyrANSI(self.newEnc)
@@ -855,7 +849,7 @@ class MyFrame(ConverterFrame):
         
         path, entered_enc = self.PathEnc()
         
-        if len(self.multiFile) >= 1:
+        if len(BT) >= 1:
             self.multipleTools()
             self.toANSI_multiple()
         else:
@@ -934,7 +928,7 @@ class MyFrame(ConverterFrame):
                     return True
 
             text = WORK_TEXT.getvalue()
-            zbir_slova, procent, chars = checkChars(text)
+            zbir_slova, procent, chars = checkChars(text, path)
             ertext = "Greška:\n\nTekst sadrži ćiriliči alfabet.\n\n{}\n{}\n\nNastaviti?\n"
             if zbir_slova > 1000 and procent >= 90:
                 err_text =\
@@ -1027,12 +1021,10 @@ class MyFrame(ConverterFrame):
         self.pre_suffix = value4_s
         self.tmpPath.clear()
         ErTxt = "Greška:\n\n{0}\nsadrži ćiriliči alfabet.\n{1}\n{2}\n\nNastaviti?\n"
-        for key, value in self.multiFile.items():
-
-            path = key
+        for i in range(len(BT)):
+            path, entered_enc, text = self.getPathEnc(i)
             fpath = os.path.basename(path)
-            entered_enc = value
-
+            
             if entered_enc == 'windows-1251':
                 logger.debug(
                     f"------------------------------------------------------\n\
@@ -1041,23 +1033,38 @@ class MyFrame(ConverterFrame):
                 f_text.append(fpath + " __skipped_"+"    \n")
                 continue
 
-            text = normalizeText(entered_enc, path)
-            zbir_slova, procent, chars = checkChars(text)
+            text = normalizeText(entered_enc, None, text)
+            
+            try:
+                text = srt.compose(srt.parse(text, True))
+            except Exception as e:
+                logger.debug(f"SRT_FIX: {e}")
+                pass
+            
+            zbir_slova, procent, chars = checkChars(text, path)
 
             def ansiAction(path, text_in):
                 if entered_enc != 'windows-1251':
                     logger.debug(
                         'ToANSI, next input encoding: {}'.format(entered_enc)
                     )
-                if text_in: text = text_in.replace('?', '¬')
-                text = fixI(text)
-                text,msg = rplStr(text)
-                text = ChangeEncoding(text).toANSI(self.newEnc)
-                nam, b = newName(path, self.pre_suffix, multi=True)
-                newF = os.path.join(self.real_dir, nam + b)
-                self.tmpPath.append(newF)
-                return newF, text
-
+                try:
+                    if not text_in:
+                        text_in = (
+                            f"{path}\nText is not SRT format.\nTry as single file."
+                        )
+                    if text_in:
+                        text = text_in.replace('?', '¬')
+                    text = fixI(text)
+                    text,msg = rplStr(text)
+                    text = ChangeEncoding(text).toANSI(self.newEnc)
+                    nam, b = newName(path, self.pre_suffix, multi=True)
+                    newF = os.path.join(self.real_dir, nam + b)
+                    self.tmpPath.append(newF)
+                    return newF, text
+                except Exception as e:
+                    logger.debug(f"{os.path.basename(path)}: {e}")
+                    
             def postAnsi():
                 self.SetStatusText(os.path.basename(newF))
                 self.SetStatusText(self.newEnc, 1)
@@ -1098,13 +1105,10 @@ class MyFrame(ConverterFrame):
                     f'ToANSI: Cyrillic alfabet u tekstu: {entered_enc} cyrillic'
                 )
                 self.SetStatusText(u'Greška u ulaznom fajlu.')
-                f_procent = 'Najmanje {} % teksta.\nIli najmanje [ {} ] znakova.'.format(
-                    procent, zbir_slova
+                f_procent = f"Najmanje {procent} % teksta.\nIli najmanje [ {zbir_slova} ] znakova"
+                dlg = dialog1(
+                    ErTxt.format(os.path.basename(path), f_procent, ",".join(chars))
                 )
-                ErTxt.format(os.path.basename(path), f_procent, ",".join(chars))
-
-                dlg = dialog1(ErTxt)
-
                 if dlg == True:
                     if procent >= 50:
                         ErrorDlg = wx.MessageDialog(
@@ -1138,9 +1142,10 @@ class MyFrame(ConverterFrame):
                 logger.debug(
                     f'ToANSI: Cyrillic alfabet u tekstu: {entered_enc} cyrillic'
                 )
-                f_zbir = 'Najmanje [ {} ] znakova.'.format(zbir_slova)
-                ErTxt.format(os.path.basename(path), f_zbir, ",".join(chars))
-                dlg = dialog1(ErTxt)
+                f_zbir = f"Najmanje [ {zbir_slova} ] znakova."
+                dlg = dialog1(
+                    ErTxt.format(os.path.basename(path), f_zbir, ",".join(chars))
+                )
 
                 if dlg == True:
                     newF, text = ansiAction(path, text)
@@ -1188,7 +1193,7 @@ class MyFrame(ConverterFrame):
             utf8_enc = 'utf-8-sig'
         else: utf8_enc = 'utf-8'
         
-        if len(self.multiFile) >= 1:
+        if len(BT) >= 1:
             self.multipleTools()
             self.toCyrUTF8_multiple()
 
@@ -1264,15 +1269,20 @@ class MyFrame(ConverterFrame):
         
         pvalue = self.preferences.IsChecked(1014)
         
-        for key, value in self.multiFile.items():
-
-            path = key
-            entered_enc = value
-
+        for i in range(len(BT)):
+            path, entered_enc, text = self.getPathEnc(i)
+            
             file_suffix = os.path.splitext(path)[-1]
 
-            text = normalizeText(entered_enc, path)
+            text = normalizeText(entered_enc, None, text)
             
+            try:
+                text = srt.compose(srt.parse(text, True))
+            except Exception as e:
+                logger.debug(f"SRT_FIX: {e}")
+                pass            
+            if not text:
+                text = f"{path}\nText nije SRT format.\nPokušaj pojedinačni fajl."
             if text: text = text.replace('?', '¬')
 
             utfText, suffix = newName(path, value_s, multi=True)
@@ -1331,7 +1341,7 @@ class MyFrame(ConverterFrame):
 
         path, entered_enc = self.PathEnc()
 
-        if len(self.multiFile) >= 1:
+        if len(BT) >= 1:
             self.multipleTools()
             self.toUTF_multiple()
         else:
@@ -1398,12 +1408,17 @@ class MyFrame(ConverterFrame):
             self.newEnc = 'utf-8'
         entered_enc = ""
         f_text = ["Files Processed:\n\n"]
-        for key, value in self.multiFile.items():
 
-            path = key
-            entered_enc = value
-
-            text = normalizeText(entered_enc, path)
+        for i in range(len(BT)):
+            path, entered_enc, text = self.getPathEnc(i)
+            
+            text = normalizeText(entered_enc, None, text)
+            try:
+                text = srt.compose(srt.parse(text, True))
+            except Exception as e:
+                logger.debug(f"SRT_FIX: {e}")
+                pass
+            if not text: text = f"{path}\nText is not SRT format.\nTry as single file."
             if text: text = text.replace('?', '¬')
 
             nam, b = newName(path, self.pre_suffix, multi=True)
@@ -1468,7 +1483,7 @@ class MyFrame(ConverterFrame):
 
         path, entered_enc = self.PathEnc()
 
-        if len(self.multiFile) >= 1:
+        if len(BT) >= 1:
             self.multipleTools()
             self.cyrToANSI_multiple()
         else:
@@ -1539,17 +1554,19 @@ class MyFrame(ConverterFrame):
         self.tmpPath.clear()
         self.pre_suffix = value1_s
         self.newEnc = 'windows-1250'
-        t_enc = 'utf-8'
+        
         f_text = ["Files Processed:\n\n"]
         
         pvalue = self.preferences.IsChecked(1014)
 
-        for key, value in self.multiFile.items():
-            path = key
-            entered_enc = value
+        for i in range(len(BT)):
+            path, entered_enc, text = self.getPathEnc(i)
 
             try:
-                text = normalizeText(entered_enc, path)
+                text = normalizeText(entered_enc, None, text)
+                
+                text = srt.compose(srt.parse(text, True))
+                
                 if text: text = text.replace('?', '¬')
                 
                 text, msg = ConvertText(text).changeLetters(pvalue, True)
@@ -1609,7 +1626,7 @@ class MyFrame(ConverterFrame):
         
         path, entered_enc = self.PathEnc()
         
-        if len(self.multiFile) >= 1:
+        if len(BT) >= 1:
             self.multipleTools()
             self.cyrToUTF_multiple()
         else:        
@@ -1688,11 +1705,15 @@ class MyFrame(ConverterFrame):
 
         pvalue = self.preferences.IsChecked(1014)
         
-        for key, value in self.multiFile.items():
-            path = key
-            entered_enc = value
-
-            text = normalizeText(entered_enc, path)
+        for i in range(len(BT)):
+            path, entered_enc, text = self.getPathEnc(i)
+            
+            text = normalizeText(entered_enc, None, text)
+            try:
+                text = srt.compose(srt.parse(text, True))
+            except Exception as e:
+                logger.debug(f"SRT_FIX: {e}")
+            if not text: text = f"{path}\nText is not SRT format.\nTry as single file." 
             if text: text = text.replace('?', '¬')
 
             nam, b = newName(path, self.pre_suffix, True)
@@ -1743,8 +1764,7 @@ class MyFrame(ConverterFrame):
         
         path, entered_enc = self.PathEnc()
 
-        if len(self.multiFile) >= 1:
-            return
+        if len(BT) >= 1: return
 
         try:
             with open(
@@ -1861,8 +1881,7 @@ class MyFrame(ConverterFrame):
         
         path, entered_enc = self.PathEnc()
 
-        if len(self.multiFile) >= 1:
-            return
+        if len(BT) >= 1: return
 
         self.newEnc = entered_enc
         self.pre_suffix = value1_s
@@ -1939,7 +1958,7 @@ class MyFrame(ConverterFrame):
         
         path, entered_enc = self.PathEnc()
 
-        if len(self.multiFile) >= 1:
+        if len(BT) >= 1:
             return
 
         self.pre_suffix = value1_s
@@ -2002,7 +2021,7 @@ class MyFrame(ConverterFrame):
        
         path, entered_enc = self.PathEnc()
 
-        if len(self.multiFile) >= 1:
+        if len(BT) >= 1:
             return
 
         self.newEnc = entered_enc
@@ -2056,7 +2075,7 @@ class MyFrame(ConverterFrame):
         
         path, entered_enc = self.PathEnc()
 
-        if len(self.multiFile) >= 1:
+        if len(BT) >= 1:
             return
 
         self.pre_suffix = "reg"
@@ -2137,7 +2156,7 @@ class MyFrame(ConverterFrame):
         
         path, entered_enc = self.PathEnc()  ## path = tmp/
 
-        if len(self.multiFile) >= 1:
+        if len(BT) >= 1:
             return
 
         self.newEnc = entered_enc  
@@ -2220,12 +2239,12 @@ class MyFrame(ConverterFrame):
 
         self.PathEnc()
 
-        if len(self.multiFile) >= 1:
+        if len(BT) >= 1:
             self.multipleTools()
             self.exportZIPmultiple()
         else:
-            if self.droped:
-                if len(self.droped) > 1:
+            if BT:
+                if len(BT) > 1:
                     return
             with open(
                 os.path.join("resources", "var", "dialog_settings.db.dat"), "rb"
@@ -2285,7 +2304,7 @@ class MyFrame(ConverterFrame):
                     f_enc = self.fromPrevious("Open").enc
 
                     a, p, l = checkChars(
-                        self.fromPrevious("Open").content[0:1000]
+                        self.fromPrevious("Open").content[0:1000], path, 
                     )
                     if p > 80:
                         dlg = wx.MessageDialog(
@@ -2407,7 +2426,7 @@ class MyFrame(ConverterFrame):
 
         self.PathEnc()
 
-        tpath = os.path.basename(list(self.multiFile)[0][:-4])
+        tpath = os.path.basename(BT[0].path[:-4])
         epattern = re.compile(r"episode\s*-*\d*", re.I)
         tpath = epattern.sub("", tpath)
         tpath = re.sub(r"(?<=s\d\d)e\d{1,2}", "", tpath, count=1, flags=re.I)
@@ -2438,14 +2457,29 @@ class MyFrame(ConverterFrame):
 
         dlg.SetFilename(tpath)
 
-        def data_out(filein):
-            _data = open(filein, 'rb').read()
-            return _data
-
+        def data_out(filein): return open(filein, 'rb').read()
+            
         if dlg.ShowModal() == wx.ID_OK:
             name = dlg.GetPath()    ## Zip file name ############################
             
             if PREVIOUS[-1].action == 'toCYR_multiple':
+
+                tl = [
+                    BT[x].path
+                    for x in range(len(BT))
+                    if BT[x].enc in ["utf-8", "utf-8-sig"]
+                ]
+                if tl:
+                    dlg = wx.MessageDialog(
+                        self,
+                        "Neki originalni tekstovi su utf-8:\n{0}".format(
+                            "".join([os.path.basename(x) + "\n" for x in tl])
+                        ),
+                        "Latinični tekst",
+                        wx.OK | wx.ICON_INFORMATION,
+                    )
+                    dlg.ShowModal()
+                
                 innames = []
                 info = []
                 zlist = []
@@ -2456,17 +2490,18 @@ class MyFrame(ConverterFrame):
                     for x in self.utf8_latText.keys():
                         nname, s = newName(x, psuff)
                         utf8_names.append(nname+s)
-                        
+                    
                     for i, x in zip(self.tmpPath, self.cyrUTFmulti):
     
-                        izbor_ansi.append(i)
-                        izbor_utf8.append(x)
+                        izbor_ansi.append(i)    ## CYR-ANSI 
+                        izbor_utf8.append(x)    ## CYR-UTF-8
                         
-                    lat_files = [x for x in self.multiFile.keys()]
+                    lat_files = [BT[x].path for x in range(len(BT))]
+                    
                     
                     zlist_a = [data_out(x) for x in izbor_ansi]
                     zlist_b = [data_out(x) for x in izbor_utf8]
-                    zlist_c = [data_out(x) for x in lat_files]
+                    zlist_c = [BT[x].content for x in range(len(BT))]
                     zlist_utf = [x for x in self.utf8_latText.values()]
                     
                     info1 = [os.path.join(CyrANSI, os.path.basename(x)) for x in izbor_ansi]
@@ -2574,15 +2609,16 @@ class MyFrame(ConverterFrame):
 
         if enc in codelist:
             error = 'surrogatepass'
-        else:
-            error = 'replace'
+        else: error = 'replace'
         try:
             self.bytesText.truncate(0)
             self.bytesText.seek(0)
             self.bytesText.write(text.encode(enc, errors=error))
             self.bytesText.seek(0)
+            btext = self.bytesText.getvalue()
+            self.bytesText.seek(0)
 
-            return self.bytesText.getvalue()
+            return btext
 
         except Exception as e:
             logger.debug(f"bytesToBuffer error: {e}")
@@ -2659,12 +2695,9 @@ class MyFrame(ConverterFrame):
 
     def PathEnc(self):
         '''This function returns path and entered_enc'''
-        if self.droped:
-            self.multiFile.clear()
-            self.multiFile.update(self.droped)
         path = ""
         entered_enc = ""
-        if self.tmpPath and not self.multiFile:
+        if self.tmpPath and not BT:
             path = PREVIOUS[-1].tpath
             entered_enc = PREVIOUS[-1].enc
         return path, entered_enc
@@ -2831,6 +2864,10 @@ class MyFrame(ConverterFrame):
         except StopIteration as e:
             logger.debug(f"fromPrevious: {e}")
 
+    def getPathEnc(self, n):
+        """"""
+        return BT[n].path, BT[n].enc, BT[n].content
+        
     def rwFileHistory(self, hfile):
         """"""
         logfile = open(log_file_history, "w", encoding="utf-8", newline="\r\n")
@@ -2857,7 +2894,7 @@ class MyFrame(ConverterFrame):
             return
         
         self.tmpPath.clear()
-        self.droped.clear()
+        BT.clear()
         self.real_path.clear()
         
         # add it back to the history so it will be moved up the list
