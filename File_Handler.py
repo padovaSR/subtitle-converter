@@ -26,7 +26,7 @@ from pydispatch import dispatcher
 from errors_check import checkErrors
 from File_processing import FileOpened
 from text_processing import normalizeText, bufferText
-from settings import WORK_TEXT, PREVIOUS, FILE_HISTORY, filePath, lenZip, droppedText
+from settings import WORK_TEXT, BYTES_TEXT, PREVIOUS, FILE_HISTORY, filePath, lenZip, droppedText
 
 import logging.config
 
@@ -43,13 +43,12 @@ def addPrevious(action, enc=None, content=None, psuffix=None, tpath=None, rpath=
 
 def fileHandle(infiles, text_control, fdrop=False):
     """"""
-
+    c = 0
     if type(infiles) != list:
         infiles = [infiles]
 
     def file_go(infile, rfile):
-        fop = FileOpened(infile)
-        enc = fop.findCode()
+        enc = FileOpened(infile).findCode()
         text = normalizeText(enc, infile)
         text = text.replace("\r\n", "\n")
         bufferText(text, WORK_TEXT)
@@ -65,8 +64,7 @@ def fileHandle(infiles, text_control, fdrop=False):
         PREVIOUS.clear()
         addPrevious("Open", enc, text, "", infile, rfile)
         logger.debug(f"Opened: {os.path.basename(infile)}, {enc}")
-        if os.path.exists(droppedText):
-            os.remove(droppedText)
+        if os.path.exists(droppedText): os.remove(droppedText)
         d_text = {text: enc}
         with open(filePath('resources', 'var', 'r_text0.pkl'), 'wb') as t:
             pickle.dump(d_text, t)
@@ -74,7 +72,6 @@ def fileHandle(infiles, text_control, fdrop=False):
         return enc
 
     if len(infiles) > 1:
-        new_d = {}
         rpath = [infiles[-1]]
         text_control.SetValue('Files List:\n')
         if fdrop == True:
@@ -82,73 +79,57 @@ def fileHandle(infiles, text_control, fdrop=False):
         for i in range(len(infiles)):
             if not zipfile.is_zipfile(infiles[i]):
                 try:
-                    name, suffix = os.path.splitext(infiles[i])
-                    tmp_path = filePath('tmp', os.path.basename(name) + suffix.lower())
-                    if tmp_path.endswith(
-                        (
-                            'zip',
-                            'srt',
-                            'txt',
-                            'log',
-                            'sub',
-                            'dll',
-                        )
-                    ):
-                        shutil.copy(infiles[i], tmp_path)
-                except Exception as e:
-                    logger.debug(f'FileHandler: {e}')
-                else:
-                    if not os.path.exists(tmp_path):
-                        logger.debug(
-                            f"FileHandler: Skipping {os.path.basename(tmp_path)}"
-                        )
+                    if not os.path.exists(infiles[i]):
+                        logger.debug(f"Skipping {os.path.basename(infiles[i])}")
                         text_control.AppendText(
-                            f"\n_SKIPP_:{os.path.basename(tmp_path)}"
+                            f"\n_SKIPP_:{os.path.basename(infiles[i])}"
                         )
                         continue
-                    fop = FileOpened(tmp_path)
+                    c += 1
+                    fop = FileOpened(infiles[i])
                     enc = fop.findCode()
-                    normalizeText(enc, tmp_path)
-                    new_d[tmp_path] = enc
-                    name = os.path.basename(tmp_path)
+                    fop.addBytes(infiles[i], enc, fop.getByteText())
+                    name = os.path.basename(infiles[i])
                     text_control.AppendText("\n")
-                    text_control.AppendText(name)
+                    text_control.AppendText(f"{c} - {name}")
+                except Exception as e:
+                    logger.debug(f'FileHandler: {e}')
             else:
                 try:
-                    fop = FileOpened(infiles[i])
+                    fop = FileOpened(infiles[i], multi=True)
                     outfile, rfile = fop.isCompressed()
                 except:
                     logger.debug('FileHandler: No files selected.')
                 else:
                     if len(outfile) == 1:
+                        c += 1
                         fop = FileOpened(outfile[0])
-                        enc = fop.findCode()
-                        normalizeText(enc, outfile[0])
+                        enc = fop.findByteCode(n=0)
+                        fop.addBytes(fop.path, enc, fop.internal[0])
                         nam = outfile[0]
-                        new_d[nam] = enc
                         text = os.path.basename(nam)
                         text_control.AppendText("\n")
-                        text_control.AppendText(text)
+                        text_control.AppendText(f"{c} - {text}")
+                        fop.internal.clear()
                     elif len(outfile) > 1:
                         for i in range(len(outfile)):
+                            c += 1
                             fop = FileOpened(outfile[i])
-                            enc = fop.findCode()
-                            normalizeText(enc, outfile[i])
-                            new_d[outfile[i]] = enc
+                            enc = fop.findByteCode(n=i)
+                            fop.addBytes(outfile[i], enc, fop.internal[i])
                             text = os.path.basename(outfile[i])
                             text_control.AppendText("\n")
-                            text_control.AppendText(text)
+                            text_control.AppendText(f"{c} - {text}")
+                        fop.internal.clear()
         logger.debug('FileHandler: Ready for multiple files.')
-        PREVIOUS.append(new_d)
-        if fdrop == True:
-            dispatcher.send("droped", msg=new_d)
     else:
         name = "".join(infiles)
         if zipfile.is_zipfile(name):
             logger.debug(f'ZIP archive: {os.path.basename(name)}')
             try:
                 fop = FileOpened(name)
-                outfile, rfile = fop.isCompressed()  ## outfile in tmp
+                outfile, rfile = fop.isCompressed() ## outfile in tmp
+                data = fop.internal
             except Exception as e:
                 logger.debug(f'ZIP; {e}.')
             else:
@@ -158,29 +139,24 @@ def fileHandle(infiles, text_control, fdrop=False):
                         FILE_HISTORY.append(lenZip(name))
                     enc = file_go(outfile[0], rfile)
                     nam = [outfile[0]]
-                    empty = {}
                     if fdrop == True:
                         dispatcher.send(
                             "TMP_PATH", message=outfile, msg=[rfile, enc, False]
                         )
-                        dispatcher.send("droped", msg=empty)
                 elif len(outfile) > 1:
                     text_control.SetValue('Files List:\n')
-                    new_d = {}
                     for i in range(len(outfile)):
-                        fop = FileOpened(outfile[i])
-                        enc = fop.findCode()
-                        normalizeText(enc, outfile[i])
-                        new_d[outfile[i]] = enc
+                        c += 1
+                        fop = FileOpened(outfile[i], data[i])
+                        enc = fop.findByteCode()
+                        fop.addBytes(outfile[i], enc, data[i])
                         text = os.path.basename(outfile[i])
                         text_control.AppendText("\n")
-                        text_control.AppendText(text)
-                    PREVIOUS.append(new_d)
+                        text_control.AppendText(f"{c} - {text}")
                     if fdrop == True:
                         dispatcher.send(
                             "TMP_PATH", message=outfile, msg=[rfile, enc, True]
                         )
-                        dispatcher.send("droped", msg=new_d)
                     logger.debug('FileHandler: Ready for multiple files.')
         elif not zipfile.is_zipfile(name):
             ## name = real path
@@ -189,8 +165,6 @@ def fileHandle(infiles, text_control, fdrop=False):
             if os.path.isfile(tmp_path):
                 os.remove(tmp_path)
             shutil.copy(name, tmp_path)
-            enc = file_go(tmp_path, name)
-            empty = {}
+            enc = file_go(name, name)
             if fdrop == True:
-                dispatcher.send("droped", msg=empty)
                 dispatcher.send("TMP_PATH", message=tmp_path, msg=[name, enc, False])
