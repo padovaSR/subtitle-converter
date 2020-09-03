@@ -18,16 +18,16 @@
 #
 
 import os
-import zipfile
 import pickle
 import shutil
+import zipfile
 from collections import namedtuple
 from pydispatch import dispatcher
 from errors_check import checkErrors
 from File_processing import FileOpened
 from text_processing import normalizeText, bufferText
-from settings import WORK_TEXT, BYTES_TEXT, PREVIOUS, FILE_HISTORY, filePath, lenZip, droppedText
-
+from settings import WORK_TEXT, PREVIOUS, FILE_HISTORY, filePath, lenZip, droppedText
+from settings import BYTES_TEXT as BT 
 import logging.config
 
 import wx
@@ -46,7 +46,7 @@ def fileHandle(infiles, text_control, fdrop=False):
     c = 0
     if type(infiles) != list:
         infiles = [infiles]
-
+    
     def file_go(infile, rfile):
         enc = FileOpened(infile).findCode()
         text = normalizeText(enc, infile)
@@ -96,6 +96,7 @@ def fileHandle(infiles, text_control, fdrop=False):
             else:
                 try:
                     fop = FileOpened(infiles[i], multi=True)
+                    fop.internal.clear()
                     outfile, rfile = fop.isCompressed()
                 except:
                     logger.debug('FileHandler: No files selected.')
@@ -125,8 +126,8 @@ def fileHandle(infiles, text_control, fdrop=False):
             logger.debug(f'ZIP archive: {os.path.basename(name)}')
             try:
                 fop = FileOpened(name)
+                fop.internal.clear()
                 outfile, rfile = fop.isCompressed() ## outfile in tmp
-                data = fop.internal
             except Exception as e:
                 logger.debug(f'ZIP; {e}.')
             else:
@@ -146,7 +147,7 @@ def fileHandle(infiles, text_control, fdrop=False):
                         c += 1
                         fop = FileOpened(outfile[i], True)
                         enc = fop.findByteCode()
-                        fop.addBytes(outfile[i], enc, data[i])
+                        fop.addBytes(outfile[i], enc, fop.internal[i])
                         text = os.path.basename(outfile[i])
                         text_control.AppendText(f"{c} - {text}\n")
                     if fdrop == True:
