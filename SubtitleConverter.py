@@ -68,7 +68,6 @@ from text_processing import (
     cleanUp,
     cleanLine,
     doReplace,
-    writeTempStr, 
     zameniImena, 
 )
 from File_processing import newName, nameDialog, writeToFile
@@ -464,7 +463,6 @@ class MyFrame(ConverterFrame):
             self.real_path.clear()
             PREVIOUS.clear()
             BT.clear()
-            print(BT)
             filepath = dlgOpen.GetPaths()  # Get the file location
             if len(filepath) == 1:
                 real_path = "".join(filepath)
@@ -536,19 +534,20 @@ class MyFrame(ConverterFrame):
         
         if PREVIOUS:
             path = self.fromPrevious("Open")[4]
+            print(path)
             if os.path.isfile(droppedText):
                 with open(droppedText, 'rb') as f:
                     d = pickle.load(f)
                 text = list(d.items())[0][0]
                 enc = list(d.items())[0][1]
                 self.text_1.SetValue(text)
-                writeTempStr(path, text, enc)
+                # writeToFile(text, path, enc)
                 bufferText(text, WORK_TEXT)
             else:
                 text = self.fromPrevious("Open")[2]
                 enc = self.fromPrevious("Open")[1]
                 self.text_1.SetValue(text)
-                writeTempStr(path, text, enc)
+                # writeToFile(text, path, enc)
                 bufferText(text, WORK_TEXT)
                 
             self.REDO_A.clear() 
