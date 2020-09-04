@@ -55,7 +55,7 @@ def fileHandle(infiles, text_control, fdrop=False):
         nlist = checkErrors(text)
         text_control.SetValue(text)
         text_control.SetInsertionPoint(0)
-        if fdrop == False:
+        if fdrop is False:
             if nlist:
                 for i in nlist:
                     text_control.SetStyle(i[0], i[1], wx.TextAttr("BLUE", "YELLOW"))
@@ -73,7 +73,7 @@ def fileHandle(infiles, text_control, fdrop=False):
     if len(infiles) > 1:
         rpath = [infiles[-1]]
         text_control.SetValue('Files List:\n\n')
-        if fdrop == True:
+        if fdrop is True:
             dispatcher.send("TMP_PATH", message=infiles, msg=[rpath, "", True])
         for i in range(len(infiles)):
             if not zipfile.is_zipfile(infiles[i]):
@@ -136,7 +136,7 @@ def fileHandle(infiles, text_control, fdrop=False):
                         FILE_HISTORY.append(lenZip(name))
                     enc = file_go(outfile[0], rfile)
                     nam = [outfile[0]]
-                    if fdrop == True:
+                    if fdrop is True:
                         dispatcher.send(
                             "TMP_PATH", message=outfile, msg=[rfile, enc, False]
                         )
@@ -149,7 +149,7 @@ def fileHandle(infiles, text_control, fdrop=False):
                         fop.addBytes(outfile[i], enc, fop.internal[i])
                         text = os.path.basename(outfile[i])
                         text_control.AppendText(f"{c} - {text}\n")
-                    if fdrop == True:
+                    if fdrop is True:
                         dispatcher.send(
                             "TMP_PATH", message=outfile, msg=[rfile, enc, True]
                         )
@@ -162,5 +162,5 @@ def fileHandle(infiles, text_control, fdrop=False):
                 os.remove(tmp_path)
             shutil.copy(name, tmp_path)
             enc = file_go(name, name)
-            if fdrop == True:
+            if fdrop is True:
                 dispatcher.send("TMP_PATH", message=tmp_path, msg=[name, enc, False])
