@@ -4,7 +4,6 @@
 import os
 import re
 import unicodedata
-import tempfile
 import srt
 import pysrt
 import pickle
@@ -86,10 +85,10 @@ class ConvertText:
     
         ## Preprocessing ###########################################################
         try:
-            if reversed_action == False:
+            if reversed_action is False:
                 robjCyr = re.compile('(%s)' % '|'.join(map(re.escape, pre_cyr.keys())))
                 text = robjCyr.sub(lambda m: pre_cyr[m.group(0)], text)
-            elif reversed_action == True:
+            elif reversed_action is True:
                 pre_lat = dict(map(reversed, pre_cyr.items()))
                 robjLat = re.compile('(%s)' % '|'.join(map(re.escape, pre_lat.keys())))
                 text = robjLat.sub(lambda m: pre_lat[m.group(0)], text)
@@ -97,7 +96,7 @@ class ConvertText:
             logger.debug(f"Preprocessing, unexpected error: {e}")
         ############################################################################
         MAPA = lat_cir_mapa
-        if reversed_action == True:
+        if reversed_action is True:
             cyr_lat_mapa = dict(map(reversed, lat_cir_mapa.items()))
             MAPA = cyr_lat_mapa
     
@@ -125,7 +124,7 @@ class ConvertText:
                         text_ch += c
     
                 ## Fix string #####################################################
-                if preProc == True:
+                if preProc is True:
                     text_ch, msg = rplStr(text_ch)
                 else:
                     msg = "0"
@@ -428,7 +427,6 @@ def cleanUp(text_in):
     except Exception as e:
         logger.debug(f"CleanSubtitle proc, unexpected error: {e}")
 
-
 def cleanLine(text_in):
 
     try:
@@ -482,7 +480,6 @@ def cleanLine(text_in):
     except Exception as e:
         logger.debug(f"CleanSubtitle_CL, unexpected error: {e}")
 
-
 def rm_dash(text_in):
 
     # fix settings ------------------------------------------------------------------------------
@@ -526,21 +523,21 @@ def rm_dash(text_in):
 
     text = remSel(text_in, _space_r, '')
 
-    if cb4_s == True:
+    if cb4_s is True:
         text = remSel(text, for_rpls, '')
 
-    if cb6_s == True:
+    if cb6_s is True:
         text = remSel(text, spaceS_r, ' ')
         text = remSel(text, pe_r, "")
 
-    if cb5_s == True:
+    if cb5_s is True:
         text = remSel(text, cs_r, '-')
-    elif cb5_s == False:
+    elif cb5_s is False:
         sp_n = text.count('- ')
         if sp_n >= 3:
             text = remSel(text, cs_r, '-')
 
-    if cb7_s == True:
+    if cb7_s is True:
         if not cb8_s:
             subs = list(srt.parse(text))
             if len(subs) > 0:
@@ -560,14 +557,14 @@ def rm_dash(text_in):
             else:
                 logger.debug('Fixer: No subtitles found!')
 
-    if cb2_s == True:
+    if cb2_s is True:
         if not cb8_s:
             subs = list(srt.parse(text))
             if len(subs) > 0:
                 new_s = []
                 for i in subs:
                     n = poravnLine(i.content)
-                    if cb5_s == False and sp_n >= 3:
+                    if cb5_s is False and sp_n >= 3:
                         n = cs_r1.sub(r'- ', n)
                     sub = srt.Subtitle(i.index, i.start, i.end, n)
                     new_s.append(sub)
@@ -576,10 +573,10 @@ def rm_dash(text_in):
                 if not len(subs) > 0:
                     logger.debug('Fixer: No subtitles found!')
 
-    if cb3_s == True:
+    if cb3_s is True:
         text = remSel(text, ct_r, "")
 
-    if cb8_s == True:
+    if cb8_s is True:
         if not cb1_s:
             try:
                 text = remSel(text, reg_0, "00:00:00,000 --> 00:00:00,000")
@@ -587,7 +584,6 @@ def rm_dash(text_in):
                 logger.debug(f'Fixer: {e}')
 
     return text
-
 
 def poravnLine(intext):
     def proCent(percent, whole):
