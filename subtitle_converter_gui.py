@@ -700,11 +700,11 @@ class ConverterFrame(wx.Frame):
                 self.preferences.Check(1012, check=True)
         with open(filePath("resources", "var", "fixer_cb3.data"), "rb") as f:
             ch = pickle.load(f)
-        if ch == True:
+        if ch is True:
             self.preferences.Check(1013, check=True)
         with open(filePath("resources", "var", "obs1.pkl"), "rb") as f:
             lch = pickle.load(f)
-        if lch == True:
+        if lch is True:
             self.preferences.Check(1014, check=True)
 
         self.Layout()
