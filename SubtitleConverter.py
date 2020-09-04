@@ -262,7 +262,7 @@ class MyFrame(ConverterFrame):
         
     def updateStatus(self, message, msg):
         ''''''
-        if msg[2] == True:
+        if msg[2] is True:
             self.multiFile = True
             self.SetStatusText('Multiple files ready for processing')
             self.SetStatusText("", 1)
@@ -451,7 +451,7 @@ class MyFrame(ConverterFrame):
         ''''''
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
-            if self.ShowDialog() == False:
+            if self.ShowDialog() is False:
                 return
         
         dlgOpen = wx.FileDialog(
@@ -499,7 +499,7 @@ class MyFrame(ConverterFrame):
         
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
-            if self.ShowDialog() == False:
+            if self.ShowDialog() is False:
                 return
         
         if zipfile.is_zipfile(self.real_path[0]):
@@ -531,7 +531,7 @@ class MyFrame(ConverterFrame):
         ''''''
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
-            if self.ShowDialog() == False:
+            if self.ShowDialog() is False:
                 return
         
         if PREVIOUS:
@@ -573,7 +573,7 @@ class MyFrame(ConverterFrame):
                 if not text:
                     text = self.fromPrevious("Open")[2]
                 v = writeToFile(text, outpath, enc, ask=True)
-                if os.path.isfile(outpath) and v == True:
+                if os.path.isfile(outpath) and v is True:
                     logger.debug(f"File saved: {outpath}")
                     fpath = os.path.basename(outpath)
                     sDlg = wx.MessageDialog(
@@ -592,7 +592,7 @@ class MyFrame(ConverterFrame):
                     self.reload.Enable(True)
                     self.reloadtext.Enable(True)
                     self.SetStatusText(os.path.basename(outpath))
-                elif v == True and not os.path.isfile(outpath):
+                elif v is True and not os.path.isfile(outpath):
                     dlg = wx.MessageDialog(
                         self,
                         "Greška\n\nTekst nije sačuvan",
@@ -667,7 +667,7 @@ class MyFrame(ConverterFrame):
         
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
-            if self.ShowDialog() == False:
+            if self.ShowDialog() is False:
                 return
         
         path, entered_enc = self.PathEnc()
@@ -697,7 +697,7 @@ class MyFrame(ConverterFrame):
             utf_path = os.path.join(self.real_dir, (utf_name + suffix))
             
             pvalue = self.preferences.IsChecked(1014)
-            if pvalue == True: text = preLatin(text_in=text)
+            if pvalue is True: text = preLatin(text_in=text)
             
             text, msg = ConvertText(text).changeLetters(preProc=pvalue)
             
@@ -834,7 +834,7 @@ class MyFrame(ConverterFrame):
 
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
-            if self.ShowDialog() == False:
+            if self.ShowDialog() is False:
                 return
         
         path, entered_enc = self.PathEnc()
@@ -952,7 +952,7 @@ class MyFrame(ConverterFrame):
                 f_procent = f'Najmanje {procent} % teksta.\nIli najmanje [ {zbir_slova} ] znakova.'
                 ErrorText = ertext.format(f_procent, ",".join(chars))
                 dlg = dialog1(ErrorText)
-                if dlg == True:
+                if dlg is True:
                     if procent >= 50:
                         ErrorDlg = wx.MessageDialog(
                             self,
@@ -982,7 +982,7 @@ class MyFrame(ConverterFrame):
                 ErrorText = ertext.format(f_zbir, ",".join(chars))
                 self.SetStatusText(u'Greška u tekstu.')
                 dlg = dialog1(ErrorText)
-                if dlg == True:
+                if dlg is True:
                     text, error_text = ansiAction(path)
                     if error_text:
                         ErrorDlg = wx.MessageDialog(
@@ -1094,7 +1094,7 @@ class MyFrame(ConverterFrame):
                 dlg = dialog1(
                     ErTxt.format(os.path.basename(path), f_procent, ",".join(chars))
                 )
-                if dlg == True:
+                if dlg is True:
                     if procent >= 50:
                         ErrorDlg = wx.MessageDialog(
                             self,
@@ -1132,7 +1132,7 @@ class MyFrame(ConverterFrame):
                     ErTxt.format(os.path.basename(path), f_zbir, ",".join(chars))
                 )
 
-                if dlg == True:
+                if dlg is True:
                     newF, text = ansiAction(path, text)
                     error_text = checkFile(path, path, text, multi=True)
 
@@ -1169,7 +1169,7 @@ class MyFrame(ConverterFrame):
 
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
-            if self.ShowDialog() == False:
+            if self.ShowDialog() is False:
                 return
 
         path, entered_enc = self.PathEnc()
@@ -1194,7 +1194,7 @@ class MyFrame(ConverterFrame):
             utf_path = os.path.join(self.real_dir, (utf_name + suffix))
             
             pvalue = self.preferences.IsChecked(1014)
-            if pvalue == True: text = preLatin(text_in=text)
+            if pvalue is True: text = preLatin(text_in=text)
             
             text = ChangeEncoding(text).toUTF_8(self.newEnc)
             text, msg = ConvertText(text).changeLetters(preProc=pvalue)
@@ -1313,7 +1313,7 @@ class MyFrame(ConverterFrame):
 
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
-            if self.ShowDialog() == False:
+            if self.ShowDialog() is False:
                 return
 
         path, entered_enc = self.PathEnc()
@@ -1442,7 +1442,7 @@ class MyFrame(ConverterFrame):
 
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
-            if self.ShowDialog() == False:
+            if self.ShowDialog() is False:
                 return
         
         with open(filePath("resources","var","dialog_settings.db.dat"), "rb",) as sp:
@@ -1579,7 +1579,7 @@ class MyFrame(ConverterFrame):
 
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
-            if self.ShowDialog() == False:
+            if self.ShowDialog() is False:
                 return
         
         with open(
@@ -1718,7 +1718,7 @@ class MyFrame(ConverterFrame):
 
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
-            if self.ShowDialog() == False:
+            if self.ShowDialog() is False:
                 return
         
         path, entered_enc = self.PathEnc()
@@ -1770,7 +1770,7 @@ class MyFrame(ConverterFrame):
                         break
                 return m, s1
 
-            if cb1_s == True:
+            if cb1_s is True:
                 if cb8_s != True:
 
                     pn = chg(subs)
@@ -1798,7 +1798,7 @@ class MyFrame(ConverterFrame):
 
             self.bytesToBuffer(text, entered_enc)
             
-            if cb1_s == True:
+            if cb1_s is True:
                 if cb8_s != True:
                     if s1 > 1:
                         s1 = s1 - 1
@@ -1835,7 +1835,7 @@ class MyFrame(ConverterFrame):
 
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
-            if self.ShowDialog() == False:
+            if self.ShowDialog() is False:
                 return
         
         path, entered_enc = self.PathEnc()
@@ -1912,7 +1912,7 @@ class MyFrame(ConverterFrame):
 
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
-            if self.ShowDialog() == False:
+            if self.ShowDialog() is False:
                 return
         
         path, entered_enc = self.PathEnc()
@@ -1975,7 +1975,7 @@ class MyFrame(ConverterFrame):
         
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
-            if self.ShowDialog() == False:
+            if self.ShowDialog() is False:
                 return
        
         path, entered_enc = self.PathEnc()
@@ -2029,7 +2029,7 @@ class MyFrame(ConverterFrame):
         
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
-            if self.ShowDialog() == False:
+            if self.ShowDialog() is False:
                 return
         
         path, entered_enc = self.PathEnc()
@@ -2110,7 +2110,7 @@ class MyFrame(ConverterFrame):
         
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
-            if self.ShowDialog() == False:
+            if self.ShowDialog() is False:
                 return
         
         path, entered_enc = self.PathEnc()  ## path = tmp/
@@ -2488,7 +2488,7 @@ class MyFrame(ConverterFrame):
                         info = list(chain.from_iterable([l1[x] for x in selections]))
                         zlist = list(chain.from_iterable([l2[x] for x in  selections]))
                         
-                        if cdlg.makeFolder() == False:
+                        if cdlg.makeFolder() is False:
                             info = [os.path.basename(x) for x in info]
                     else:
                         logger.debug(f"ZIP canceled; {os.path.basename(name)}")
@@ -2522,7 +2522,7 @@ class MyFrame(ConverterFrame):
             try:
                 with zipfile.ZipFile(name, 'w') as fzip:
                     for i, x in zip(info, zlist):
-                        if i == None:
+                        if i is None:
                             continue
                         fzip.writestr(i, x, zipfile.ZIP_DEFLATED)
                 for i in self.tmpPath:
@@ -2672,7 +2672,7 @@ class MyFrame(ConverterFrame):
         fixer_dlg = FixerSettings(None)
         ret_code = fixer_dlg.ShowModal()
         fixer_dlg.Destroy()
-        if ret_code == True:
+        if ret_code is True:
             self.onFixSubs()
         event.Skip()
 
@@ -2839,7 +2839,7 @@ class MyFrame(ConverterFrame):
         ''''''
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
-            if self.ShowDialog() == False:
+            if self.ShowDialog() is False:
                 return
 
         # get the file based on the menu ID
@@ -3027,7 +3027,7 @@ class MyFrame(ConverterFrame):
     
     def displayText(self, intext=[]):
         """"""
-        if self.hideDialog == True:
+        if self.hideDialog is True:
             return
         dlg = wx.RichMessageDialog(
             self, "".join(intext), "SubtitleConverter", style=wx.OK
