@@ -40,7 +40,7 @@ class FileOpened:
             if len(zf.namelist()) == 1:
                 singleFile = zf.namelist()[0]
                 outfile = [os.path.join(basepath, singleFile)]
-                if self.multi == False:
+                if self.multi is False:
                     with open(outfile[0], 'wb') as f:
                         f.write(zf.read(singleFile))     ## zf.read() equaly bytes  ##
                 else: self.internal.append(zf.read(singleFile).replace(b"\r\n", b"\n"))
@@ -261,8 +261,8 @@ def writeToFile(text, path, enc, multi=False, ask=False):
     if enc in codelist:
         error = 'surrogatepass'
     else: error = 'replace'
-    if multi == False:
-        if os.path.isfile(path) and os.path.dirname(path) != "tmp" and ask == True:
+    if multi is False:
+        if os.path.isfile(path) and os.path.dirname(path) != "tmp" and ask is True:
             dlg = wx.MessageBox(
                 f"{os.path.basename(path)}\nFile already exists! Proceed?",
                 "Overwrite the file?",
