@@ -61,7 +61,7 @@ def showMeError(infile, in_text, outfile, kode):
 
             if os.path.isfile(outfile):
                 logger.debug(f"ErrorFile: {outfile}")
-            if cb3_s == True:
+            if cb3_s is True:
                 webbrowser.open(outfile)
     else:
         logger.debug(
