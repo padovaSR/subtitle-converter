@@ -2522,8 +2522,7 @@ class MyFrame(ConverterFrame):
             try:
                 with zipfile.ZipFile(name, 'w') as fzip:
                     for i, x in zip(info, zlist):
-                        if i is None:
-                            continue
+                        if not i: continue
                         fzip.writestr(i, x, zipfile.ZIP_DEFLATED)
                 for i in self.tmpPath:
                     if os.path.exists(i):
@@ -2672,7 +2671,7 @@ class MyFrame(ConverterFrame):
         fixer_dlg = FixerSettings(None)
         ret_code = fixer_dlg.ShowModal()
         fixer_dlg.Destroy()
-        if ret_code is True:
+        if ret_code == True:
             self.onFixSubs()
         event.Skip()
 
