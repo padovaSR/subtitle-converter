@@ -10,6 +10,10 @@ Program za obradu srt i txt fajlova.
 
 Windows (MSYS2): 
 ```sh
+python -m pip install -r /path/to/requirements.txt
+```
+Linux:
+```sh
 pip install -r /path/to/requirements.txt
 ```
 
