@@ -7,7 +7,8 @@ Program za obradu srt i txt fajlova.
 * [wxPython](https://wxpython.org/) version 4.0.3 or newer
 * Libraries: [pysrt](https://github.com/byroot/pysrt),  [srt](https://github.com/cdown/srt),  [PyDispatcher](https://pypi.org/project/PyDispatcher/), [more_itertools](https://github.com/more-itertools/more-itertools)
 ### To install requirements:
- 
+
+Windows (MSYS2): 
 ```sh
 pip install -r /path/to/requirements.txt
 ```
