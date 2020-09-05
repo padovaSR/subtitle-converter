@@ -8,7 +8,7 @@ Program za obradu srt i txt fajlova.
 * Libraries: [pysrt](https://github.com/byroot/pysrt),  [srt](https://github.com/cdown/srt),  [PyDispatcher](https://pypi.org/project/PyDispatcher/), [more_itertools](https://github.com/more-itertools/more-itertools)
 ### To install requirements:
 
-Windows (MSYS2): 
+Windows: 
 ```sh
 python -m pip install -r /path/to/requirements.txt
 ```
