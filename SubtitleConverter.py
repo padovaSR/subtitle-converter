@@ -2952,37 +2952,42 @@ class MyFrame(ConverterFrame):
 
     def onUndo(self, event):
         """"""
-        
-        self.addHistory(
-            self.text_1.GetInsertionPoint(), self.text_1.GetValue(), l=self.RedoText
-        )
+        if len(self.RedoText) == 0:
+            self.addHistory(
+                self.text_1.GetInsertionPoint(), self.text_1.GetValue(), self.RedoText)
         self.redo.Enable()
         ## UndoText
         if self.UndoText:
+            self.UndoText=sorted(set(self.UndoText), key=self.UndoText.index)
+            self.RedoText.append(self.UndoText[len(self.UndoText)-1])
             self.text_1.SetValue(self.UndoText[len(self.UndoText)-1].text)
             self.text_1.SetInsertionPoint(
                 self.UndoText[len(self.UndoText)-1].position
             )
-            self.UndoText = self.UndoText[:-1]
-
+            
+            
+            if len(self.UndoText) >= 2:
+                self.UndoText = self.UndoText[:-1]
+            
         if not self.UndoText:
             self.undo.Enable(False)
-        if len(self.UndoText) > 60:
-            self.UndoText = self.UndoText[1:]
+        if len(self.UndoText) > 30: self.UndoText = self.UndoText[1:]
         event.Skip()
         
     def onRedo(self, event):
         """"""
         if self.RedoText:
+            self.RedoText=sorted(set(self.RedoText), key=self.RedoText.index)
             self.text_1.SetValue(self.RedoText[len(self.RedoText)-1].text)
             self.text_1.SetInsertionPoint(
                 self.RedoText[len(self.RedoText)-1].position
             )
             self.UndoText.append(self.RedoText[-1])
-            self.RedoText = self.RedoText[:-1]
+            
+            if len(self.RedoText) >= 2: self.RedoText = self.RedoText[:-1]
+                
         if not self.RedoText: self.redo.Enable(False)
-        if len(self.RedoText) > 60:
-            self.RedoText = self.RedoText[1:]
+        if len(self.RedoText) > 30: self.RedoText = self.RedoText[1:]
         event.Skip()
 
     def addHistory(self, position, text, l=[]):
@@ -3066,10 +3071,13 @@ class MyFrame(ConverterFrame):
     
     def EvtKey(self, event):
         """"""
-        #self.addHistory(
-            #self.text_1.GetInsertionPoint(), self.text_1.GetValue(), l=self.UndoText
-        #)            
-        #self.undo.Enable()
+        if not self.text_1.GetValue().startswith("Files "):
+            self.addHistory(
+                self.text_1.GetInsertionPoint(), self.text_1.GetValue(), l=self.UndoText
+            )
+            self.UndoText=sorted(set(self.UndoText), key=self.UndoText.index)
+            self.undo.Enable()
+    
         
         event.Skip()
         
@@ -3079,11 +3087,11 @@ class MyFrame(ConverterFrame):
         #controlDown = event.CmdDown()
         #altDown = event.AltDown()
         #shiftDown = event.ShiftDown()
-        if not self.text_1.GetValue().startswith("Files "):
-            self.addHistory(
-                self.text_1.GetInsertionPoint(), self.text_1.GetValue(), l=self.UndoText
-            )
-            self.undo.Enable()
+        #if not self.text_1.GetValue().startswith("Files "):
+            #self.addHistory(
+                #self.text_1.GetInsertionPoint(), self.text_1.GetValue(), l=self.UndoText
+            #)
+            #self.undo.Enable()
         
         event.Skip()
         
