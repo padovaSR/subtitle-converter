@@ -2965,7 +2965,6 @@ class MyFrame(ConverterFrame):
                 self.UndoText[len(self.UndoText)-1].position
             )
             
-            
             if len(self.UndoText) >= 2:
                 self.UndoText = self.UndoText[:-1]
             
@@ -3077,7 +3076,6 @@ class MyFrame(ConverterFrame):
             )
             self.UndoText=sorted(set(self.UndoText), key=self.UndoText.index)
             self.undo.Enable()
-    
         
         event.Skip()
         
