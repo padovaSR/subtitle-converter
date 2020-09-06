@@ -400,6 +400,7 @@ class MyFrame(ConverterFrame):
 
         path = self.fStatus(path)
         self.SetStatusText(path)
+        self.SetStatusText(printEncoding(self.newEnc), 1)
 
         for i in [wx.ID_SAVE, wx.ID_SAVEAS, wx.ID_CLOSE]:
             self.menubar1.Enable(i, True)
@@ -409,12 +410,14 @@ class MyFrame(ConverterFrame):
 
         self.frame_toolbar.EnableTool(1010, True)  # Save
 
-        if not self.REDO_A:
-            self.redo_action.Enable(False)
+        if not self.REDO_A: self.redo_action.Enable(False)
 
-        if PREVIOUS[-1].action != "toCYR":
-            self.frame_toolbar.EnableTool(1003, True)
-            self.to_ansi.Enable(True)
+        if (
+            any(PREVIOUS[-1].action for x in ["toCYR", "toCyrUTF8"])
+            or self.newEnc == "windows-1251"
+        ):
+            self.frame_toolbar.EnableTool(1003, False)
+            self.to_ansi.Enable(False)
 
     def newText(self, event):
         """"""
@@ -725,16 +728,11 @@ class MyFrame(ConverterFrame):
                 )
                 ErrorDlg.ShowModal()
                 
-            self.SetStatusText(os.path.basename(path))
-            self.SetStatusText(self.newEnc, 1)
-            
-            self.postAction(path)
-            self.frame_toolbar.EnableTool(1003, False)   # toANSI
-            self.to_ansi.Enable(False)
-            
             addPrevious(
                 "toCYR", self.newEnc, text, self.pre_suffix, path, self.real_path[-1]
             )
+            self.postAction(path)
+            
         event.Skip()
 
     def toCyrillic_multiple(self):
@@ -1219,15 +1217,16 @@ class MyFrame(ConverterFrame):
                 )
                 ErrorDlg.ShowModal()
                 
-            self.SetStatusText(os.path.basename(path))
-            enc = printEncoding(self.newEnc)
-            self.SetStatusText(enc, 1)
+            addPrevious(
+                "toCyrUTF8",
+                self.newEnc,
+                text,
+                self.pre_suffix,
+                path,
+                self.real_path[-1],
+            )
             
             self.postAction(path)
-            self.frame_toolbar.EnableTool(1003, False)   # toANSI
-            self.to_ansi.Enable(False)
-            
-            addPrevious("toCyrUTF8", self.newEnc, text, self.pre_suffix, path, self.real_path[-1])
                 
         event.Skip()
         
@@ -1497,9 +1496,6 @@ class MyFrame(ConverterFrame):
             if os.path.exists(self.cyrUTF):
                 os.remove(self.cyrUTF)
             
-            self.SetStatusText(self.newEnc, 1)
-
-            self.postAction(path)
             addPrevious(
                 "cyrToANSI",
                 self.newEnc,
@@ -1508,6 +1504,7 @@ class MyFrame(ConverterFrame):
                 path,
                 self.real_path[-1],
             )
+            self.postAction(path)
         event.Skip()
     
     def cyrToANSI_multiple(self):
@@ -1640,13 +1637,11 @@ class MyFrame(ConverterFrame):
             
             if os.path.exists(self.cyrUTF):
                 os.remove(self.cyrUTF)
-            
-            self.SetStatusText(printEncoding(self.newEnc), 1)
-
-            self.postAction(path)            
+                        
             addPrevious(
                 "cyrToUTF", self.newEnc, text, self.pre_suffix, path, self.real_path[-1]
             )
+            self.postAction(path)
         event.Skip()
         
     def cyrToUTF_multiple(self):
@@ -1819,7 +1814,6 @@ class MyFrame(ConverterFrame):
         addPrevious(
             "FixSubtitle", self.newEnc, text, self.pre_suffix, path, self.real_path[-1]
         )
-        self.SetStatusText(printEncoding(self.newEnc), 1)
         self.postAction(path)
         
     def onCleanup(self, event):
@@ -1885,7 +1879,6 @@ class MyFrame(ConverterFrame):
                 )
                 msginfo.ShowModal()
             
-            self.SetStatusText(printEncoding(self.newEnc), 1)
             addPrevious(
                 "Cleanup",
                 self.newEnc,
@@ -1901,6 +1894,7 @@ class MyFrame(ConverterFrame):
             return
         
         event.Skip()
+        
     def onTranscribe(self, event):
         
         with open(
@@ -1961,14 +1955,13 @@ class MyFrame(ConverterFrame):
                 self, error_text, "SubtitleConverter", wx.OK | wx.ICON_ERROR,
             )
             ErrorDlg.ShowModal()
-        self.SetStatusText(printEncoding(self.newEnc), 1)
 
+            addPrevious(
+                "Transcribe", self.newEnc, text, self.pre_suffix, path, self.real_path[-1]
+            )
+                    
         self.postAction(path)
 
-        addPrevious(
-            "Transcribe", self.newEnc, text, self.pre_suffix, path, self.real_path[-1]
-        )
-        
         event.Skip()
         
     def onRepSpecial(self, event):
@@ -2016,8 +2009,6 @@ class MyFrame(ConverterFrame):
             ErrorDlg.ShowModal()
             self.Error_Text = error_text
         
-        self.SetStatusText(printEncoding(entered_enc), 1)
-
         self.postAction(path)
         addPrevious(
             "repSpec", self.newEnc, text_s, self.pre_suffix, path, self.real_path[-1]
@@ -2033,6 +2024,7 @@ class MyFrame(ConverterFrame):
                 return
         
         path, entered_enc = self.PathEnc()
+        self.newEnc = entered_enc
 
         if len(BT) >= 1:
             return
@@ -2096,14 +2088,11 @@ class MyFrame(ConverterFrame):
         
         self.bytesToBuffer(text, entered_enc)
         
-        self.SetStatusText(os.path.basename(path))
-        self.SetStatusText(printEncoding(entered_enc), 1)
-
+        addPrevious(
+            "CustomRegex", self.newEnc, text, self.pre_suffix, path, self.real_path[-1]
+        )
         self.postAction(path)
 
-        addPrevious(
-            "CustomRegex", entered_enc, text, self.pre_suffix, path, self.real_path[-1]
-        )
         event.Skip()
     
     def onMergeLines(self, event):
@@ -2185,13 +2174,11 @@ class MyFrame(ConverterFrame):
                     wx.OK | wx.ICON_INFORMATION,
                 )
                 sDlg.ShowModal()
-            
-            enc = printEncoding(self.newEnc)
-            self.SetStatusText(printEncoding(enc), 1)
-            self.postAction(path)
             addPrevious(
                 "Merger", self.newEnc, text, self.pre_suffix, path, self.real_path[-1]
-            )
+            )            
+            self.postAction(path)
+            
         event.Skip()
 
     def exportZIP(self, event):
