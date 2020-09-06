@@ -194,8 +194,7 @@ class TreeDialog(wx.Dialog):
     def rebuildItems(self, event):
         ''''''
         self.tree.DeleteChildren(self.root)
-        clist = self.GetSelections()
-        makef = [self.files[x] for x in clist]
+        makef = [self.files[x] for x in self.GetSelections()]
         self.items = [self.makeMenu(x) for x in makef]
         event.Skip()
     
