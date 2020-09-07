@@ -413,7 +413,7 @@ class MyFrame(ConverterFrame):
         if not self.REDO_A: self.redo_action.Enable(False)
 
         if (
-            any(PREVIOUS[-1].action for x in ["toCYR", "toCyrUTF8"])
+            any([PREVIOUS[-1].action == x for x in ("toCYR", "toCyrUTF8")])
             or self.newEnc == "windows-1251"
         ):
             self.frame_toolbar.EnableTool(1003, False)
@@ -684,7 +684,8 @@ class MyFrame(ConverterFrame):
             self.toCyrillic_multiple()
 
         else:
-            text = WORK_TEXT.getvalue()
+            if self.text_1.IsModified(): text = self.text_1.GetValue()
+            else: text = WORK_TEXT.getvalue()
             
             self.newEnc = 'windows-1251'
             self.pre_suffix = value1_s
@@ -865,7 +866,8 @@ class MyFrame(ConverterFrame):
                 if entered_enc != 'windows-1251':
                     logger.debug(f'toANSI: {os.path.basename(inpath)}, {entered_enc}')
 
-                text = WORK_TEXT.getvalue()
+                if self.text_1.IsModified(): text = self.text_1.GetValue()
+                else: text = WORK_TEXT.getvalue()
                 
                 text = text.replace('?', '¬')
                 text = fixI(text)
@@ -915,9 +917,10 @@ class MyFrame(ConverterFrame):
                 if ErrorDlg.ShowModal() == wx.ID_OK:
                     return True
 
-            text = WORK_TEXT.getvalue()
+            text = self.text_1.GetValue()
             zbir_slova, procent, chars = checkChars(text, path)
             ertext = "Greška:\n\nTekst sadrži ćiriliči alfabet.\n\n{}\n{}\n\nNastaviti?\n"
+            
             if zbir_slova > 1000 and procent >= 90:
                 err_text =\
                 "Greška:\n\nTekst sadrži ćiriliči alfabet.\n\n{0} procenta teksta:\n[{1}...]\n"\
@@ -1181,7 +1184,8 @@ class MyFrame(ConverterFrame):
             self.toCyrUTF8_multiple()
 
         else:
-            text = WORK_TEXT.getvalue()
+            if self.text_1.IsModified(): text = self.text_1.GetValue()
+            else: text = WORK_TEXT.getvalue()
             
             self.newEnc = utf8_enc
             self.pre_suffix = value_s
@@ -1339,7 +1343,9 @@ class MyFrame(ConverterFrame):
                 code = printEncoding(entered_enc)
                 logger.debug(f"toUTF: Encoding is {entered_enc}.")
 
-            text = WORK_TEXT.getvalue()
+            if self.text_1.IsModified(): text = self.text_1.GetValue()
+            else: text = WORK_TEXT.getvalue()
+            
             text = ChangeEncoding(text).toUTF_8(new_enc=self.newEnc)
             text = fixI(text)
             self.text_1.SetValue(text)
@@ -1459,9 +1465,9 @@ class MyFrame(ConverterFrame):
 
             self.newEnc = 'windows-1250'
             
-            text = WORK_TEXT.getvalue()
-            # text = self.text_1.GetValue()
-
+            if self.text_1.IsModified(): text = self.text_1.GetValue()
+            else: text = WORK_TEXT.getvalue()
+            
             if text: text = text.replace('?', '¬')
                 
             pvalue = self.preferences.IsChecked(1014)
@@ -1600,9 +1606,9 @@ class MyFrame(ConverterFrame):
             else:
                 self.newEnc = 'utf-8'
             
-            # text = WORK_TEXT.getvalue()
-            text = self.text_1.GetValue()
-            
+            if self.text_1.IsModified(): text = self.text_1.GetValue()
+            else: text = WORK_TEXT.getvalue()
+                    
             if text: text = text.replace('?', '¬')
             
             pvalue = self.preferences.IsChecked(1014)
@@ -1736,7 +1742,9 @@ class MyFrame(ConverterFrame):
         self.pre_suffix = value1_s
         self.newEnc = entered_enc  # VAZNO za Save funkciju
         
-        text = WORK_TEXT.getvalue()
+        if self.text_1.IsModified(): text = self.text_1.GetValue()
+        else: text = WORK_TEXT.getvalue()
+                
         subs = pysrt.from_string(text)
 
         if len(subs) == 0:
@@ -1778,11 +1786,9 @@ class MyFrame(ConverterFrame):
                     logger.debug("Fixer: Remove gaps not enabled.")
             try:
                 if not cb8_s:
-                    text = WORK_TEXT.getvalue()
-                    textis = srt.parse(text)
-                    text = srt.compose(textis)
+                    text = srt.compose(srt.parse(self.text_1.GetValue()))
                 else:
-                    text = WORK_TEXT.getvalue()
+                    text = self.text_1.GetValue()
             except Exception as e:
                 logger.debug(f"FixSubtitle, unexpected error: {e}")
 
@@ -1839,9 +1845,9 @@ class MyFrame(ConverterFrame):
         self.newEnc = entered_enc
         self.pre_suffix = value1_s
 
-        text = WORK_TEXT.getvalue()
-        # text = self.text_1.GetValue()
-
+        if self.text_1.IsModified(): text = self.text_1.GetValue()
+        else: text = WORK_TEXT.getvalue()
+            
         try:
             subs = list(srt.parse(text))
             NUM1 = len(subs)
@@ -1920,9 +1926,9 @@ class MyFrame(ConverterFrame):
             self.newEnc = 'utf-8-sig'
         else: self.newEnc = 'utf-8'
 
-        text = WORK_TEXT.getvalue()
-        # text = self.text_1.GetValue()
-        
+        if self.text_1.IsModified(): text = self.text_1.GetValue()
+        else: text = WORK_TEXT.getvalue()
+            
         if text: text = text.replace('?', '¬')
 
         text = ChangeEncoding(text).toUTF_8(self.newEnc)
@@ -1979,9 +1985,9 @@ class MyFrame(ConverterFrame):
         self.newEnc = entered_enc
         self.pre_suffix = 'rpl'
 
-        text = WORK_TEXT.getvalue()
-        # text = self.text_1.GetValue()
-
+        if self.text_1.IsModified(): text = self.text_1.GetValue()
+        else: text = WORK_TEXT.getvalue()
+        
         text = text.replace('?', '¬')
 
         num, text_o = doReplace(text)
@@ -2031,7 +2037,8 @@ class MyFrame(ConverterFrame):
 
         self.pre_suffix = "reg"
 
-        text = WORK_TEXT.getvalue()
+        if self.text_1.IsModified(): text = self.text_1.GetValue()
+        else: text = WORK_TEXT.getvalue()
 
         d_file = os.path.join("resources", "Regex_def.config")
 
@@ -2076,10 +2083,12 @@ class MyFrame(ConverterFrame):
                     text = reg_def.sub(reps, text)
 
                 except Exception as e:
-                    error_text = f"Regex error\n\n{d_file}\n{line}: {cn}\n{e}"
+                    error_text = (
+                        f"Regex error\n\n{os.path.basename(d_file)}\n{line}: {cn}\n{e}"
+                    )
                     logger.debug(error_text)
                     ErrorDlg = wx.MessageDialog(
-                        None, error_text, "SubConverter", wx.OK | wx.ICON_ERROR
+                        None, error_text, "SubtitleConverter", wx.OK | wx.ICON_ERROR
                     )
                     ErrorDlg.ShowModal()
                     
@@ -2123,13 +2132,14 @@ class MyFrame(ConverterFrame):
             logger.debug(f"Merger, unexpected error: {e}")
 
         try:
-            text = WORK_TEXT.getvalue()
+            if self.text_1.IsModified(): text = self.text_1.GetValue()
+            else: text = WORK_TEXT.getvalue()
+            
             subs_a = pysrt.from_string(text)
-
         except Exception as e:
             logger.debug(f"Merger _1, unexpected error: {e}")
 
-        if subs_a[1].start and subs_a[2].start == "00:00:00,000":
+        if subs_a[1].start == subs_a[2].start == "00:00:00,000":
 
             msginfo = wx.MessageDialog(
                 self,
@@ -2152,8 +2162,7 @@ class MyFrame(ConverterFrame):
             a1 = len(subs_a)
 
             text = WORK_TEXT.getvalue()
-            subs = list(srt.parse(text))
-            text = srt.compose(subs)
+            text = srt.compose(srt.parse(text))
             bufferText(text, WORK_TEXT)
             
             self.bytesToBuffer(text, entered_enc)
