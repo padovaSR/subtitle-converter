@@ -85,7 +85,7 @@ logging.config.fileConfig(
 logger = logging.getLogger(__name__)
 
 
-VERSION = "v0.5.9.0_test5"
+VERSION = "v0.5.9.0_test6"
 
 
 class MyFrame(ConverterFrame):
@@ -2965,8 +2965,7 @@ class MyFrame(ConverterFrame):
                 self.UndoText[len(self.UndoText)-1].position
             )
             
-            if len(self.UndoText) >= 2:
-                self.UndoText = self.UndoText[:-1]
+            if len(self.UndoText) >= 2: self.UndoText = self.UndoText[:-1]
             
         if not self.UndoText:
             self.undo.Enable(False)
@@ -3097,12 +3096,74 @@ class MyFrame(ConverterFrame):
 
 
 class MyApp(wx.App):
+    def remOnstart(self):
+        
+        f_list = [
+            "r_text0.pkl",
+            "droped0.pkl",
+            "'LatCyr.map.cfg",
+            "path0.pkl",
+            "rpath0.pkl",
+            "dialog_settings.db.bak",
+            "dialog_settings.db.dir",
+            "txt0.pkl"
+        ]
+        for x in f_list:
+            file_path = filePath("resources","var",x)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+
+        if not os.path.isdir('tmp'):
+            os.mkdir('tmp')
+
+        b_file = filePath("resources","var","presuffix_list.bak")
+        if os.path.exists(b_file):
+            with open(b_file, "r", encoding="utf-8") as f:
+                lines = f.readlines()
+            line_set = set(lines)
+            out = open(b_file, "w", encoding="utf-8")
+            for line in line_set:
+                out.write(line)
+            out.close()
+
+    def m_files(self):
+
+        v_list = [
+            "bcp.pkl",
+            "file_ext.pkl",
+            "obs1.pkl",
+            "presuffix_list.bak",
+            "tcf.pkl",
+            "bcf.pkl",
+            "dialog_settings.db.dat",
+            "fixer_cb3.data",
+            "m_extensions.pkl",
+            "obsE.pkl",
+            "set_size.pkl",
+        ]
+        r_list = ["shortcut_keys.cfg", "Regex_def.config"]
+        v_paths = [os.path.join("resources", "var", x) for x in v_list]
+        r_paths = [os.path.join("resources", x) for x in r_list]
+        logs = os.path.join("resources","var","log","mainlog.ini")
+        v_list.append(logs)
+        m_list = [x for x in (v_paths + r_paths) if not os.path.isfile(x)]
+
+        if m_list:
+            error_text = "File Not Found\n\n{}\nPlease check files!".format(
+                "".join([x + '\n' for x in m_list])
+            )
+            ErrorDlg = wx.MessageDialog(
+                None, error_text, "SubConverter", wx.OK | wx.ICON_ERROR
+            )
+            ErrorDlg.ShowModal()
+    
     def OnInit(self):
         self.frame = MyFrame(None, wx.ID_ANY, "")
         self.SetTopWindow(self.frame)
         self.frame.Show()
+        self.remOnstart()
+        self.m_files()
         return True
-
 
 # end of class MyApp
 
