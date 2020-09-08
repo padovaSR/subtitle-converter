@@ -46,12 +46,12 @@ class TreeDialog(wx.Dialog):
         self.SetIcon(_icon)
         self.SetFocus()
 
-        sizer_1 = wx.BoxSizer(wx.VERTICAL)
+        szr_1 = wx.BoxSizer(wx.VERTICAL)
 
-        sizer_3 = wx.FlexGridSizer(1, 5, 0, 0)
-        sizer_1.Add(sizer_3, 0, wx.ALL | wx.EXPAND | wx.FIXED_MINSIZE, 5)
+        szr_3 = wx.FlexGridSizer(1, 5, 0, 0)
+        szr_1.Add(szr_3, 0, wx.ALL | wx.EXPAND | wx.FIXED_MINSIZE, 5)
 
-        self.label_1 = wx.StaticText(self, wx.ID_ANY, "Selekcija", style=wx.ALIGN_LEFT)
+        self.label_1 = wx.StaticText(self, wx.ID_ANY, "Selekcija ", style=wx.ALIGN_LEFT)
         self.label_1.SetFont(
             wx.Font(
                 8,
@@ -62,52 +62,50 @@ class TreeDialog(wx.Dialog):
                 "Segoe UI",
             )
         )
-        sizer_3.Add(self.label_1, 1, wx.ALL | wx.EXPAND, 5)
+        szr_3.Add(self.label_1, 1, wx.ALL | wx.EXPAND, 5)
 
         self.chbox_1 = wx.CheckBox(self, wx.ID_ANY, "Cyr-ansi", style=wx.CHK_2STATE)
         self.chbox_1.SetValue(1)
-        sizer_3.Add(self.chbox_1, 0, wx.ALIGN_BOTTOM | wx.ALL, 5)
+        szr_3.Add(self.chbox_1, 0, wx.ALIGN_BOTTOM | wx.ALL, 5)
 
         self.chbox_2 = wx.CheckBox(self, wx.ID_ANY, "Cyr-utf8", style=wx.CHK_2STATE)
         self.chbox_2.SetValue(1)
-        sizer_3.Add(self.chbox_2, 0, wx.ALL | wx.EXPAND, 5)
+        szr_3.Add(self.chbox_2, 0, wx.ALL | wx.EXPAND, 5)
 
         self.chbox_3 = wx.CheckBox(self, wx.ID_ANY, "Lat-ansi", style=wx.CHK_2STATE)
         self.chbox_3.SetValue(1)
-        sizer_3.Add(self.chbox_3, 0, wx.ALL | wx.EXPAND, 5)
+        szr_3.Add(self.chbox_3, 0, wx.ALL | wx.EXPAND, 5)
 
         self.chbox_4 = wx.CheckBox(self, wx.ID_ANY, "Lat-utf8", style=wx.CHK_2STATE)
         self.chbox_4.SetValue(1)
-        sizer_3.Add(self.chbox_4, 0, wx.ALL | wx.EXPAND, 5)
+        szr_3.Add(self.chbox_4, 0, wx.ALL | wx.EXPAND, 5)
 
         tID = wx.NewIdRef()
         self.tree = wx.TreeCtrl(self, tID)
 
         self.tree.SetMinSize((315, 200))
         self.tree.SetToolTip("Struktura foldera")
-        sizer_1.Add(
-            self.tree, 1, wx.ALL | wx.EXPAND | wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 5
-        )
+        szr_1.Add(self.tree, 1, wx.ALL | wx.EXPAND | wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 5)
 
-        sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
-        sizer_1.Add(sizer_2, 0, wx.BOTTOM | wx.EXPAND | wx.FIXED_MINSIZE, 0)
+        szr_2 = wx.BoxSizer(wx.HORIZONTAL)
+        szr_1.Add(szr_2, 0, wx.BOTTOM | wx.EXPAND | wx.FIXED_MINSIZE, 0)
 
         self.checkbox_1 = wx.CheckBox(
             self, wx.ID_ANY, "Kreiraj foldere", style=wx.CHK_2STATE
         )
         self.checkbox_1.SetValue(1)
-        sizer_2.Add(
+        szr_2.Add(
             self.checkbox_1,
             1,
             wx.ALIGN_CENTER_VERTICAL | wx.BOTTOM | wx.LEFT | wx.TOP,
             5,
         )
 
-        sizer_2.Add((20, 20), 1, wx.ALIGN_CENTER_VERTICAL, 0)
+        szr_2.Add((20, 20), 1, wx.ALIGN_CENTER_VERTICAL, 0)
 
         self.button_OK = wx.Button(self, wx.ID_OK, "")
         self.button_OK.SetDefault()
-        sizer_2.Add(
+        szr_2.Add(
             self.button_OK,
             0,
             wx.ALIGN_CENTER_VERTICAL | wx.BOTTOM | wx.LEFT | wx.TOP,
@@ -115,15 +113,15 @@ class TreeDialog(wx.Dialog):
         )
 
         self.button_CANCEL = wx.Button(self, wx.ID_CANCEL, "")
-        sizer_2.Add(
+        szr_2.Add(
             self.button_CANCEL,
             0,
             wx.ALIGN_CENTER_VERTICAL | wx.BOTTOM | wx.RIGHT | wx.TOP,
             5,
         )
 
-        self.SetSizer(sizer_1)
-        sizer_1.SetSizeHints(self)
+        self.SetSizer(szr_1)
+        szr_1.SetSizeHints(self)
 
         self.SetAffirmativeId(self.button_OK.GetId())
         self.SetEscapeId(self.button_CANCEL.GetId())
@@ -167,7 +165,7 @@ class TreeDialog(wx.Dialog):
         """"""
         l = [os.path.dirname(x) for x in items]
         folders = sorted(set(l), key=l.index)
-        
+
         cItems = [self.tree.AppendItem(self.root, x) for x in folders]
         for i in items:
             a = os.path.dirname(i)
@@ -197,16 +195,12 @@ class TreeDialog(wx.Dialog):
         makef = [self.files[x] for x in self.GetSelections()]
         self.items = [self.makeMenu(x) for x in makef]
         event.Skip()
-    
+
     def onCancel(self, event):
         self.Destroy()
 
     def onQuit(self, event):
         self.Destroy()
-
-
-# end of class MyDialog
-
 
 class MyApp(wx.App):
     def OnInit(self):
@@ -215,9 +209,6 @@ class MyApp(wx.App):
         self.dialog.ShowModal()
         self.dialog.Destroy()
         return True
-
-
-# end of class MyApp
 
 if __name__ == "__main__":
     app = MyApp(0)
