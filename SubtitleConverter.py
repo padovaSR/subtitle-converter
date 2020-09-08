@@ -572,9 +572,10 @@ class MyFrame(ConverterFrame):
             # Puna putanja sa imenom novog fajla
             outpath = nameDialog(fname, nsuffix, self.real_dir)
             if outpath:
-                text = WORK_TEXT.getvalue()
-                if not text:
-                    text = self.fromPrevious("Open")[2]
+                if self.text_1.IsModified(): text = self.text_1.GetValue()
+                else: text = WORK_TEXT.getvalue()
+                if not text: text = self.fromPrevious("Open")[2]
+                
                 v = writeToFile(text, outpath, enc, ask=True)
                 if os.path.isfile(outpath) and v is True:
                     logger.debug(f"File saved: {outpath}")
@@ -632,12 +633,13 @@ class MyFrame(ConverterFrame):
         dlg.SetFilename(fname)
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
-            text = WORK_TEXT.getvalue()
-            if not text:
-                text = self.text_1.GetValue()
-            writeToFile(text, path, self.newEnc, multi=False)
+            if self.text_1.IsModified(): text = self.text_1.GetValue()
+            else: text = WORK_TEXT.getvalue()
+            if not text: text = text = self.fromPrevious("Open")[2]
+            
+            v = writeToFile(text, path, self.newEnc, multi=False)
             addPrevious("Saved")
-            if os.path.isfile(path):
+            if os.path.isfile(path) and v is True:
                 logger.debug(f"File saved sucessfully. {path}")
                 sDlg = wx.MessageDialog(
                     self,
