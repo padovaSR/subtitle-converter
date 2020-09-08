@@ -85,7 +85,7 @@ logging.config.fileConfig(
 logger = logging.getLogger(__name__)
 
 
-VERSION = "v0.5.9.0_test6"
+VERSION = "v0.5.9.0_test7"
 
 
 class MyFrame(ConverterFrame):
@@ -3078,7 +3078,10 @@ class MyFrame(ConverterFrame):
     
     def EvtKey(self, event):
         """"""
-        if not self.text_1.GetValue().startswith("Files "):
+        keycode = event.GetKeyCode()
+        if not self.text_1.GetValue().startswith("Files ") and not any(
+            [keycode == x for x in (306, 307, 308, 311, 314, 315, 316, 317)]
+        ):
             self.addHistory(
                 self.text_1.GetInsertionPoint(), self.text_1.GetValue(), l=self.UndoText
             )
@@ -3101,9 +3104,6 @@ class MyFrame(ConverterFrame):
         
         event.Skip()
         
-# end of class MyFrame
-
-
 class MyApp(wx.App):
     def remOnstart(self):
         
@@ -3174,7 +3174,6 @@ class MyApp(wx.App):
         self.m_files()
         return True
 
-# end of class MyApp
 
 if __name__ == "__main__":
     app = MyApp(0)
