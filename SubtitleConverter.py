@@ -85,7 +85,7 @@ logging.config.fileConfig(
 logger = logging.getLogger(__name__)
 
 
-VERSION = "v0.5.9.0_test7"
+VERSION = "v0.5.9.0_test8"
 
 
 class MyFrame(ConverterFrame):
@@ -2980,7 +2980,7 @@ class MyFrame(ConverterFrame):
             
         if not self.UndoText:
             self.undo.Enable(False)
-        if len(self.UndoText) > 30: self.UndoText = self.UndoText[1:]
+        if len(self.UndoText) > 62: self.UndoText = self.UndoText[1:]
         event.Skip()
         
     def onRedo(self, event):
@@ -2996,13 +2996,13 @@ class MyFrame(ConverterFrame):
             if len(self.RedoText) >= 2: self.RedoText = self.RedoText[:-1]
                 
         if not self.RedoText: self.redo.Enable(False)
-        if len(self.RedoText) > 30: self.RedoText = self.RedoText[1:]
+        if len(self.RedoText) > 62: self.RedoText = self.RedoText[1:]
         event.Skip()
 
-    def addHistory(self, position, text, l=[]):
+    def addHistory(self, position, text, l=[], k=None):
         '''This function creates namedtuple'''
-        hist = namedtuple("hist", ["position", "text"])
-        l.append(hist(position, text))        
+        hist = namedtuple("hist", ["position", "text", "k"])
+        l.append(hist(position, text, k))        
         
     def ShowDialog(self):
 
@@ -3081,15 +3081,28 @@ class MyFrame(ConverterFrame):
     def EvtKey(self, event):
         """"""
         keycode = event.GetKeyCode()
+
         if not self.text_1.GetValue().startswith("Files ") and not any(
             [keycode == x for x in (306, 307, 308, 311, 314, 315, 316, 317)]
         ):
+            if keycode == 32 or keycode == 13:
+                k = keycode
+            else: k = None
             self.addHistory(
-                self.text_1.GetInsertionPoint(), self.text_1.GetValue(), l=self.UndoText
+                self.text_1.GetInsertionPoint(),
+                self.text_1.GetValue(),
+                l=self.UndoText,
+                k=k,
             )
-            self.UndoText=sorted(set(self.UndoText), key=self.UndoText.index)
+            if (
+                any(self.UndoText[-1].k == x for x in [13, 32])
+                and len(self.UndoText) > 24
+            ):
+                for i in self.UndoText:
+                    if i.k != 13 or i.k != 32:
+                        self.UndoText.remove(i)
+            self.UndoText = sorted(set(self.UndoText), key=self.UndoText.index)
             self.undo.Enable()
-        
         event.Skip()
         
     def EvtChar(self, event):
