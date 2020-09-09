@@ -286,6 +286,7 @@ class MyFrame(ConverterFrame):
     def enKode(self, message, msg):
 
         self.enableTool()
+        self.clearUndoRedo()
 
         rlPath = msg[0]
         tpath = message
@@ -468,6 +469,7 @@ class MyFrame(ConverterFrame):
             self.real_path.clear()
             PREVIOUS.clear()
             BT.clear()
+            self.clearUndoRedo()
             filepath = dlgOpen.GetPaths()  # Get the file location
             if len(filepath) == 1:
                 real_path = "".join(filepath)
@@ -3096,7 +3098,7 @@ class MyFrame(ConverterFrame):
             )
             if (
                 any(self.UndoText[-1].k == x for x in [13, 32])
-                and len(self.UndoText) > 24
+                and len(self.UndoText) > 36
             ):
                 for i in self.UndoText:
                     if i.k != 13 or i.k != 32:
