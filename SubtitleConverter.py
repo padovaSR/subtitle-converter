@@ -85,7 +85,7 @@ logging.config.fileConfig(
 logger = logging.getLogger(__name__)
 
 
-VERSION = "v0.5.9.0_test8"
+VERSION = "v0.5.9.0_test9"
 
 
 class MyFrame(ConverterFrame):
@@ -507,29 +507,29 @@ class MyFrame(ConverterFrame):
             if self.ShowDialog() is False:
                 return
         
-        if zipfile.is_zipfile(self.real_path[0]):
-            zfile = zipfile.ZipFile(self.real_path[0])
-            if len(zfile.namelist()) >= 2:
+        if PREVIOUS:
+            if zipfile.is_zipfile(self.real_path[0]):
+                zfile = zipfile.ZipFile(self.real_path[0])
+                if len(zfile.namelist()) >= 2:
+                    self.clearUndoRedo()
+                    self.reload.Enable(False)
+                    self.reloadtext.Enable(False)
+                    return
+            if self.real_path:
+                fileHandle(self.real_path, self.text_1)
+                self.pre_suffix = ""
+                path = self.fromPrevious("Open")[4]
+                enc = self.fromPrevious("Open")[1]
+                self.pre_suffix = ""
                 self.clearUndoRedo()
+                if len(self.real_path) > 1:
+                    self.real_path.clear()
+                    self.real_path.append(self.fromPrevious("Open")[5])
+                logger.debug(f'Reloaded {os.path.basename(path)}, encoding: {enc}')
+                self.SetStatusText(printEncoding(enc), 1)        
+            else:
                 self.reload.Enable(False)
-                self.reloadtext.Enable(False)
                 return
-        if self.real_path:
-            fileHandle(self.real_path, self.text_1)
-            self.pre_suffix = ""
-            path = self.fromPrevious("Open")[4]
-            enc = self.fromPrevious("Open")[1]
-            self.pre_suffix = ""
-            self.clearUndoRedo()
-            if len(self.real_path) > 1:
-                self.real_path.clear()
-                self.real_path.append(self.fromPrevious("Open")[5])
-            logger.debug(f'Reloaded {os.path.basename(path)}, encoding: {enc}')
-            self.SetStatusText(printEncoding(enc), 1)        
-        else:
-            self.reload.Enable(False)
-            return
-        
         event.Skip()
         
     def onReloadText(self, event):
@@ -2980,6 +2980,7 @@ class MyFrame(ConverterFrame):
         if not self.UndoText: self.undo.Enable(False)
         if len(self.UndoText) > 62: self.UndoText = self.UndoText[1:]
         self.reloadtext.Enable()
+        self.reload.Enable()
         event.Skip()
         
     def onRedo(self, event):
@@ -3079,12 +3080,42 @@ class MyFrame(ConverterFrame):
     
     def EvtKey(self, event):
         """"""
+        #keycode = event.GetKeyCode()
+        
+        #if not self.text_1.GetValue().startswith("Files ") and not any(
+            #[keycode == x for x in (306, 307, 308, 311, 314, 315, 316, 317)]
+        #):
+            #if any(keycode == x for x in [13, 32, 46]):
+                #k = keycode
+            #else: k = None
+            #self.addHistory(
+                #self.text_1.GetInsertionPoint(),
+                #self.text_1.GetValue(),
+                #l=self.UndoText,
+                #k=k,
+            #)
+            #self.UndoText = sorted(set(self.UndoText), key=self.UndoText.index)
+            #if (
+                #any(self.UndoText[-1].k == x for x in [13, 32, 46])
+                #and len(self.UndoText) > 0
+            #):
+                #for i in self.UndoText:
+                    #if i.k != 32:
+                        #self.UndoText.remove(i)
+            #self.undo.Enable()
+        event.Skip()
+        
+    def EvtChar(self, event):
+        ''''''
         keycode = event.GetKeyCode()
-
+        # print(keycode)
+        #controlDown = event.CmdDown()
+        #altDown = event.AltDown()
+        #shiftDown = event.ShiftDown()
         if not self.text_1.GetValue().startswith("Files ") and not any(
-            [keycode == x for x in (306, 307, 308, 311, 314, 315, 316, 317)]
+            [keycode == x for x in (306, 307, 308, 311, 314, 316)]
         ):
-            if keycode == 32 or keycode == 13:
+            if any(keycode == x for x in [13, 32, 46, 33, 63]):
                 k = keycode
             else: k = None
             self.addHistory(
@@ -3095,27 +3126,13 @@ class MyFrame(ConverterFrame):
             )
             self.UndoText = sorted(set(self.UndoText), key=self.UndoText.index)
             if (
-                any(self.UndoText[-1].k == x for x in [13, 32])
+                any(self.UndoText[-1].k == x for x in [13, 32, 46, 33, 63, 317, 315])
                 and len(self.UndoText) > 0
             ):
                 for i in self.UndoText:
                     if i.k != 32:
                         self.UndoText.remove(i)
-            self.undo.Enable()
-        event.Skip()
-        
-    def EvtChar(self, event):
-        ''''''
-        #keycode = event.GetKeyCode()
-        #controlDown = event.CmdDown()
-        #altDown = event.AltDown()
-        #shiftDown = event.ShiftDown()
-        #if not self.text_1.GetValue().startswith("Files "):
-            #self.addHistory(
-                #self.text_1.GetInsertionPoint(), self.text_1.GetValue(), l=self.UndoText
-            #)
-            #self.undo.Enable()
-        
+            self.undo.Enable()        
         event.Skip()
         
 class MyApp(wx.App):
