@@ -30,155 +30,127 @@ class FileSettings(wx.Dialog):
         self.SetIcon(_icon)
         self.SetFocus()
 
-        self.sizer_1 = wx.StaticBoxSizer(
+        sizer_1 = wx.StaticBoxSizer(
             wx.StaticBox(self, wx.ID_ANY, "Pre_suffix"), wx.VERTICAL
         )
 
-        self.grid_sizer_1 = wx.FlexGridSizer(8, 2, 0, 10)
-        self.sizer_1.Add(self.grid_sizer_1, 0, wx.ALL | wx.EXPAND, 3)
+        grid_sizer_1 = wx.FlexGridSizer(8, 2, 0, 10)
+        sizer_1.Add(grid_sizer_1, 0, wx.ALL | wx.EXPAND, 3)
 
-        self.label_1 = wx.StaticText(
+        label_1 = wx.StaticText(
             self, wx.ID_ANY, u"Ćirilica ansi srt", style=wx.ALIGN_LEFT
         )
-        self.label_1.SetMinSize((113, 14))
-        self.grid_sizer_1.Add(
-            self.label_1,
+        label_1.SetMinSize((113, 14))
+        grid_sizer_1.Add(
+            label_1,
             0,
             wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP,
             5,
         )
 
-        self.label_6 = wx.StaticText(
+        label_6 = wx.StaticText(
             self, wx.ID_ANY, u"Ćirilica utf-8 txt", style=wx.ALIGN_LEFT
         )
-        self.label_6.SetMinSize((113, 14))
-        self.grid_sizer_1.Add(
-            self.label_6, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.RIGHT | wx.TOP, 5
+        label_6.SetMinSize((113, 14))
+        grid_sizer_1.Add(
+            label_6, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.RIGHT | wx.TOP, 5
         )
 
-        self.text_1 = wx.TextCtrl(
-            self, wx.ID_ANY, "", style=wx.TE_PROCESS_ENTER
-        )
+        self.text_1 = wx.TextCtrl(self, wx.ID_ANY, "cyr", style=wx.TE_PROCESS_ENTER)
         self.text_1.SetMinSize((136, 23))
-        self.grid_sizer_1.Add(self.text_1, 0, wx.ALL | wx.EXPAND, 5)
+        grid_sizer_1.Add(self.text_1, 0, wx.ALL | wx.EXPAND, 5)
 
         self.text_2 = wx.TextCtrl(
-            self, wx.ID_ANY, "", style=wx.TE_PROCESS_ENTER
+            self, wx.ID_ANY, "cyr_utf8", style=wx.TE_PROCESS_ENTER
         )
         self.text_2.SetMinSize((136, 23))
-        self.grid_sizer_1.Add(
-            self.text_2, 0, wx.BOTTOM | wx.EXPAND | wx.RIGHT | wx.TOP, 5
-        )
+        grid_sizer_1.Add(self.text_2, 0, wx.BOTTOM | wx.EXPAND | wx.RIGHT | wx.TOP, 5)
 
-        self.label_5 = wx.StaticText(
+        label_5 = wx.StaticText(
             self, wx.ID_ANY, u"Ćirilica utf-8 srt", style=wx.ALIGN_LEFT
         )
-        self.label_5.SetMinSize((113, 14))
-        self.grid_sizer_1.Add(
-            self.label_5,
+        label_5.SetMinSize((113, 14))
+        grid_sizer_1.Add(
+            label_5,
             0,
             wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP,
             5,
         )
 
-        self.label_4 = wx.StaticText(
+        label_4 = wx.StaticText(
             self, wx.ID_ANY, "Latinica ansi srt", style=wx.ALIGN_LEFT
         )
-        self.label_4.SetMinSize((113, 14))
-        self.grid_sizer_1.Add(
-            self.label_4, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.RIGHT | wx.TOP, 5
+        label_4.SetMinSize((113, 14))
+        grid_sizer_1.Add(
+            label_4, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.RIGHT | wx.TOP, 5
         )
 
-        self.text_3 = wx.TextCtrl(
-            self, wx.ID_ANY, "", style=wx.TE_PROCESS_ENTER
-        )
+        self.text_3 = wx.TextCtrl(self, wx.ID_ANY, "utf8", style=wx.TE_PROCESS_ENTER)
         self.text_3.SetMinSize((136, 23))
-        self.grid_sizer_1.Add(self.text_3, 0, wx.ALL | wx.EXPAND, 5)
+        grid_sizer_1.Add(self.text_3, 0, wx.ALL | wx.EXPAND, 5)
 
-        self.text_4 = wx.TextCtrl(
-            self, wx.ID_ANY, "", style=wx.TE_PROCESS_ENTER
-        )
+        self.text_4 = wx.TextCtrl(self, wx.ID_ANY, "lat", style=wx.TE_PROCESS_ENTER)
         self.text_4.SetMinSize((136, 23))
-        self.grid_sizer_1.Add(
-            self.text_4, 0, wx.BOTTOM | wx.EXPAND | wx.RIGHT | wx.TOP, 5
-        )
+        grid_sizer_1.Add(self.text_4, 0, wx.BOTTOM | wx.EXPAND | wx.RIGHT | wx.TOP, 5)
 
-        self.label_3 = wx.StaticText(
+        label_3 = wx.StaticText(
             self, wx.ID_ANY, "Latinica utf-8 srt", style=wx.ALIGN_LEFT
         )
-        self.label_3.SetMinSize((113, 14))
-        self.grid_sizer_1.Add(
-            self.label_3,
+        label_3.SetMinSize((113, 14))
+        grid_sizer_1.Add(
+            label_3,
             0,
             wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP,
             5,
         )
 
-        self.label_2 = wx.StaticText(
-            self, wx.ID_ANY, "Fixed subtitle", style=wx.ALIGN_LEFT
-        )
-        self.label_2.SetMinSize((113, 14))
-        self.grid_sizer_1.Add(
-            self.label_2, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.RIGHT | wx.TOP, 5
+        label_2 = wx.StaticText(self, wx.ID_ANY, "Fixed subtitle", style=wx.ALIGN_LEFT)
+        label_2.SetMinSize((113, 14))
+        grid_sizer_1.Add(
+            label_2, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.RIGHT | wx.TOP, 5
         )
 
-        self.text_5 = wx.TextCtrl(
-            self, wx.ID_ANY, "", style=wx.TE_PROCESS_ENTER
-        )
+        self.text_5 = wx.TextCtrl(self, wx.ID_ANY, "utf8", style=wx.TE_PROCESS_ENTER)
         self.text_5.SetMinSize((136, 23))
-        self.grid_sizer_1.Add(self.text_5, 0, wx.ALL | wx.EXPAND, 5)
+        grid_sizer_1.Add(self.text_5, 0, wx.ALL | wx.EXPAND, 5)
 
-        self.text_6 = wx.TextCtrl(
-            self, wx.ID_ANY, "", style=wx.TE_PROCESS_ENTER
-        )
+        self.text_6 = wx.TextCtrl(self, wx.ID_ANY, "fixed", style=wx.TE_PROCESS_ENTER)
         self.text_6.SetMinSize((136, 23))
-        self.grid_sizer_1.Add(
-            self.text_6, 0, wx.BOTTOM | wx.EXPAND | wx.RIGHT | wx.TOP, 5
-        )
+        grid_sizer_1.Add(self.text_6, 0, wx.BOTTOM | wx.EXPAND | wx.RIGHT | wx.TOP, 5)
 
-        self.label_7 = wx.StaticText(
-            self, wx.ID_ANY, "Transcribe srt", style=wx.ALIGN_LEFT
-        )
-        self.label_7.SetMinSize((113, 14))
-        self.grid_sizer_1.Add(
-            self.label_7,
+        label_7 = wx.StaticText(self, wx.ID_ANY, "Transcribe srt", style=wx.ALIGN_LEFT)
+        label_7.SetMinSize((113, 14))
+        grid_sizer_1.Add(
+            label_7,
             0,
             wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP,
             5,
         )
 
-        self.label_8 = wx.StaticText(
-            self, wx.ID_ANY, "Cleanup srt", style=wx.ALIGN_LEFT
-        )
-        self.label_8.SetMinSize((113, 14))
-        self.grid_sizer_1.Add(
-            self.label_8, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.RIGHT | wx.TOP, 5
+        label_8 = wx.StaticText(self, wx.ID_ANY, "Cleanup srt", style=wx.ALIGN_LEFT)
+        label_8.SetMinSize((113, 14))
+        grid_sizer_1.Add(
+            label_8, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.RIGHT | wx.TOP, 5
         )
 
         self.text_7 = wx.TextCtrl(
-            self, wx.ID_ANY, "", style=wx.TE_PROCESS_ENTER
+            self, wx.ID_ANY, "transcribe", style=wx.TE_PROCESS_ENTER
         )
         self.text_7.SetMinSize((136, 23))
-        self.grid_sizer_1.Add(self.text_7, 0, wx.ALL | wx.EXPAND, 5)
+        grid_sizer_1.Add(self.text_7, 0, wx.ALL | wx.EXPAND, 5)
 
-        self.text_8 = wx.TextCtrl(
-            self, wx.ID_ANY, "", style=wx.TE_PROCESS_ENTER
-        )
+        self.text_8 = wx.TextCtrl(self, wx.ID_ANY, "cln", style=wx.TE_PROCESS_ENTER)
         self.text_8.SetMinSize((136, 23))
-        self.grid_sizer_1.Add(
-            self.text_8, 0, wx.BOTTOM | wx.EXPAND | wx.RIGHT | wx.TOP, 5
-        )
+        grid_sizer_1.Add(self.text_8, 0, wx.BOTTOM | wx.EXPAND | wx.RIGHT | wx.TOP, 5)
 
-        self.sizer_3 = wx.StaticBoxSizer(
-            wx.StaticBox(self, wx.ID_ANY, ""), wx.HORIZONTAL
-        )
-        self.sizer_1.Add(self.sizer_3, 0, wx.ALL | wx.EXPAND, 3)
+        sizer_3 = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, ""), wx.HORIZONTAL)
+        sizer_1.Add(sizer_3, 0, wx.BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT, 3)
+
+        grid_sizer_2 = wx.GridSizer(2, 3, 3, 3)
+        sizer_3.Add(grid_sizer_2, 0, wx.ALL | wx.EXPAND, 3)
 
         label_9 = wx.StaticText(
-            self,
-            wx.ID_ANY,
-            "  Export Zip folderi:\n  Cyr-ansi, Cyr-utf8\n  Lat,  Lat-utf8",
-            style=wx.ALIGN_LEFT,
+            self, wx.ID_ANY, "  Export Zip folderi:\n", style=wx.ALIGN_LEFT
         )
         label_9.SetFont(
             wx.Font(
@@ -190,48 +162,52 @@ class FileSettings(wx.Dialog):
                 "Franklin Gothic Medium",
             )
         )
-        self.sizer_3.Add(label_9, 1, wx.TOP, 3)
-
-        self.grid_sizer_2 = wx.GridSizer(2, 2, 3, 3)
-        self.sizer_3.Add(self.grid_sizer_2, 0, wx.ALL | wx.SHAPED, 3)
+        grid_sizer_2.Add(label_9, 1, wx.TOP, 3)
 
         self.tctrl_1 = wx.TextCtrl(
             self, wx.ID_ANY, "Cyr-ansi", style=wx.TE_PROCESS_ENTER
         )
-        self.grid_sizer_2.Add(self.tctrl_1, 0, wx.ALL, 3)
+        grid_sizer_2.Add(self.tctrl_1, 0, wx.ALL, 3)
 
         self.tctrl_2 = wx.TextCtrl(
             self, wx.ID_ANY, "Cyr-utf8", style=wx.TE_PROCESS_ENTER
         )
-        self.grid_sizer_2.Add(self.tctrl_2, 0, wx.ALL, 3)
+        grid_sizer_2.Add(self.tctrl_2, 0, wx.ALL, 3)
+
+        self.checkbox_1 = wx.CheckBox(
+            self, wx.ID_ANY, "Kreiraj foldere", style=wx.CHK_2STATE
+        )
+        self.checkbox_1.SetToolTip("Kreiraj foldere u Zipu")
+        self.checkbox_1.SetValue(1)
+        grid_sizer_2.Add(self.checkbox_1, 1, wx.ALL | wx.EXPAND, 5)
 
         self.tctrl_3 = wx.TextCtrl(
             self, wx.ID_ANY, "Lat-ansi", style=wx.TE_PROCESS_ENTER
         )
-        self.grid_sizer_2.Add(self.tctrl_3, 0, wx.ALL, 3)
+        grid_sizer_2.Add(self.tctrl_3, 0, wx.ALL, 3)
 
         self.tctrl_4 = wx.TextCtrl(
             self, wx.ID_ANY, "Lat-utf8", style=wx.TE_PROCESS_ENTER
         )
-        self.grid_sizer_2.Add(self.tctrl_4, 0, wx.ALL, 3)
+        grid_sizer_2.Add(self.tctrl_4, 0, wx.ALL, 3)
 
-        self.sizer_2 = wx.StdDialogButtonSizer()
-        self.sizer_1.Add(self.sizer_2, 1, wx.ALIGN_RIGHT, 0)
+        sizer_2 = wx.StdDialogButtonSizer()
+        sizer_1.Add(sizer_2, 1, wx.ALIGN_RIGHT | wx.ALL, 0)
 
-        self.button_2 = wx.Button(self, wx.ID_OK, "")
-        self.button_2.SetDefault()
-        self.sizer_2.AddButton(self.button_2)
+        button_2 = wx.Button(self, wx.ID_OK, "")
+        button_2.SetDefault()
+        sizer_2.AddButton(button_2)
 
-        self.button_1 = wx.Button(self, wx.ID_CANCEL, "")
-        self.sizer_2.AddButton(self.button_1)
+        button_1 = wx.Button(self, wx.ID_CANCEL, "")
+        sizer_2.AddButton(button_1)
 
-        self.sizer_2.Realize()
+        sizer_2.Realize()
 
-        self.grid_sizer_1.AddGrowableCol(0)
-        self.grid_sizer_1.AddGrowableCol(1)
+        grid_sizer_1.AddGrowableCol(0)
+        grid_sizer_1.AddGrowableCol(1)
 
-        self.SetSizer(self.sizer_1)
-        
+        self.SetSizer(sizer_1)
+
         t1 = os.path.join("resources", "var", "dialog_settings.db.dat")
         try:
             with open(t1, "rb") as sp:
@@ -251,12 +227,12 @@ class FileSettings(wx.Dialog):
                 self.tctrl_4.SetValue(ex["Lat-utf-8"])
 
         except Exception as e:
-            logger.debug(f"FileSetting: {e}")        
+            logger.debug(f"FileSetting: {e}")
 
         self.Layout()
 
         self.Bind(wx.EVT_CLOSE, self.onCancel, self)
-        self.Bind(wx.EVT_BUTTON, self.onSave, self.button_2)
+        self.Bind(wx.EVT_BUTTON, self.onSave, button_2)
         # end wxGlade
 
     def onCancel(self, event):
@@ -280,23 +256,24 @@ class FileSettings(wx.Dialog):
                 "Lat-ansi": self.tctrl_3.GetValue(),
                 "Lat-utf8": self.tctrl_4.GetValue(),
             }
-    
+
             FILE_SETTINGS["key5"].update(s_dict)
-    
+
             with open(t1, "wb") as d:
                 pickle.dump(FILE_SETTINGS, d)
-    
+
             name_data[1] = s_dict["cyr_utf8_txt"]
             name_data[2] = s_dict["lat_utf8_srt"]
             name_data[5] = s_dict
-    
+
             with open(os.path.join("resources", "var", "file_ext.pkl"), "wb") as f:
                 pickle.dump(s_dict, f)
         except Exception as e:
             logger.debug(f"FileSettings: {e}")
         self.Destroy()
         event.Skip()
-        
+
+
 # end of class FileSettings
 
 
