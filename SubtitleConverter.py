@@ -423,7 +423,7 @@ class MyFrame(ConverterFrame):
     def newText(self, event):
         """"""
         tval = self.text_1.GetValue()
-        if not tval.startswith('Files ') and len(tval) > 40:
+        if not tval.startswith('Files ') and not PREVIOUS and len(tval) > 40:
             try:
                 text = self.text_1.GetValue()
                 place = self.text_1.GetInsertionPoint()
@@ -541,20 +541,17 @@ class MyFrame(ConverterFrame):
         
         if PREVIOUS:
             path = self.fromPrevious("Open")[4]
-            print(path)
             if os.path.isfile(droppedText):
                 with open(droppedText, 'rb') as f:
                     d = pickle.load(f)
                 text = list(d.items())[0][0]
                 enc = list(d.items())[0][1]
                 self.text_1.SetValue(text)
-                # writeToFile(text, path, enc)
                 bufferText(text, WORK_TEXT)
             else:
                 text = self.fromPrevious("Open")[2]
                 enc = self.fromPrevious("Open")[1]
                 self.text_1.SetValue(text)
-                # writeToFile(text, path, enc)
                 bufferText(text, WORK_TEXT)
                 
             self.REDO_A.clear() 
@@ -2968,6 +2965,7 @@ class MyFrame(ConverterFrame):
         if len(self.RedoText) == 0:
             self.addHistory(
                 self.text_1.GetInsertionPoint(), self.text_1.GetValue(), self.RedoText)
+            
         self.redo.Enable()
         ## UndoText
         if self.UndoText:
@@ -2977,25 +2975,24 @@ class MyFrame(ConverterFrame):
             self.text_1.SetInsertionPoint(
                 self.UndoText[len(self.UndoText)-1].position
             )
-            
             if len(self.UndoText) >= 2: self.UndoText = self.UndoText[:-1]
-            
-        if not self.UndoText:
-            self.undo.Enable(False)
+                        
+        if not self.UndoText: self.undo.Enable(False)
         if len(self.UndoText) > 62: self.UndoText = self.UndoText[1:]
+        self.reloadtext.Enable()
         event.Skip()
         
     def onRedo(self, event):
         """"""
         if self.RedoText:
             self.RedoText=sorted(set(self.RedoText), key=self.RedoText.index)
+            self.UndoText.append(self.RedoText[-1])
             self.text_1.SetValue(self.RedoText[len(self.RedoText)-1].text)
             self.text_1.SetInsertionPoint(
                 self.RedoText[len(self.RedoText)-1].position
             )
-            self.UndoText.append(self.RedoText[-1])
             
-            if len(self.RedoText) >= 2: self.RedoText = self.RedoText[:-1]
+            self.RedoText = self.RedoText[:-1]
                 
         if not self.RedoText: self.redo.Enable(False)
         if len(self.RedoText) > 62: self.RedoText = self.RedoText[1:]
@@ -3096,14 +3093,14 @@ class MyFrame(ConverterFrame):
                 l=self.UndoText,
                 k=k,
             )
+            self.UndoText = sorted(set(self.UndoText), key=self.UndoText.index)
             if (
                 any(self.UndoText[-1].k == x for x in [13, 32])
-                and len(self.UndoText) > 36
+                and len(self.UndoText) > 0
             ):
                 for i in self.UndoText:
-                    if i.k != 13 or i.k != 32:
+                    if i.k != 32:
                         self.UndoText.remove(i)
-            self.UndoText = sorted(set(self.UndoText), key=self.UndoText.index)
             self.undo.Enable()
         event.Skip()
         
