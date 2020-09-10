@@ -30,31 +30,33 @@ class Settings(wx.Dialog):
             self, wx.ID_ANY, style=wx.SP_ARROW_KEYS | wx.TE_PROCESS_ENTER
         )
         self.spin_ctrl_1.SetRange(0, 15000)
-        # self.spin_ctrl_1.SetValue(lineLenght)
 
         self.label_2 = wx.StaticText(
-            self, wx.ID_ANY, "Broj znakova spojenih linija:", style=wx.ALIGN_LEFT,
+            self,
+            wx.ID_ANY,
+            "Broj znakova spojenih linija:",
+            style=wx.ALIGN_LEFT,
         )
         self.spin_ctrl_2 = wx.SpinCtrl(
             self, wx.ID_ANY, style=wx.SP_ARROW_KEYS | wx.TE_PROCESS_ENTER
         )
         self.spin_ctrl_2.SetRange(0, 200)
-        # self.spin_ctrl_2.SetValue(maxChar)
 
         self.label_3 = wx.StaticText(
-            self, wx.ID_ANY, "Dozvoljeni gap između linija (ms):", style=wx.ALIGN_LEFT,
+            self,
+            wx.ID_ANY,
+            "Dozvoljeni gap između linija (ms):",
+            style=wx.ALIGN_LEFT,
         )
         self.spin_ctrl_3 = wx.SpinCtrl(
             self, wx.ID_ANY, style=wx.SP_ARROW_KEYS | wx.TE_PROCESS_ENTER
         )
         self.spin_ctrl_3.SetRange(0, 5000)
-        # self.spin_ctrl_3.SetValue(maxGap)
 
         self.label_4 = wx.StaticText(
             self, wx.ID_ANY, "Sufiks novog fajla:", style=wx.ALIGN_LEFT
         )
         self.tctrl_1 = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_PROCESS_ENTER)
-        # self.tctrl_1.SetValue(suffix)
 
         self.static_line_1 = wx.StaticLine(self, wx.ID_ANY)
         self.button_1 = wx.Button(self, wx.ID_CLOSE, "")
@@ -90,7 +92,8 @@ class Settings(wx.Dialog):
         _icon = wx.NullIcon
         _icon.CopyFromBitmap(
             wx.Bitmap(
-                os.path.join("resources", "icons", "tool.ico"), wx.BITMAP_TYPE_ANY,
+                os.path.join("resources", "icons", "tool.ico"),
+                wx.BITMAP_TYPE_ANY,
             )
         )
         self.SetIcon(_icon)
@@ -153,16 +156,28 @@ class Settings(wx.Dialog):
         self.grid_sizer_1.AddGrowableCol(0)
         self.sizer_4.Add(self.grid_sizer_1, 1, wx.ALL | wx.EXPAND, 3)
         sizer_5.Add(
-            self.static_line_1, 0, wx.BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT, 3,
+            self.static_line_1,
+            0,
+            wx.BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT,
+            3,
         )
         self.sizer_6.Add(
-            (20, 20), 1, wx.ALL | wx.EXPAND, 3,
+            (20, 20),
+            1,
+            wx.ALL | wx.EXPAND,
+            3,
         )
         self.sizer_6.Add(
-            self.button_1, 1, wx.ALL | wx.EXPAND, 3,
+            self.button_1,
+            1,
+            wx.ALL | wx.EXPAND,
+            3,
         )
         self.sizer_6.Add(
-            self.button_2, 1, wx.ALL | wx.EXPAND, 3,
+            self.button_2,
+            1,
+            wx.ALL | wx.EXPAND,
+            3,
         )
         sizer_5.Add(self.sizer_6, 1, wx.ALL | wx.EXPAND, 3)
         self.sizer_4.Add(sizer_5, 0, wx.EXPAND, 0)
@@ -170,20 +185,20 @@ class Settings(wx.Dialog):
         self.Layout()
         # end wxGlade
 
-    def onSaveSettings(self, event):  # wxGlade: Settings.<event_handler>
+    def onSaveSettings(self, event):
+        ''''''
         line_Lenght = self.spin_ctrl_1.GetValue()
         max_Char = self.spin_ctrl_2.GetValue()
         max_Gap = self.spin_ctrl_3.GetValue()
         file_suffix = self.tctrl_1.GetValue()
-        # config.write()
-        konf = [line_Lenght, max_Char, max_Gap, file_suffix]
-        a = konf[0]
-        b = konf[1]
-        c = konf[2]
-        d = konf[3]
 
         FILE_SETTINGS["key2"].update(
-            {"l_lenght": a, "m_char": b, "m_gap": c, "f_suffix": d}
+            {
+                "l_lenght": line_Lenght,
+                "m_char": max_Char,
+                "m_gap": max_Gap,
+                "f_suffix": file_suffix,
+            }
         )
         with open("os.path.join('resources', 'var', 'dialog_settings.db", "wb") as d:
             pickle.dump(FILE_SETTINGS, d)
@@ -196,7 +211,7 @@ class Settings(wx.Dialog):
             self.Destroy()
         event.Skip()
 
-    def onCloseSettings(self, event):  # wxGlade: Settings.<event_handler>
+    def onCloseSettings(self, event):
         self.Destroy()
         event.Skip()
 
