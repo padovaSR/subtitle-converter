@@ -25,23 +25,15 @@ class FixerSettings(wx.Dialog):
         t1 = os.path.join('resources', 'var', 'dialog_settings.db.dat')
         cb3s = os.path.join('resources', 'var', 'fixer_cb3.data')
 
-        self.cb1 = wx.CheckBox(
-            self, wx.ID_ANY, "cbox_1", style=wx.CHK_2STATE
-        )
-        self.lb1 = wx.StaticText(
-            self, wx.ID_ANY, "Popravi gapove", style=wx.ALIGN_LEFT
-        )
+        self.cb1 = wx.CheckBox(self, wx.ID_ANY, "cbox_1", style=wx.CHK_2STATE)
+        self.lb1 = wx.StaticText(self, wx.ID_ANY, "Popravi gapove", style=wx.ALIGN_LEFT)
 
-        self.cb2 = wx.CheckBox(
-            self, wx.ID_ANY, "cbox_2", style=wx.CHK_2STATE
-        )
+        self.cb2 = wx.CheckBox(self, wx.ID_ANY, "cbox_2", style=wx.CHK_2STATE)
         self.lb2 = wx.StaticText(
             self, wx.ID_ANY, "Poravnaj linije teksta", style=wx.ALIGN_LEFT
         )
 
-        self.cb3 = wx.CheckBox(
-            self, wx.ID_ANY, "cbox_3", style=wx.CHK_2STATE
-        )
+        self.cb3 = wx.CheckBox(self, wx.ID_ANY, "cbox_3", style=wx.CHK_2STATE)
         self.lb3 = wx.StaticText(
             self,
             wx.ID_ANY,
@@ -49,9 +41,7 @@ class FixerSettings(wx.Dialog):
             style=wx.ALIGN_LEFT,
         )
 
-        self.cb4 = wx.CheckBox(
-            self, wx.ID_ANY, "cbox_4", style=wx.CHK_2STATE
-        )
+        self.cb4 = wx.CheckBox(self, wx.ID_ANY, "cbox_4", style=wx.CHK_2STATE)
         self.lb4 = wx.StaticText(
             self,
             wx.ID_ANY,
@@ -59,9 +49,7 @@ class FixerSettings(wx.Dialog):
             style=wx.ALIGN_LEFT,
         )
 
-        self.cb5 = wx.CheckBox(
-            self, wx.ID_ANY, "cbox_5", style=wx.CHK_2STATE
-        )
+        self.cb5 = wx.CheckBox(self, wx.ID_ANY, "cbox_5", style=wx.CHK_2STATE)
         self.lb5 = wx.StaticText(
             self,
             wx.ID_ANY,
@@ -69,9 +57,7 @@ class FixerSettings(wx.Dialog):
             style=wx.ALIGN_LEFT,
         )
 
-        self.cb6 = wx.CheckBox(
-            self, wx.ID_ANY, "cbox_6", style=wx.CHK_2STATE
-        )
+        self.cb6 = wx.CheckBox(self, wx.ID_ANY, "cbox_6", style=wx.CHK_2STATE)
         self.lb6 = wx.StaticText(
             self,
             wx.ID_ANY,
@@ -79,9 +65,7 @@ class FixerSettings(wx.Dialog):
             style=wx.ALIGN_LEFT,
         )
 
-        self.cb7 = wx.CheckBox(
-            self, wx.ID_ANY, "cbox_7", style=wx.CHK_2STATE
-        )
+        self.cb7 = wx.CheckBox(self, wx.ID_ANY, "cbox_7", style=wx.CHK_2STATE)
         self.lb7 = wx.StaticText(
             self,
             wx.ID_ANY,
@@ -89,9 +73,7 @@ class FixerSettings(wx.Dialog):
             style=wx.ALIGN_LEFT,
         )
 
-        self.cb8 = wx.CheckBox(
-            self, wx.ID_ANY, "cbox_8", style=wx.CHK_2STATE
-        )
+        self.cb8 = wx.CheckBox(self, wx.ID_ANY, "cbox_8", style=wx.CHK_2STATE)
         self.lb8 = wx.StaticText(
             self,
             wx.ID_ANY,
@@ -101,7 +83,9 @@ class FixerSettings(wx.Dialog):
 
         if os.path.exists(t1):
             try:
-                with open(filePath('resources', 'var', 'dialog_settings.db.dat'), "rb") as sp:
+                with open(
+                    filePath('resources', 'var', 'dialog_settings.db.dat'), "rb"
+                ) as sp:
                     data = pickle.load(sp)
                 ex = data['key1']
                 cb1_s = ex['state1']
@@ -112,10 +96,8 @@ class FixerSettings(wx.Dialog):
                 cb6_s = ex['state6']
                 cb7_s = ex['state7']
                 cb8_s = ex['state8']
-            except IOError as e:
-                logger.debug(f"fixerSettings, I/O error({e.errno}): {e.strerror}")
             except Exception as e:
-                logger.debug(f"fixerSetting, unexpected error: {e}")
+                logger.debug(f"fixerSetting error: {e}")
             else:
                 self.cb1.SetValue(cb1_s)
                 self.cb2.SetValue(cb2_s)
@@ -204,9 +186,7 @@ class FixerSettings(wx.Dialog):
 
     def __do_layout(self):
         # begin wxGlade: fixerSettings.__do_layout
-        self.sizer_1 = wx.StaticBoxSizer(
-            wx.StaticBox(self, wx.ID_ANY, ""), wx.VERTICAL
-        )
+        self.sizer_1 = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, ""), wx.VERTICAL)
         self.sizer_8 = wx.BoxSizer(wx.HORIZONTAL)
         self.sizer_10 = wx.BoxSizer(wx.HORIZONTAL)
         self.sizer_9 = wx.BoxSizer(wx.HORIZONTAL)
@@ -264,38 +244,19 @@ class FixerSettings(wx.Dialog):
         event.Skip()
 
     def on_ok(self, event):
-        
-        c1 = self.cb1.GetValue()
-        c2 = self.cb2.GetValue()
-        c3 = self.cb3.GetValue()
-        c4 = self.cb4.GetValue()
-        c5 = self.cb5.GetValue()
-        c6 = self.cb6.GetValue()
-        c7 = self.cb7.GetValue()
-        c8 = self.cb8.GetValue()
-
-        konf = [c1, c2, c3, c4, c5, c6, c7, c8]
-        a = konf[0]
-        b = konf[1]
-        c = konf[2]
-        d = konf[3]
-        e = konf[4]
-        f = konf[5]
-        g = konf[6]
-        h = konf[7]
-        
+        ''''''
         sdict = {
-            'state1': a,
-            'state2': b,
-            'state3': c,
-            'state4': d,
-            'state5': e,
-            'state6': f,
-            'state7': g,
-            'state8': h,
+            'state1': self.cb1.GetValue(),
+            'state2': self.cb2.GetValue(),
+            'state3': self.cb3.GetValue(),
+            'state4': self.cb4.GetValue(),
+            'state5': self.cb5.GetValue(),
+            'state6': self.cb6.GetValue(),
+            'state7': self.cb7.GetValue(),
+            'state8': self.cb8.GetValue(),
         }
 
-        FILE_SETTINGS["key1"]=sdict
+        FILE_SETTINGS["key1"] = sdict
 
         with open(
             os.path.join('resources', 'var', 'dialog_settings.db.dat'), "wb"
@@ -303,7 +264,7 @@ class FixerSettings(wx.Dialog):
             pickle.dump(FILE_SETTINGS, s)
 
         self.EndModal(True)
-        
+
     def onClose(self, event):
         self.Destroy()
         event.Skip()
