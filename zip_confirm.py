@@ -21,6 +21,7 @@
 
 import wx
 import os
+from settings import filePath
 import logging.config
 
 logger = logging.getLogger(__name__)
@@ -40,7 +41,7 @@ class TreeDialog(wx.Dialog):
         _icon = wx.NullIcon
         _icon.CopyFromBitmap(
             wx.Bitmap(
-                os.path.join("resources", "icons", "subConvert.ico"), wx.BITMAP_TYPE_ANY
+                filePath("resources", "icons", "subConvert.ico"), wx.BITMAP_TYPE_ANY
             )
         )
         self.SetIcon(_icon)
@@ -137,7 +138,7 @@ class TreeDialog(wx.Dialog):
         il = wx.ImageList(*isz)
         self.fldrix = il.Add(
             wx.Bitmap(
-                os.path.join("resources", "icons", "a-zip-icon.png"), wx.BITMAP_TYPE_ANY
+                filePath("resources", "icons", "a-zip-icon.png"), wx.BITMAP_TYPE_ANY
             )
         )
         self.fldridx = il.Add(
@@ -202,6 +203,7 @@ class TreeDialog(wx.Dialog):
     def onQuit(self, event):
         self.Destroy()
 
+
 class MyApp(wx.App):
     def OnInit(self):
         self.dialog = TreeDialog(None, wx.ID_ANY, "", "")
@@ -209,6 +211,7 @@ class MyApp(wx.App):
         self.dialog.ShowModal()
         self.dialog.Destroy()
         return True
+
 
 if __name__ == "__main__":
     app = MyApp(0)
