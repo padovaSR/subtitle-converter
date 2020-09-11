@@ -4,7 +4,7 @@
 
 import os
 import re
-from settings import filePath
+from settings import filePath, baseName
 from showError import showMeError
 
 import wx
@@ -38,12 +38,12 @@ def checkFile(path, newfile, text_s, multi=False):
                 u'!! Greška u tekstu\
             !!\n{0}\nNeispravnih znakova\ konvertovanih kao znak `?` ukupno:\
             [{1} ]',
-            ).format(os.path.basename(file1_name), n_sign)
+            ).format(baseName(file1_name), n_sign)
 
             logger.debug(poruka)
             if multi is True:
                 file1_name = newfile
-            error_text = f"Greška:\n\n{os.path.basename(file1_name)}\nBilo je neispravnih znakova u\
+            error_text = f"Greška:\n\n{baseName(file1_name)}\nBilo je neispravnih znakova u\
             tekstu\nkonvertovanih kao znak `?`\nUkupno: [{n_sign}]\nProverite tekst."
             if error_text:
                 error_text = re.sub("(?: ){2,4}", " ", error_text)
@@ -118,7 +118,7 @@ def checkChars(text, path=None):
         try:
             return int(100 * part / whole)
         except ZeroDivisionError:
-            logger.debug(f"File is empty: {os.path.basename(path)}")
+            logger.debug(f"File is empty: {baseName(path)}")
             return 0
 
     def chars(*args):
@@ -158,7 +158,7 @@ def checkChars(text, path=None):
 def displayError(text, tctrl, rdir, path, new_enc, multi=False):
     """"""
     nlist = w_position(r"\?", text)
-    epath = os.path.basename(path)
+    epath = baseName(path)
     
     if type(rdir) == list:
         rdir = [x for rdir[0] in rdir for x in rdir[0]]
