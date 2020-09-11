@@ -28,6 +28,8 @@ BYTES_TEXT = []
 
 def filePath(*args): return os.path.join(*args)
 
+def baseName(path): return os.path.basename(path)
+
 def printEncoding(entered_enc):
     ''''''
     if entered_enc == "utf-8-sig":
