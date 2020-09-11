@@ -86,7 +86,7 @@ logging.config.fileConfig(
 logger = logging.getLogger(__name__)
 
 
-VERSION = "v0.5.9.0_test9"
+VERSION = "v0.5.9.0_beta1"
 
 
 class MyFrame(ConverterFrame):
@@ -248,14 +248,14 @@ class MyFrame(ConverterFrame):
         ## drop target
         dt = FileDrop(self.text_1)
         self.text_1.SetDropTarget(dt)
-        
+        ##=========================================================================================##
         FILE_SETTINGS["CB_value"] = self.comboBox1.GetValue()
         
         for i in FILE_HISTORY:
             if os.path.isfile(i):
                 self.filehistory.AddFileToHistory(i)
             else: FILE_HISTORY.remove(i)
-
+        ##=========================================================================================##
         self.disableTool()
 
         dispatcher.connect(self.updateStatus, "TMP_PATH", sender=dispatcher.Any)
@@ -936,7 +936,7 @@ class MyFrame(ConverterFrame):
                     self.frame_toolbar.EnableTool(1003, False)
                     return            
 
-            ## ---------------------------------------------------------------------------------------##
+            ##=====================================================================================##
             if zbir_slova == 0 and procent == 0:
                 text, error_text = ansiAction(path)
                 if error_text:
@@ -949,7 +949,7 @@ class MyFrame(ConverterFrame):
                     ErrorDlg.ShowModal()
                     self.Error_Text = error_text
                 postAnsi()
-            ## ---------------------------------------------------------------------------------------##
+            ##=====================================================================================##
             elif procent > 0:
                 self.SetStatusText(u'Greška u tekstu.')
                 f_procent = f'Najmanje {procent} % teksta.\nIli najmanje [ {zbir_slova} ] znakova.'
@@ -979,7 +979,7 @@ class MyFrame(ConverterFrame):
                         ErrorDlg.ShowModal()
                         self.Error_Text = error_text
                     postAnsi()
-            ## ---------------------------------------------------------------------------------------##
+            ##=====================================================================================##
             elif zbir_slova > 0:
                 f_zbir = 'Najmanje [ {} ] znakova.'.format(zbir_slova)
                 ErrorText = ertext.format(f_zbir, ",".join(chars))
@@ -2393,7 +2393,7 @@ class MyFrame(ConverterFrame):
 
         if PREVIOUS[-1].action == "exportZIPmultiple":
             return
-        
+
         ndata = FILE_SETTINGS["key5"]
         CyrANSI = ndata["Cyr-ansi"]
         CyrUTF = ndata["Cyr-utf8"]
@@ -2419,16 +2419,12 @@ class MyFrame(ConverterFrame):
             
             if PREVIOUS[-1].action == 'toCYR_multiple':
 
-                tl = [
-                    BT[x].path
-                    for x in range(len(BT))
-                    if BT[x].enc in ["utf-8", "utf-8-sig"]
-                ]
+                tl = [x.path for x in BT if x.enc in ["utf-8", "utf-8-sig"]]
                 if tl:
                     dlg = wx.MessageDialog(
                         self,
-                        "Neki originalni tekstovi su utf-8:\n{0}".format(
-                            "".join([baseName(x) + "\n" for x in tl])
+                        "Originalni tekstovi su utf-8:\n\n{0}".format(
+                            "".join([baseName(x) + "   \n" for x in tl])
                         ),
                         "Latinični tekst",
                         wx.OK | wx.ICON_INFORMATION,
@@ -2455,7 +2451,7 @@ class MyFrame(ConverterFrame):
                     
                     zlist_a = [data_out(x) for x in izbor_ansi]
                     zlist_b = [data_out(x) for x in izbor_utf8]
-                    zlist_c = [BT[x].content.replace(b"\n", b"\r\n") for x in range(len(BT))]
+                    zlist_c = [x.content.replace(b"\n", b"\r\n") for x in BT]
                     zlist_utf = [x for x in self.utf8_latText.values()]
                     
                     info1 = [filePath(CyrANSI, baseName(x)) for x in izbor_ansi]
@@ -2486,8 +2482,7 @@ class MyFrame(ConverterFrame):
                         info = list(chain.from_iterable([l1[x] for x in selections]))
                         zlist = list(chain.from_iterable([l2[x] for x in  selections]))
                         
-                        if cdlg.makeFolder() is False:
-                            info = [baseName(x) for x in info]
+                        if cdlg.makeFolder() is False: info = [baseName(x) for x in info]
                     else:
                         logger.debug(f"ZIP canceled; {baseName(name)}")
                         return
@@ -2522,26 +2517,35 @@ class MyFrame(ConverterFrame):
                     for i, x in zip(info, zlist):
                         if not i: continue
                         fzip.writestr(i, x, zipfile.ZIP_DEFLATED)
-                for i in self.tmpPath:
-                    if os.path.exists(i):
-                        os.remove(i)
-                    logger.debug(f"Delete {i}")
-                for i in self.cyrUTFmulti:
-                    os.remove(i)
-                    logger.debug(f"Delete {i}")
+                for item in zip(self.tmpPath, self.cyrUTFmulti):
+                    if any(os.path.exists(x) for x in item):
+                        for i in item:
+                            os.remove(i)
+                            logger.debug(f"Delete {i}")
             except Exception as e:
                 logger.debug(f"Export ZIP_final error: {e}")
 
             if os.path.isfile(name):
-                logger.debug(f"ZIP file saved sucessfully: {name}")
-                sDlg = wx.MessageDialog(
-                    self,
-                    f'Fajl je uspešno sačuvan\n{baseName(name)}',
-                    'SubtitleConverter',
-                    wx.OK | wx.ICON_INFORMATION,
-                )
-                sDlg.ShowModal()
-            addPrevious("exportZIPmultiple")
+                with zipfile.ZipFile(name) as zf:
+                    if len(zf.infolist()) == len(info):
+                        logger.debug(f"ZIP file saved sucessfully: {name}")
+                        sDlg = wx.MessageDialog(
+                            self,
+                            f'Zip fajl je uspešno sačuvan\n{baseName(name)}',
+                            'SubtitleConverter',
+                            wx.OK | wx.ICON_INFORMATION,
+                        )
+                        sDlg.ShowModal()
+                        addPrevious("exportZIPmultiple")
+                    else:
+                        edlg = wx.MessageDialog(
+                            self,
+                            f"Greška\n\n\
+                            Zip nije kompletan\nSačuvanih fajlova: [ {len(zf.infolist())} ]",
+                            "SubtitleConverter",
+                            wx.OK | wx.ICON_ERROR,
+                        )
+                        edlg.ShowModal()
         else:
             dlg.Destroy()
 
