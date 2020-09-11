@@ -5,11 +5,10 @@ import os
 import codecs
 import re
 import zipfile
-import pickle
 from collections import namedtuple 
 from text_processing import codelist
 from choice_dialog import MultiChoice
-from settings import chreg, FILE_SETTINGS, BYTES_TEXT, name_data
+from settings import chreg, baseName, filePath, FILE_SETTINGS, BYTES_TEXT, name_data
 import logging.config
 
 from codecs import BOM_UTF8
@@ -34,17 +33,17 @@ class FileOpened:
 
         basepath = 'tmp'
         # basepath = os.path.dirname(self.path)
-        fileName = os.path.basename(self.path)
+        fileName = baseName(self.path)
         
         with zipfile.ZipFile(self.path, 'r') as zf:
             if len(zf.namelist()) == 1:
                 singleFile = zf.namelist()[0]
-                outfile = [os.path.join(basepath, singleFile)]
+                outfile = [filePath(basepath, singleFile)]
                 if self.multi is False:
                     with open(outfile[0], 'wb') as f:
                         f.write(zf.read(singleFile))     ## zf.read() equaly bytes  ##
                 else: self.internal.append(zf.read(singleFile).replace(b"\r\n", b"\n"))
-                outfile1 = os.path.join(
+                outfile1 = filePath(
                     os.path.dirname(self.path), singleFile
                 )
                 return outfile, outfile1
@@ -60,11 +59,11 @@ class FileOpened:
                     if dlg.ShowModal() == wx.ID_OK:
                         response = dlg.GetSelections()
                         files = [izbor[x] for x in response]
-                        names = [os.path.basename(i) for i in files]
-                        outfiles = [os.path.join(basepath, x) for x in names]
-                        single = os.path.join(
+                        names = [baseName(i) for i in files]
+                        outfiles = [filePath(basepath, x) for x in names]
+                        single = filePath(
                             os.path.dirname(self.path),
-                            os.path.basename(files[-1]),
+                            baseName(files[-1]),
                         )
                         for i in files:
                             self.internal.append(zf.read(i).replace(b"\r\n", b"\n"))
@@ -81,11 +80,8 @@ class FileOpened:
         """"""
         kodek = FILE_SETTINGS["CB_value"]
 
-        if kodek != 'auto':
-            added = kodek
-        else:
-            added = 'utf-8'
-
+        if kodek != 'auto': added = kodek
+        else: added = 'utf-8'
         return [
             added,
             'utf-8',
@@ -107,9 +103,7 @@ class FileOpened:
         
     def findCode(self):
         ''''''
-        f = open(self.path, "rb")
-        data = f.read(4)
-        f.close()
+        data = open(self.path, "rb").read(4)
         if data.startswith(BOM_UTF8):
             return "utf-8-sig"
         else:
@@ -121,13 +115,14 @@ class FileOpened:
                 except:
                     pass
                 else:
-                    logger.debug(f'{os.path.basename(self.path)}: {enc}')
+                    logger.debug(f'{baseName(self.path)}: {enc}')
                     break
             self.internEnc = enc
             return enc
     
     def findByteCode(self, n=0):
         """"""
+        ## n is selecting number for multifile list ##  
         dat = self.internal[n]
         if dat[:4].startswith(BOM_UTF8):
             return "utf-8-sig"
@@ -138,18 +133,17 @@ class FileOpened:
                 except:
                     pass
                 else:
-                    logger.debug(f"{os.path.basename(self.path)}: {enc}")
+                    logger.debug(f"{baseName(self.path)}: {enc}")
                     break        
             self.internEnc = enc
             return enc
     
     @staticmethod
     def addBytes(path, enc, content):
-        """"""
+        '''Create and append namedtuple to BYTES_TEXT list'''
         multi = namedtuple("multi", ["path","enc", "content"])
         BYTES_TEXT.append(multi(path, enc, content))
         
-
 def newName(path, pre_suffix, multi=False):
     ''''''
     added = name_data[0]
@@ -172,7 +166,7 @@ def newName(path, pre_suffix, multi=False):
     elif re.findall(tpattern, path):
         path = tpattern.sub(r".txt", path)
 
-    fprint = os.path.basename(path)
+    fprint = baseName(path)
 
     n = os.path.splitext(fprint)[0]
 
@@ -185,8 +179,8 @@ def newName(path, pre_suffix, multi=False):
         sufix = ".txt"
     elif oformat == "txt" and pre_suffix == value2_s:
         sufix = ".txt"
-    else:
-        sufix = os.path.splitext(path)[-1]  ## srt,txt ili neki drugi otvoren
+    ## srt,txt ili neki drugi otvoren
+    else: sufix = os.path.splitext(path)[-1]
 
     suffix_list = ["." + x if not x.startswith("_") else x for x in ex.values()] + added
     suffix_list.append(value_m)
@@ -197,7 +191,7 @@ def newName(path, pre_suffix, multi=False):
         _d = pre_suffix
 
     if psufix in suffix_list:
-        name1 = '{0}{1}'.format(os.path.splitext(n)[0], _d)  ## fajl u tmp/ folderu
+        name1 = '{0}{1}'.format(os.path.splitext(n)[0], _d)  ## u tmp/ folderu
     else: name1 = '{0}{1}'.format(n, _d)
 
     if name1.endswith("."): name1 = name1[:-1]
@@ -217,7 +211,7 @@ def nameDialog(name_entry, sufix_entry, dir_entry):
 
     ex = FILE_SETTINGS['key5']
 
-    presuffix_l = os.path.join("resources", "var", "presuffix_list.bak")
+    presuffix_l = filePath("resources", "var", "presuffix_list.bak")
     real_dir = dir_entry
     name1 = name_entry
     sufix = sufix_entry
@@ -235,7 +229,7 @@ def nameDialog(name_entry, sufix_entry, dir_entry):
 
     if dlg.ShowModal() == wx.ID_OK:
         name = dlg.GetValue()
-        nameO = '{0}{1}'.format(os.path.join(real_dir, name), sufix)
+        nameO = '{0}{1}'.format(filePath(real_dir, name), sufix)
         if nameO.endswith("."):
             nameO = nameO[:-1]
         dlg.Destroy()
@@ -264,7 +258,7 @@ def writeToFile(text, path, enc, multi=False, ask=False):
     if multi is False:
         if os.path.isfile(path) and os.path.dirname(path) != "tmp" and ask is True:
             dlg = wx.MessageBox(
-                f"{os.path.basename(path)}\nFile already exists! Proceed?",
+                f"{baseName(path)}\nFile already exists! Proceed?",
                 "Overwrite the file?",
                 wx.ICON_INFORMATION | wx.YES_NO,
                 None,
