@@ -160,7 +160,7 @@ def displayError(text, tctrl, rdir, path, new_enc, multi=False):
     nlist = w_position(r"\?", text)
     epath = baseName(path)
     
-    if type(rdir) == list:
+    if type(rdir) is list:
         rdir = [x for rdir[0] in rdir for x in rdir[0]]
         outf = os.path.join(rdir[0], os.path.splitext(epath)[0]+"_error.log")
     else:
