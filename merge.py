@@ -52,11 +52,10 @@ def myMerger(subs_in, max_time, max_char, _gap):
             ## ordinal je vreme u milisekundama
             gap = second.start.ordinal - first.end.ordinal
             trajanje = second.end.ordinal - first.start.ordinal
-            tekst1 = re.sub(re_pattern, '', first.text)  # convert to string
+            tekst1 = re.sub(re_pattern, '', first.text)
             tekst2 = re.sub(re_pattern, '', second.text)
             text_len = len(tekst1) + len(tekst2)
             if gap <= _gap and trajanje <= max_time and text_len <= max_char:
-                # dodaj spojene linije kao string
                 if (
                     first.text == second.text
                     and first.start == second.start
@@ -118,6 +117,7 @@ class FixSubGaps:
         mingap = self.mingap
         
         new_s = []
+        new_f = []
         
         gaps = 0
         overlaps = 0
@@ -141,8 +141,6 @@ class FixSubGaps:
                 new_s.append(Subtitle(FSUB.index, FSUB.start, FSUB.end, FSUB.content))
                 
         new_s.append(Subtitle(inlist[-1].index, inlist[-1].start, inlist[-1].end, inlist[-1].content))
-        
-        new_f = []
         
         new_f.append(Subtitle(new_s[0].index, new_s[0].start, new_s[0].end, new_s[0].content))
         
