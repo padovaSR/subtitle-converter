@@ -53,8 +53,9 @@ from merger_settings import Settings
 from fixer_settings import FixerSettings
 from File_Handler import fileHandle, addPrevious
 from file_dnd import FileDrop
-from merge import myMerger,fixGaps
+from merge import myMerger, FixSubGaps
 from zamenaImena import shortcutsKey 
+from File_processing import newName, nameDialog, writeToFile
 from text_processing import (
     ConvertText,
     ChangeEncoding,
@@ -71,7 +72,6 @@ from text_processing import (
     doReplace,
     zameniImena, 
 )
-from File_processing import newName, nameDialog, writeToFile
 
 import logging
 import logging.config
@@ -1744,31 +1744,24 @@ class MyFrame(ConverterFrame):
         self.pre_suffix = value1_s
         self.newEnc = entered_enc  # VAZNO za Save funkciju
         
-        if self.text_1.IsModified(): text = self.text_1.GetValue()
-        else: text = WORK_TEXT.getvalue()
+        if self.text_1.IsModified():
+            text = self.text_1.GetValue()
+        else:
+            text = WORK_TEXT.getvalue()
                 
-        subs = pysrt.from_string(text)
+        subs = list(srt.parse(text))
 
         if len(subs) == 0:
             logger.debug("Fixer: No subtitles found.")
         else:
             text = ""
 
-            def chg(subs_in):
-                N = 0
-                for first, second in zip(subs_in, subs_in[1:]):
-                    t1 = first.end.ordinal
-                    t2 = second.start.ordinal
-                    if t1 > t2 or t2 - t1 < 85:
-                        N += 1
-                return N
-
             def rpt(path, enc):
                 m = 0
                 s1 = 0
                 while True:
-                    subs = pysrt.from_string(WORK_TEXT.getvalue())
-                    x, y = fixGaps(subs)
+                    subs = list(srt.parse(WORK_TEXT.getvalue()))
+                    x, y = FixSubGaps(inlist=subs, mingap=100).powerSubs()
                     m += x
                     s1 += y
                     if x == 0:
@@ -1777,20 +1770,14 @@ class MyFrame(ConverterFrame):
 
             if cb1_s is True:
                 if cb8_s != True:
-
-                    pn = chg(subs)
-                    if pn > 0:
-                        m, s1 = rpt(path, entered_enc)
-                    else:
-                        m = 0
-                        s1 = 0
+                    m, s1 = rpt(path, entered_enc)
                 else:
                     logger.debug("Fixer: Remove gaps not enabled.")
             try:
                 if not cb8_s:
-                    text = srt.compose(srt.parse(self.text_1.GetValue()))
+                    text = srt.compose(srt.parse(WORK_TEXT.getvalue()))
                 else:
-                    text = self.text_1.GetValue()
+                    text = WORK_TEXT.getvalue()
             except Exception as e:
                 logger.debug(f"FixSubtitle, unexpected error: {e}")
 
@@ -1804,16 +1791,16 @@ class MyFrame(ConverterFrame):
             if cb1_s is True:
                 if cb8_s != True:
                     if s1 > 1:
-                        s1 = s1 - 1
-                        m1 = f'\nPreklopljenih linija ukupno: {s1}'
+                        s1 = s1
+                        m1 = f'\nPreklopljenih linija: [ {s1} ]'
                         logger.debug(m1)
                     else:
                         m1 = ''
-                    logger.debug(f'Fixer: Popravljenih gapova ukupno: {m}')
+                    logger.debug(f'Fixer: Popravljenih gapova: {m}')
                     if m >= 0:
                         sDlg = wx.MessageDialog(
                             self,
-                            f'Subtitle fix\n\nPopravljenih gapova ukupno: {m}\n{m1}',
+                            f'Subtitle fix\n\nPopravljenih gapova: [ {m} ]\n{m1}',
                             'SubtitleConverter',
                             wx.OK | wx.ICON_INFORMATION,
                         )
@@ -1847,7 +1834,8 @@ class MyFrame(ConverterFrame):
         self.newEnc = entered_enc
         self.pre_suffix = value1_s
 
-        if self.text_1.IsModified(): text = self.text_1.GetValue()
+        if self.text_1.IsModified():
+            text = self.text_1.GetValue()
         else: text = WORK_TEXT.getvalue()
             
         try:
