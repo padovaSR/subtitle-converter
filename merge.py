@@ -17,7 +17,9 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-import pysrt
+import srt
+import datetime as DT
+from srt import Subtitle
 from pysrt import SubRipFile, SubRipItem
 import logging.config
 
@@ -103,82 +105,66 @@ def myMerger(subs_in, max_time, max_char, _gap):
     WORK_TEXT.seek(0)
 
 
-def fixGaps(subs):
-
-    new_j = SubRipFile()
-    k = 0
-    pfp = 0
-    for first, second in zip(subs, subs[1:]):
-
-        t1 = first.end.ordinal
-        t2 = second.start.ordinal
-
-        if t1 > t2:
-            pfp += 1
-
-        if t1 > t2 or t2 - t1 < 85:
-            k += 1
-            # first.shift(milliseconds=-25)
-            t_fix = pysrt.SubRipTime.from_ordinal(
-                (second.start.ordinal) - 70
-            )
-            sub = SubRipItem(first.index, first.start, t_fix, first.text)
-            new_j.append(sub)
-        else:
-            sub = SubRipItem(first.index, first.start, first.end, first.text)
-            new_j.append(sub)
-
-    sub = SubRipItem(
-        subs[-1].index, subs[-1].start, subs[-1].end, subs[-1].text
-    )
-    new_j.append(sub)
-    new_j.clean_indexes()
-
-    new_f = SubRipFile()
-    fsub = SubRipItem(
-        new_j[0].index, new_j[0].start, new_j[0].end, new_j[0].text
-    )
-    new_f.append(fsub)
-
-    for first, second in zip(new_j, new_j[1:]):
-
-        t1 = first.end.ordinal
-        t2 = second.start.ordinal
-        if t2 - t1 < 100:
-            t1_fix = pysrt.SubRipTime.from_ordinal(
-                (second.start.ordinal) + 15
-            )
-            subf = SubRipItem(second.index, t1_fix, second.end, second.text)
-            new_f.append(subf)
-        else:
-            subf = SubRipItem(
-                second.index, second.start, second.end, second.text
-            )
-            new_f.append(subf)
-
-    new_f.clean_indexes()
-    WORK_TEXT.truncate(0)
-    WORK_TEXT.seek(0)
-    SubRipFile(new_f).write_into(WORK_TEXT)
-    WORK_TEXT.seek(0)
-
-    return k, pfp
-
-
-def fixLast(infile, kode):
-    subs = pysrt.open(infile, encoding=kode)
-    s1 = (subs[-1].start, subs[-1].end, subs[-1].text)
-    s2 = (subs[-2].start, subs[-2].end, subs[-2].text)
-    s3 = (subs[-3].start, subs[-3].end, subs[-3].text)
-    s4 = (subs[-4].start, subs[-4].end, subs[-4].text)
-
-    if s4 == s3 and s3 == s2 and s2 == s1:
-        subs.remove(subs[-4])
-        subs.remove(subs[-3])
-        subs.remove(subs[-2])
-        subs.clean_indexes()
-        subs.save(infile, encoding=kode)
-    elif s1 == s2:
-        subs.remove(subs[-1])
-        subs.clean_indexes()
-        subs.save(infile, encoding=kode)
+class FixSubGaps:
+    """"""
+    def __init__(self, inlist=[], mingap=0):
+        """"""
+        self.inlist = inlist
+        self.mingap = mingap
+    
+    def powerSubs(self):
+        
+        inlist = self.inlist
+        mingap = self.mingap
+        
+        new_s = []
+        
+        gaps = 0
+        overlaps = 0
+        
+        Left = mingap*70/100
+        Right = mingap*30/100
+        
+        for FSUB, ESUB in zip(inlist, inlist[1:]):
+            
+            end_1 = self.mTime(FSUB.end)
+            start_1 = self.mTime(ESUB.start)
+            gap = start_1 - end_1
+            
+            if start_1 < end_1: overlaps += 1
+            
+            if gap < mingap:
+                gaps += 1
+                new_end = DT.timedelta(milliseconds=(start_1-Left))
+                new_s.append(Subtitle(FSUB.index, FSUB.start, new_end, FSUB.content))
+            else:
+                new_s.append(Subtitle(FSUB.index, FSUB.start, FSUB.end, FSUB.content))
+                
+        new_s.append(Subtitle(inlist[-1].index, inlist[-1].start, inlist[-1].end, inlist[-1].content))
+        
+        new_f = []
+        
+        new_f.append(Subtitle(new_s[0].index, new_s[0].start, new_s[0].end, new_s[0].content))
+        
+        for FSUB, ESUB in zip(new_s, new_s[1:]):
+            
+            end_1 = self.mTime(FSUB.end)
+            start_1 = self.mTime(ESUB.start)
+            gap = start_1 - end_1
+            
+            if gap < mingap:
+                new_start = DT.timedelta(milliseconds=(start_1+Right))
+                new_f.append(Subtitle(ESUB.index, new_start, ESUB.end, ESUB.content))
+            else:
+                new_f.append(Subtitle(ESUB.index, ESUB.start, ESUB.end, ESUB.content))
+                
+        WORK_TEXT.truncate(0)
+        WORK_TEXT.seek(0)
+        WORK_TEXT.write(srt.compose(new_f))
+        WORK_TEXT.seek(0)        
+        return gaps, overlaps
+    
+    # taken from srt_tools
+    @staticmethod
+    def mTime(delta):
+        return delta.days*86400000+delta.seconds*1000+delta.microseconds/1000
