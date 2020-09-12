@@ -35,6 +35,15 @@ from more_itertools import unique_justseen
 from Manual import MyManual
 from zip_confirm import TreeDialog 
 from errors_check import checkErrors, checkChars, checkFile, displayError
+from file_settings import FileSettings
+from merger_settings import Settings
+from fixer_settings import FixerSettings
+from File_Handler import fileHandle, addPrevious
+from file_dnd import FileDrop
+from merge import myMerger, FixSubGaps
+from zamenaImena import shortcutsKey 
+from File_processing import newName, nameDialog, writeToFile
+from settings import BYTES_TEXT as BT
 from settings import (
     filePath,
     baseName, 
@@ -47,15 +56,7 @@ from settings import (
     printEncoding,
     droppedText, 
 )
-from settings import BYTES_TEXT as BT 
-from file_settings import FileSettings
-from merger_settings import Settings
-from fixer_settings import FixerSettings
-from File_Handler import fileHandle, addPrevious
-from file_dnd import FileDrop
-from merge import myMerger, FixSubGaps
-from zamenaImena import shortcutsKey 
-from File_processing import newName, nameDialog, writeToFile
+
 from text_processing import (
     ConvertText,
     ChangeEncoding,
@@ -270,7 +271,7 @@ class MyFrame(ConverterFrame):
         else:
             path = message
             enc = printEncoding(msg[1])
-            if type(path) == list:
+            if type(path) is list:
                 path = path[-1]
             self.filehistory.AddFileToHistory(FILE_HISTORY[len(FILE_HISTORY)-1])
             self.SetStatusText(baseName(path))
@@ -291,7 +292,7 @@ class MyFrame(ConverterFrame):
 
         rlPath = msg[0]
         tpath = message
-        if type(tpath) == list:
+        if type(tpath) is list:
             tpath = tpath[-1]
         enc = msg[1]
 
@@ -2238,7 +2239,7 @@ class MyFrame(ConverterFrame):
                         return b_data
                     if buffer:
                         a_data = buffer.getvalue()
-                        if type(a_data) == str:
+                        if type(a_data) is str:
                             a_data = a_data.encode(enc)
                         a_data = a_data.replace(b"\n", b"\r\n")
                         buffer.seek(0)
@@ -2538,10 +2539,10 @@ class MyFrame(ConverterFrame):
             dlg.Destroy()
 
     def fStatus(self, path):
-        if type(path) == list:
+        if type(path) is list:
             path = path[-1]
         p, s = os.path.splitext(path)
-        if type(self.real_path[0]) == list:
+        if type(self.real_path[0]) is list:
             self.real_path = self.real_path[0]
         suffix = os.path.splitext(self.real_path[0])[-1]
         if s != suffix and suffix != ".zip":
