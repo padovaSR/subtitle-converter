@@ -72,7 +72,7 @@ def myMerger(subs_in, max_time, max_char, _gap):
                     )
                     new_j.append(sub)
             else:
-                ## dodaj originalne linije kao string
+                ## dodaj originalne linije
                 sub1 = SubRipItem(first.index, first.start, first.end, first.text)
                 sub2 = SubRipItem(second.index, second.start, second.end, second.text)
                 new_j.append(sub1)
@@ -86,6 +86,7 @@ def myMerger(subs_in, max_time, max_char, _gap):
         neparni = [x for x in new_j[0::2]]
 
         return new_j, parni, neparni
+    
     out_f, par1, nep1 = merge_lines(parni, neparni)
     out_f, par2, nep2 = merge_lines(par1, nep1)
     out_f, par3, nep3 = merge_lines(par2, nep2)
@@ -112,57 +113,60 @@ class FixSubGaps:
         self.mingap = mingap
     
     def powerSubs(self):
-        
-        inlist = self.inlist
-        mingap = self.mingap
-        
-        new_s = []
-        new_f = []
-        
-        gaps = 0
-        overlaps = 0
-        
-        Left = mingap*70/100
-        Right = mingap*30/100
-        
-        for FSUB, ESUB in zip(inlist, inlist[1:]):
+        ''''''
+        gaps, overlaps, new_list = self.lefGap()
+        new_subs_list = self.rightGap(new_list)
             
-            end_1 = self.mTime(FSUB.end)
-            start_1 = self.mTime(ESUB.start)
-            gap = start_1 - end_1
-            
-            if start_1 < end_1: overlaps += 1
-            
-            if gap < mingap:
-                gaps += 1
-                new_end = DT.timedelta(milliseconds=(start_1-Left))
-                new_s.append(Subtitle(FSUB.index, FSUB.start, new_end, FSUB.content))
-            else:
-                new_s.append(Subtitle(FSUB.index, FSUB.start, FSUB.end, FSUB.content))
-                
-        new_s.append(Subtitle(inlist[-1].index, inlist[-1].start, inlist[-1].end, inlist[-1].content))
-        
-        new_f.append(Subtitle(new_s[0].index, new_s[0].start, new_s[0].end, new_s[0].content))
-        
-        for FSUB, ESUB in zip(new_s, new_s[1:]):
-            
-            end_1 = self.mTime(FSUB.end)
-            start_1 = self.mTime(ESUB.start)
-            gap = start_1 - end_1
-            
-            if gap < mingap:
-                new_start = DT.timedelta(milliseconds=(start_1+Right))
-                new_f.append(Subtitle(ESUB.index, new_start, ESUB.end, ESUB.content))
-            else:
-                new_f.append(Subtitle(ESUB.index, ESUB.start, ESUB.end, ESUB.content))
-                
         WORK_TEXT.truncate(0)
-        WORK_TEXT.seek(0)
-        WORK_TEXT.write(srt.compose(new_f))
+        WORK_TEXT.write(srt.compose(new_subs_list))
         WORK_TEXT.seek(0)        
         return gaps, overlaps
     
+    def lefGap(self):
+        """"""
+        inlist = self.inlist
+        mingap = self.mingap
+        Left = mingap*70/100
+        
+        new_s = []
+        gaps = 0
+        overlaps = 0
+        
+        for FSUB in zip(inlist, inlist[1:]):
+            end_1 = self.mTime(FSUB[0].end)
+            start_1 = self.mTime(FSUB[1].start)
+            if start_1 < end_1: overlaps += 1
+            gap = start_1 - end_1
+            if gap < mingap:
+                gaps += 1            
+                new_end = DT.timedelta(milliseconds=(start_1-Left))
+                new_s.append(Subtitle(FSUB[0].index, FSUB[0].start, new_end, FSUB[0].content))
+            else: new_s.append(Subtitle(FSUB[0].index, FSUB[0].start, FSUB[0].end, FSUB[0].content))
+        new_s.append(Subtitle(inlist[-1].index, inlist[-1].start, inlist[-1].end, inlist[-1].content))
+        
+        return gaps, overlaps, new_s
+        
+    def rightGap(self, in_list):
+        """"""
+        inlist = in_list
+        mingap = self.mingap
+        
+        new_f = []
+        Right = mingap*30/100
+        new_f.append(Subtitle(inlist[0].index, inlist[0].start, inlist[0].end, inlist[0].content))
+        for FSUB in zip(inlist, inlist[1:]):
+            end_1 = self.mTime(FSUB[0].end)
+            start_1 = self.mTime(FSUB[1].start)
+            gap = start_1 - end_1
+            if gap < mingap:
+                new_start = DT.timedelta(milliseconds=(start_1+Right))
+                new_f.append(Subtitle(FSUB[1].index, new_start, FSUB[1].end, FSUB[1].content))
+            else: new_f.append(Subtitle(FSUB[1].index, FSUB[1].start, FSUB[1].end, FSUB[1].content))
+            
+        return new_f
+                
     # taken from srt_tools
     @staticmethod
     def mTime(delta):
         return delta.days*86400000+delta.seconds*1000+delta.microseconds/1000
+
