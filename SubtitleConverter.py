@@ -1757,23 +1757,18 @@ class MyFrame(ConverterFrame):
         else:
             text = ""
 
-            def rpt(path, enc):
-                m = 0
-                s1 = 0
-                while True:
-                    subs = list(srt.parse(WORK_TEXT.getvalue()))
-                    x, y = FixSubGaps(inlist=subs, mingap=100).powerSubs()
-                    m += x
-                    s1 += y
-                    if x == 0:
-                        break
-                return m, s1
-
             if cb1_s is True:
                 if cb8_s != True:
-                    m, s1 = rpt(path, entered_enc)
-                else:
-                    logger.debug("Fixer: Remove gaps not enabled.")
+                    m = 0
+                    s1 = 0
+                    while True:
+                        subs = list(srt.parse(WORK_TEXT.getvalue()))
+                        x, y = FixSubGaps(inlist=subs, mingap=100).powerSubs()
+                        m += x
+                        s1 += y
+                        if x == 0:
+                            break                    
+                else: logger.debug("Fixer: Remove gaps not enabled.")
             try:
                 if not cb8_s:
                     text = srt.compose(srt.parse(WORK_TEXT.getvalue()))
@@ -1792,7 +1787,6 @@ class MyFrame(ConverterFrame):
             if cb1_s is True:
                 if cb8_s != True:
                     if s1 > 1:
-                        s1 = s1
                         m1 = f'\nPreklopljenih linija: [ {s1} ]'
                         logger.debug(m1)
                     else:
