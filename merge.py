@@ -39,13 +39,12 @@ def myMerger(subs_in, max_time, max_char, _gap):
     )
     if len(subs)-1 % 2 != 0: subs.append(dsub)
     
-    parni = [x for x in subs[2::2]]
-    neparni = [x for x in subs[1::2]]
+    parni = [x for x in subs[1::2]]
+    neparni = [x for x in subs[0::2]]
     
     def merge_lines(inPar, inNepar):
         re_pattern = re.compile(r'<[^<]*>')
         new_j = SubRipFile()
-        new_j.append(subs[0])
         for first, second, in zip(
             inNepar, inPar
         ):
@@ -78,8 +77,6 @@ def myMerger(subs_in, max_time, max_char, _gap):
                 new_j.append(sub1)
                 new_j.append(sub2)
 
-        if dsub in new_j:
-            new_j.remove(dsub)
         new_j.clean_indexes()
 
         parni = [x for x in new_j[1::2]]
