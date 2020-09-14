@@ -121,7 +121,7 @@ class FixSubGaps:
     
     def powerSubs(self):
         ''''''
-        gaps, overlap, new_list = self.lefGap()
+        gaps, overlap, new_list = self.leftGap()
         new_subs_list = self.rightGap(new_list)
             
         WORK_TEXT.truncate(0)
@@ -129,7 +129,7 @@ class FixSubGaps:
         WORK_TEXT.seek(0)        
         return gaps, overlap
     
-    def lefGap(self):
+    def leftGap(self):
         """"""
         inlist = self.inlist
         mingap = self.mingap
@@ -160,7 +160,6 @@ class FixSubGaps:
         new_f = []
         
         new_f.append(inlist[0])
-        inlist[0].end, inlist[0].content
         for FSUB in zip(inlist, inlist[1:]):
             end_1 = self.mTime(FSUB[0].end)
             start_1 = self.mTime(FSUB[1].start)
