@@ -22,7 +22,6 @@ import os
 import sys
 import srt
 import re
-import pysrt
 import shutil
 import pickle
 import zipfile
@@ -1743,7 +1742,7 @@ class MyFrame(ConverterFrame):
             logger.debug(f"FixSubtitle error: {e}")
 
         self.pre_suffix = value1_s
-        self.newEnc = entered_enc  # VAZNO za Save funkciju
+        self.newEnc = entered_enc
         
         if self.text_1.IsModified():
             text = self.text_1.GetValue()
@@ -1756,7 +1755,6 @@ class MyFrame(ConverterFrame):
             logger.debug("Fixer: No subtitles found.")
         else:
             text = ""
-
             if cb1_s is True:
                 if cb8_s != True:
                     m = 0
@@ -1767,7 +1765,7 @@ class MyFrame(ConverterFrame):
                         m += x
                         s1 += y
                         if x == 0:
-                            break                    
+                            break
                 else: logger.debug("Fixer: Remove gaps not enabled.")
             try:
                 if not cb8_s:
@@ -2119,12 +2117,11 @@ class MyFrame(ConverterFrame):
         try:
             if self.text_1.IsModified(): text = self.text_1.GetValue()
             else: text = WORK_TEXT.getvalue()
-            
-            subs_a = pysrt.from_string(text)
+            subs_a = list(srt.parse(text))
         except Exception as e:
             logger.debug(f"Merger _1, unexpected error: {e}")
 
-        if subs_a[1].start == subs_a[2].start == "00:00:00,000":
+        if subs_a[1].start == subs_a[2].start == "0:00:00,000000":
 
             msginfo = wx.MessageDialog(
                 self,
@@ -2143,7 +2140,7 @@ class MyFrame(ConverterFrame):
                 subs_in=subs_a, max_time=lineLenght, max_char=maxChar, _gap=maxGap,
             )
 
-            b1 = len(pysrt.from_string(WORK_TEXT.getvalue()))
+            b1 = len(list(srt.parse(WORK_TEXT.getvalue())))
             a1 = len(subs_a)
 
             text = WORK_TEXT.getvalue()
@@ -2295,10 +2292,12 @@ class MyFrame(ConverterFrame):
                     if dlg.ShowModal() == wx.ID_OK:
                         response = dlg.GetSelections()
                         files = [izbor[x] for x in response]
+                        
                         zdata = data_out(None, fpath)                       ## latFile original
                         tzdata = data_out(None, tUTF)                       ## cyrUTF-8
                         cyrdata = data_out(self.bytesText, None)            ## cyrillic text binary
                         utf8ldata = self.utf8_latText[tpath]                ## latFile utf-8
+                        
                         data_v = [cyrdata, tzdata, zdata, utf8ldata]
                         zip_data = [data_v[x] for x in response]
                         if not files:
