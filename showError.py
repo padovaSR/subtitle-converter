@@ -17,9 +17,8 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-import sys
 import os
-import pysrt
+import srt
 import webbrowser
 import pickle
 import logging.config
@@ -31,7 +30,7 @@ def showMeError(infile, in_text, outfile, kode):
     with open(os.path.join('resources', 'var', 'fixer_cb3.data'), 'rb') as f:
         cb3_s = pickle.load(f)
 
-    subs = pysrt.from_string(in_text)
+    subs = list(srt.parse(in_text))
 
     if len(subs) > 0:
 
@@ -41,19 +40,19 @@ def showMeError(infile, in_text, outfile, kode):
             kode = "utf-8"
         FP = re.compile(r"\?")
         count = 0
-        sl = pysrt.SubRipFile()
+        sl = []
         sl.append(st)
         for i in subs:
             t = i.text
             FE = re.findall(FP, t)
             if FE:
                 t = t.replace('¬', '?')
-                sub = pysrt.SubRipItem(i.index, i.start, i.end, t)
-                sl.append(sub)
+                sl.append(srt.Subtitle(i.index, i.start, i.end, t))
                 count += 1
         if count > 0:
             try:
-                sl.save(outfile, encoding=kode)
+                with open(outfile, "w", encoding=kode) as f:
+                    f.write(srt.compose(sl))
             except Exception as e:
                 logger.debug(
                     f"ErrorFile, unexpected error: {e}"
