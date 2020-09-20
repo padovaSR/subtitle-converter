@@ -19,65 +19,54 @@
 import re
 import srt
 import datetime as DT
+from itertools import zip_longest
 from srt import Subtitle
-from pysrt import SubRipFile, SubRipItem
 import logging.config
 
 from settings import WORK_TEXT
 
 logger = logging.getLogger(__name__)
 
+# Taken from srt_tools
+def mTime(delta):
+    return delta.days*86400000+delta.seconds*1000+delta.microseconds/1000
+
 def myMerger(subs_in, max_time, max_char, _gap):
 
     subs = subs_in
 
-    dsub = SubRipItem(
+    dsub = Subtitle(
         subs[-1].index + 1,
-        subs[-1].start + 6000,
-        subs[-1].end + 11000,
+        DT.timedelta(milliseconds=(mTime(subs[-1].start) + 6000)),
+        DT.timedelta(milliseconds=(mTime(subs[-1].end) + 11000)),
         'Darkstar test appliance',
     )
-    if len(subs)-1 % 2 != 0: subs.append(dsub)
     
     parni = [x for x in subs[1::2]]
     neparni = [x for x in subs[0::2]]
     
     def merge_lines(inPar, inNepar):
         re_pattern = re.compile(r'<[^<]*>')
-        new_j = SubRipFile()
-        for first, second, in zip(
-            inNepar, inPar
-        ):
-            ## ordinal je vreme u milisekundama
-            gap = second.start.ordinal - first.end.ordinal
-            trajanje = second.end.ordinal - first.start.ordinal
-            tekst1 = re.sub(re_pattern, '', first.text)
-            tekst2 = re.sub(re_pattern, '', second.text)
+        new_j = []
+        for (first, second,) in zip_longest(inNepar, inPar, fillvalue=dsub):
+            
+            gap = mTime(second.start) - mTime(first.end)
+            trajanje = mTime(second.end) - mTime(first.start)
+            tekst1 = re.sub(re_pattern, '', first.content)
+            tekst2 = re.sub(re_pattern, '', second.content)
             text_len = len(tekst1) + len(tekst2)
             if gap <= _gap and trajanje <= max_time and text_len <= max_char:
                 if (
-                    first.text == second.text
+                    first.content == second.content
                     and first.start == second.start
                     and first.end == second.end
                 ):
-                    sub = SubRipItem(first.index, first.start, second.end, first.text)
-                    new_j.append(sub)
+                    new_j.append(Subtitle(first.index, first.start, second.end, first.content))
                 else:
-                    sub = SubRipItem(
-                        first.index,
-                        first.start,
-                        second.end,
-                        first.text + " " + second.text,
-                    )
-                    new_j.append(sub)
+                    new_j.append(Subtitle(first.index, first.start, second.end, first.content + " " + second.content))
             else:
-                ## dodaj originalne linije
-                sub1 = SubRipItem(first.index, first.start, first.end, first.text)
-                sub2 = SubRipItem(second.index, second.start, second.end, second.text)
-                new_j.append(sub1)
-                new_j.append(sub2)
-
-        new_j.clean_indexes()
+                new_j.append(Subtitle(first.index, first.start, first.end, first.content))
+                new_j.append(Subtitle(second.index, second.start, second.end, second.content))
 
         parni = [x for x in new_j[1::2]]
         neparni = [x for x in new_j[0::2]]
@@ -90,14 +79,11 @@ def myMerger(subs_in, max_time, max_char, _gap):
     out_f, par4, nep4 = merge_lines(par3, nep3)
     
     for i in out_f[-4:]:
-        if i.text == "Darkstar test appliance":
-            out_f.remove(i)
-            out_f.clean_indexes()    
+        if i.content == "Darkstar test appliance": out_f.remove(i)    
     
     WORK_TEXT.truncate(0)
-    SubRipFile(out_f).write_into(WORK_TEXT)
+    WORK_TEXT.write(srt.compose(out_f))
     WORK_TEXT.seek(0)
-
 
 class FixSubGaps:
     """"""
@@ -108,11 +94,6 @@ class FixSubGaps:
         self.Left = self.mingap*70/100
         self.Right = self.mingap*30/100
         
-    # taken from srt_tools
-    @staticmethod
-    def mTime(delta):
-            return delta.days*86400000+delta.seconds*1000+delta.microseconds/1000
-    
     def powerSubs(self):
         ''''''
         gaps, overlap, new_list = self.leftGap()
@@ -133,8 +114,8 @@ class FixSubGaps:
         new_s = []
         
         for FSUB in zip(inlist, inlist[1:]):
-            end_1 = self.mTime(FSUB[0].end)
-            start_1 = self.mTime(FSUB[1].start)
+            end_1 = mTime(FSUB[0].end)
+            start_1 = mTime(FSUB[1].start)
             if start_1 < end_1: overlap += 1
             gap = start_1 - end_1
             if gap < mingap:
@@ -155,8 +136,8 @@ class FixSubGaps:
         
         new_f.append(inlist[0])
         for FSUB in zip(inlist, inlist[1:]):
-            end_1 = self.mTime(FSUB[0].end)
-            start_1 = self.mTime(FSUB[1].start)
+            end_1 = mTime(FSUB[0].end)
+            start_1 = mTime(FSUB[1].start)
             gap = start_1 - end_1
             if gap < mingap:
                 new_start = DT.timedelta(milliseconds=(start_1+Right))
