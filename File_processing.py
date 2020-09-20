@@ -76,6 +76,12 @@ class FileOpened:
                     dlg.Destroy()
 
     @staticmethod
+    def addBytes(path, enc, content):
+        '''Create and append namedtuple to BYTES_TEXT list'''
+        multi = namedtuple("multi", ["path","enc", "content"])
+        BYTES_TEXT.append(multi(path, enc, content))
+        
+    @staticmethod
     def fCodeList():
         """"""
         kodek = FILE_SETTINGS["CB_value"]
@@ -137,13 +143,7 @@ class FileOpened:
                     break        
             self.internEnc = enc
             return enc
-    
-    @staticmethod
-    def addBytes(path, enc, content):
-        '''Create and append namedtuple to BYTES_TEXT list'''
-        multi = namedtuple("multi", ["path","enc", "content"])
-        BYTES_TEXT.append(multi(path, enc, content))
-        
+
 def newName(path, pre_suffix, multi=False):
     ''''''
     added = name_data[0]
