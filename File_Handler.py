@@ -39,7 +39,6 @@ def addPrevious(action, enc=None, content=None, psuffix=None, tpath=None, rpath=
     prev = namedtuple("prev", ["action", "enc", "content", "psuffix", "tpath", "rpath"])
     PREVIOUS.append(prev(action, enc, content, psuffix, tpath, rpath))
 
-
 def fileHandle(infiles, text_control, fdrop=False):
     """"""
     c = 0
@@ -81,7 +80,7 @@ def fileHandle(infiles, text_control, fdrop=False):
                     if not os.path.exists(infiles[i]):
                         logger.debug(f"Skipping {baseName(infiles[i])}")
                         text_control.AppendText(
-                            f"\n_SKIPP_:{baseName(infiles[i])}"
+                            f"\n_SKIP_:{baseName(infiles[i])}"
                         )
                         continue
                     c += 1
