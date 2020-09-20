@@ -296,8 +296,7 @@ def zameniImena(text_in):
     if len(list(srt.parse(text_in))) == 0:
         logger.debug(f"Transkrib, No subtitles found.")
     else:
-        subs = srt.parse(text_in)
-        text_in = srt.compose(subs)
+        text_in = srt.compose(srt.parse(text_in, ignore_errors=True))
 
     robj1 = re.compile(r'\b(' + '|'.join(map(re.escape, dictionary_1.keys())) + r')\b')
     robj2 = re.compile(r'\b(' + '|'.join(map(re.escape, dictionary_2.keys())) + r')\b')
@@ -488,20 +487,20 @@ def rm_dash(text_in):
         ) as sp:
             data = pickle.load(sp)
             ex = data['key1']
-            cb1_s = ex['state1']
-            cb2_s = ex['state2']
-            cb3_s = ex['state3']
-            cb4_s = ex['state4']
-            cb5_s = ex['state5']
-            cb6_s = ex['state6']
-            cb7_s = ex['state7']
-            cb8_s = ex['state8']
+            cb1_s = ex['fixgap']
+            cb2_s = ex['linije']
+            cb3_s = ex['italik']
+            cb4_s = ex['crtice']
+            cb5_s = ex['crtice_sp']
+            cb6_s = ex['spejsevi']
+            cb7_s = ex['kolor']
+            cb8_s = ex['nuliranje']
     except IOError as e:
         logger.debug("FixSubtitle, I/O error({0}): {1}".format(e.errno, e.strerror))
     except Exception as e:
         logger.debug(f"FixSubtitle, unexpected error: {e}")
     # ------------------------------------------------------------------------------------------ #
-    #  cb1_s Popravi gapove, cb2_s Poravnaj linije, cb3_s Pokazi linije sa greskama,             #
+    #  cb1_s Popravi gapove, cb2_s Poravnaj linije, cb3_s italik tagovi, cb8_s=nuliranje         #
     #  cb4_s Crtice na pocetku prvog reda, cb5_s Spejs iza crtice, cb6_s Vise spejseva u jedan   #
     # ------------------------------------------------------------------------------------------ #
 
@@ -537,40 +536,36 @@ def rm_dash(text_in):
             text = remSel(text, cs_r, '-')
 
     if cb7_s is True:
-        if not cb8_s:
-            subs = list(srt.parse(text))
-            if len(subs) > 0:
-                new_f = []
-                for i in range(len(subs)):
-                    t = subs[i].content
-                    t = (
-                        t.replace('</i><i>', '')
-                        .replace('</i> <i>', ' ')
-                        .replace('</i>\n<i>', '\n')
-                        .replace('</i>-<i>', '-')
-                        .replace('</i>\n-<i>', '-\n')
-                    )
-                    sub = srt.Subtitle(subs[i].index, subs[i].start, subs[i].end, t)
-                    new_f.append(sub)
-                text = srt.compose(new_f)
-            else:
-                logger.debug('Fixer: No subtitles found!')
+        subs = list(srt.parse(text))
+        if len(subs) > 0:
+            new_f = []
+            for i in range(len(subs)):
+                t = subs[i].content
+                t = (
+                    t.replace('</i><i>', '')
+                    .replace('</i> <i>', ' ')
+                    .replace('</i>\n<i>', '\n')
+                    .replace('</i>-<i>', '-')
+                    .replace('</i>\n-<i>', '-\n')
+                )
+                new_f.append(srt.Subtitle(subs[i].index, subs[i].start, subs[i].end, t))
+            text = srt.compose(new_f)
+        else:
+            logger.debug('Fixer: No subtitles found!')
 
     if cb2_s is True:
-        if not cb8_s:
-            subs = list(srt.parse(text))
-            if len(subs) > 0:
-                new_s = []
-                for i in subs:
-                    n = poravnLine(i.content)
-                    if cb5_s is False and sp_n >= 3:
-                        n = cs_r1.sub(r'- ', n)
-                    sub = srt.Subtitle(i.index, i.start, i.end, n)
-                    new_s.append(sub)
-                text = srt.compose(new_s)
-            else:
-                if not len(subs) > 0:
-                    logger.debug('Fixer: No subtitles found!')
+        subs = list(srt.parse(text))
+        if len(subs) > 0:
+            new_s = []
+            for i in subs:
+                n = poravnLine(i.content)
+                if cb5_s is False and sp_n >= 3:
+                    n = cs_r1.sub(r'- ', n)
+                new_s.append(srt.Subtitle(i.index, i.start, i.end, n))
+            text = srt.compose(new_s)
+        else:
+            if not len(subs) > 0:
+                logger.debug('Fixer: No subtitles found!')
 
     if cb3_s is True:
         text = remSel(text, ct_r, "")
@@ -591,7 +586,7 @@ def poravnLine(intext):
     def myWrapper(intext):
         f_rpl = re.compile(r'^((.*?\n.*?){1})\n', re.I)
         # n = len(intext) // 2
-        n = proCent(50, len(intext))
+        n = proCent(48, len(intext))
         wrapper = TextWrapper(break_long_words=False, break_on_hyphens=False, width=n)
         te = wrapper.fill(intext)
         if te.count('\n') >= 2:
