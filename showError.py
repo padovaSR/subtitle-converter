@@ -43,7 +43,7 @@ def showMeError(infile, in_text, outfile, kode):
         sl = []
         sl.append(st)
         for i in subs:
-            t = i.text
+            t = i.content
             FE = re.findall(FP, t)
             if FE:
                 t = t.replace('¬', '?')
