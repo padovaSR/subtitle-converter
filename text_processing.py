@@ -5,7 +5,6 @@ import os
 import re
 import unicodedata
 import srt
-import pysrt
 import pickle
 from textwrap import TextWrapper
 from zamenaImena import (
@@ -294,7 +293,7 @@ def remTag(text_in):
 
 def zameniImena(text_in):
 
-    if len(pysrt.from_string(text_in)) == 0:
+    if len(list(srt.parse(text_in))) == 0:
         logger.debug(f"Transkrib, No subtitles found.")
     else:
         subs = srt.parse(text_in)
