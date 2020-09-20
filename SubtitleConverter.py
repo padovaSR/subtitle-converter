@@ -86,7 +86,7 @@ logging.config.fileConfig(
 logger = logging.getLogger(__name__)
 
 
-VERSION = "v0.5.9.0_beta2"
+VERSION = "v0.5.9.0_beta3"
 
 
 class MyFrame(ConverterFrame):
@@ -1734,8 +1734,9 @@ class MyFrame(ConverterFrame):
             ) as sp:
                 data = pickle.load(sp)
                 ex = data['key1']
-                cb1_s = ex['state1']
-                cb8_s = ex['state8']
+                cb1_s = ex['fixgap']
+                cb8_s = ex['nuliranje']
+                _gap = ex["mingap"]
                 fx = data['key5']
                 value1_s = fx['fixed_subs']
         except Exception as e:
@@ -1744,10 +1745,8 @@ class MyFrame(ConverterFrame):
         self.pre_suffix = value1_s
         self.newEnc = entered_enc
         
-        if self.text_1.IsModified():
-            text = self.text_1.GetValue()
-        else:
-            text = WORK_TEXT.getvalue()
+        if self.text_1.IsModified(): text = self.text_1.GetValue()
+        else: text = WORK_TEXT.getvalue()
                 
         subs = list(srt.parse(text))
 
@@ -1761,7 +1760,7 @@ class MyFrame(ConverterFrame):
                     s1 = 0
                     while True:
                         subs = list(srt.parse(WORK_TEXT.getvalue()))
-                        x, y = FixSubGaps(inlist=subs, mingap=100).powerSubs()
+                        x, y = FixSubGaps(inlist=subs, mingap=_gap).powerSubs()
                         m += x
                         s1 += y
                         if x == 0:
@@ -1811,8 +1810,6 @@ class MyFrame(ConverterFrame):
         ) as sp:
             data = pickle.load(sp)
             ex = data['key5']
-            ef = data['key1']
-            cb8_s = ef["state8"]
             value1_s = ex['cleanup']
 
         tval = self.text_1.GetValue()
