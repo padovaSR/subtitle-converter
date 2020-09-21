@@ -36,11 +36,11 @@ class FixerSettings(wx.Dialog):
         sizer_1.Add(sizer_3, 0, wx.EXPAND|wx.TOP|wx.LEFT, 5)
 
         self.cbx_8 = wx.CheckBox(self, wx.ID_ANY, "Popravi gapove na:  ")
-        self.cbx_8.SetMinSize((120, 15))
+        self.cbx_8.SetMinSize((140, 15))
         sizer_3.Add(
             self.cbx_8, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT | wx.TOP, 5
         )
-        sizer_3.Add((20, 20), 0, 0, 0)
+        sizer_3.Add((18, 18), 0, 0, 0)
 
         self.mingap = wx.lib.intctrl.IntCtrl(self, size=(50, -1))
         sizer_3.Add(self.mingap, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 3)
@@ -48,7 +48,7 @@ class FixerSettings(wx.Dialog):
         self.label_1 = wx.StaticText(self, wx.ID_ANY, "(ms)")
         sizer_3.Add(self.label_1, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT|wx.RIGHT, 5)
         
-        sizer_3.Add((70, 20), 0, 0, 0)
+        sizer_3.Add((64, 20), 0, 0, 0)
 
         self.cbx_7 = wx.CheckBox(
             self, wx.ID_ANY, "Poravnaj linije teksta", style=wx.CHK_2STATE
@@ -125,12 +125,12 @@ class FixerSettings(wx.Dialog):
         sizer_1.Add(sizer_2, 0, wx.ALIGN_RIGHT | wx.ALL, 4)
 
         self.button_OK = wx.Button(self, wx.ID_OK, "")
-        self.button_OK.SetMinSize((72, 20))
+        self.button_OK.SetMinSize((70, 22))
         self.button_OK.SetDefault()
         sizer_2.Add(self.button_OK, 0, 0, 0)
 
         self.button_CANCEL = wx.Button(self, wx.ID_CANCEL, "")
-        self.button_CANCEL.SetMinSize((72, 20))
+        self.button_CANCEL.SetMinSize((70, 22))
         sizer_2.Add(self.button_CANCEL, 0, 0, 0)
 
         self.SetSizer(sizer_1)
