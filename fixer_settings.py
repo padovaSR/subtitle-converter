@@ -33,19 +33,22 @@ class FixerSettings(wx.Dialog):
         sizer_1 = wx.BoxSizer(wx.VERTICAL)
 
         sizer_3 = wx.BoxSizer(wx.HORIZONTAL)
-        sizer_1.Add(sizer_3, 1, wx.EXPAND, 0)
+        sizer_1.Add(sizer_3, 0, wx.EXPAND|wx.TOP|wx.LEFT, 5)
 
-        self.cbx_8 = wx.CheckBox(self, wx.ID_ANY, "Popravi gapove na: ")
+        self.cbx_8 = wx.CheckBox(self, wx.ID_ANY, "Popravi gapove na:  ")
         self.cbx_8.SetMinSize((120, 15))
         sizer_3.Add(
-            self.cbx_8, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT | wx.RIGHT | wx.TOP, 5
+            self.cbx_8, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT | wx.TOP, 5
         )
+        sizer_3.Add((20, 20), 0, 0, 0)
 
         self.mingap = wx.lib.intctrl.IntCtrl(self, size=(50, -1))
         sizer_3.Add(self.mingap, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 3)
 
         self.label_1 = wx.StaticText(self, wx.ID_ANY, "(ms)")
-        sizer_3.Add(self.label_1, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 5)
+        sizer_3.Add(self.label_1, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT|wx.RIGHT, 5)
+        
+        sizer_3.Add((70, 20), 0, 0, 0)
 
         self.cbx_7 = wx.CheckBox(
             self, wx.ID_ANY, "Poravnaj linije teksta", style=wx.CHK_2STATE
@@ -87,7 +90,7 @@ class FixerSettings(wx.Dialog):
             self, wx.ID_ANY, "Nuliranje vremena celog titla", style=wx.CHK_2STATE
         )
         self.cbx_1.SetForegroundColour(wx.Colour(255, 0, 0))
-        self.cbx_1.SetToolTip("\n Carefully, think tvice :-)\n \n")
+        self.cbx_1.SetToolTip("\n Carefully, think twice :-)\n \n")
         sizer_1.Add(self.cbx_1, 0, wx.EXPAND | wx.LEFT | wx.TOP, 5)
         
         t1 = os.path.join('resources', 'var', 'dialog_settings.db.dat')
@@ -131,6 +134,7 @@ class FixerSettings(wx.Dialog):
         sizer_2.Add(self.button_CANCEL, 0, 0, 0)
 
         self.SetSizer(sizer_1)
+        sizer_1.SetSizeHints(self)
 
         self.SetAffirmativeId(self.button_OK.GetId())
         self.SetEscapeId(self.button_CANCEL.GetId())
