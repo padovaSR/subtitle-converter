@@ -263,6 +263,9 @@ class MyFrame(ConverterFrame):
         
     def updateStatus(self, message, msg):
         ''''''
+        self.enableTool()
+        self.clearUndoRedo()
+        
         if msg[2] is True:
             self.multiFile = True
             self.SetStatusText('Multiple files ready for processing')
@@ -290,6 +293,7 @@ class MyFrame(ConverterFrame):
         self.clearUndoRedo()
 
         rlPath = msg[0]
+        
         tpath = message
         if type(tpath) is list:
             tpath = tpath[-1]
@@ -724,7 +728,7 @@ class MyFrame(ConverterFrame):
                 ErrorDlg.ShowModal()
                 
             addPrevious(
-                "toCYR", self.newEnc, text, self.pre_suffix, path, self.real_path[-1]
+                "toCYR", self.newEnc, text.replace("¬", "?"), self.pre_suffix, path, self.real_path[-1]
             )
             self.postAction(path)
             
