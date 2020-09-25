@@ -86,7 +86,7 @@ logging.config.fileConfig(
 logger = logging.getLogger(__name__)
 
 
-VERSION = "v0.5.9.0_beta4b"
+VERSION = "v0.5.9.0_beta5"
 
 
 class MyFrame(ConverterFrame):
@@ -587,12 +587,8 @@ class MyFrame(ConverterFrame):
                         wx.OK | wx.ICON_INFORMATION
                     )
                     sDlg.ShowModal()
-                    addPrevious("Saved")
                     FILE_HISTORY.append(outpath)
                     self.filehistory.AddFileToHistory(outpath)                
-                    self.MenuBar.Enable(wx.ID_SAVE, False)
-                    self.MenuBar.Enable(wx.ID_SAVEAS, False)
-                    self.frame_toolbar.EnableTool(1010, False)
                     self.reload.Enable(True)
                     self.reloadtext.Enable(True)
                     self.SetStatusText(baseName(outpath))
@@ -638,7 +634,6 @@ class MyFrame(ConverterFrame):
             if not text: text = text = self.fromPrevious("Open")[2]
             
             v = writeToFile(text, path, self.newEnc, multi=False)
-            addPrevious("Saved")
             if os.path.isfile(path) and v is True:
                 logger.debug(f"File saved sucessfully. {path}")
                 sDlg = wx.MessageDialog(
@@ -652,9 +647,6 @@ class MyFrame(ConverterFrame):
                 sDlg.ShowModal()
                 FILE_HISTORY.append(path)
                 self.filehistory.AddFileToHistory(path)
-                self.MenuBar.Enable(wx.ID_SAVE, False)
-                self.MenuBar.Enable(wx.ID_SAVEAS, False)
-                self.frame_toolbar.EnableTool(1010, False)
                 self.reload.Enable(True)
         else:
             dlg.Destroy()
@@ -2352,7 +2344,6 @@ class MyFrame(ConverterFrame):
                         wx.OK | wx.ICON_INFORMATION,
                     )
                     sDlg.ShowModal()
-                addPrevious("exportZIP")
             else:
                 logger.debug(f"Export ZIP: None selected")
                 return
@@ -2515,7 +2506,6 @@ class MyFrame(ConverterFrame):
                             wx.OK | wx.ICON_INFORMATION,
                         )
                         sDlg.ShowModal()
-                        addPrevious("exportZIPmultiple")
                     else:
                         edlg = wx.MessageDialog(
                             self,
