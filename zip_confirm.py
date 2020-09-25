@@ -35,14 +35,6 @@ class TreeDialog(wx.Dialog):
         self.files = files
         self.caption = caption
         self.root_name = root_name
-        #self.files = [
-            #["Cyr-ansi/test1.cyr.srt", "Cyr-ansi/Sub.cyr.srt"],
-            #["Cyr-utf8/test1.cyr_utf8.srt", "Cyr-utf8/Sub.cyr_utf8.srt"],
-            #["Ansi/test1.srt", "Ansi/Sub.srt"],
-            #["UTF8/test1.utf8.srt", "UTF8/Sub.utf8.srt"],
-        #]
-        self.caption = "ZIP Creation"
-        self.root_name = "test_subtitle.zip"
 
         self.SetSize((339, 334))
         self.SetTitle(self.caption)
@@ -240,7 +232,7 @@ class MyApp(wx.App):
         self.dialog = TreeDialog(None, wx.ID_ANY, "", "")
         self.SetTopWindow(self.dialog)
         self.dialog.ShowModal()
-        # self.dialog.Destroy()
+        self.dialog.Destroy()
         return True
 
 
