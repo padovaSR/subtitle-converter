@@ -23,11 +23,27 @@ if not os.path.exists(page):
 </HEAD>
 
 <BODY TEXT="#808080" BGCOLOR="#ebf5fb" LINK="#0000FF" VLINK="#FF0000" ALINK="#000088">
-
+<a name="top"></a>
 <H1><FONT COLOR="#616B87">Subtitle Converter v-0.5.9</FONT></H1>
 
+<br>&nbsp;
+
+<br><b><a href="#precice" style="color:#93BBD5; text-decoration: none">&bull; Prečice</a></b></br>
+<br>
+<b><a href="#antivirus" style="color:#93BBD5; text-decoration: none">&bull; Antivirus alarm</a></b></br>
+<br>
+<b><a href="#actions" style="color:#93BBD5; text-decoration: none">&bull; Actions</a></b></br>
+<br>
+<b><a href="#preslov" style="color:#93BBD5; text-decoration: none">&bull; Preslovljavanje</a></b></br>
+<br>
+<b><a href="#reload" style="color:#93BBD5; text-decoration: none">&bull; Reload</a></b></br>
+<br>
+<b><a href="#select" style="color:#93BBD5; text-decoration: none">&bull; Selektovanje fajlova</a></b></br>
+
+<br>&nbsp;
+
 <H2>
-<FONT COLOR="#777F95">Prečice:</FONT></H2>
+<a name="precice"><FONT COLOR="#777F95">Prečice:</FONT></H2></a>
 
 <P><B><FONT COLOR="#777F95">Ctrl+Shift+F</B></FONT>: FileSettings dijalog, predefinisani "pre presufiks" novih fajlova(lat,cyr,utf8...)<br>
 <B><FONT COLOR="#777F95">Ctrl+Shift+Y</B></FONT>: Latinica u Ćirilicu UTF-8<br>
@@ -36,7 +52,7 @@ Ostale prečice se mogu uređivati u <b>ShortcutEditoru</b> u meniju <b>Preferen
 
 <BR>&nbsp;
 
-<H2><FONT COLOR="#777F95">Ativirus alarm:</FONT></H2>
+<a name="antivirus"><H2><FONT COLOR="#777F95">Ativirus alarm:</FONT></H2></a>
 <P>Ako Avast ili neki drugi AV program prepoznaje SubtitleConverter.exe kao pretnju<br>
 ili neku vrstu virusa, to je takozvani "False Positive" ili lažni alarm.</br>
 
@@ -47,14 +63,14 @@ https://support.avast.com/en-ww/article/168/</br>
 
 <br>&nbsp;
 
-<h2><font color="#777F95">Actions</font></h2>
+<a name="actions"><h2><font color="#777F95">Actions</font></h2></a>
 <p>Akcije iz menija <b>Actions</b> se nastavjaju jedna na drugu. Bilo kojim redom<br>
 Promene će biti sačuvane kao što su prikazane u prozoru programa.<br>
 Postoje opcije u meniju <b>Edit</b>, Undo i Redo akcije.</br></p>
 
 <br>&nbsp;
 
-<h2><font color="#777F95">Preslovljavanje</font></h2>
+<a name="preslov"><h2><font color="#777F95">Preslovljavanje</font></h2></a>
 <p>Tekst titla se preslovljava iz Latinice u Ćirilicu i obratno.<br>
 Predviđeno je da tekst unutar izlomljenih zagrada: <b>&lt; &gt;</b> ostaje u latinici.<br>
 Stavljanjem nekih delova teksta unutar zagrada <b>&lt; &gt;</b> postiže se selektivno preslovljavanje iz Latinice u Ćirilicu.<br>
@@ -73,20 +89,23 @@ Opcije za preslovljavanje iz Ćirilice u Latinicu nalaze se u meniju <b>Actions:
 
 <br>&nbsp;
 
-<h2><font color="#777F95">Reload</font></h2>
+<a name="reload"><h2><font color="#777F95">Reload</font></h2></a>
 <p>U meniju <b>File</b> postoji opcija "Reload file" kojom se ponovo otvara i učitava trenutni fajl. Sve promene u fajlu<br>
 koje su nastale u međuvremenu će biti učitane u radni tekst.<br>
 U meniju <b>Edit</b> postoji opcija "Reload text", ova opcija samo ponovo učitava početni tekst a pri tome ne otvara ponovo fajl koji u međuvremenu može biti promenjen.</br></p>
 
 <br>&nbsp;
 
-<h2><font color="#777F95">Selektovanje fajlova</font></h2>
+<a name="select"><h2><font color="#777F95">Selektovanje fajlova</font></h2></a>
 <p>Selektovanje više datoteka ili fajlova koji se nalaze u nizu vrši se mišem ili označavanjem prve datoteke<br>
-zatim držanjem tatera <b>Shift</b> i klikom na željene ikone u nizu.<br>
+zatim držanjem tastera <b>Shift</b> i klikom na željene ikone u nizu.<br>
 <br></br>
 Selektovanje više datoteka koje nisu u nizu:<br>
 označiti prvu, držati pritisnut taster <b>Ctrl</b> i klikom na svaku sledeću datoteku koju želimo označiti.
 </br></p>
+
+<br>
+<a href="#top" style="color:#93BBD5; text-decoration: none">Na vrh</a></b></br>
 
 <br>&nbsp;
 
