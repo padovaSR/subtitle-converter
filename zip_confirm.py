@@ -35,6 +35,14 @@ class TreeDialog(wx.Dialog):
         self.files = files
         self.caption = caption
         self.root_name = root_name
+        #self.files = [
+            #["Cyr-ansi/test1.cyr.srt", "Cyr-ansi/Sub.cyr.srt"],
+            #["Cyr-utf8/test1.cyr_utf8.srt", "Cyr-utf8/Sub.cyr_utf8.srt"],
+            #["Ansi/test1.srt", "Ansi/Sub.srt"],
+            #["UTF8/test1.utf8.srt", "UTF8/Sub.utf8.srt"],
+        #]
+        self.caption = "ZIP Creation"
+        self.root_name = "test_subtitle.zip"
 
         self.SetSize((339, 334))
         self.SetTitle(self.caption)
@@ -132,6 +140,7 @@ class TreeDialog(wx.Dialog):
         self.Bind(wx.EVT_BUTTON, self.onQuit, self.button_CANCEL)
         self.Bind(wx.EVT_CLOSE, self.onCancel, id=-1)
         self.Bind(wx.EVT_CHECKBOX, self.rebuildItems, id=-1)
+        self.Bind(wx.EVT_CHECKBOX, self.DoFolders, self.checkbox_1)
         # end wxGlade
 
         isz = (16, 16)
@@ -164,23 +173,32 @@ class TreeDialog(wx.Dialog):
 
     def makeMenu(self, items=[]):
         """"""
-        l = [os.path.dirname(x) for x in items]
-        folders = sorted(set(l), key=l.index)
-
-        cItems = [self.tree.AppendItem(self.root, x) for x in folders]
-        for i in items:
-            a = os.path.dirname(i)
-            b = os.path.basename(i)
-            for x in range(len(folders)):
-                if a == folders[x]:
-                    lfile = self.tree.AppendItem(cItems[x], b)
-                    self.tree.SetItemImage(lfile, self.fileidx, wx.TreeItemIcon_Normal)
-        for i in cItems:
-            self.tree.SetItemImage(i, self.fldridx, wx.TreeItemIcon_Normal)
-            self.tree.SetItemImage(i, self.fldropenidx, wx.TreeItemIcon_Expanded)
-        self.tree.Expand(self.root)
-        return cItems
-
+        if self.checkbox_1.IsChecked():
+            l = [os.path.dirname(x) for x in items]
+            fItems = sorted(set(l), key=l.index)
+            cItems = [self.tree.AppendItem(self.root, x) for x in fItems]
+        else:
+            fItems = []
+            fItems.append(items)
+            for x in fItems:
+                for i in range(len(x)):
+                    self.tree.AppendItem(self.root, os.path.basename(x[i]))
+                
+        if self.checkbox_1.IsChecked():
+            for i in items:
+                a = os.path.dirname(i)
+                b = os.path.basename(i)
+                for x in range(len(fItems)):
+                    if a == fItems[x]:
+                        lfile = self.tree.AppendItem(cItems[x], b)
+                        self.tree.SetItemImage(lfile, self.fileidx, wx.TreeItemIcon_Normal)
+        if self.checkbox_1.IsChecked():                
+            for i in cItems:
+                self.tree.SetItemImage(i, self.fldridx, wx.TreeItemIcon_Normal)
+                self.tree.SetItemImage(i, self.fldropenidx, wx.TreeItemIcon_Expanded)
+            self.tree.Expand(self.root)
+            return cItems
+        
     def makeFolder(self):
         """"""
         return self.checkbox_1.IsChecked()
@@ -190,6 +208,19 @@ class TreeDialog(wx.Dialog):
         t = [self.chbox_1, self.chbox_2, self.chbox_3, self.chbox_4]
         return [t.index(x) for x in t if x.IsChecked()]
 
+    def DoFolders(self, event):
+        """"""
+        selected = self.GetSelections()
+        if not self.checkbox_1.IsChecked():
+            files = [self.files[x] for x in selected]
+            makef = []
+            for i in files:
+                for x in range(len(i)):
+                    makef.append(os.path.basename(i[x]))
+            self.tree.DeleteChildren(self.root)
+            self.items = [self.makeMenu(x) for x in makef]
+        event.Skip()
+    
     def rebuildItems(self, event):
         ''''''
         self.tree.DeleteChildren(self.root)
@@ -209,7 +240,7 @@ class MyApp(wx.App):
         self.dialog = TreeDialog(None, wx.ID_ANY, "", "")
         self.SetTopWindow(self.dialog)
         self.dialog.ShowModal()
-        self.dialog.Destroy()
+        # self.dialog.Destroy()
         return True
 
 
