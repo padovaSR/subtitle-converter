@@ -65,6 +65,9 @@ class FileOpened:
                             os.path.dirname(self.path),
                             baseName(files[-1]),
                         )
+                        if len(files) == 1:
+                            with open(outfiles[0], "wb") as f:
+                                f.write(zf.read(files[0]))
                         for i in files:
                             self.internal.append(zf.read(i).replace(b"\r\n", b"\n"))
                         self.internPath.extend((files))
