@@ -134,11 +134,12 @@ def fileHandle(infiles, text_control, fdrop=False):
                         ## Append if not multiple
                         FILE_HISTORY.append(lenZip(name))
                     enc = file_go(outfile[0], rfile)
-                    nam = [outfile[0]]
                     if fdrop is True:
-                        dispatcher.send(
-                            "TMP_PATH", message=outfile, msg=[rfile, enc, False]
-                        )
+                        try:
+                            FILE_HISTORY.append(outfile[0])
+                            dispatcher.send("TMP_PATH", message=outfile, msg=[rfile, enc, False])
+                        except Exception as e:
+                            logger.debug(f"dispatcher: {e} {outfile} {rfile}")
                 elif len(outfile) > 1:
                     text_control.SetValue('Files List:\n\n')
                     for i in range(len(outfile)):
@@ -149,9 +150,7 @@ def fileHandle(infiles, text_control, fdrop=False):
                         text = baseName(outfile[i])
                         text_control.AppendText(f"{c} - {text}\n")
                     if fdrop is True:
-                        dispatcher.send(
-                            "TMP_PATH", message=outfile, msg=[rfile, enc, True]
-                        )
+                        dispatcher.send("TMP_PATH", message=outfile, msg=[rfile, enc, True])
                     logger.debug('FileHandler: Ready for multiple files.')
         elif not zipfile.is_zipfile(name):
             ## name = real path
