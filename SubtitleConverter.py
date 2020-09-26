@@ -29,7 +29,7 @@ from collections import namedtuple
 from operator import itemgetter
 from io import BytesIO
 from pydispatch import dispatcher
-from itertools import chain,zip_longest 
+from itertools import chain
 from more_itertools import unique_justseen
 from Manual import MyManual
 from zip_confirm import TreeDialog 
@@ -86,7 +86,7 @@ logging.config.fileConfig(
 logger = logging.getLogger(__name__)
 
 
-VERSION = "v0.5.9.0_alpha1a"
+VERSION = "v0.5.9.0_alpha2"
 
 
 class MyFrame(ConverterFrame):
@@ -226,6 +226,7 @@ class MyFrame(ConverterFrame):
         self.Bind(wx.EVT_TOOL, self.onQuit, id=1008)
         ## Events other #############################################################################
         self.text_1.Bind(wx.EVT_TEXT, self.removeFiles, id=-1, id2=wx.ID_ANY)
+        self.text_1.Bind(wx.EVT_TEXT, self.writeText, self.text_1)
         # self.text_1.Bind(wx.EVT_LEFT_DOWN, self.newText, id=wx.ID_ANY)
         self.text_1.Bind(wx.EVT_TEXT_ENTER, self.newText, id=wx.ID_ANY)
         self.Bind(
@@ -2360,7 +2361,7 @@ class MyFrame(ConverterFrame):
 
     def exportZIPmultiple(self):
         ''''''
-        tpath = baseName(BT[0].path[:-4])
+        tpath = baseName(BT[0].path[:-4])   ## BT=BYTES_TEXT
         epattern = re.compile(r"episode\s*-*\d*", re.I)
         tpath = epattern.sub("", tpath)
         tpath = re.sub(r"(?<=s\d\d)e\d{1,2}", "", tpath, count=1, flags=re.I)
@@ -2499,7 +2500,7 @@ class MyFrame(ConverterFrame):
                 
                 if any(self.tmpPath+self.cyrUTFmulti):
                     for i in self.tmpPath+self.cyrUTFmulti:
-                        os.remove(i)
+                        if os.path.isfile(i): os.remove(i)
                         logger.debug(f"Delete {i}")
             except Exception as e:
                 logger.debug(f"Export ZIP_final error: {e}")
@@ -3116,6 +3117,13 @@ class MyFrame(ConverterFrame):
                     if i.k != 32:
                         self.UndoText.remove(i)
             self.undo.Enable()        
+        event.Skip()
+
+    def writeText(self, event):
+        """"""
+        text = self.text_1.GetValue()
+        bufferText(text, WORK_TEXT)
+        
         event.Skip()
         
 class MyApp(wx.App):
