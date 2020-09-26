@@ -29,7 +29,7 @@ from collections import namedtuple
 from operator import itemgetter
 from io import BytesIO
 from pydispatch import dispatcher
-from itertools import chain 
+from itertools import chain,zip_longest 
 from more_itertools import unique_justseen
 from Manual import MyManual
 from zip_confirm import TreeDialog 
@@ -86,7 +86,7 @@ logging.config.fileConfig(
 logger = logging.getLogger(__name__)
 
 
-VERSION = "v0.5.9.0_beta5"
+VERSION = "v0.5.9.0_alpha1a"
 
 
 class MyFrame(ConverterFrame):
@@ -258,8 +258,8 @@ class MyFrame(ConverterFrame):
         ##=========================================================================================##
         self.disableTool()
 
-        dispatcher.connect(self.updateStatus, "TMP_PATH", sender=dispatcher.Any)
-        dispatcher.connect(self.enKode, "TMP_PATH", sender=dispatcher.Any)
+        dispatcher.connect(self.updateStatus, signal="TMP_PATH", sender=dispatcher.Any)
+        dispatcher.connect(self.enKode, signal="TMP_PATH", sender=dispatcher.Any)
         
     def updateStatus(self, message, msg):
         ''''''
@@ -280,7 +280,7 @@ class MyFrame(ConverterFrame):
             self.SetStatusText(enc, 1)
             self.tmpPath = [path]
             self.real_dir = os.path.dirname(msg[0])
-
+            logger.debug(f"Droped <updateStatus> real_dir: {self.real_dir}")
         nlist = checkErrors(self.text_1.GetValue())
         if nlist:
             for i in nlist:
@@ -293,7 +293,7 @@ class MyFrame(ConverterFrame):
         self.clearUndoRedo()
 
         rlPath = msg[0]
-        
+        logger.debug(f"Droped <enKode> real_path: {rlPath}")
         tpath = message
         if type(tpath) is list:
             tpath = tpath[-1]
@@ -728,7 +728,12 @@ class MyFrame(ConverterFrame):
                 ErrorDlg.ShowModal()
                 
             addPrevious(
-                "toCYR", self.newEnc, text.replace("¬", "?"), self.pre_suffix, path, self.real_path[-1]
+                "toCYR",
+                self.newEnc,
+                text.replace("¬", "?"),
+                self.pre_suffix,
+                path,
+                self.real_path[-1],
             )
             self.postAction(path)
             
@@ -2491,11 +2496,11 @@ class MyFrame(ConverterFrame):
                     for i, x in zip(info, zlist):
                         if not i: continue
                         fzip.writestr(i, x, zipfile.ZIP_DEFLATED)
-                for item in zip(self.tmpPath, self.cyrUTFmulti):
-                    if any(os.path.exists(x) for x in item):
-                        for i in item:
-                            os.remove(i)
-                            logger.debug(f"Delete {i}")
+                
+                if any(self.tmpPath+self.cyrUTFmulti):
+                    for i in self.tmpPath+self.cyrUTFmulti:
+                        os.remove(i)
+                        logger.debug(f"Delete {i}")
             except Exception as e:
                 logger.debug(f"Export ZIP_final error: {e}")
 
