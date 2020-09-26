@@ -161,7 +161,6 @@ class ConvertText:
 def bufferText(intext, buffer):
 
     buffer.truncate(0)
-    buffer.seek(0)
     buffer.write(intext)
     buffer.seek(0)
 
