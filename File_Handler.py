@@ -134,9 +134,9 @@ def fileHandle(infiles, text_control, fdrop=False):
                         ## Append if not multiple
                         FILE_HISTORY.append(lenZip(name))
                     enc = file_go(outfile[0], rfile)
+                    FILE_HISTORY.append(outfile[0])
                     if fdrop is True:
                         try:
-                            FILE_HISTORY.append(outfile[0])
                             dispatcher.send("TMP_PATH", message=outfile, msg=[rfile, enc, False])
                         except Exception as e:
                             logger.debug(f"dispatcher: {e} {outfile} {rfile}")
@@ -157,8 +157,10 @@ def fileHandle(infiles, text_control, fdrop=False):
             FILE_HISTORY.append(name)
             tmp_path = filePath('tmp', baseName(name))
             if os.path.isfile(tmp_path):
+                text = open(tmp_path, "rb").read()
                 os.remove(tmp_path)
-            shutil.copy(name, tmp_path)
+            if os.path.isfile(name): shutil.copy(name, tmp_path)
+            else: open(tmp_path, "wb").write(text)
             enc = file_go(name, name)
             if fdrop is True:
                 dispatcher.send("TMP_PATH", message=tmp_path, msg=[name, enc, False])
