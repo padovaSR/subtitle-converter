@@ -26,7 +26,7 @@ from pydispatch import dispatcher
 from errors_check import checkErrors
 from File_processing import FileOpened
 from text_processing import normalizeText, bufferText
-from settings import WORK_TEXT, PREVIOUS, FILE_HISTORY, filePath, baseName, lenZip, droppedText
+from settings import WORK_TEXT, PREVIOUS, FILE_HISTORY, BYTES_TEXT, filePath, baseName, lenZip, droppedText
 import logging.config
 
 import wx
@@ -125,6 +125,7 @@ def fileHandle(infiles, text_control, fdrop=False):
             try:
                 fop = FileOpened(name)
                 fop.internal.clear()
+                BYTES_TEXT.clear()
                 outfile, rfile = fop.isCompressed() ## outfile in tmp
             except Exception as e:
                 logger.debug(f'ZIP; {e}.')
@@ -157,7 +158,8 @@ def fileHandle(infiles, text_control, fdrop=False):
             FILE_HISTORY.append(name)
             tmp_path = filePath('tmp', baseName(name))
             if os.path.isfile(tmp_path):
-                text = open(tmp_path, "rb").read()
+                if os.path.dirname(name) == "tmp":
+                    text = open(tmp_path, "rb").read()
                 os.remove(tmp_path)
             if os.path.isfile(name): shutil.copy(name, tmp_path)
             else: open(tmp_path, "wb").write(text)
