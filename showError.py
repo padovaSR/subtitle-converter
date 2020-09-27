@@ -30,7 +30,7 @@ def showMeError(infile, in_text, outfile, kode):
     with open(os.path.join('resources', 'var', 'fixer_cb3.data'), 'rb') as f:
         cb3_s = pickle.load(f)
 
-    subs = list(srt.parse(in_text))
+    subs = list(srt.parse(in_text, ignore_errors=True))
 
     if len(subs) > 0:
 
