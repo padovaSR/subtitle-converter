@@ -402,7 +402,7 @@ def cleanUp(text_in):
     # def opFile(in_text):
     # return in_text.replace(']:', ']').replace('):', ')').replace('}:', '}').replace('  ', ' ')
 
-    textis = srt.parse(text_in)
+    textis = srt.parse(text_in, ignore_errors=True)
     text_subs = srt.compose(textis)
 
     try:
@@ -427,7 +427,7 @@ def cleanUp(text_in):
 def cleanLine(text_in):
 
     try:
-        subs = list(srt.parse(text_in))
+        subs = list(srt.parse(text_in, ignore_errors=True))
         if len(subs) > 0:
             # Trim white spaces
             text_stripped = []
@@ -535,7 +535,7 @@ def rm_dash(text_in):
             text = remSel(text, cs_r, '-')
 
     if cb7_s is True:
-        subs = list(srt.parse(text))
+        subs = list(srt.parse(text, ignore_errors=True))
         if len(subs) > 0:
             new_f = []
             for i in range(len(subs)):
@@ -553,7 +553,7 @@ def rm_dash(text_in):
             logger.debug('Fixer: No subtitles found!')
 
     if cb2_s is True:
-        subs = list(srt.parse(text))
+        subs = list(srt.parse(text, ignore_errors=True))
         if len(subs) > 0:
             new_s = []
             for i in subs:
