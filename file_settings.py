@@ -271,7 +271,7 @@ class FileSettings(wx.Dialog):
                 self.text_9.SetValue(ex["Cyr-ansi"])
                 self.text_10.SetValue(ex["Lat-ansi"])
                 self.text_11.SetValue(ex["Cyr-utf8"])
-                self.text_12.SetValue(ex["Lat-utf-8"])
+                self.text_12.SetValue(ex["Lat-utf8"])
 
         except Exception as e:
             logger.debug(f"FileSetting: {e}")
