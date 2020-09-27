@@ -86,7 +86,7 @@ logging.config.fileConfig(
 logger = logging.getLogger(__name__)
 
 
-VERSION = "v0.5.9.0_alpha3"
+VERSION = "v0.5.9.0_alpha4"
 
 
 class MyFrame(ConverterFrame):
@@ -356,13 +356,14 @@ class MyFrame(ConverterFrame):
                 self.frame_toolbar.EnableTool(1003, False)
             for i in [self.save, self.save_as]:
                 if not i.IsEnabled():
-                    if baseName(self.fromPrevious("Open")[5]) in [
-                        "Untitled.srt",
-                        "Untitled.txt",
-                    ]:
-                        self.save.Enable()
-                        self.save_as.Enable()
-                        self.frame_toolbar.EnableTool(1010, True)  ## 1010=Save
+                    if not PREVIOUS[-1].action.endswith("multiple"):
+                        if baseName(self.fromPrevious("Open")[5]) in [
+                            "Untitled.srt",
+                            "Untitled.txt",
+                        ]:
+                            self.save.Enable()
+                            self.save_as.Enable()
+                            self.frame_toolbar.EnableTool(1010, True)  ## 1010=Save
 
     def disableTool(self):
 
@@ -1750,7 +1751,7 @@ class MyFrame(ConverterFrame):
         if self.text_1.IsModified(): text = self.text_1.GetValue()
         else: text = WORK_TEXT.getvalue()
                 
-        subs = list(srt.parse(text))
+        subs = list(srt.parse(text, ignore_errors=True))
 
         if len(subs) == 0:
             logger.debug("Fixer: No subtitles found.")
@@ -1761,7 +1762,7 @@ class MyFrame(ConverterFrame):
                     m = 0
                     s1 = 0
                     while True:
-                        subs = list(srt.parse(WORK_TEXT.getvalue()))
+                        subs = list(srt.parse(WORK_TEXT.getvalue(), ignore_errors=True))
                         x, y = FixSubGaps(inlist=subs, mingap=_gap).powerSubs()
                         m += x
                         s1 += y
@@ -1770,7 +1771,7 @@ class MyFrame(ConverterFrame):
                 else: logger.debug("Fixer: Remove gaps not enabled.")
             try:
                 if not cb8_s:
-                    text = srt.compose(srt.parse(WORK_TEXT.getvalue()))
+                    text = srt.compose(srt.parse(WORK_TEXT.getvalue(), ignore_errors=True))
                 else:
                     text = WORK_TEXT.getvalue()
             except Exception as e:
@@ -1831,7 +1832,7 @@ class MyFrame(ConverterFrame):
         else: text = WORK_TEXT.getvalue()
             
         try:
-            subs = list(srt.parse(text))
+            subs = list(srt.parse(text, ignore_errors=True))
             NUM1 = len(subs)
             subs = srt.compose(subs)
             
@@ -2116,7 +2117,7 @@ class MyFrame(ConverterFrame):
         try:
             if self.text_1.IsModified(): text = self.text_1.GetValue()
             else: text = WORK_TEXT.getvalue()
-            subs_a = list(srt.parse(text))
+            subs_a = list(srt.parse(text, ignore_errors=True))
         except Exception as e:
             logger.debug(f"Merger _1, unexpected error: {e}")
 
@@ -2139,11 +2140,11 @@ class MyFrame(ConverterFrame):
                 subs_in=subs_a, max_time=lineLenght, max_char=maxChar, _gap=maxGap,
             )
 
-            b1 = len(list(srt.parse(WORK_TEXT.getvalue())))
+            b1 = len(list(srt.parse(WORK_TEXT.getvalue(), ignore_errors=True)))
             a1 = len(subs_a)
 
             text = WORK_TEXT.getvalue()
-            text = srt.compose(srt.parse(text))
+            text = srt.compose(srt.parse(text, ignore_errors=True))
             bufferText(text, WORK_TEXT)
             
             self.bytesToBuffer(text, entered_enc)
