@@ -71,6 +71,7 @@ def fileHandle(infiles, text_control, fdrop=False):
 
     if len(infiles) > 1:
         rpath = [infiles[-1]]
+        BYTES_TEXT.clear()
         text_control.SetValue('Files List:\n\n')
         if fdrop is True:
             dispatcher.send("TMP_PATH", message=infiles, msg=[rpath, "", True])
