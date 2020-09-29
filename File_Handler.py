@@ -156,9 +156,9 @@ def fileHandle(infiles, text_control, fdrop=False):
                     logger.debug('FileHandler: Ready for multiple files.')
         elif not zipfile.is_zipfile(name):
             ## name = real path
+            BYTES_TEXT.clear()
             FILE_HISTORY.append(name)
             tmp_path = filePath('tmp', baseName(name))
-            BYTES_TEXT.clear()
             if os.path.isfile(tmp_path):
                 if os.path.dirname(name) == "tmp":
                     text = open(tmp_path, "rb").read()

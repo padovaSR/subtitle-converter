@@ -86,7 +86,7 @@ logging.config.fileConfig(
 logger = logging.getLogger(__name__)
 
 
-VERSION = "v0.5.9.0_alpha6"
+VERSION = "v0.5.9.0_alpha7"
 
 
 class MyFrame(ConverterFrame):
@@ -2642,6 +2642,7 @@ class MyFrame(ConverterFrame):
     def onFileSettings(self, event):
         settings_dlg = FileSettings(None)
         settings_dlg.ShowModal()
+        settings_dlg.Destroy()
         event.Skip()
 
     def onMergerSettings(self, event):
