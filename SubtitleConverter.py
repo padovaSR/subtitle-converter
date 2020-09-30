@@ -475,7 +475,6 @@ class MyFrame(ConverterFrame):
             self.tmpPath.clear()
             self.real_path.clear()
             PREVIOUS.clear()
-            BT.clear()
             self.clearUndoRedo()
             filepath = dlgOpen.GetPaths()  # Get the file location
             if len(filepath) == 1:
