@@ -63,7 +63,7 @@ def myMerger(subs_in, max_time, max_char, _gap):
                 ):
                     new_j.append(Subtitle(first.index, first.start, second.end, first.content))
                 else:
-                    new_j.append(Subtitle(first.index, first.start, second.end, first.content + " " + second.content))
+                    new_j.append(Subtitle(first.index, first.start, second.end, f"{first.content} {second.content}"))
             else:
                 new_j.append(Subtitle(first.index, first.start, first.end, first.content))
                 new_j.append(Subtitle(second.index, second.start, second.end, second.content))
