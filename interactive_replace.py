@@ -40,9 +40,7 @@ class FindReplace(wx.Dialog):
         )
         sizer_1.Add(label_1, 0, wx.EXPAND | wx.LEFT | wx.TOP, 6)
 
-        self.text_1 = wx.TextCtrl(self, wx.ID_ANY, "")
-        self.text_1.SetFont(
-            wx.Font(
+        t_font = wx.Font(
                 9,
                 wx.FONTFAMILY_DEFAULT,
                 wx.FONTSTYLE_NORMAL,
@@ -50,23 +48,16 @@ class FindReplace(wx.Dialog):
                 0,
                 "Segoe UI",
             )
-        )
+
+        self.text_1 = wx.TextCtrl(self, wx.ID_ANY, "")
+        self.text_1.SetFont(t_font)
         sizer_1.Add(self.text_1, 0, wx.ALL | wx.EXPAND, 5)
 
         sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
         sizer_1.Add(sizer_2, 1, wx.EXPAND, 0)
 
-        self.text_2 = wx.TextCtrl(self, wx.ID_ANY, style=wx.TE_PROCESS_ENTER|wx.TE_MULTILINE)
-        self.text_2.SetFont(
-            wx.Font(
-                9,
-                wx.FONTFAMILY_DEFAULT,
-                wx.FONTSTYLE_NORMAL,
-                wx.FONTWEIGHT_NORMAL,
-                0,
-                "Segoe UI",
-            )
-        )
+        self.text_2 = wx.TextCtrl(self, wx.ID_ANY, style=wx.TE_PROCESS_ENTER|wx.TE_MULTILINE|wx.TE_NO_VSCROLL)
+        self.text_2.SetFont(t_font)
         self.text_2.SetToolTip("Change at will")
         self.text_2.SetFocus()
         sizer_2.Add(self.text_2, 1, wx.ALL | wx.EXPAND, 5)
