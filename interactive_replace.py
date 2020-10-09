@@ -55,7 +55,7 @@ class FindReplace(wx.Dialog):
         
         self.dname = r""
         
-        self.SetSize((524, 459))
+        self.SetSize((525, 400))
         self.SetTitle("Find-Replace")
         _icon = wx.NullIcon
         _icon.CopyFromBitmap(
@@ -109,7 +109,7 @@ class FindReplace(wx.Dialog):
             sizer_3, 0, wx.BOTTOM | wx.EXPAND | wx.RIGHT | wx.SHAPED | wx.TOP, 5
         )
 
-        self.button_0 = wx.Button(self, wx.ID_ANY, "Start")
+        self.button_0 = wx.Button(self, wx.ID_ANY, "Find")
         self.button_0.SetMinSize((76, 25))
         sizer_3.Add(self.button_0, 0, wx.BOTTOM | wx.LEFT | wx.RIGHT, 2)
 
@@ -163,10 +163,11 @@ class FindReplace(wx.Dialog):
         self.ReplaceAll = []
         self.Replace = []
         self.new_subs = []
+        self.default_subs = list(srt.parse(getSubs("test.srt")))
         
         ## Events ##################################################################################
         self.filePicker.Bind(wx.EVT_FILEPICKER_CHANGED, self.FileChanged, self.filePicker)        
-        self.Bind(wx.EVT_BUTTON, self.onStart, self.button_0)
+        self.Bind(wx.EVT_BUTTON, self.onFind, self.button_0)
         self.Bind(wx.EVT_BUTTON, self.onReplace, self.button_1)
         self.Bind(wx.EVT_BUTTON, self.onReplaceAll, self.button_2)
         self.Bind(wx.EVT_BUTTON, self.onIgnore, self.button_3)
@@ -222,12 +223,12 @@ class FindReplace(wx.Dialog):
         self.subs = srt.parse(getSubs("test.srt"))
         self.wdict = self.clearDict(wdict, srt.compose(self.subs))
         self.subs = srt.parse(getSubs("test.srt"))
+        self.onReplace(event)
         event.Skip()
 
-    def onStart(self, event):
-        # self.text_1.Clear()
-        # self.getValues()
-        # self.text_1.SetDefaultStyle(wx.TextAttr(wx.BLACK, "WHEAT"))        
+    def onFind(self, event):
+        self.text_1.Clear()
+        self.text_2.Clear()
         event.Skip()
     
     def onReplace(self, event):
@@ -240,7 +241,6 @@ class FindReplace(wx.Dialog):
             c = self.getValues(self.subs)
             if c == 0 or c is None:
                 break
-        # print(self.new_subs)
         event.Skip()
 
     def onReplaceAll(self, event):
@@ -251,7 +251,8 @@ class FindReplace(wx.Dialog):
         print(k, " = ", v)
         subs = ctext.sub(v, subs)
         self.subs = srt.parse(subs)
-        self.IgnoreAll.append(k)
+        self.wdict.pop(k)
+        self.onReplace(event)
         event.Skip()
 
     def onIgnore(self, event):
@@ -265,7 +266,7 @@ class FindReplace(wx.Dialog):
     def clearDict(self, _dict, _subs):
         """"""
         new_dict = {}
-        robj1 = re.compile(r'\b(' + '|'.join(map(re.escape, _dict.keys())) + r')\b')
+        robj1 = re.compile(r"\b("+"|".join(map(re.escape, _dict.keys()))+r")\b")
         t_out1 = robj1.findall(_subs)
         for i in t_out1:
             for k, v in _dict.items():
