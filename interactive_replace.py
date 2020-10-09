@@ -9,9 +9,17 @@ import re
 import srt
 from srt import Subtitle 
 from more_itertools import first_true
-from itertools import tee 
+from itertools import tee, zip_longest, cycle
+import multiprocessing
+from multiprocessing import Pool
+import concurrent.futures
+import logging.config
 
 import wx
+
+
+logger = logging.getLogger(__name__)
+
 
 def getSubs(filein):
     """"""
@@ -34,6 +42,13 @@ def getDict(dfile):
             value = x[-1]
             s_dict[key] = value
     return s_dict
+
+def split_dict(x, chunks):      
+    i = cycle(range(chunks))       
+    split = [dict() for _ in range(chunks)]
+    for k, v in x.items():
+        split[next(i)][k] = v
+    return split
 
 class FindReplace(wx.Dialog):
     def __init__(self, parent, subtitles=[]):
@@ -101,7 +116,7 @@ class FindReplace(wx.Dialog):
         self.button_0.SetMinSize((76, 25))
         sizer_3.Add(self.button_0, 0, wx.BOTTOM | wx.LEFT | wx.RIGHT, 2)
 
-        self.button_1 = wx.Button(self, wx.ID_REPLACE, "Replace")
+        self.button_1 = wx.Button(self, wx.ID_REPLACE, "Accept")
         self.button_1.SetMinSize((76, 25))
         self.button_1.SetDefault()
         sizer_3.Add(self.button_1, 0, wx.BOTTOM | wx.LEFT | wx.RIGHT, 2)
@@ -135,6 +150,7 @@ class FindReplace(wx.Dialog):
         self.filePicker.SetInitialDirectory(os.path.join(os.getcwd(), "dicitionaries"))
         self.filePicker.SetToolTip(" \n Find dictionary \n ")
         self.filePicker.SetPath(os.path.abspath("dictionaries/Dictionary-1.txt"))
+        self.dname = self.filePicker.GetPath()
         sizer_1.Add(self.filePicker, 0, wx.BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT, 5)
         
         self.SetSizer(sizer_1)
@@ -160,27 +176,31 @@ class FindReplace(wx.Dialog):
         self.Bind(wx.EVT_BUTTON, self.onIgnoreAll, self.button_4)
         ############################################################################################
         
+        self.wdict = getDict(self.dname)
         self.subs = srt.parse(getSubs("test.srt"))
-        #text = next(x.content for x in self.subs)
-        #self.text_2.WriteText(text)
-        
+        self.wdict = self.clearDict(self.wdict, srt.compose(self.subs))
+        self.subs = srt.parse(getSubs("test.srt"))
         self.getValues(self.subs)
+        
         
     def getValues(self, iterator):
         """"""
+        wdict = self.wdict
         c = 0
-        wdict = getDict(self.filePicker.GetPath())
         try:
             sub = next(self.subs)
             c += 1
-        except StopIteration:
-            self.text_2.SetValue("{}\nEnd of subtitles reached!\n{}".format("="*20, "="*20))
+        except StopIteration as e:
+            logger.debug(f"error {e}")
+            p = "="*20
+            self.text_2.SetValue(f"{p}\nEnd of subtitles reached!\n{p}")
         try:
             for k, v in wdict.items():
-                ctext = re.compile(r'\b'+k+r'\b')
                 print(sub.content, " > ", k)
+                self.text_1.SetValue(k)
+                ctext = re.compile(r'\b'+k+r'\b')
                 if ctext.search(sub.content):
-                    self.text_1.SetValue(k)
+                    self.button_1.SetFocus()
                     text = sub.content
                     text = ctext.sub(v, text)
                     self.text_2.SetValue(text)
@@ -199,8 +219,11 @@ class FindReplace(wx.Dialog):
     def FileChanged(self, event):
         """"""
         self.filePicker.SetPath(self.filePicker.GetPath())
-        self.text_2.SetFocus()
-        self.dname = os.path.basename(self.filePicker.GetPath())
+        self.button_1.SetFocus()
+        self.dname = self.filePicker.GetPath()
+        wdict = getDict(self.dname)
+        self.subs = srt.parse(getSubs("test.srt"))
+        self.wdict = self.clearDict(wdict, srt.compose(self.subs))
         self.subs = srt.parse(getSubs("test.srt"))
         event.Skip()
 
@@ -216,15 +239,25 @@ class FindReplace(wx.Dialog):
             sub = self.Replace[0]
             self.Replace.clear()
             self.new_subs.append(Subtitle(sub.index, sub.start, sub.end, text))
-        while len(self.Replace) == 0:
-            c = self.getValues(self.subs)
-            if c == 0 or c is None:
-                break
+        IT = split_dict(self.wdict, 4)
+        p = [x for x in IT]
+        for i in p:
+            while len(self.Replace) == 0:
+                c = self.getValues(i)
+                if c == 0 or c is None:
+                    break
         # print(self.new_subs)
         event.Skip()
 
     def onReplaceAll(self, event):
-        print("{0}\nEvent handler 'onReplaceAll' not implemented!\n{1}")
+        subs = srt.compose(self.subs)
+        k = self.text_1.GetValue()
+        v = self.wdict[k]
+        ctext = re.compile(r'\b'+k+r'\b')
+        print(k, " = ", v)
+        subs = ctext.sub(v, subs)
+        self.subs = srt.parse(subs)
+        self.IgnoreAll.append(k)
         event.Skip()
 
     def onIgnore(self, event):
@@ -234,7 +267,18 @@ class FindReplace(wx.Dialog):
     def onIgnoreAll(self, event):
         print("Event handler 'onIgnoreAll' not implemented!")
         event.Skip()
-        
+    
+    def clearDict(self, _dict, _subs):
+        """"""
+        new_dict = {}
+        robj1 = re.compile(r'\b(' + '|'.join(map(re.escape, _dict.keys())) + r')\b')
+        t_out1 = robj1.findall(_subs)
+        for i in t_out1:
+            for k, v in _dict.items():
+                if i == k:
+                    new_dict[i] = v
+        print(new_dict)
+        return new_dict            
 
 
 # end of class MyDialog
