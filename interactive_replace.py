@@ -168,14 +168,16 @@ class FindReplace(wx.Dialog):
         
     def getValues(self, iterator):
         """"""
+        c = 0
         dfile = self.filePicker.GetPath()
         wdict = getDict(dfile)
         #fval = next(x for x in wdict.keys())
         # rval = [x.content for x in self.subs]
         try:
             sub = next(self.subs)
+            c += 1
         except StopIteration:
-            self.text_2.SetValue("End of subtitles reached!")
+            self.text_2.SetValue("End of subtitles reached!".upper())
         try:
             for k, v in wdict.items():
                 ctext = re.compile(r'\b'+k+r'\b')
@@ -193,6 +195,7 @@ class FindReplace(wx.Dialog):
                     break
                 else:
                     continue
+            return c
         except Exception as e:
             print(f"Error: {e}")
             
@@ -216,10 +219,10 @@ class FindReplace(wx.Dialog):
             self.Replace.clear()
             self.new_subs.append(Subtitle(sub.index, sub.start, sub.end, text))
         while len(self.Replace) == 0:
-            self.getValues(self.subs)
-            if not self.subs:
+            c = self.getValues(self.subs)
+            if c == 0 or c is None:
                 break
-        print(self.new_subs)
+        # print(self.new_subs)
         event.Skip()
 
     def onReplaceAll(self, event):
