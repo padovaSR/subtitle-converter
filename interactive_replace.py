@@ -10,9 +10,6 @@ import srt
 from srt import Subtitle 
 from more_itertools import first_true
 from itertools import tee, zip_longest, cycle
-import multiprocessing
-from multiprocessing import Pool
-import concurrent.futures
 import logging.config
 
 import wx
@@ -239,13 +236,10 @@ class FindReplace(wx.Dialog):
             sub = self.Replace[0]
             self.Replace.clear()
             self.new_subs.append(Subtitle(sub.index, sub.start, sub.end, text))
-        IT = split_dict(self.wdict, 4)
-        p = [x for x in IT]
-        for i in p:
-            while len(self.Replace) == 0:
-                c = self.getValues(i)
-                if c == 0 or c is None:
-                    break
+        while len(self.Replace) == 0:
+            c = self.getValues(self.subs)
+            if c == 0 or c is None:
+                break
         # print(self.new_subs)
         event.Skip()
 
