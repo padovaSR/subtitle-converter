@@ -344,7 +344,7 @@ def zameniImena(text_in):
 
 def doReplace(text_in):
 
-    robj_r = re.compile('(%s)' % '|'.join(map(re.escape, searchReplc.keys())))
+    robj_r = re.compile("(%s)" % "|".join(map(re.escape, searchReplc.keys())))
     try:
         t_out = robj_r.subn(lambda m: searchReplc[m.group(0)], text_in)
     except IOError as e:
