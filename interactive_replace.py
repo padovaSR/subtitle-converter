@@ -169,15 +169,12 @@ class FindReplace(wx.Dialog):
     def getValues(self, iterator):
         """"""
         c = 0
-        dfile = self.filePicker.GetPath()
-        wdict = getDict(dfile)
-        #fval = next(x for x in wdict.keys())
-        # rval = [x.content for x in self.subs]
+        wdict = getDict(self.filePicker.GetPath())
         try:
             sub = next(self.subs)
             c += 1
         except StopIteration:
-            self.text_2.SetValue("End of subtitles reached!".upper())
+            self.text_2.SetValue("{}\nEnd of subtitles reached!\n{}".format("="*20, "="*20))
         try:
             for k, v in wdict.items():
                 ctext = re.compile(r'\b'+k+r'\b')
@@ -204,6 +201,7 @@ class FindReplace(wx.Dialog):
         self.filePicker.SetPath(self.filePicker.GetPath())
         self.text_2.SetFocus()
         self.dname = os.path.basename(self.filePicker.GetPath())
+        self.subs = srt.parse(getSubs("test.srt"))
         event.Skip()
 
     def onStart(self, event):
@@ -226,7 +224,7 @@ class FindReplace(wx.Dialog):
         event.Skip()
 
     def onReplaceAll(self, event):
-        print("Event handler 'onReplaceAll' not implemented!")
+        print("{0}\nEvent handler 'onReplaceAll' not implemented!\n{1}")
         event.Skip()
 
     def onIgnore(self, event):
