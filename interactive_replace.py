@@ -5,13 +5,43 @@
 #
 
 import os
+import re
+import srt
+from srt import Subtitle 
+from more_itertools import first_true
+from itertools import tee 
 
 import wx
 
+def getSubs(filein):
+    """"""
+    with open(filein, "r", encoding="utf-8") as f:
+        return f.read()
+    
+def getDict(dfile):
+    with open(dfile, 'r', encoding='utf-8') as dict_file:
+        s_dict = {}
+        for line in dict_file:
+            x = line.strip().split("=>")
+            if not line:
+                continue
+            if line.startswith('#'):
+                continue
+            if not x[0]:
+                continue
+            else:
+                key = x[0]
+            value = x[-1]
+            s_dict[key] = value
+    return s_dict
 
 class FindReplace(wx.Dialog):
-    def __init__(self, parent, *args,):
+    def __init__(self, parent, subtitles=[]):
         wx.Dialog.__init__(self, parent, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
+        
+        self.subtitles = subtitles
+        
+        self.dname = r""
         
         self.SetSize((524, 459))
         self.SetTitle("Find-Replace")
@@ -22,11 +52,11 @@ class FindReplace(wx.Dialog):
             )
         )
         self.SetIcon(_icon)
-
+        
         sizer_1 = wx.BoxSizer(wx.VERTICAL)
 
         label_1 = wx.StaticText(
-            self, wx.ID_ANY, "Replace from dictionary:", style=wx.ALIGN_LEFT
+            self, wx.ID_ANY, f"Replace from dictionary:  {self.dname}", style=wx.ALIGN_LEFT
         )
         label_1.SetFont(
             wx.Font(
@@ -41,7 +71,7 @@ class FindReplace(wx.Dialog):
         sizer_1.Add(label_1, 0, wx.EXPAND | wx.LEFT | wx.TOP, 6)
 
         t_font = wx.Font(
-                9,
+                10,
                 wx.FONTFAMILY_DEFAULT,
                 wx.FONTSTYLE_NORMAL,
                 wx.FONTWEIGHT_NORMAL,
@@ -49,14 +79,14 @@ class FindReplace(wx.Dialog):
                 "Segoe UI",
             )
 
-        self.text_1 = wx.TextCtrl(self, wx.ID_ANY, "")
+        self.text_1 = wx.TextCtrl(self, wx.ID_ANY, style=wx.TE_PROCESS_ENTER|wx.TE_MULTILINE|wx.TE_NO_VSCROLL|wx.TE_RICH)
         self.text_1.SetFont(t_font)
         sizer_1.Add(self.text_1, 0, wx.ALL | wx.EXPAND, 5)
 
         sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
         sizer_1.Add(sizer_2, 1, wx.EXPAND, 0)
 
-        self.text_2 = wx.TextCtrl(self, wx.ID_ANY, style=wx.TE_PROCESS_ENTER|wx.TE_MULTILINE|wx.TE_NO_VSCROLL)
+        self.text_2 = wx.TextCtrl(self, wx.ID_ANY, style=wx.TE_PROCESS_ENTER|wx.TE_MULTILINE|wx.TE_NO_VSCROLL|wx.TE_RICH)
         self.text_2.SetFont(t_font)
         self.text_2.SetToolTip("Change at will")
         self.text_2.SetFocus()
@@ -106,7 +136,7 @@ class FindReplace(wx.Dialog):
         self.filePicker.SetToolTip(" \n Find dictionary \n ")
         self.filePicker.SetPath(os.path.abspath("dictionaries/Dictionary-1.txt"))
         sizer_1.Add(self.filePicker, 0, wx.BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT, 5)
-
+        
         self.SetSizer(sizer_1)
 
         self.SetEscapeId(self.button_5.GetId())
@@ -114,35 +144,82 @@ class FindReplace(wx.Dialog):
         self.Layout()
         self.Centre()
 
-        self.filePicker.Bind(
-            wx.EVT_FILEPICKER_CHANGED, self.FileChanged, self.filePicker
-        )
+        ############################################################################################
 
         self.IgnoreAll = []
         self.ReplaceAll = []
-
+        self.Replace = []
+        self.new_subs = []
+        
+        ## Events ##################################################################################
+        self.filePicker.Bind(wx.EVT_FILEPICKER_CHANGED, self.FileChanged, self.filePicker)        
         self.Bind(wx.EVT_BUTTON, self.onStart, self.button_0)
         self.Bind(wx.EVT_BUTTON, self.onReplace, self.button_1)
         self.Bind(wx.EVT_BUTTON, self.onReplaceAll, self.button_2)
         self.Bind(wx.EVT_BUTTON, self.onIgnore, self.button_3)
         self.Bind(wx.EVT_BUTTON, self.onIgnoreAll, self.button_4)
+        ############################################################################################
         
-
+        self.subs = srt.parse(getSubs("test.srt"))
+        #text = next(x.content for x in self.subs)
+        #self.text_2.WriteText(text)
+        
+        self.getValues(self.subs)
+        
+    def getValues(self, iterator):
+        """"""
+        dfile = self.filePicker.GetPath()
+        wdict = getDict(dfile)
+        #fval = next(x for x in wdict.keys())
+        # rval = [x.content for x in self.subs]
+        try:
+            sub = next(self.subs)
+        except StopIteration:
+            self.text_2.SetValue("End of subtitles reached!")
+        try:
+            for k, v in wdict.items():
+                ctext = re.compile(r'\b'+k+r'\b')
+                print(sub.content, " > ", k)
+                if ctext.search(sub.content):
+                    self.text_1.SetValue(k)
+                    text = sub.content
+                    text = ctext.sub(v, text)
+                    self.text_2.SetValue(text)
+                    self.Replace.append(Subtitle(sub.index, sub.start, sub.end, text))
+                    for m in re.finditer(v, self.text_2.GetValue()):
+                        start = m.start()
+                        end = m.end()
+                        self.text_2.SetStyle(start, end, wx.TextAttr("RED"))
+                    break
+                else:
+                    continue
+        except Exception as e:
+            print(f"Error: {e}")
+            
     def FileChanged(self, event):
         """"""
         self.filePicker.SetPath(self.filePicker.GetPath())
         self.text_2.SetFocus()
+        self.dname = os.path.basename(self.filePicker.GetPath())
         event.Skip()
 
     def onStart(self, event):
-        
+        # self.text_1.Clear()
+        # self.getValues()
+        # self.text_1.SetDefaultStyle(wx.TextAttr(wx.BLACK, "WHEAT"))        
         event.Skip()
     
     def onReplace(self, event):
-        path = self.filePicker.GetPath()
-        with open(path, "r", encoding="utf-8") as f:
-            for i in f:
-                print(i)
+        text = self.text_2.GetValue()
+        if self.Replace:
+            sub = self.Replace[0]
+            self.Replace.clear()
+            self.new_subs.append(Subtitle(sub.index, sub.start, sub.end, text))
+        while len(self.Replace) == 0:
+            self.getValues(self.subs)
+            if not self.subs:
+                break
+        print(self.new_subs)
         event.Skip()
 
     def onReplaceAll(self, event):
@@ -164,7 +241,7 @@ class FindReplace(wx.Dialog):
 
 class MyApp(wx.App):
     def OnInit(self):
-        self.dialog = FindReplace(None, wx.ID_ANY, "")
+        self.dialog = FindReplace(None, wx.ID_ANY)
         self.SetTopWindow(self.dialog)
         self.dialog.ShowModal()
         self.dialog.Destroy()
