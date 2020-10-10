@@ -7,7 +7,8 @@
 import os
 import re
 import srt
-from srt import Subtitle 
+from srt import Subtitle
+from zamenaImena import new_dict 
 from more_itertools import first_true
 from itertools import tee, zip_longest, cycle
 import logging.config
@@ -23,29 +24,6 @@ def getSubs(filein):
     with open(filein, "r", encoding="utf-8") as f:
         return f.read()
     
-def getDict(dfile):
-    with open(dfile, 'r', encoding='utf-8') as dict_file:
-        s_dict = {}
-        for line in dict_file:
-            x = line.strip().split("=>")
-            if not line:
-                continue
-            if line.startswith('#'):
-                continue
-            if not x[0]:
-                continue
-            else:
-                key = x[0]
-            value = x[-1]
-            s_dict[key] = value
-    return s_dict
-
-def split_dict(x, chunks):      
-    i = cycle(range(chunks))       
-    split = [dict() for _ in range(chunks)]
-    for k, v in x.items():
-        split[next(i)][k] = v
-    return split
 
 class FindReplace(wx.Dialog):
     def __init__(self, parent, subtitles=[]):
@@ -175,7 +153,7 @@ class FindReplace(wx.Dialog):
         self.Bind(wx.EVT_BUTTON, self.onIgnoreAll, self.button_4)
         ############################################################################################
         
-        self.wdict = getDict(self.dname)
+        self.wdict = new_dict(self.dname)
         self.subs = srt.parse(getSubs("test.srt"))
         self.wdict = self.clearDict(self.wdict, srt.compose(self.subs))
         self.getValues(self.subs)
@@ -219,14 +197,14 @@ class FindReplace(wx.Dialog):
                 self.new_d = newd
             return c
         except Exception as e:
-            print(f"Error: {e}")
+            logger.debug(f"Error: {e}")
             
     def FileChanged(self, event):
         """"""
         self.filePicker.SetPath(self.filePicker.GetPath())
         self.button_1.SetFocus()
         self.dname = self.filePicker.GetPath()
-        wdict = getDict(self.dname)
+        wdict = new_dict(self.dname)
         self.subs = srt.parse(getSubs("test.srt"))
         self.wdict = self.clearDict(wdict, srt.compose(self.subs))
         self.subs = srt.parse(getSubs("test.srt"))
@@ -254,15 +232,18 @@ class FindReplace(wx.Dialog):
 
     def onReplaceAll(self, event):
         ''''''
-        subs_d = srt.compose(self.default_subs)
-        k = self.text_1.GetValue()
-        
-        ctext = re.compile(r"\b("+"|".join(map(re.escape,self.new_d.keys()))+r")\b")
-        subs_d = ctext.sub(lambda x: self.new_d[x.group()], subs_d)
-        
-        self.default_subs = list(srt.parse(subs_d))
-        for k in self.new_d.keys(): self.wdict.pop(k)
-        self.onReplace(event)
+        try:
+            subs_d = srt.compose(self.default_subs)
+            k = self.text_1.GetValue()
+            
+            ctext = re.compile(r"\b("+"|".join(map(re.escape,self.new_d.keys()))+r")\b")
+            subs_d = ctext.sub(lambda x: self.new_d[x.group()], subs_d)
+            
+            self.default_subs = list(srt.parse(subs_d))
+            for k in self.new_d.keys(): self.wdict.pop(k)
+            self.onReplace(event)
+        except Exception as e:
+            logger.debug(f"Error: {e}")
         event.Skip()
 
     def onIgnore(self, event):
