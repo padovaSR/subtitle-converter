@@ -177,7 +177,6 @@ class FindReplace(wx.Dialog):
         self.wdict = getDict(self.dname)
         self.subs = srt.parse(getSubs("test.srt"))
         self.wdict = self.clearDict(self.wdict, srt.compose(self.subs))
-        self.subs = srt.parse(getSubs("test.srt"))
         self.getValues(self.subs)
         
         
@@ -189,7 +188,9 @@ class FindReplace(wx.Dialog):
             sub = next(self.subs)
             c += 1
         except StopIteration as e:
-            logger.debug(f"error {e}")
+            wdict = self.clearDict(wdict, srt.compose(self.new_subs))
+            logger.debug(f"Iter {e}")
+        finally:
             p = "="*20
             self.text_2.SetValue(f"{p}\nEnd of subtitles reached!\n{p}")
         try:
@@ -229,6 +230,8 @@ class FindReplace(wx.Dialog):
     def onFind(self, event):
         self.text_1.Clear()
         self.text_2.Clear()
+        t = self.UpdateList(self.new_subs, self.default_subs)
+        self.text_2.SetValue(srt.compose(t))
         event.Skip()
     
     def onReplace(self, event):
@@ -244,13 +247,13 @@ class FindReplace(wx.Dialog):
         event.Skip()
 
     def onReplaceAll(self, event):
-        subs = srt.compose(self.subs)
+        subs_d = srt.compose(self.default_subs)
         k = self.text_1.GetValue()
         v = self.wdict[k]
         ctext = re.compile(r'\b'+k+r'\b')
         print(k, " = ", v)
-        subs = ctext.sub(v, subs)
-        self.subs = srt.parse(subs)
+        subs_d = ctext.sub(v, subs_d)
+        self.default_subs = list(srt.parse(subs_d))
         self.wdict.pop(k)
         self.onReplace(event)
         event.Skip()
@@ -272,8 +275,19 @@ class FindReplace(wx.Dialog):
             for k, v in _dict.items():
                 if i == k:
                     new_dict[i] = v
+        self.subs = srt.parse(getSubs("test.srt"))
         print(new_dict)
-        return new_dict            
+        return new_dict
+    
+    def UpdateList(self, l1, to_update):
+        """"""
+        for i in l1:
+            for x in to_update:
+                if i.index == x.index:
+                    t = to_update.index(x)
+                    to_update[t] = i
+        return to_update
+        
 
 
 # end of class MyDialog
