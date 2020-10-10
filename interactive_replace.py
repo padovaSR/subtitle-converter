@@ -98,7 +98,7 @@ class FindReplace(wx.Dialog):
         sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
         sizer_1.Add(sizer_2, 1, wx.EXPAND, 0)
 
-        self.text_2 = wx.TextCtrl(self, wx.ID_ANY, style=wx.TE_PROCESS_ENTER|wx.TE_MULTILINE|wx.TE_NO_VSCROLL|wx.TE_RICH)
+        self.text_2 = wx.TextCtrl(self, wx.ID_ANY, style=wx.TE_PROCESS_ENTER|wx.TE_MULTILINE|wx.TE_RICH)
         self.text_2.SetFont(t_font)
         self.text_2.SetToolTip("Change at will")
         self.text_2.SetFocus()
@@ -167,7 +167,7 @@ class FindReplace(wx.Dialog):
         
         ## Events ##################################################################################
         self.filePicker.Bind(wx.EVT_FILEPICKER_CHANGED, self.FileChanged, self.filePicker)        
-        self.Bind(wx.EVT_BUTTON, self.onFind, self.button_0)
+        self.Bind(wx.EVT_BUTTON, self.onShowText, self.button_0)
         self.Bind(wx.EVT_BUTTON, self.onReplace, self.button_1)
         self.Bind(wx.EVT_BUTTON, self.onReplaceAll, self.button_2)
         self.Bind(wx.EVT_BUTTON, self.onIgnore, self.button_3)
@@ -227,10 +227,10 @@ class FindReplace(wx.Dialog):
         self.onReplace(event)
         event.Skip()
 
-    def onFind(self, event):
+    def onShowText(self, event):
         self.text_1.Clear()
         self.text_2.Clear()
-        t = self.UpdateList(self.new_subs, self.default_subs)
+        t = self.GetText()
         self.text_2.SetValue(srt.compose(t))
         event.Skip()
     
@@ -279,14 +279,14 @@ class FindReplace(wx.Dialog):
         print(new_dict)
         return new_dict
     
-    def UpdateList(self, l1, to_update):
+    def GetText(self):
         """"""
-        for i in l1:
-            for x in to_update:
+        for i in self.new_subs:
+            for x in self.default_subs:
                 if i.index == x.index:
-                    t = to_update.index(x)
-                    to_update[t] = i
-        return to_update
+                    t = self.default_subs.index(x)
+                    self.default_subs[t] = i
+        return self.default_subs
         
 
 
