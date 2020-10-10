@@ -78,7 +78,7 @@ class FindReplace(wx.Dialog):
 
         self.text_2 = wx.TextCtrl(self, wx.ID_ANY, style=wx.TE_PROCESS_ENTER|wx.TE_MULTILINE|wx.TE_RICH)
         self.text_2.SetFont(t_font)
-        self.text_2.SetToolTip("Change at will")
+        self.text_2.SetToolTip("Text modification is supported")
         self.text_2.SetFocus()
         sizer_2.Add(self.text_2, 1, wx.ALL | wx.EXPAND, 5)
 
@@ -188,9 +188,7 @@ class FindReplace(wx.Dialog):
             self.text_2.SetValue(sub.content)
             for v in newd.values():
                 for m in re.finditer(v, self.text_2.GetValue()):
-                    start = m.start()
-                    end = m.end()
-                    self.text_2.SetStyle(start, end, wx.TextAttr("RED"))
+                    self.text_2.SetStyle(m.start(), m.end(), wx.TextAttr("RED"))
             if t1:
                 self.Replace.append(Subtitle(sub.index, sub.start, sub.end, sub.content))
                 self.button_1.SetFocus()
