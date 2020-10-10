@@ -66,7 +66,7 @@ def dict_fromFile(text_in, delim):
         return new_dict
 
 
-def new_dict(indict, n):
+def new_dict(indict, n=None):
     with open(indict, 'r', encoding='utf-8') as dict_file:
 
         newDict = {}
@@ -79,10 +79,12 @@ def new_dict(indict, n):
                 continue
             if not x[0]:
                 continue
-            if len(x[0].split(' ')) >= 2:
+            if len(x[0].split(' ')) >= 2 and n != None:
                 key = x[0].replace(' ', '\n', n)
-                value = x[-1]
-                newDict[key] = value
+            else:
+                key = x[0]
+            value = x[-1]
+            newDict[key] = value
         return newDict
 
 
