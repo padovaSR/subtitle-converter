@@ -164,6 +164,7 @@ class FindReplace(wx.Dialog):
         self.Replace = []
         self.new_subs = []
         self.default_subs = list(srt.parse(getSubs("test.srt")))
+        self.new_d = {}
         
         ## Events ##################################################################################
         self.filePicker.Bind(wx.EVT_FILEPICKER_CHANGED, self.FileChanged, self.filePicker)        
@@ -183,6 +184,7 @@ class FindReplace(wx.Dialog):
     def getValues(self, iterator):
         """"""
         wdict = self.wdict
+        r1 = re.compile(r"\b("+"|".join(map(re.escape, wdict.keys()))+r")\b")
         c = 0
         try:
             sub = next(self.subs)
@@ -194,23 +196,27 @@ class FindReplace(wx.Dialog):
             p = "="*20
             self.text_2.SetValue(f"{p}\nEnd of subtitles reached!\n{p}")
         try:
-            for k, v in wdict.items():
-                print(sub.content, " > ", k)
-                self.text_1.SetValue(k)
+            t1 = r1.findall(sub.content)
+            t1 = list(set(t1))            
+            newd = {}
+            self.text_1.Clear()
+            for i in range(len(t1)):
+                self.text_1.AppendText(f"{t1[i]} ")
+                v = wdict[t1[i]]
+                newd[t1[i]] = v
+            for k, v in newd.items():
                 ctext = re.compile(r'\b'+k+r'\b')
-                if ctext.search(sub.content):
-                    self.button_1.SetFocus()
-                    text = sub.content
-                    text = ctext.sub(v, text)
-                    self.text_2.SetValue(text)
-                    self.Replace.append(Subtitle(sub.index, sub.start, sub.end, text))
-                    for m in re.finditer(v, self.text_2.GetValue()):
-                        start = m.start()
-                        end = m.end()
-                        self.text_2.SetStyle(start, end, wx.TextAttr("RED"))
-                    break
-                else:
-                    continue
+                sub.content = ctext.sub(v, sub.content)
+            self.text_2.SetValue(sub.content)
+            for v in newd.values():
+                for m in re.finditer(v, self.text_2.GetValue()):
+                    start = m.start()
+                    end = m.end()
+                    self.text_2.SetStyle(start, end, wx.TextAttr("RED"))
+            if t1:
+                self.Replace.append(Subtitle(sub.index, sub.start, sub.end, sub.content))
+                self.button_1.SetFocus()
+                self.new_d = newd
             return c
         except Exception as e:
             print(f"Error: {e}")
@@ -247,14 +253,15 @@ class FindReplace(wx.Dialog):
         event.Skip()
 
     def onReplaceAll(self, event):
+        ''''''
         subs_d = srt.compose(self.default_subs)
         k = self.text_1.GetValue()
-        v = self.wdict[k]
-        ctext = re.compile(r'\b'+k+r'\b')
-        print(k, " = ", v)
-        subs_d = ctext.sub(v, subs_d)
+        
+        ctext = re.compile(r"\b("+"|".join(map(re.escape,self.new_d.keys()))+r")\b")
+        subs_d = ctext.sub(lambda x: self.new_d[x.group()], subs_d)
+        
         self.default_subs = list(srt.parse(subs_d))
-        self.wdict.pop(k)
+        for k in self.new_d.keys(): self.wdict.pop(k)
         self.onReplace(event)
         event.Skip()
 
