@@ -1,4 +1,4 @@
-﻿Address=>Adresa
+Address=>Adresa
 address=>adresa
 Agent=>agent
 agent=>agent
