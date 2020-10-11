@@ -107,10 +107,14 @@ class FindReplace(wx.Dialog):
         self.button_4 = wx.Button(self, wx.ID_ANY, "Ignore all")
         self.button_4.SetMinSize((76, 25))
         sizer_3.Add(self.button_4, 0, wx.BOTTOM | wx.LEFT | wx.RIGHT, 2)
-
-        self.button_5 = wx.Button(self, wx.ID_CLOSE, "")
+        
+        self.button_5 = wx.Button(self, wx.ID_ANY, "Show text")
         self.button_5.SetMinSize((76, 25))
-        sizer_3.Add(self.button_5, 0, wx.BOTTOM | wx.LEFT | wx.RIGHT, 2)
+        sizer_3.Add(self.button_5, 0, wx.BOTTOM | wx.LEFT | wx.RIGHT, 2)        
+
+        self.button_6 = wx.Button(self, wx.ID_CLOSE, "")
+        self.button_6.SetMinSize((76, 25))
+        sizer_3.Add(self.button_6, 0, wx.BOTTOM | wx.LEFT | wx.RIGHT, 2)
 
         self.filePicker = wx.FilePickerCtrl(
             self,
@@ -130,31 +134,33 @@ class FindReplace(wx.Dialog):
         
         self.SetSizer(sizer_1)
 
-        self.SetEscapeId(self.button_5.GetId())
+        self.SetEscapeId(self.button_6.GetId())
 
         self.Layout()
         self.Centre()
 
         ############################################################################################
 
-        self.IgnoreAll = []
-        self.ReplaceAll = []
-        self.Replace = []
+        self.Ignored = []
+        self.ReplacedAll = []
+        self.Replaced = []
         self.new_subs = []
-        self.default_subs = list(srt.parse(getSubs("test.srt")))
+        self.default_subs = getSubs("test.srt")
         self.new_d = {}
+        self.current_text = ""
         
         ## Events ##################################################################################
         self.filePicker.Bind(wx.EVT_FILEPICKER_CHANGED, self.FileChanged, self.filePicker)        
-        self.Bind(wx.EVT_BUTTON, self.onShowText, self.button_0)
+        self.Bind(wx.EVT_BUTTON, self.getValues, self.button_0)
         self.Bind(wx.EVT_BUTTON, self.onReplace, self.button_1)
         self.Bind(wx.EVT_BUTTON, self.onReplaceAll, self.button_2)
         self.Bind(wx.EVT_BUTTON, self.onIgnore, self.button_3)
         self.Bind(wx.EVT_BUTTON, self.onIgnoreAll, self.button_4)
+        self.Bind(wx.EVT_BUTTON, self.onShowText, self.button_5)
         ############################################################################################
         
         self.wdict = new_dict(self.dname)
-        self.subs = srt.parse(getSubs("test.srt"))
+        self.subs = srt.parse(self.default_subs)
         self.wdict = self.clearDict(self.wdict, srt.compose(self.subs))
         self.getValues(self.subs)
         
@@ -190,9 +196,11 @@ class FindReplace(wx.Dialog):
                 for m in re.finditer(v, self.text_2.GetValue()):
                     self.text_2.SetStyle(m.start(), m.end(), wx.TextAttr("RED"))
             if t1:
-                self.Replace.append(Subtitle(sub.index, sub.start, sub.end, sub.content))
-                self.button_1.SetFocus()
+                self.Replaced.append(Subtitle(sub.index, sub.start, sub.end, sub.content))
+                for v in newd.values(): self.ReplacedAll.append(v)
                 self.new_d = newd
+                self.current_text = self.text_2.GetValue()
+                self.button_1.SetFocus()
             return c
         except Exception as e:
             logger.debug(f"Error: {e}")
@@ -203,26 +211,26 @@ class FindReplace(wx.Dialog):
         self.button_1.SetFocus()
         self.dname = self.filePicker.GetPath()
         wdict = new_dict(self.dname)
-        self.subs = srt.parse(getSubs("test.srt"))
+        self.subs = srt.parse(self.default_subs)
         self.wdict = self.clearDict(wdict, srt.compose(self.subs))
-        self.subs = srt.parse(getSubs("test.srt"))
+        self.subs = srt.parse(self.default_subs)
         self.onReplace(event)
         event.Skip()
 
     def onShowText(self, event):
+        self.onReplace(event)
         self.text_1.Clear()
         self.text_2.Clear()
-        t = self.GetText()
-        self.text_2.SetValue(srt.compose(t))
+        self.text_2.SetValue(self.GetText())
         event.Skip()
     
     def onReplace(self, event):
-        text = self.text_2.GetValue()
-        if self.Replace:
-            sub = self.Replace[0]
-            self.Replace.clear()
+        text = self.current_text
+        if self.Replaced:
+            sub = self.Replaced[0]
+            self.Replaced.clear()
             self.new_subs.append(Subtitle(sub.index, sub.start, sub.end, text))
-        while len(self.Replace) == 0:
+        while len(self.Replaced) == 0:
             c = self.getValues(self.subs)
             if c == 0 or c is None:
                 break
@@ -231,13 +239,9 @@ class FindReplace(wx.Dialog):
     def onReplaceAll(self, event):
         ''''''
         try:
-            subs_d = srt.compose(self.default_subs)
-            k = self.text_1.GetValue()
-            
             ctext = re.compile(r"\b("+"|".join(map(re.escape,self.new_d.keys()))+r")\b")
-            subs_d = ctext.sub(lambda x: self.new_d[x.group()], subs_d)
+            self .default_subs = ctext.sub(lambda x: self.new_d[x.group()], self.default_subs)
             
-            self.default_subs = list(srt.parse(subs_d))
             for k in self.new_d.keys(): self.wdict.pop(k)
             self.onReplace(event)
         except Exception as e:
@@ -261,17 +265,19 @@ class FindReplace(wx.Dialog):
             for k, v in _dict.items():
                 if i == k:
                     new_dict[i] = v
-        self.subs = srt.parse(getSubs("test.srt"))
+        self.subs = srt.parse(self.default_subs)
         print(new_dict)
         return new_dict
     
     def GetText(self):
         """"""
+        d_subs = list(srt.parse(self.default_subs))
         for i in self.new_subs:
-            for x in self.default_subs:
+            for x in d_subs:
                 if i.index == x.index:
-                    t = self.default_subs.index(x)
-                    self.default_subs[t] = i
+                    t = d_subs.index(x)
+                    d_subs[t] = i
+        self.default_subs = srt.compose(d_subs)
         return self.default_subs
         
 
