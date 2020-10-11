@@ -1,4 +1,4 @@
-Address=>Adresa
+﻿Address=>Adresa
 address=>adresa
 Agent=>agent
 agent=>agent
@@ -19,7 +19,9 @@ programmer=>programer
 system=>sistem
 Technically=>Tehnički
 tradition=>tradicija
+Woman=>Žena
 woman=>žena
+wife=>žena
 two=>dva
 three=>tri
 four=>četiri
