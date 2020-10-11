@@ -61,12 +61,14 @@ class FindReplace(wx.Dialog):
         sizer_1.Add(label_1, 0, wx.EXPAND | wx.LEFT | wx.TOP, 6)
 
         t_font = wx.Font(
-                10,
+                11,
                 wx.FONTFAMILY_DEFAULT,
                 wx.FONTSTYLE_NORMAL,
                 wx.FONTWEIGHT_NORMAL,
                 0,
-                "Segoe UI",
+                #"Segoe UI",
+                #"Arial"
+                "Franklin Gothic Medium",
             )
 
         self.text_1 = wx.TextCtrl(self, wx.ID_ANY, style=wx.TE_PROCESS_ENTER|wx.TE_MULTILINE|wx.TE_NO_VSCROLL|wx.TE_RICH)
@@ -173,9 +175,9 @@ class FindReplace(wx.Dialog):
         try:
             sub = next(self.subs)
             c += 1
-        except StopIteration as e:
+        except StopIteration:
             wdict = self.clearDict(wdict, srt.compose(self.new_subs))
-            logger.debug(f"Iter {e}")
+            logger.debug(f"Subs Iterator empty")
         finally:
             p = "="*20
             self.text_2.SetValue(f"{p}\nEnd of subtitles reached!\n{p}")
@@ -198,8 +200,8 @@ class FindReplace(wx.Dialog):
             if t1:
                 self.Replaced.append(Subtitle(sub.index, sub.start, sub.end, sub.content))
                 for v in newd.values(): self.ReplacedAll.append(v)
-                self.new_d = newd
                 self.current_text = self.text_2.GetValue()
+                self.new_d = newd
                 self.button_1.SetFocus()
             return c
         except Exception as e:
@@ -240,7 +242,7 @@ class FindReplace(wx.Dialog):
         ''''''
         try:
             ctext = re.compile(r"\b("+"|".join(map(re.escape,self.new_d.keys()))+r")\b")
-            self .default_subs = ctext.sub(lambda x: self.new_d[x.group()], self.default_subs)
+            self.default_subs = ctext.sub(lambda x: self.new_d[x.group()], self.default_subs)
             
             for k in self.new_d.keys(): self.wdict.pop(k)
             self.onReplace(event)
@@ -266,7 +268,6 @@ class FindReplace(wx.Dialog):
                 if i == k:
                     new_dict[i] = v
         self.subs = srt.parse(self.default_subs)
-        print(new_dict)
         return new_dict
     
     def GetText(self):
@@ -275,8 +276,7 @@ class FindReplace(wx.Dialog):
         for i in self.new_subs:
             for x in d_subs:
                 if i.index == x.index:
-                    t = d_subs.index(x)
-                    d_subs[t] = i
+                    d_subs[d_subs.index(x)] = i
         self.default_subs = srt.compose(d_subs)
         return self.default_subs
         
