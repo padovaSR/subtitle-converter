@@ -217,7 +217,7 @@ class FindReplace(wx.Dialog):
         self.filePicker.SetPath(self.filePicker.GetPath())
         self.button_1.SetFocus()
         self.dname = self.filePicker.GetPath()
-        wdict = new_dict(self.dname)
+        wdict = dict_fromFile(self.dname, "=>")
         self.subs = srt.parse(self.default_subs)
         self.wdict = self.clearDict(wdict, srt.compose(self.subs))
         self.subs = srt.parse(self.default_subs)
