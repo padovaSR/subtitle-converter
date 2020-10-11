@@ -8,9 +8,8 @@ import os
 import re
 import srt
 from srt import Subtitle
-from zamenaImena import new_dict 
-from more_itertools import first_true
-from itertools import tee, zip_longest, cycle
+from zamenaImena import dict_fromFile 
+from settings import WORK_TEXT 
 import logging.config
 
 import wx
@@ -61,7 +60,7 @@ class FindReplace(wx.Dialog):
         sizer_1.Add(label_1, 0, wx.EXPAND | wx.LEFT | wx.TOP, 6)
 
         t_font = wx.Font(
-                11,
+                10,
                 wx.FONTFAMILY_DEFAULT,
                 wx.FONTSTYLE_NORMAL,
                 wx.FONTWEIGHT_NORMAL,
@@ -114,9 +113,13 @@ class FindReplace(wx.Dialog):
         self.button_5.SetMinSize((76, 25))
         sizer_3.Add(self.button_5, 0, wx.BOTTOM | wx.LEFT | wx.RIGHT, 2)        
 
-        self.button_6 = wx.Button(self, wx.ID_CLOSE, "")
-        self.button_6.SetMinSize((76, 25))
-        sizer_3.Add(self.button_6, 0, wx.BOTTOM | wx.LEFT | wx.RIGHT, 2)
+        self.button_OK = wx.Button(self, wx.ID_OK, "")
+        self.button_OK.SetMinSize((76, 25))
+        sizer_3.Add(self.button_OK, 0, wx.BOTTOM | wx.LEFT | wx.RIGHT, 2)        
+        
+        self.button_7 = wx.Button(self, wx.ID_CANCEL, "")
+        self.button_7.SetMinSize((76, 25))
+        sizer_3.Add(self.button_7, 0, wx.BOTTOM | wx.LEFT | wx.RIGHT, 2)
 
         self.filePicker = wx.FilePickerCtrl(
             self,
@@ -136,7 +139,8 @@ class FindReplace(wx.Dialog):
         
         self.SetSizer(sizer_1)
 
-        self.SetEscapeId(self.button_6.GetId())
+        self.SetAffirmativeId(self.button_OK.GetId())
+        self.SetEscapeId(self.button_7.GetId())
 
         self.Layout()
         self.Centre()
@@ -159,9 +163,10 @@ class FindReplace(wx.Dialog):
         self.Bind(wx.EVT_BUTTON, self.onIgnore, self.button_3)
         self.Bind(wx.EVT_BUTTON, self.onIgnoreAll, self.button_4)
         self.Bind(wx.EVT_BUTTON, self.onShowText, self.button_5)
+        self.Bind(wx.EVT_BUTTON, self.onOK, self.button_OK)
         ############################################################################################
         
-        self.wdict = new_dict(self.dname)
+        self.wdict = dict_fromFile(self.dname, "=>")
         self.subs = srt.parse(self.default_subs)
         self.wdict = self.clearDict(self.wdict, srt.compose(self.subs))
         self.getValues(self.subs)
@@ -220,14 +225,18 @@ class FindReplace(wx.Dialog):
         event.Skip()
 
     def onShowText(self, event):
-        self.onReplace(event)
         self.text_1.Clear()
+        if not self.current_text:
+            self.current_text = self.text_2.GetValue()
         self.text_2.Clear()
         self.text_2.SetValue(self.GetText())
+        self.button_1.SetFocus()
         event.Skip()
     
     def onReplace(self, event):
-        text = self.current_text
+        if not self.current_text:
+            text = self.text_2.GetValue()
+        else: text = self.current_text
         if self.Replaced:
             sub = self.Replaced[0]
             self.Replaced.clear()
@@ -250,6 +259,14 @@ class FindReplace(wx.Dialog):
             logger.debug(f"Error: {e}")
         event.Skip()
 
+    def onOK(self, event):
+        """"""
+        WORK_TEXT.truncate(0)
+        WORK_TEXT.write(self.GetText())
+        WORK_TEXT.seek(0)
+        event.Skip()
+        
+    
     def onIgnore(self, event):
         print("Event handler 'onIgnore' not implemented!")
         event.Skip()
