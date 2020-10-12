@@ -60,8 +60,8 @@ def dict_fromFile(text_in, delim):
             if not x[0]:
                 continue
             else:
-                key = x[0]
-            value = x[-1]
+                key = x[0].strip()
+            value = x[-1].strip()
             new_dict[key] = value
         return new_dict
 
