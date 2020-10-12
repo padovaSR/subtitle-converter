@@ -268,6 +268,18 @@ class ConverterFrame(wx.Frame):
             wx.ArtProvider.GetBitmap(wx.ART_HELP_SETTINGS, wx.ART_MENU)
         )
         self.action.Append(self.transcrib)
+        
+        self.change = wx.MenuItem(
+            self.action,
+            wx.ID_ANY,
+            "&ChangeManualy\t" + keyS["Change"],
+            "Transcribe manualy from dictionaries",
+            wx.ITEM_NORMAL,
+        )
+        self.change.SetBitmap(
+            wx.Bitmap(filePath("resources", "icons", "cyr-ltr.png"), wx.BITMAP_TYPE_ANY)
+        )
+        self.action.Append(self.change)
 
         self.specials = wx.MenuItem(
             self.action,
