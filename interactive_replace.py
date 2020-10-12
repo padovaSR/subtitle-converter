@@ -8,6 +8,7 @@ import os
 import re
 import srt
 from srt import Subtitle
+from pydispatch import dispatcher 
 from collections import defaultdict 
 from zamenaImena import dict_fromFile 
 from settings import WORK_TEXT 
@@ -30,11 +31,12 @@ class FindReplace(wx.Dialog):
         wx.Dialog.__init__(self, parent, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
         
         self.subtitles = subtitles
+        subtitles = self.subtitles
         
         self.dname = r""
         
         self.SetSize((525, 400))
-        self.SetTitle("Find-Replace")
+        self.SetTitle("Find-Replace from dictionary")
         _icon = wx.NullIcon
         _icon.CopyFromBitmap(
             wx.Bitmap(
@@ -154,7 +156,8 @@ class FindReplace(wx.Dialog):
         self.ReplacedAll = []
         self.Replaced = []
         self.new_subs = []
-        self.default_subs = getSubs("test.srt")
+        # self.default_subs = getSubs("test.srt")
+        self.default_subs = srt.compose(subtitles)
         self.new_d = {}
         self.current_text = ""
         
@@ -280,6 +283,7 @@ class FindReplace(wx.Dialog):
         WORK_TEXT.truncate(0)
         WORK_TEXT.write(self.GetText())
         WORK_TEXT.seek(0)
+        dispatcher.send("DIALOG", message=self.ReplacedAll)
         event.Skip()
         
     
