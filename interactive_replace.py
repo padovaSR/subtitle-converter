@@ -8,6 +8,7 @@ import os
 import re
 import srt
 from srt import Subtitle
+from collections import defaultdict 
 from zamenaImena import dict_fromFile 
 from settings import WORK_TEXT 
 import logging.config
@@ -42,6 +43,10 @@ class FindReplace(wx.Dialog):
         )
         self.SetIcon(_icon)
         
+        SetFont = dict_fromFile(os.path.join("resources", "var", "dialog_font.conf"), "=")
+        tFont = defaultdict(str)
+        tFont.update(SetFont)
+        
         sizer_1 = wx.BoxSizer(wx.VERTICAL)
 
         label_1 = wx.StaticText(
@@ -54,20 +59,18 @@ class FindReplace(wx.Dialog):
                 wx.FONTSTYLE_NORMAL,
                 wx.FONTWEIGHT_NORMAL,
                 0,
-                "Franklin Gothic Medium",
+                tFont["LabelFont"], 
             )
         )
         sizer_1.Add(label_1, 0, wx.EXPAND | wx.LEFT | wx.TOP, 6)
 
         t_font = wx.Font(
-                10,
+                int(tFont["fSize"]),
                 wx.FONTFAMILY_DEFAULT,
                 wx.FONTSTYLE_NORMAL,
                 wx.FONTWEIGHT_NORMAL,
                 0,
-                #"Segoe UI",
-                #"Arial"
-                "Franklin Gothic Medium",
+                tFont["TextFont"],
             )
 
         self.text_1 = wx.TextCtrl(self, wx.ID_ANY, style=wx.TE_PROCESS_ENTER|wx.TE_MULTILINE|wx.TE_NO_VSCROLL|wx.TE_RICH)
@@ -191,6 +194,7 @@ class FindReplace(wx.Dialog):
             t1 = list(set(t1))            
             newd = {}
             self.text_1.Clear()
+            self.text_2.Clear()
             for i in range(len(t1)):
                 self.text_1.AppendText(f"{t1[i]} ")
                 v = wdict[t1[i]]
@@ -205,7 +209,6 @@ class FindReplace(wx.Dialog):
             if t1:
                 self.Replaced.append(Subtitle(sub.index, sub.start, sub.end, sub.content))
                 for v in newd.values(): self.ReplacedAll.append(v)
-                self.current_text = self.text_2.GetValue()
                 self.new_d = newd
                 self.button_1.SetFocus()
             return c
@@ -225,22 +228,35 @@ class FindReplace(wx.Dialog):
         event.Skip()
 
     def onShowText(self, event):
+        ''''''       
+        self.replaceCurrent()
         self.text_1.Clear()
-        if not self.current_text:
-            self.current_text = self.text_2.GetValue()
         self.text_2.Clear()
         self.text_2.SetValue(self.GetText())
+        for x in set(self.ReplacedAll):
+            ctext = re.compile(r"\b"+x+r"\b")
+            for m in re.finditer(ctext, self.text_2.GetValue()):
+                self.text_2.SetStyle(m.start(), m.end(), wx.TextAttr(wx.RED, wx.YELLOW))        
+        self.button_1.SetLabelText("Continue")
         self.button_1.SetFocus()
         event.Skip()
     
+    def replaceCurrent(self):
+        """"""
+        text = self.text_2.GetValue()
+        sub = self.Replaced[0]
+        self.Replaced.clear()
+        self.new_subs.append(Subtitle(sub.index, sub.start, sub.end, text))
+        
     def onReplace(self, event):
-        if not self.current_text:
-            text = self.text_2.GetValue()
-        else: text = self.current_text
+        ''''''
+        text = self.text_2.GetValue()
         if self.Replaced:
             sub = self.Replaced[0]
             self.Replaced.clear()
             self.new_subs.append(Subtitle(sub.index, sub.start, sub.end, text))
+        else: self.default_subs = text
+        self.button_1.SetLabelText("Accept")
         while len(self.Replaced) == 0:
             c = self.getValues(self.subs)
             if c == 0 or c is None:
