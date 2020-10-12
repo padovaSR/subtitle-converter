@@ -246,10 +246,11 @@ class FindReplace(wx.Dialog):
     
     def replaceCurrent(self):
         """"""
-        text = self.text_2.GetValue()
-        sub = self.Replaced[0]
-        self.Replaced.clear()
-        self.new_subs.append(Subtitle(sub.index, sub.start, sub.end, text))
+        if self.Replaced:
+            text = self.text_2.GetValue()
+            sub = self.Replaced[0]
+            self.Replaced.clear()
+            self.new_subs.append(Subtitle(sub.index, sub.start, sub.end, text))
         
     def onReplace(self, event):
         ''''''
