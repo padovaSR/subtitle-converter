@@ -34,14 +34,15 @@ from more_itertools import unique_justseen
 from Manual import MyManual
 from zip_confirm import TreeDialog 
 from errors_check import checkErrors, checkChars, checkFile, displayError
+from File_processing import newName, nameDialog, writeToFile
+from File_Handler import fileHandle, addPrevious
 from file_settings import FileSettings
 from merger_settings import Settings
 from fixer_settings import FixerSettings
-from File_Handler import fileHandle, addPrevious
 from file_dnd import FileDrop
 from merge import myMerger, FixSubGaps
 from zamenaImena import shortcutsKey 
-from File_processing import newName, nameDialog, writeToFile
+from interactive_replace import FindReplace 
 from settings import BYTES_TEXT as BT
 from settings import (
     filePath,
@@ -198,6 +199,7 @@ class MyFrame(ConverterFrame):
         self.Bind(wx.EVT_MENU, self.toANSI, id=self.to_ansi.GetId())
         self.Bind(wx.EVT_MENU, self.toUTF, id=self.to_utf8.GetId())
         self.Bind(wx.EVT_MENU, self.onTranscribe, id=self.transcrib.GetId())
+        self.Bind(wx.EVT_MENU, self.ChangeManualy, id=self.change.GetId())
         self.Bind(wx.EVT_MENU, self.onRepSpecial, id=self.specials.GetId())
         self.Bind(wx.EVT_MENU, self.onCleanup, id=self.cleaner.GetId())
         self.Bind(wx.EVT_MENU, self.applyRegex, id=self._regex.GetId())
@@ -261,6 +263,7 @@ class MyFrame(ConverterFrame):
 
         dispatcher.connect(self.updateStatus, signal="TMP_PATH", sender=dispatcher.Any)
         dispatcher.connect(self.enKode, signal="TMP_PATH", sender=dispatcher.Any)
+        dispatcher.connect(self.updateText, signal="DIALOG", sender=dispatcher.Any)
         
     def updateStatus(self, message, msg):
         ''''''
@@ -336,6 +339,16 @@ class MyFrame(ConverterFrame):
         self.curClr = wx.Colour((fC[0], fC[1], fC[2], fC[3]))
         self.text_1.SetFont(self.curFont)
         self.text_1.SetForegroundColour(self.curClr)
+    
+    def updateText(self, message):
+        """"""
+        text = WORK_TEXT.getvalue()
+        self.text_1.SetValue(text)
+        for x in set(message):
+            ctext = re.compile(r"\b"+x+r"\b")
+            for m in re.finditer(ctext, self.text_1.GetValue()):
+                self.text_1.SetStyle(m.start(), m.end(), wx.TextAttr(wx.RED, wx.YELLOW))        
+                self.text_1.SetInsertionPoint(m.end())
 
     def enableTool(self):
 
@@ -1950,6 +1963,14 @@ class MyFrame(ConverterFrame):
                     
         self.postAction(path)
 
+        event.Skip()
+        
+    def ChangeManualy(self, event):
+        """"""
+        text = self.text_1.GetValue()
+        dlg = FindReplace(None, subtitles=list(srt.parse(text)))
+        dlg.ShowModal()
+        dlg.Destroy()
         event.Skip()
         
     def onRepSpecial(self, event):
