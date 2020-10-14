@@ -156,10 +156,9 @@ class FindReplace(wx.Dialog):
         self.ReplacedAll = []
         self.Replaced = []
         self.new_subs = []
-        self.default_subs = getSubs("test.srt")
-        # self.default_subs = srt.compose(subtitles)
+        # self.default_subs = getSubs("test.srt")
+        self.default_subs = srt.compose(subtitles)
         self.new_d = {}
-        self.multi = False
         
         ## Events ##################################################################################
         self.filePicker.Bind(wx.EVT_FILEPICKER_CHANGED, self.FileChanged, self.filePicker)        
@@ -187,7 +186,7 @@ class FindReplace(wx.Dialog):
             c += 1
         except StopIteration:
             wdict = self.clearDict(wdict, srt.compose(self.new_subs, reindex=False))
-            logger.debug(f"Subs Iterator was empty")
+            logger.debug(f"Iterator was empty")
         finally:
             p = "="*20
             self.text_2.SetValue(f"{p}\nEnd of subtitles reached!\n{p}")
@@ -234,6 +233,10 @@ class FindReplace(wx.Dialog):
         self.text_1.Clear()
         self.text_2.Clear()
         self.text_2.SetValue(self.GetText())
+        for x in self.Ignored:
+            ctext = re.compile(r"\b"+x+r"\b")
+            for m in re.finditer(ctext, self.text_2.GetValue()):
+                self.text_2.SetStyle(m.start(), m.end(), wx.TextAttr(wx.BLUE))            
         for x in set(self.ReplacedAll):
             ctext = re.compile(r"\b"+x+r"\b")
             for m in re.finditer(ctext, self.text_2.GetValue()):
@@ -268,9 +271,9 @@ class FindReplace(wx.Dialog):
             self.default_subs = ctext.sub(lambda x: self.new_d[x.group()], self.default_subs)
             wsubs = srt.compose(self.subs, reindex=False)
             wsubs = ctext.sub(lambda x: self.new_d[x.group()], wsubs)
-            for v in self.new_d.values():
+            for k, v in self.new_d.items():
                 self.ReplacedAll.append(v)
-            for k in self.new_d.keys(): self.wdict.pop(k)
+                self.wdict.pop(k)
             self.subs = srt.parse(wsubs)
             self.onReplace(event)
         except Exception as e:
@@ -286,11 +289,19 @@ class FindReplace(wx.Dialog):
         event.Skip()
     
     def onIgnore(self, event):
-        
+        ''''''
+        for i in self.text_1.GetValue().split():
+            self.Ignored.append(i.strip())
+        self.Replaced.clear()
+        self.onReplace(event)
         event.Skip()
 
     def onIgnoreAll(self, event):
-        print("Event handler 'onIgnoreAll' not implemented!")
+        for i in self.text_1.GetValue().split():
+            self.Ignored.append(i.strip())
+        for k in self.Ignored: self.wdict.pop(k)
+        self.Replaced.clear()
+        self.onReplace(event)        
         event.Skip()
     
     def clearDict(self, _dict, _subs):
