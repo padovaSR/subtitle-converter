@@ -156,10 +156,10 @@ class FindReplace(wx.Dialog):
         self.ReplacedAll = []
         self.Replaced = []
         self.new_subs = []
-        # self.default_subs = getSubs("test.srt")
-        self.default_subs = srt.compose(subtitles)
+        self.default_subs = getSubs("test.srt")
+        # self.default_subs = srt.compose(subtitles)
         self.new_d = {}
-        self.current_text = ""
+        self.multi = False
         
         ## Events ##################################################################################
         self.filePicker.Bind(wx.EVT_FILEPICKER_CHANGED, self.FileChanged, self.filePicker)        
@@ -177,18 +177,17 @@ class FindReplace(wx.Dialog):
         self.wdict = self.clearDict(self.wdict, srt.compose(self.subs))
         self.getValues(self.subs)
         
-        
     def getValues(self, iterator):
         """"""
+        c = 0
         wdict = self.wdict
         r1 = re.compile(r"\b("+"|".join(map(re.escape, wdict.keys()))+r")\b")
-        c = 0
         try:
-            sub = next(self.subs)
+            sub = next(iterator)
             c += 1
         except StopIteration:
-            wdict = self.clearDict(wdict, srt.compose(self.new_subs))
-            logger.debug(f"Subs Iterator empty")
+            wdict = self.clearDict(wdict, srt.compose(self.new_subs, reindex=False))
+            logger.debug(f"Subs Iterator was empty")
         finally:
             p = "="*20
             self.text_2.SetValue(f"{p}\nEnd of subtitles reached!\n{p}")
@@ -197,7 +196,6 @@ class FindReplace(wx.Dialog):
             t1 = list(set(t1))            
             newd = {}
             self.text_1.Clear()
-            self.text_2.Clear()
             for i in range(len(t1)):
                 self.text_1.AppendText(f"{t1[i]} ")
                 v = wdict[t1[i]]
@@ -225,13 +223,13 @@ class FindReplace(wx.Dialog):
         self.dname = self.filePicker.GetPath()
         wdict = dict_fromFile(self.dname, "=>")
         self.subs = srt.parse(self.default_subs)
-        self.wdict = self.clearDict(wdict, srt.compose(self.subs))
+        self.wdict = self.clearDict(wdict, srt.compose(self.subs, reindex=False))
         self.subs = srt.parse(self.default_subs)
         self.onReplace(event)
         event.Skip()
 
     def onShowText(self, event):
-        ''''''       
+        ''''''
         self.replaceCurrent()
         self.text_1.Clear()
         self.text_2.Clear()
@@ -239,7 +237,8 @@ class FindReplace(wx.Dialog):
         for x in set(self.ReplacedAll):
             ctext = re.compile(r"\b"+x+r"\b")
             for m in re.finditer(ctext, self.text_2.GetValue()):
-                self.text_2.SetStyle(m.start(), m.end(), wx.TextAttr(wx.RED, wx.YELLOW))        
+                self.text_2.SetStyle(m.start(), m.end(), wx.TextAttr(wx.RED, wx.YELLOW))
+                self.text_2.SetInsertionPoint(m.end())
         self.button_1.SetLabelText("Continue")
         self.button_1.SetFocus()
         event.Skip()
@@ -254,12 +253,7 @@ class FindReplace(wx.Dialog):
         
     def onReplace(self, event):
         ''''''
-        text = self.text_2.GetValue()
-        if self.Replaced:
-            sub = self.Replaced[0]
-            self.Replaced.clear()
-            self.new_subs.append(Subtitle(sub.index, sub.start, sub.end, text))
-        else: self.default_subs = text
+        self.replaceCurrent()
         self.button_1.SetLabelText("Accept")
         while len(self.Replaced) == 0:
             c = self.getValues(self.subs)
@@ -272,8 +266,12 @@ class FindReplace(wx.Dialog):
         try:
             ctext = re.compile(r"\b("+"|".join(map(re.escape,self.new_d.keys()))+r")\b")
             self.default_subs = ctext.sub(lambda x: self.new_d[x.group()], self.default_subs)
-            
+            wsubs = srt.compose(self.subs, reindex=False)
+            wsubs = ctext.sub(lambda x: self.new_d[x.group()], wsubs)
+            for v in self.new_d.values():
+                self.ReplacedAll.append(v)
             for k in self.new_d.keys(): self.wdict.pop(k)
+            self.subs = srt.parse(wsubs)
             self.onReplace(event)
         except Exception as e:
             logger.debug(f"Error: {e}")
@@ -286,10 +284,9 @@ class FindReplace(wx.Dialog):
         WORK_TEXT.seek(0)
         dispatcher.send("DIALOG", message=self.ReplacedAll)
         event.Skip()
-        
     
     def onIgnore(self, event):
-        print("Event handler 'onIgnore' not implemented!")
+        
         event.Skip()
 
     def onIgnoreAll(self, event):
@@ -311,17 +308,19 @@ class FindReplace(wx.Dialog):
     def GetText(self):
         """"""
         d_subs = list(srt.parse(self.default_subs))
-        for i in self.new_subs:
-            for x in d_subs:
+        for i in d_subs:
+            for x in self.new_subs:
+                if i.start == x.start and i.content == x.content:
+                    d_subs.remove(i)
                 if i.index == x.index:
-                    d_subs[d_subs.index(x)] = i
+                    try:
+                        d_subs[d_subs.index(i)] = x
+                    except:
+                        d_subs.append(x)
         self.default_subs = srt.compose(d_subs)
         return self.default_subs
-        
 
-
-# end of class MyDialog
-
+# end of class FindReplace
 
 class MyApp(wx.App):
     def OnInit(self):
@@ -330,7 +329,6 @@ class MyApp(wx.App):
         self.dialog.ShowModal()
         self.dialog.Destroy()
         return True
-
 
 # end of class MyApp
 
