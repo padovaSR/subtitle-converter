@@ -96,6 +96,7 @@ Philadelphia=>Filadelfija
 Phoenix=>Finiks
 Portland=>Portland
 Sacramento=>Sakramento
+St\. Louis=>Sent Luis
 St\' Louis=>Sent Luis
 San Antonio=>San Antonio
 San Diego=>San Dijego
