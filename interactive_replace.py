@@ -225,10 +225,6 @@ class FindReplace(wx.Dialog):
         self.subs = srt.parse(self.default_subs)
         self.wdict = self.clearDict(wdict, srt.compose(self.subs, reindex=False))
         self.subs = srt.parse(self.default_subs)
-        for x in set(self.Ignored):
-            for k in self.wdict.keys():
-                if x == k:
-                    self.Ignored.remove(x)
         self.onReplace(event)
         event.Skip()
 
@@ -249,8 +245,6 @@ class FindReplace(wx.Dialog):
                 self.text_2.SetInsertionPoint(m.end())
         self.button_1.SetLabelText("Continue")
         self.button_1.SetFocus()
-        for i in [self.button_0, self.button_2, self.button_3, self.button_4]:
-            i.Disable
         event.Skip()
     
     def replaceCurrent(self):
