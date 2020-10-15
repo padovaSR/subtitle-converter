@@ -156,12 +156,13 @@ class FindReplace(wx.Dialog):
         self.ReplacedAll = []
         self.Replaced = []
         self.new_subs = []
-        # self.default_subs = getSubs("test.srt")
-        self.default_subs = srt.compose(subtitles)
+        self.default_subs = getSubs("test.srt")
+        # self.default_subs = srt.compose(subtitles)
         self.new_d = {}
         
         ## Events ##################################################################################
-        self.filePicker.Bind(wx.EVT_FILEPICKER_CHANGED, self.FileChanged, self.filePicker)        
+        self.filePicker.Bind(wx.EVT_FILEPICKER_CHANGED, self.FileChanged, self.filePicker)
+        self.text_2.Bind(wx.EVT_TEXT, self.textChanged, self.text_2)
         self.Bind(wx.EVT_BUTTON, self.getValues, self.button_0)
         self.Bind(wx.EVT_BUTTON, self.onReplace, self.button_1)
         self.Bind(wx.EVT_BUTTON, self.onReplaceAll, self.button_2)
@@ -224,6 +225,10 @@ class FindReplace(wx.Dialog):
         self.subs = srt.parse(self.default_subs)
         self.wdict = self.clearDict(wdict, srt.compose(self.subs, reindex=False))
         self.subs = srt.parse(self.default_subs)
+        for x in set(self.Ignored):
+            for k in self.wdict.keys():
+                if x == k:
+                    self.Ignored.remove(x)
         self.onReplace(event)
         event.Skip()
 
@@ -233,7 +238,7 @@ class FindReplace(wx.Dialog):
         self.text_1.Clear()
         self.text_2.Clear()
         self.text_2.SetValue(self.GetText())
-        for x in self.Ignored:
+        for x in set(self.Ignored):
             ctext = re.compile(r"\b"+x+r"\b")
             for m in re.finditer(ctext, self.text_2.GetValue()):
                 self.text_2.SetStyle(m.start(), m.end(), wx.TextAttr(wx.BLUE))            
@@ -244,6 +249,8 @@ class FindReplace(wx.Dialog):
                 self.text_2.SetInsertionPoint(m.end())
         self.button_1.SetLabelText("Continue")
         self.button_1.SetFocus()
+        for i in [self.button_0, self.button_2, self.button_3, self.button_4]:
+            i.Disable
         event.Skip()
     
     def replaceCurrent(self):
@@ -260,7 +267,7 @@ class FindReplace(wx.Dialog):
         self.button_1.SetLabelText("Accept")
         while len(self.Replaced) == 0:
             c = self.getValues(self.subs)
-            if c == 0 or c is None:
+            if c is None or c == 0:
                 break
         event.Skip()
 
@@ -318,7 +325,7 @@ class FindReplace(wx.Dialog):
     
     def GetText(self):
         """"""
-        d_subs = list(srt.parse(self.default_subs))
+        d_subs = list(srt.parse(self.default_subs, ignore_errors=True))
         for i in d_subs:
             for x in self.new_subs:
                 if i.start == x.start and i.content == x.content:
@@ -328,9 +335,15 @@ class FindReplace(wx.Dialog):
                         d_subs[d_subs.index(i)] = x
                     except:
                         d_subs.append(x)
-        self.default_subs = srt.compose(d_subs)
-        return self.default_subs
-
+        return srt.compose(d_subs)
+    
+    def textChanged(self, event):
+        """"""
+        if self.text_2.IsModified():
+            if self.button_1.GetLabelText() == "Continue":
+                self.default_subs = self.text_2.GetValue()
+        event.Skip()
+        
 # end of class FindReplace
 
 class MyApp(wx.App):
