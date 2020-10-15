@@ -156,14 +156,14 @@ class FindReplace(wx.Dialog):
         self.ReplacedAll = []
         self.Replaced = []
         self.new_subs = []
-        self.default_subs = getSubs("test.srt")
-        # self.default_subs = srt.compose(subtitles)
+        # self.default_subs = getSubs("test.srt")
+        self.default_subs = srt.compose(subtitles)
         self.new_d = {}
         
         ## Events ##################################################################################
         self.filePicker.Bind(wx.EVT_FILEPICKER_CHANGED, self.FileChanged, self.filePicker)
         self.text_2.Bind(wx.EVT_TEXT, self.textChanged, self.text_2)
-        self.Bind(wx.EVT_BUTTON, self.getValues, self.button_0)
+        # self.Bind(wx.EVT_BUTTON, self.getValues, self.button_0)
         self.Bind(wx.EVT_BUTTON, self.onReplace, self.button_1)
         self.Bind(wx.EVT_BUTTON, self.onReplaceAll, self.button_2)
         self.Bind(wx.EVT_BUTTON, self.onIgnore, self.button_3)
@@ -192,8 +192,7 @@ class FindReplace(wx.Dialog):
             p = "="*20
             self.text_2.SetValue(f"{p}\nEnd of subtitles reached!\n{p}")
         try:
-            t1 = r1.findall(sub.content)
-            t1 = list(set(t1))            
+            t1 = list(set(r1.findall(sub.content)))
             newd = {}
             self.text_1.Clear()
             for i in range(len(t1)):
@@ -300,7 +299,7 @@ class FindReplace(wx.Dialog):
     def onIgnoreAll(self, event):
         for i in self.text_1.GetValue().split():
             self.Ignored.append(i.strip())
-        for k in self.Ignored: self.wdict.pop(k)
+        for k in set(self.Ignored): self.wdict.pop(k)
         self.Replaced.clear()
         self.onReplace(event)        
         event.Skip()
@@ -314,7 +313,7 @@ class FindReplace(wx.Dialog):
             for k, v in _dict.items():
                 if i == k:
                     new_dict[i] = v
-        self.subs = srt.parse(self.default_subs)
+        self.subs = srt.parse(self.default_subs, ignore_errors=True)
         return new_dict
     
     def GetText(self):
