@@ -35,7 +35,7 @@ class FindReplace(wx.Dialog):
         
         self.dname = r""
         
-        self.SetSize((525, 400))
+        self.SetSize((524, 462))
         self.SetTitle("Find-Replace from dictionary")
         _icon = wx.NullIcon
         _icon.CopyFromBitmap(
@@ -186,11 +186,10 @@ class FindReplace(wx.Dialog):
             sub = next(iterator)
             c += 1
         except StopIteration:
-            wdict = self.clearDict(wdict, srt.compose(self.new_subs, reindex=False))
-            logger.debug(f"Iterator was empty")
+            logger.debug("Iterator was empty")
         finally:
             p = "="*20
-            self.text_2.SetValue(f"{p}\nEnd of subtitles reached!\n{p}")
+            self.text_2.SetValue(f"{p}\nEnd of subtitles reached\n{p}")
         try:
             t1 = list(set(r1.findall(sub.content)))
             newd = {}
@@ -231,7 +230,6 @@ class FindReplace(wx.Dialog):
         ''''''
         self.replaceCurrent()
         self.text_1.Clear()
-        self.text_2.Clear()
         self.text_2.SetValue(self.GetText())
         for x in set(self.Ignored):
             ctext = re.compile(r"\b"+x+r"\b")
