@@ -317,15 +317,10 @@ class FindReplace(wx.Dialog):
     def GetText(self):
         """"""
         d_subs = list(srt.parse(self.default_subs, ignore_errors=True))
-        for i in d_subs:
-            for x in self.new_subs:
-                if i.start == x.start and i.content == x.content:
-                    d_subs.remove(i)
+        for x in self.new_subs:
+            for i in d_subs:
                 if i.index == x.index:
-                    try:
-                        d_subs[d_subs.index(i)] = x
-                    except:
-                        d_subs.append(x)
+                    d_subs[d_subs.index(i)] = x
         return srt.compose(d_subs)
     
     def textChanged(self, event):
