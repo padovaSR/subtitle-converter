@@ -344,7 +344,8 @@ class FindReplace(wx.Dialog):
         if type(self.find) is list:
             self.find.clear()
         else: self.find = []
-        # self.text_2.SetDefaultStyle(self.text_2.GetDefaultStyle())
+        t_end = len(self.text_2.GetValue())
+        self.text_2.SetStyle(0, t_end, self.text_2.GetDefaultStyle())
         event.Skip()
         
     def onFind(self, event):
@@ -360,7 +361,7 @@ class FindReplace(wx.Dialog):
             self.text_2.SetStyle(p[0], p[1], wx.TextAttr("BLACK", "LIGHT BLUE"))
             self.text_2.SetInsertionPoint(p[1])
         except StopIteration:
-            logger.debug("StopIteration")
+            logger.debug("Iterator exhausted")
             self.find = []
         event.Skip()
         
