@@ -177,6 +177,7 @@ class MyFrame(ConverterFrame):
             self.to_cyrillic,
             self.to_utf8,
             self.transcrib,
+            self.change, 
         ]
 
         ## MENU EVENTS ##############################################################################
