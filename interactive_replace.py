@@ -96,20 +96,23 @@ class FindReplace(wx.Dialog):
 
         self.button_0 = wx.Button(self, wx.ID_ANY, "Find")
         self.button_0.SetMinSize((76, 25))
-        self.button_0.SetToolTip("F3 - Find")
+        self.button_0.SetToolTip("F3 : Find")
         sizer_3.Add(self.button_0, 0, wx.BOTTOM | wx.LEFT | wx.RIGHT, 2)
 
         self.button_1 = wx.Button(self, wx.ID_REPLACE, "Accept")
         self.button_1.SetMinSize((76, 25))
+        self.button_1.SetToolTip("Tab : Accept; Continue")
         self.button_1.SetDefault()
         sizer_3.Add(self.button_1, 0, wx.BOTTOM | wx.LEFT | wx.RIGHT, 2)
 
         self.button_2 = wx.Button(self, wx.ID_ANY, "Replace all")
         self.button_2.SetMinSize((76, 25))
+        self.button_2.SetToolTip("Ctrl+A : ReplaceAll")
         sizer_3.Add(self.button_2, 0, wx.BOTTOM | wx.LEFT | wx.RIGHT, 2)
 
         self.button_3 = wx.Button(self, wx.ID_ANY, "Ignore")
         self.button_3.SetMinSize((76, 25))
+        self.button_3.SetToolTip("Ctrl+I : Ignore")
         sizer_3.Add(self.button_3, 0, wx.BOTTOM | wx.LEFT | wx.RIGHT, 2)
 
         self.button_4 = wx.Button(self, wx.ID_ANY, "Ignore all")
@@ -118,6 +121,7 @@ class FindReplace(wx.Dialog):
         
         self.button_5 = wx.Button(self, wx.ID_ANY, "Show text")
         self.button_5.SetMinSize((76, 25))
+        self.button_5.SetToolTip("Ctrl+P : ShowText")
         sizer_3.Add(self.button_5, 0, wx.BOTTOM | wx.LEFT | wx.RIGHT, 2)        
 
         self.button_OK = wx.Button(self, wx.ID_OK, "")
@@ -175,8 +179,12 @@ class FindReplace(wx.Dialog):
         self.Bind(wx.EVT_BUTTON, self.onShowText, self.button_5)
         self.Bind(wx.EVT_BUTTON, self.onOK, self.button_OK)
         ############################################################################################
-        entries = [wx.AcceleratorEntry() for i in range(1)]
+        entries = [wx.AcceleratorEntry() for i in range(5)]
         entries[0].Set(wx.ACCEL_NORMAL, wx.WXK_F3, self.button_0.GetId())
+        entries[1].Set(wx.ACCEL_NORMAL, wx.WXK_TAB, self.button_1.GetId())
+        entries[2].Set(wx.ACCEL_CTRL, ord("P"), self.button_5.GetId())
+        entries[3].Set(wx.ACCEL_CTRL, ord("A"), self.button_2.GetId())
+        entries[4].Set(wx.ACCEL_CTRL, ord("I"), self.button_3.GetId())
         accel_tbl = wx.AcceleratorTable(entries)
         self.SetAcceleratorTable(accel_tbl)        
         ############################################################################################
