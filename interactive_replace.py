@@ -85,6 +85,7 @@ class FindReplace(wx.Dialog):
         self.text_2 = wx.TextCtrl(self, wx.ID_ANY, style=wx.TE_PROCESS_ENTER|wx.TE_MULTILINE|wx.TE_RICH)
         self.text_2.SetFont(t_font)
         self.text_2.SetToolTip("Text modification is supported")
+        self.text_2.SetDefaultStyle(style=(wx.TextAttr(wx.BLACK, wx.WHITE)))
         self.text_2.SetFocus()
         sizer_2.Add(self.text_2, 1, wx.ALL | wx.EXPAND, 5)
 
@@ -95,6 +96,7 @@ class FindReplace(wx.Dialog):
 
         self.button_0 = wx.Button(self, wx.ID_ANY, "Find")
         self.button_0.SetMinSize((76, 25))
+        self.button_0.SetToolTip("F3 - Find")
         sizer_3.Add(self.button_0, 0, wx.BOTTOM | wx.LEFT | wx.RIGHT, 2)
 
         self.button_1 = wx.Button(self, wx.ID_REPLACE, "Accept")
@@ -136,7 +138,7 @@ class FindReplace(wx.Dialog):
             wx.DefaultSize,
             wx.FLP_DEFAULT_STYLE,
         )
-        self.filePicker.SetInitialDirectory(os.path.join(os.getcwd(), "dicitionaries"))
+        self.filePicker.SetInitialDirectory(os.path.join(os.getcwd(), "dictionaries"))
         self.filePicker.SetToolTip(" \n Find dictionary \n ")
         self.filePicker.SetPath(os.path.abspath("dictionaries/Dictionary-1.txt"))
         self.dname = self.filePicker.GetPath()
@@ -159,17 +161,24 @@ class FindReplace(wx.Dialog):
         # self.default_subs = getSubs("test.srt")
         self.default_subs = srt.compose(subtitles)
         self.new_d = {}
+        self.find = []
         
         ## Events ##################################################################################
         self.filePicker.Bind(wx.EVT_FILEPICKER_CHANGED, self.FileChanged, self.filePicker)
         self.text_2.Bind(wx.EVT_TEXT, self.textChanged, self.text_2)
-        # self.Bind(wx.EVT_BUTTON, self.getValues, self.button_0)
+        self.text_1.Bind(wx.EVT_TEXT, self.Text1, self.text_1)
+        self.Bind(wx.EVT_BUTTON, self.onFind, self.button_0)
         self.Bind(wx.EVT_BUTTON, self.onReplace, self.button_1)
         self.Bind(wx.EVT_BUTTON, self.onReplaceAll, self.button_2)
         self.Bind(wx.EVT_BUTTON, self.onIgnore, self.button_3)
         self.Bind(wx.EVT_BUTTON, self.onIgnoreAll, self.button_4)
         self.Bind(wx.EVT_BUTTON, self.onShowText, self.button_5)
         self.Bind(wx.EVT_BUTTON, self.onOK, self.button_OK)
+        ############################################################################################
+        entries = [wx.AcceleratorEntry() for i in range(1)]
+        entries[0].Set(wx.ACCEL_NORMAL, wx.WXK_F3, self.button_0.GetId())
+        accel_tbl = wx.AcceleratorTable(entries)
+        self.SetAcceleratorTable(accel_tbl)        
         ############################################################################################
         
         self.wdict = dict_fromFile(self.dname, "=>")
@@ -329,6 +338,32 @@ class FindReplace(wx.Dialog):
             if self.button_1.GetLabelText() == "Continue":
                 self.default_subs = self.text_2.GetValue()
         event.Skip()
+        
+    def Text1(self, event):
+        """"""
+        if type(self.find) is list:
+            self.find.clear()
+        else: self.find = []
+        # self.text_2.SetDefaultStyle(self.text_2.GetDefaultStyle())
+        event.Skip()
+        
+    def onFind(self, event):
+        """"""
+        if not self.find:
+            s_text = self.text_1.GetValue().split()
+            text2 = self.text_2.GetValue()
+            for t in s_text:
+                new = [(m.start(), m.end()) for m in re.finditer(re.compile(r"\b"+t+r"\b"), text2)]
+                self.find=iter(new)
+        try:
+            p = next(self.find)
+            self.text_2.SetStyle(p[0], p[1], wx.TextAttr("BLACK", "LIGHT BLUE"))
+            self.text_2.SetInsertionPoint(p[1])
+        except StopIteration:
+            logger.debug("StopIteration")
+            self.find = []
+        event.Skip()
+        
         
 # end of class FindReplace
 
