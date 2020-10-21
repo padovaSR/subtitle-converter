@@ -3114,7 +3114,7 @@ class MyFrame(ConverterFrame):
         
     def EvtChar(self, event):
         ''''''
-        keycode = event.GetKeyCode()
+        keycode = event.GetUnicodeKey()
         # print(keycode)
         #controlDown = event.CmdDown()
         #altDown = event.AltDown()
