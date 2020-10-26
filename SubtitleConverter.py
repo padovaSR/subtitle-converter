@@ -87,7 +87,7 @@ logging.config.fileConfig(
 logger = logging.getLogger(__name__)
 
 
-VERSION = "v0.5.9.0_alpha9"
+VERSION = "v0.5.9.0_alpha10"
 
 
 class MyFrame(ConverterFrame):
@@ -148,6 +148,7 @@ class MyFrame(ConverterFrame):
         self.real_path = []
         self.real_dir = r""
         self.cyrUTFmulti = []
+        self.find = []
 
         ## Undo-Redo ######################
         self.UNDO_A = []
@@ -227,6 +228,8 @@ class MyFrame(ConverterFrame):
         self.Bind(wx.EVT_TOOL, self.onRepSpecial, id=1006)
         self.Bind(wx.EVT_TOOL, self.onCleanup, id=1007)
         self.Bind(wx.EVT_TOOL, self.onQuit, id=1008)
+        self.searchCtrl1.Bind(wx.EVT_SEARCHCTRL_SEARCH_BTN, self.searchText, id=self.searchCtrl1.GetId())
+        self.searchCtrl1.Bind(wx.EVT_TEXT, self.searchChange, id=self.searchCtrl1.GetId())
         ## Events other #############################################################################
         self.text_1.Bind(wx.EVT_TEXT, self.removeFiles, id=-1, id2=wx.ID_ANY)
         self.text_1.Bind(wx.EVT_TEXT, self.writeText, self.text_1)
@@ -3147,6 +3150,28 @@ class MyFrame(ConverterFrame):
         text = self.text_1.GetValue()
         bufferText(text, WORK_TEXT)
         
+        event.Skip()
+        
+    def searchText(self, event):
+        """"""
+        if not self.find:
+            s_text = event.GetString()
+            text2 = self.text_1.GetValue()
+            new = [(m.start(), m.end()) for m in re.finditer(re.compile(r"\b"+s_text+r"\b"), text2)]
+            self.find = iter(new)
+        try:
+            p = next(self.find)
+            self.text_1.SetStyle(p[0], p[1], wx.TextAttr("WHITE", "LIGHT STEEL BLUE"))
+            self.text_1.SetInsertionPoint(p[1])
+        except StopIteration:
+            logger.debug("Iterator exhausted")
+            self.find = []
+        event.Skip()
+        
+    def searchChange(self, event):
+        """"""
+        self.find = []
+        self.text_1.SetValue(self.text_1.GetValue())
         event.Skip()
         
 class MyApp(wx.App):
