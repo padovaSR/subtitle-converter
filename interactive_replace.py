@@ -42,7 +42,16 @@ class FindReplace(wx.Dialog):
         sizer_2 = wx.BoxSizer(wx.VERTICAL)
 
         self.label_1 = wx.StaticText(self, wx.ID_ANY, "Replace from dictionary")
-        self.label_1.SetFont(wx.Font(9, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, 0, "Segoe UI"))
+        self.label_1.SetFont(
+            wx.Font(
+                9,
+                wx.FONTFAMILY_DEFAULT,
+                wx.FONTSTYLE_NORMAL,
+                wx.FONTWEIGHT_NORMAL,
+                0,
+                "Segoe UI",
+            )
+        )
         sizer_2.Add(self.label_1, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 8)
 
         self.filePicker = wx.FilePickerCtrl(
@@ -72,9 +81,18 @@ class FindReplace(wx.Dialog):
             )        
         self.text_1 = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_PROCESS_ENTER)
         self.text_1.SetMinSize((500, 25))
-        self.text_1.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, 0, "Franklin Gothic Medium"))
+        self.text_1.SetFont(
+            wx.Font(
+                10,
+                wx.FONTFAMILY_SWISS,
+                wx.FONTSTYLE_NORMAL,
+                wx.FONTWEIGHT_NORMAL,
+                0,
+                "Franklin Gothic Medium",
+            )
+        )
         self.text_1.SetForegroundColour("BLUE")
-        self.text_1.SetToolTip("Enter text for search")        
+        self.text_1.SetToolTip("Enter text for search")
         sizer_2.Add(self.text_1, 0, wx.BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT, 8)
 
         sizer_3 = wx.BoxSizer(wx.HORIZONTAL)
@@ -130,7 +148,16 @@ class FindReplace(wx.Dialog):
                 0,
                 tFont["Text2Font"],
             )        
-        self.text_3 = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_CENTRE | wx.TE_MULTILINE | wx.TE_NO_VSCROLL | wx.TE_PROCESS_ENTER|wx.TE_RICH)
+        self.text_3 = wx.TextCtrl(
+            self,
+            wx.ID_ANY,
+            "",
+            style=wx.TE_CENTRE
+            | wx.TE_MULTILINE
+            | wx.TE_NO_VSCROLL
+            | wx.TE_PROCESS_ENTER
+            | wx.TE_RICH,
+        )
         self.text_3.SetMinSize((500, 89))
         self.text_3.SetFont(t_font2)
         self.text_3.SetToolTip(" Text modification \n is supported ")
@@ -153,8 +180,8 @@ class FindReplace(wx.Dialog):
         self.ReplacedAll = []
         self.Replaced = []
         self.new_subs = []
-        self.default_subs = getSubs("test.srt")
-        # self.default_subs = srt.compose(subtitles)
+        # self.default_subs = getSubs("test.srt")
+        self.default_subs = srt.compose(subtitles)
         self.new_d = {}
         self.find = []
         
