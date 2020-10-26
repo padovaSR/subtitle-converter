@@ -131,7 +131,7 @@ class FindReplace(wx.Dialog):
                 tFont["Text2Font"],
             )        
         self.text_3 = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_CENTRE | wx.TE_MULTILINE | wx.TE_NO_VSCROLL | wx.TE_PROCESS_ENTER|wx.TE_RICH)
-        self.text_3.SetMinSize((500, 84))
+        self.text_3.SetMinSize((500, 89))
         self.text_3.SetFont(t_font2)
         self.text_3.SetToolTip(" Text modification \n is supported ")
         self.text_3.SetFocus()
@@ -153,8 +153,8 @@ class FindReplace(wx.Dialog):
         self.ReplacedAll = []
         self.Replaced = []
         self.new_subs = []
-        # self.default_subs = getSubs("test.srt")
-        self.default_subs = srt.compose(subtitles)
+        self.default_subs = getSubs("test.srt")
+        # self.default_subs = srt.compose(subtitles)
         self.new_d = {}
         self.find = []
         
@@ -208,9 +208,8 @@ class FindReplace(wx.Dialog):
                 sub.content = ctext.sub(v, sub.content)
             self.text_3.SetValue(sub.content)
             for v in newd.values():
-                for m in re.finditer(v, self.text_3.GetValue()):
-                    self.text_3.SetStyle(m.start(), m.end(), wx.TextAttr("RED"))
-                    self.text_3.SetInsertionPoint(m.end())
+                self.textStyle(self.text_3, self.text_3.GetValue(), "RED", "WHITE", v)
+                self.text_3.SetInsertionPointEnd()
             if t1:
                 changed = Subtitle(sub.index, sub.start, sub.end, sub.content)
                 self.Replaced.append(changed)
@@ -266,7 +265,7 @@ class FindReplace(wx.Dialog):
             if c is None or c == 0:
                 break
         self.text_3.SetFocus()
-        self.text_3.SetInsertionPoint(0)
+        self.text_3.SetInsertionPointEnd()
         for x in set(self.ReplacedAll):
             self.textStyle(self.text_2, self.text_2.GetValue(), "RED", "YELLOW", x)        
         event.Skip()
