@@ -674,6 +674,12 @@ class ConverterFrame(wx.Frame):
         self.comboBox1.SetMinSize((118, 18))
         self.frame_toolbar.AddControl(self.comboBox1)
         self.comboBox1.SetSelection(0)
+        
+        self.frame_toolbar.AddSeparator()
+        self.searchCtrl1 = wx.SearchCtrl(self.frame_toolbar, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_PROCESS_ENTER)
+        self.searchCtrl1.ShowSearchButton(True)
+        self.searchCtrl1.ShowCancelButton(False)
+        self.frame_toolbar.AddControl(self.searchCtrl1)        
 
         self.frame_toolbar.SetToolBitmapSize((24, 24))
         self.frame_toolbar.SetMargins((3, 3))
