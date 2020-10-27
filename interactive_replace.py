@@ -152,16 +152,15 @@ class FindReplace(wx.Dialog):
             self,
             wx.ID_ANY,
             "",
-            style=wx.TE_CENTRE
-            | wx.TE_MULTILINE
+            style=wx.TE_MULTILINE
+            | wx.TE_CENTER
             | wx.TE_NO_VSCROLL
             | wx.TE_PROCESS_ENTER
-            | wx.TE_RICH,
+            | wx.TE_RICH2,
         )
         self.text_3.SetMinSize((500, 89))
         self.text_3.SetFont(t_font2)
         self.text_3.SetToolTip(" Text modification \n is supported ")
-        self.text_3.SetFocus()
         sizer_2.Add(self.text_3, 0, wx.BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT, 8)
 
         self.SetSizer(sizer_2)
@@ -234,9 +233,9 @@ class FindReplace(wx.Dialog):
                 ctext = re.compile(r'\b'+k+r'\b')
                 sub.content = ctext.sub(v, sub.content)
             self.text_3.SetValue(sub.content)
+            self.text_3.SetFocus()
             for v in newd.values():
-                self.textStyle(self.text_3, self.text_3.GetValue(), "RED", "WHITE", v)
-                self.text_3.SetInsertionPointEnd()
+                self.textStyle(self.text_3, sub.content, "RED", "", v)
             if t1:
                 changed = Subtitle(sub.index, sub.start, sub.end, sub.content)
                 self.Replaced.append(changed)
@@ -279,11 +278,10 @@ class FindReplace(wx.Dialog):
             sub = self.Replaced[0]
             changed = Subtitle(sub.index, sub.start, sub.end, text)
             self.text_2.AppendText(self.composeSub(changed))
-            self.text_2.SetInsertionPointEnd()
             self.Replaced.clear()
             self.new_subs.append(changed)
             self.default_subs = self.GetText()
-        
+            
     def onReplace(self, event):
         ''''''
         self.replaceCurrent()
@@ -292,7 +290,10 @@ class FindReplace(wx.Dialog):
             if c is None or c == 0:
                 break
         for x in set(self.ReplacedAll):
-            self.textStyle(self.text_2, self.text_2.GetValue(), "RED", "YELLOW", x)        
+            self.textStyle(self.text_2, self.text_2.GetValue(), "RED", "YELLOW", x)
+        self.text_3.SetInsertionPointEnd()
+        self.text_2.SetFocus()
+        self.text_3.SetFocus()
         event.Skip()
 
     def onReplaceAll(self, event):
