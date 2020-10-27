@@ -654,7 +654,7 @@ class ConverterFrame(wx.Frame):
         )
         self.searchCtrl1.ShowSearchButton(True)
         self.searchCtrl1.ShowCancelButton(False)
-        self.searchCtrl1.SetSize(120, 23)
+        self.searchCtrl1.SetSize(120, 24)
         self.frame_toolbar.AddControl(self.searchCtrl1)
         self.frame_toolbar.AddSeparator()
         
