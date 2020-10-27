@@ -291,8 +291,6 @@ class FindReplace(wx.Dialog):
             c = self.getValues(self.subs)
             if c is None or c == 0:
                 break
-        self.text_3.SetFocus()
-        self.text_3.SetInsertionPointEnd()
         for x in set(self.ReplacedAll):
             self.textStyle(self.text_2, self.text_2.GetValue(), "RED", "YELLOW", x)        
         event.Skip()
