@@ -98,11 +98,11 @@ class FindReplace(wx.Dialog):
         sizer_3 = wx.BoxSizer(wx.HORIZONTAL)
         sizer_2.Add(sizer_3, 1, wx.EXPAND, 0)
                 
-        self.text_2 = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_MULTILINE|wx.TE_PROCESS_ENTER|wx.TE_RICH)
+        self.text_2 = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_MULTILINE|wx.TE_PROCESS_ENTER|wx.TE_RICH|wx.TE_NOHIDESEL)
         self.text_2.SetMinSize((500, 350))
         self.text_2.SetFont(t_font1)
         self.text_2.SetToolTip(" Text modification \n is supported ")
-        sizer_3.Add(self.text_2, 1, wx.BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT, 8)
+        sizer_3.Add(self.text_2, 1, wx.BOTTOM | wx.EXPAND | wx.LEFT, 8)
 
         sizer_4 = wx.BoxSizer(wx.VERTICAL)
         sizer_3.Add(sizer_4, 0, wx.ALL | wx.EXPAND, 5)
@@ -110,22 +110,22 @@ class FindReplace(wx.Dialog):
         self.button_0 = wx.Button(self, wx.ID_ANY, "Find")
         self.button_0.SetMinSize((75, 23))
         self.button_0.SetToolTip(" \n F3 key \n Find in text \n ")
-        sizer_4.Add(self.button_0, 0, wx.BOTTOM | wx.RIGHT, 1)
+        sizer_4.Add(self.button_0, 0, wx.BOTTOM|wx.LEFT|wx.RIGHT, 1)
 
         self.button_1 = wx.Button(self, wx.ID_ANY, "Accept")
         self.button_1.SetMinSize((75, 23))
         self.button_1.SetToolTip(" \n TAB key \n Accept text \n ")
-        sizer_4.Add(self.button_1, 0, wx.BOTTOM | wx.RIGHT | wx.TOP, 1)
+        sizer_4.Add(self.button_1, 0, wx.ALL, 1)
 
         self.button_2 = wx.Button(self, wx.ID_ANY, "Replace all")
         self.button_2.SetMinSize((75, 23))
         self.button_2.SetToolTip(" \n Ctrl+L  \n All occurrences \n ")
-        sizer_4.Add(self.button_2, 0, wx.BOTTOM | wx.RIGHT | wx.TOP, 1)
+        sizer_4.Add(self.button_2, 0, wx.ALL, 1)
 
         self.button_3 = wx.Button(self, wx.ID_ANY, "Ignore")
         self.button_3.SetMinSize((75, 23))
         self.button_3.SetToolTip(" \n Ctrl+I \n Ignore the replacement \n ")
-        sizer_4.Add(self.button_3, 0, wx.BOTTOM | wx.RIGHT | wx.TOP, 1)
+        sizer_4.Add(self.button_3, 0, wx.ALL, 1)
 
         self.button_4 = wx.Button(self, wx.ID_ANY, "Ignore all")
         self.button_4.SetMinSize((75, 23))
@@ -134,11 +134,11 @@ class FindReplace(wx.Dialog):
         self.button_OK = wx.Button(self, wx.ID_OK, "")
         self.button_OK.SetMinSize((75, 23))
         self.button_OK.SetToolTip(" \n Accept all the changes \n and exit dialog \n ")
-        sizer_4.Add(self.button_OK, 0, wx.BOTTOM | wx.RIGHT | wx.TOP, 1)
+        sizer_4.Add(self.button_OK, 0, wx.ALL, 1)
 
         self.button_6 = wx.Button(self, wx.ID_CANCEL, "")
         self.button_6.SetMinSize((75, 23))
-        sizer_4.Add(self.button_6, 0, wx.BOTTOM | wx.RIGHT | wx.TOP, 1)
+        sizer_4.Add(self.button_6, 0, wx.ALL, 1)
         
         t_font2 = wx.Font(
                 int(tFont["fontSize2"]),
@@ -155,6 +155,7 @@ class FindReplace(wx.Dialog):
             style=wx.TE_MULTILINE
             | wx.TE_CENTER
             | wx.TE_NO_VSCROLL
+            | wx.TE_NOHIDESEL
             | wx.TE_PROCESS_ENTER
             | wx.TE_RICH2,
         )
