@@ -704,6 +704,7 @@ class ConverterFrame(wx.Frame):
             wx.ID_ANY,
             "",
             style=wx.TE_MULTILINE
+            | wx.TE_NOHIDESEL
             | wx.TE_PROCESS_ENTER
             | wx.TE_PROCESS_TAB
             | wx.TE_RICH2
