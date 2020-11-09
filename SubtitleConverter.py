@@ -87,7 +87,7 @@ logging.config.fileConfig(
 logger = logging.getLogger(__name__)
 
 
-VERSION = "v0.5.9.0_alpha12"
+VERSION = "v0.5.9.0_alpha13"
 
 
 class MyFrame(ConverterFrame):
@@ -1975,6 +1975,10 @@ class MyFrame(ConverterFrame):
         dlg = FindReplace(None, subtitles=list(srt.parse(text)))
         dlg.ShowModal()
         dlg.Destroy()
+        if PREVIOUS:
+            l = PREVIOUS[-1]
+            self.newEnc = l.enc
+            self.postAction(l.tpath)
         event.Skip()
         
     def onRepSpecial(self, event):
@@ -2823,8 +2827,8 @@ class MyFrame(ConverterFrame):
         """"""
         try:
             return next(x for x in PREVIOUS if x.action == action)
-        except StopIteration as e:
-            logger.debug(f"fromPrevious: {e}")
+        except StopIteration:
+            logger.debug("fromPrevious; StopIteration")
 
     def getPathEnc(self, n):
         """"""
