@@ -29,7 +29,7 @@ class FindReplace(wx.Dialog):
     def __init__(self, parent, subtitles=[]):
         wx.Dialog.__init__(self, parent, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
         
-        self.SetSize((540, 489))
+        self.SetSize((540, 621))
         self.SetTitle("Find-Replace manually")
         _icon = wx.NullIcon
         _icon.CopyFromBitmap(wx.Bitmap(os.path.join("resources","icons","edit-find-replace.png"), wx.BITMAP_TYPE_ANY))
@@ -98,7 +98,12 @@ class FindReplace(wx.Dialog):
         sizer_3 = wx.BoxSizer(wx.HORIZONTAL)
         sizer_2.Add(sizer_3, 1, wx.EXPAND, 0)
                 
-        self.text_2 = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_MULTILINE|wx.TE_PROCESS_ENTER|wx.TE_RICH|wx.TE_NOHIDESEL)
+        self.text_2 = wx.TextCtrl(
+            self,
+            wx.ID_ANY,
+            "",
+            style=wx.TE_MULTILINE | wx.TE_PROCESS_ENTER | wx.TE_RICH,
+        )
         self.text_2.SetMinSize((500, 350))
         self.text_2.SetFont(t_font1)
         self.text_2.SetToolTip(" Text modification \n is supported ")
@@ -109,31 +114,36 @@ class FindReplace(wx.Dialog):
 
         self.button_0 = wx.Button(self, wx.ID_ANY, "Find")
         self.button_0.SetMinSize((75, 23))
-        self.button_0.SetToolTip(" \n F3 key \n Find in text \n ")
+        self.button_0.SetToolTip("F3 key \nFind in text")
         sizer_4.Add(self.button_0, 0, wx.BOTTOM|wx.LEFT|wx.RIGHT, 1)
 
         self.button_1 = wx.Button(self, wx.ID_ANY, "Accept")
         self.button_1.SetMinSize((75, 23))
-        self.button_1.SetToolTip(" \n TAB key \n Accept text \n ")
+        self.button_1.SetToolTip("TAB key \nAccept text")
         sizer_4.Add(self.button_1, 0, wx.ALL, 1)
 
         self.button_2 = wx.Button(self, wx.ID_ANY, "Replace all")
         self.button_2.SetMinSize((75, 23))
-        self.button_2.SetToolTip(" \n Ctrl+L  \n All occurrences \n ")
+        self.button_2.SetToolTip("Ctrl+L  \nAll occurrences")
         sizer_4.Add(self.button_2, 0, wx.ALL, 1)
 
         self.button_3 = wx.Button(self, wx.ID_ANY, "Ignore")
         self.button_3.SetMinSize((75, 23))
-        self.button_3.SetToolTip(" \n Ctrl+I \n Ignore the replacement \n ")
+        self.button_3.SetToolTip("Ctrl+I \nIgnore the replacement")
         sizer_4.Add(self.button_3, 0, wx.ALL, 1)
 
         self.button_4 = wx.Button(self, wx.ID_ANY, "Ignore all")
         self.button_4.SetMinSize((75, 23))
         sizer_4.Add(self.button_4, 0, wx.ALL, 1)
+        
+        self.button_add = wx.Button(self, wx.ID_ADD, "")
+        self.button_add.SetMinSize((75, 23))
+        self.button_add.SetToolTip("Shift+C keys \nAdd selected \nto dictionary")
+        sizer_4.Add(self.button_add, 0, wx.ALL, 1)        
 
         self.button_OK = wx.Button(self, wx.ID_OK, "")
         self.button_OK.SetMinSize((75, 23))
-        self.button_OK.SetToolTip(" \n Accept all the changes \n and exit dialog \n ")
+        self.button_OK.SetToolTip("Accept all the changes \nand exit dialog")
         sizer_4.Add(self.button_OK, 0, wx.ALL, 1)
 
         self.button_6 = wx.Button(self, wx.ID_CANCEL, "")
@@ -162,8 +172,40 @@ class FindReplace(wx.Dialog):
         self.text_3.SetMinSize((500, 89))
         self.text_3.SetFont(t_font2)
         self.text_3.SetToolTip(" Text modification \n is supported ")
-        sizer_2.Add(self.text_3, 0, wx.BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT, 8)
+        sizer_2.Add(self.text_3, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 8)
 
+        sizer_1 = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_2.Add(sizer_1, 0, wx.EXPAND, 0)        
+        
+        self.text_add = wx.TextCtrl(
+            self,
+            wx.ID_ANY,
+            "",
+            style=wx.TE_NOHIDESEL | wx.TE_NO_VSCROLL | wx.TE_PROCESS_ENTER | wx.TE_RICH,
+        )
+        self.text_add.SetFont(
+            wx.Font(
+                10,
+                wx.FONTFAMILY_DEFAULT,
+                wx.FONTSTYLE_NORMAL,
+                wx.FONTWEIGHT_NORMAL,
+                0,
+                "Franklin Gothic Medium",
+            )
+        )
+        self.text_add.SetToolTip("Enter text")
+        sizer_1.Add(self.text_add, 1, wx.ALL | wx.EXPAND, 8)
+        self.button_dict = wx.Button(self, wx.ID_ANY, "OK")
+        self.button_dict.SetMinSize((75, 23))
+        self.button_dict.Enable(False)
+        self.button_dict.SetDefault()
+        sizer_1.Add(self.button_dict, 0, wx.BOTTOM | wx.TOP, 8)
+
+        self.button_cancel = wx.Button(self, wx.ID_ANY, "Cancel")
+        self.button_cancel.SetMinSize((75, 23))
+        self.button_cancel.Enable(False)
+        sizer_1.Add(self.button_cancel, 0, wx.BOTTOM | wx.RIGHT | wx.TOP, 8)        
+        
         self.SetSizer(sizer_2)
         sizer_2.SetSizeHints(self)
 
@@ -194,12 +236,17 @@ class FindReplace(wx.Dialog):
         self.Bind(wx.EVT_BUTTON, self.onIgnore, self.button_3)
         self.Bind(wx.EVT_BUTTON, self.onIgnoreAll, self.button_4)
         self.Bind(wx.EVT_BUTTON, self.onOK, self.button_OK)
+        self.Bind(wx.EVT_BUTTON, self.addSelected, self.button_add)
+        self.text_add.Bind(wx.EVT_TEXT, self.textAdded, self.text_add)
+        self.Bind(wx.EVT_BUTTON, self.addOK, self.button_dict)
+        self.Bind(wx.EVT_BUTTON, self.addCANCEL, self.button_cancel)        
         ############################################################################################
-        entries = [wx.AcceleratorEntry() for i in range(4)]
+        entries = [wx.AcceleratorEntry() for i in range(5)]
         entries[0].Set(wx.ACCEL_NORMAL, wx.WXK_F3, self.button_0.GetId())
         entries[1].Set(wx.ACCEL_NORMAL, wx.WXK_TAB, self.button_1.GetId())
         entries[2].Set(wx.ACCEL_CTRL, ord("L"), self.button_2.GetId())
         entries[3].Set(wx.ACCEL_CTRL, ord("I"), self.button_3.GetId())
+        entries[4].Set(wx.ACCEL_SHIFT, ord("C"), self.button_add.GetId())
         accel_tbl = wx.AcceleratorTable(entries)
         self.SetAcceleratorTable(accel_tbl)        
         ############################################################################################
@@ -386,6 +433,40 @@ class FindReplace(wx.Dialog):
         except StopIteration:
             logger.debug("Iterator exhausted")
             self.find = []
+        event.Skip()
+    
+    def addSelected(self, event):
+        '''button_add event'''
+        p = self.text_3.GetSelection()
+        text = self.text_3.GetValue()[p[0]:p[1]]
+        self.text_add.SetValue(f"{text}=>")
+        self.text_add.SetFocus()
+        self.text_add.SetInsertionPointEnd()
+        event.Skip()
+
+    def textAdded(self, event):
+        '''EVT_TEXT text.add'''
+        if self.text_add.IsModified():
+            self.textStyle(self.text_add, self.text_add.GetValue(), "GREY","","=>")
+            self.button_dict.Enable()
+            self.button_cancel.Enable()
+        event.Skip()
+        
+    def addOK(self, event):
+        '''Button_dict event'''
+        current_dict = self.filePicker.GetPath()
+        with open(current_dict, "a", encoding="utf-8") as dict_file:
+            dict_file.write(self.text_add.GetValue().strip())
+        self.text_add.Clear()
+        self.button_dict.Enable(False)
+        self.button_cancel.Enable(False)        
+        event.Skip()
+
+    def addCANCEL(self, event):
+        '''Button event'''
+        self.text_add.Clear()
+        self.button_dict.Enable(False)
+        self.button_cancel.Enable(False)
         event.Skip()
         
     
