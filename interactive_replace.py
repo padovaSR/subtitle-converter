@@ -10,7 +10,8 @@ from srt import Subtitle
 from pydispatch import dispatcher 
 from collections import defaultdict 
 from zamenaImena import dict_fromFile 
-from settings import WORK_TEXT 
+from settings import WORK_TEXT, PREVIOUS
+from  File_Handler import addPrevious
 import logging.config
 
 import wx
@@ -362,10 +363,13 @@ class FindReplace(wx.Dialog):
 
     def onOK(self, event):
         """"""
+        current_text = self.GetText()
         WORK_TEXT.truncate(0)
-        WORK_TEXT.write(self.GetText())
+        WORK_TEXT.write(current_text)
         WORK_TEXT.seek(0)
         dispatcher.send("DIALOG", message=self.ReplacedAll)
+        l = PREVIOUS[-1]
+        addPrevious("ChangeManualy", l.enc, current_text, l.psuffix, l.tpath, l.rpath)
         event.Skip()
     
     def onIgnore(self, event):
