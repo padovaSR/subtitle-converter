@@ -196,15 +196,15 @@ class FindReplace(wx.Dialog):
         self.text_add.SetToolTip("Enter text")
         sizer_1.Add(self.text_add, 1, wx.ALL | wx.EXPAND, 8)
         self.button_dict = wx.Button(self, wx.ID_ANY, "OK")
-        self.button_dict.SetMinSize((75, 23))
+        self.button_dict.SetMinSize((68, 28))
         self.button_dict.Enable(False)
         self.button_dict.SetDefault()
-        sizer_1.Add(self.button_dict, 0, wx.BOTTOM | wx.TOP, 8)
+        sizer_1.Add(self.button_dict, 0, wx.ALIGN_CENTER_VERTICAL|wx.BOTTOM | wx.TOP, 8)
 
         self.button_cancel = wx.Button(self, wx.ID_ANY, "Cancel")
-        self.button_cancel.SetMinSize((75, 23))
+        self.button_cancel.SetMinSize((68, 28))
         self.button_cancel.Enable(False)
-        sizer_1.Add(self.button_cancel, 0, wx.BOTTOM | wx.RIGHT | wx.TOP, 8)        
+        sizer_1.Add(self.button_cancel, 0, wx.ALIGN_CENTER_VERTICAL|wx.BOTTOM | wx.RIGHT | wx.TOP, 8)        
         
         self.SetSizer(sizer_2)
         sizer_2.SetSizeHints(self)
@@ -459,7 +459,8 @@ class FindReplace(wx.Dialog):
             dict_file.write(self.text_add.GetValue().strip())
         self.text_add.Clear()
         self.button_dict.Enable(False)
-        self.button_cancel.Enable(False)        
+        self.button_cancel.Enable(False)
+        self.text_3.SetFocus()
         event.Skip()
 
     def addCANCEL(self, event):
@@ -467,6 +468,7 @@ class FindReplace(wx.Dialog):
         self.text_add.Clear()
         self.button_dict.Enable(False)
         self.button_cancel.Enable(False)
+        self.text_3.SetFocus()
         event.Skip()
         
     
