@@ -1977,6 +1977,7 @@ class MyFrame(ConverterFrame):
         dlg.Destroy()
         if PREVIOUS:
             l = PREVIOUS[-1]
+            addPrevious("ChangeManualy", l.enc, WORK_TEXT.getvalue(), l.psuffix, l.tpath, l.rpath)
             self.newEnc = l.enc
             self.postAction(l.tpath)
         event.Skip()
