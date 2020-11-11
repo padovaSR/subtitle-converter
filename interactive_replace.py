@@ -10,8 +10,7 @@ from srt import Subtitle
 from pydispatch import dispatcher 
 from collections import defaultdict 
 from zamenaImena import dict_fromFile 
-from settings import WORK_TEXT, PREVIOUS
-from  File_Handler import addPrevious
+from settings import WORK_TEXT
 import logging.config
 
 import wx
@@ -178,13 +177,13 @@ class FindReplace(wx.Dialog):
         sizer_1 = wx.BoxSizer(wx.HORIZONTAL)
         sizer_2.Add(sizer_1, 0, wx.EXPAND, 0)        
         
-        self.text_add = wx.TextCtrl(
+        self.text_ADD = wx.TextCtrl(
             self,
             wx.ID_ANY,
             "",
             style=wx.TE_NOHIDESEL | wx.TE_NO_VSCROLL | wx.TE_PROCESS_ENTER | wx.TE_RICH,
         )
-        self.text_add.SetFont(
+        self.text_ADD.SetFont(
             wx.Font(
                 10,
                 wx.FONTFAMILY_DEFAULT,
@@ -194,8 +193,8 @@ class FindReplace(wx.Dialog):
                 "Franklin Gothic Medium",
             )
         )
-        self.text_add.SetToolTip("Enter text")
-        sizer_1.Add(self.text_add, 1, wx.ALL | wx.EXPAND, 8)
+        self.text_ADD.SetToolTip("Enter text")
+        sizer_1.Add(self.text_ADD, 1, wx.ALL | wx.EXPAND, 8)
         self.button_dict = wx.Button(self, wx.ID_ANY, "OK")
         self.button_dict.SetMinSize((68, 28))
         self.button_dict.Enable(False)
@@ -238,7 +237,7 @@ class FindReplace(wx.Dialog):
         self.Bind(wx.EVT_BUTTON, self.onIgnoreAll, self.button_4)
         self.Bind(wx.EVT_BUTTON, self.onOK, self.button_OK)
         self.Bind(wx.EVT_BUTTON, self.addSelected, self.button_add)
-        self.text_add.Bind(wx.EVT_TEXT, self.textAdded, self.text_add)
+        self.text_ADD.Bind(wx.EVT_TEXT, self.textAdded, self.text_ADD)
         self.Bind(wx.EVT_BUTTON, self.addOK, self.button_dict)
         self.Bind(wx.EVT_BUTTON, self.addCANCEL, self.button_cancel)        
         ############################################################################################
@@ -368,8 +367,6 @@ class FindReplace(wx.Dialog):
         WORK_TEXT.write(current_text)
         WORK_TEXT.seek(0)
         dispatcher.send("DIALOG", message=self.ReplacedAll)
-        l = PREVIOUS[-1]
-        addPrevious("ChangeManualy", l.enc, current_text, l.psuffix, l.tpath, l.rpath)
         event.Skip()
     
     def onIgnore(self, event):
@@ -443,15 +440,15 @@ class FindReplace(wx.Dialog):
         '''button_add event'''
         p = self.text_3.GetSelection()
         text = self.text_3.GetValue()[p[0]:p[1]]
-        self.text_add.SetValue(f"{text}=>")
-        self.text_add.SetFocus()
-        self.text_add.SetInsertionPointEnd()
+        self.text_ADD.SetValue(f"{text}=>")
+        self.text_ADD.SetFocus()
+        self.text_ADD.SetInsertionPointEnd()
         event.Skip()
 
     def textAdded(self, event):
-        '''EVT_TEXT text.add'''
-        if self.text_add.IsModified():
-            self.textStyle(self.text_add, self.text_add.GetValue(), "GREY","","=>")
+        '''EVT_TEXT text.aADD'''
+        if self.text_ADD.IsModified():
+            self.textStyle(self.text_ADD, self.text_ADD.GetValue(), "GREY","","=>")
             self.button_dict.Enable()
             self.button_cancel.Enable()
         event.Skip()
@@ -460,8 +457,8 @@ class FindReplace(wx.Dialog):
         '''Button_dict event'''
         current_dict = self.filePicker.GetPath()
         with open(current_dict, "a", encoding="utf-8") as dict_file:
-            dict_file.write(self.text_add.GetValue().strip())
-        self.text_add.Clear()
+            dict_file.write(f"\n{self.text_ADD.GetValue().strip()}")
+        self.text_ADD.Clear()
         self.button_dict.Enable(False)
         self.button_cancel.Enable(False)
         self.text_3.SetFocus()
@@ -469,7 +466,7 @@ class FindReplace(wx.Dialog):
 
     def addCANCEL(self, event):
         '''Button event'''
-        self.text_add.Clear()
+        self.text_ADD.Clear()
         self.button_dict.Enable(False)
         self.button_cancel.Enable(False)
         self.text_3.SetFocus()
