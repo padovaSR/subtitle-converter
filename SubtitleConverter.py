@@ -87,7 +87,7 @@ logging.config.fileConfig(
 logger = logging.getLogger(__name__)
 
 
-VERSION = "v0.5.9.0_alpha13"
+VERSION = "v0.5.9.0_alpha14"
 
 
 class MyFrame(ConverterFrame):
@@ -3127,6 +3127,9 @@ class MyFrame(ConverterFrame):
         #controlDown = event.CmdDown()
         #altDown = event.AltDown()
         #shiftDown = event.ShiftDown()
+        
+        if self.text_1.IsModified(): self.find = []
+            
         if not self.text_1.GetValue().startswith("Files ") and not any(
             [keycode == x for x in (306, 307, 308, 311, 314, 316)]
         ):
