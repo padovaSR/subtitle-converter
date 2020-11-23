@@ -222,10 +222,10 @@ class FindReplace(wx.Dialog):
         self.ReplacedAll = []
         self.Replaced = []
         self.new_subs = []
-        # self.default_subs = getSubs("test.srt")
-        self.default_subs = srt.compose(subtitles)
         self.new_d = {}
         self.find = []
+        # self.default_subs = getSubs("test.srt")
+        self.default_subs = srt.compose(subtitles)
         
         ## Events ##################################################################################
         self.filePicker.Bind(wx.EVT_FILEPICKER_CHANGED, self.FileChanged, self.filePicker)
@@ -251,7 +251,7 @@ class FindReplace(wx.Dialog):
         self.SetAcceleratorTable(accel_tbl)        
         ############################################################################################
         
-        self.wdict = dict_fromFile(self.dname, "=>")
+        self.wdict = dict_fromFile(self.dname)
         self.subs = srt.parse(self.default_subs)
         self.wdict = self.clearDict(self.wdict, srt.compose(self.subs))
         self.getValues(self.subs)        
@@ -305,7 +305,7 @@ class FindReplace(wx.Dialog):
         """"""
         self.filePicker.SetPath(self.filePicker.GetPath())
         self.dname = self.filePicker.GetPath()
-        wdict = dict_fromFile(self.dname, "=>")
+        wdict = dict_fromFile(self.dname)
         self.subs = srt.parse(self.default_subs)
         self.wdict = self.clearDict(wdict, srt.compose(self.subs, reindex=False))
         self.text_2.Clear()
@@ -413,9 +413,7 @@ class FindReplace(wx.Dialog):
     
     def Text1(self, event):
         """"""
-        if type(self.find) is list:
-            self.find.clear()
-        else: self.find = []
+        self.find = []
         t_end = len(self.text_2.GetValue())
         self.text_2.SetStyle(0, t_end, self.text_2.GetDefaultStyle())
         event.Skip()
@@ -423,9 +421,9 @@ class FindReplace(wx.Dialog):
     def onFind(self, event):
         """"""
         if not self.find:
-            s_text = self.text_1.GetValue()
+            s = self.text_1.GetValue()
             text2 = self.text_2.GetValue()
-            new = [(m.start(), m.end()) for m in re.finditer(re.compile(r"\b"+s_text+r"\b"), text2)]
+            new = [(m.start(), m.end()) for m in re.finditer(re.compile(r"\b"+s+r"\b"), text2)]
             self.find=iter(new)
         try:
             p = next(self.find)
