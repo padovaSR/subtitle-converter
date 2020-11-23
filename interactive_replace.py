@@ -9,7 +9,7 @@ import srt
 from srt import Subtitle
 from pydispatch import dispatcher 
 from collections import defaultdict 
-from zamenaImena import dict_fromFile 
+from zamenaImena import dict_fromFile
 from settings import WORK_TEXT
 import logging.config
 
@@ -251,7 +251,7 @@ class FindReplace(wx.Dialog):
         self.SetAcceleratorTable(accel_tbl)        
         ############################################################################################
         
-        self.wdict = dict_fromFile(self.dname)
+        self.wdict = dict_fromFile(self.dname, "=>")
         self.subs = srt.parse(self.default_subs)
         self.wdict = self.clearDict(self.wdict, srt.compose(self.subs))
         self.getValues(self.subs)        
@@ -305,7 +305,7 @@ class FindReplace(wx.Dialog):
         """"""
         self.filePicker.SetPath(self.filePicker.GetPath())
         self.dname = self.filePicker.GetPath()
-        wdict = dict_fromFile(self.dname)
+        wdict = dict_fromFile(self.dname, "=>")
         self.subs = srt.parse(self.default_subs)
         self.wdict = self.clearDict(wdict, srt.compose(self.subs, reindex=False))
         self.text_2.Clear()
