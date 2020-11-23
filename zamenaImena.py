@@ -41,7 +41,7 @@ def remBom(infile):
             fp.truncate()
 
 
-def dict_fromFile(text_in, delim=None):
+def dict_fromFile(text_in, delim):
     if not os.path.exists(text_in):
         with open(
             text_in, 'w', encoding='utf-8', newline="\r\n"
@@ -50,21 +50,17 @@ def dict_fromFile(text_in, delim=None):
             text_file.write(t)
     with open(text_in, 'r', encoding='utf-8') as dict_file:
 
-        if delim is not None: delim = delim
-        else: delim = re.compile(r"=>|=+|\t+| +")
         new_dict = {}
         
         for line in dict_file:
-            x = line.strip()
-            x = re.split(delim, x)
+            x = line.strip().split(delim)
             if not line:
                 continue
             if line.startswith('#'):
                 continue
             if not x[0]:
                 continue
-            else:
-                key = x[0].strip()
+            key = x[0].strip()
             value = x[-1].strip()
             new_dict[key] = value
         return new_dict
