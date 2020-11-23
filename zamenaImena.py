@@ -17,6 +17,7 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import re
 import codecs
 
 from collections import defaultdict
@@ -40,7 +41,7 @@ def remBom(infile):
             fp.truncate()
 
 
-def dict_fromFile(text_in, delim):
+def dict_fromFile(text_in, delim=None):
     if not os.path.exists(text_in):
         with open(
             text_in, 'w', encoding='utf-8', newline="\r\n"
@@ -49,10 +50,13 @@ def dict_fromFile(text_in, delim):
             text_file.write(t)
     with open(text_in, 'r', encoding='utf-8') as dict_file:
 
+        if delim is not None: delim = delim
+        else: delim = re.compile(r"=>|=+|\t+| +")
         new_dict = {}
-
+        
         for line in dict_file:
-            x = line.strip().split(delim)
+            x = line.strip()
+            x = re.split(delim, x)
             if not line:
                 continue
             if line.startswith('#'):
@@ -239,6 +243,3 @@ _shortcutsKey = dict_fromFile(conf_file, delim="=")
 
 shortcutsKey = defaultdict(str)
 shortcutsKey.update(_shortcutsKey)
-
-if not "CustomRegex" in shortcutsKey.keys():
-    shortcutsKey["CustomRegex"] = "Ctrl+Shift+R"
