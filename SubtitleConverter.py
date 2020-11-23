@@ -3128,7 +3128,7 @@ class MyFrame(ConverterFrame):
         #altDown = event.AltDown()
         #shiftDown = event.ShiftDown()
         
-        if self.text_1.IsModified(): self.find = []
+        self.find = []
             
         if not self.text_1.GetValue().startswith("Files ") and not any(
             [keycode == x for x in (306, 307, 308, 311, 314, 316)]
