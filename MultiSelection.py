@@ -175,7 +175,7 @@ class MyApp(wx.App):
         self.dialog = MultiFiles(None, wx.ID_ANY)
         self.SetTopWindow(self.dialog)
         self.dialog.ShowModal()
-        self.dialog.Destroy()
+        # self.dialog.Destroy()
         return True
 
 # end of class MyApp
