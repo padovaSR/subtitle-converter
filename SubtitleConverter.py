@@ -32,7 +32,8 @@ from pydispatch import dispatcher
 from itertools import chain
 from more_itertools import unique_justseen
 from Manual import MyManual
-from zip_confirm import TreeDialog 
+from zip_confirm import TreeDialog
+from MultiSelection import MultiFiles
 from errors_check import checkErrors, checkChars, checkFile, displayError
 from File_processing import newName, nameDialog, writeToFile
 from File_Handler import fileHandle, addPrevious
@@ -87,7 +88,7 @@ logging.config.fileConfig(
 logger = logging.getLogger(__name__)
 
 
-VERSION = "v0.5.9.0_alpha14"
+VERSION = "v0.5.9.0_alpha15"
 
 
 class MyFrame(ConverterFrame):
@@ -183,6 +184,7 @@ class MyFrame(ConverterFrame):
 
         ## MENU EVENTS ##############################################################################
         self.Bind(wx.EVT_MENU, self.onOpen, id=self.fopen.GetId())
+        self.Bind(wx.EVT_MENU, self.getMultipleFiles, id=self.openMulti.GetId())
         self.Bind(wx.EVT_MENU, self.onReload, id=self.reload.GetId())
         self.Bind(wx.EVT_MENU, self.onSave, id=self.save.GetId())
         self.Bind(wx.EVT_MENU, self.onSaveAs, id=self.save_as.GetId())
@@ -473,6 +475,38 @@ class MyFrame(ConverterFrame):
                 self.undo.Enable()
             except Exception as e:
                 logger.debug(f"newText: {e}")
+        event.Skip()
+        
+    def getMultipleFiles(self, event):
+        '''openMulti event'''
+        dlg = MultiFiles(None)
+        if dlg.ShowModal() == wx.ID_OK:
+            MultipleFiles = dlg.GetSelectedFiles()
+            if len(MultipleFiles) == 1:
+                real_path = "".join(MultipleFiles)
+                self.real_path.append(real_path)
+                self.real_dir = os.path.dirname(real_path)
+            else:
+                for fpath in MultipleFiles:
+                    self.real_path.append(fpath)
+                self.real_dir = os.path.dirname(self.real_path[-1])
+            fileHandle(MultipleFiles, self.text_1)
+            dlg.Destroy()
+            if BT:
+                self.real_path.clear()
+                self.tmpPath.clear()
+                self.SetStatusText(f"Multiple files ready for processing")
+                self.SetStatusText("", 1)
+                self.enableTool()
+                self.multipleTools()
+            if PREVIOUS:
+                l = self.fromPrevious("Open")
+                self.tmpPath.append(l.tpath)
+                self.SetStatusText(baseName(l.tpath))
+                self.SetStatusText(printEncoding(l.enc), 1)
+                self.enableTool()                
+        else:
+            dlg.Destroy()
         event.Skip()
 
     def onOpen(self, event):
