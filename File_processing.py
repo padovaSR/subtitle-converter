@@ -31,8 +31,8 @@ class FileOpened:
 
     def isCompressed(self):
 
-        basepath = 'tmp'
-        # basepath = os.path.dirname(self.path)
+        # basepath = 'tmp'
+        basepath = os.path.dirname(self.path)
         fileName = baseName(self.path)
         
         with zipfile.ZipFile(self.path, 'r') as zf:
