@@ -816,6 +816,7 @@ class MyFrame(ConverterFrame):
         
         for i in range(len(BT)):
             path, entered_enc, text = self.getPathEnc(i)
+            self.real_dir = os.path.dirname(path)
             
             file_suffix = os.path.splitext(path)[-1]
             
@@ -1070,6 +1071,7 @@ class MyFrame(ConverterFrame):
         
         for i in range(len(BT)):
             path, entered_enc, text = self.getPathEnc(i)
+            self.real_dir = os.path.dirname(path)
             fpath = baseName(path)
             
             if entered_enc == 'windows-1251':
@@ -1312,7 +1314,7 @@ class MyFrame(ConverterFrame):
         
         for i in range(len(BT)):
             path, entered_enc, text = self.getPathEnc(i)
-            
+            self.real_dir = os.path.dirname(path)
             file_suffix = os.path.splitext(path)[-1]
 
             text = normalizeText(entered_enc, None, text)
@@ -1445,6 +1447,7 @@ class MyFrame(ConverterFrame):
 
         for i in range(len(BT)):
             path, entered_enc, text = self.getPathEnc(i)
+            self.real_dir = os.path.dirname(path)
             
             text = normalizeText(entered_enc, None, text)
             if not text: text = f"{path}\nText is not SRT format.\nTry as single file."
@@ -1586,7 +1589,7 @@ class MyFrame(ConverterFrame):
 
         for i in range(len(BT)):
             path, entered_enc, text = self.getPathEnc(i)
-
+            self.real_dir = os.path.dirname(path)
             try:
                 text = normalizeText(entered_enc, None, text)
                 
@@ -1726,6 +1729,7 @@ class MyFrame(ConverterFrame):
         
         for i in range(len(BT)):
             path, entered_enc, text = self.getPathEnc(i)
+            self.real_dir = os.path.dirname(path)
             
             text = normalizeText(entered_enc, None, text)
             if not text: text = f"{path}\nText is not SRT format.\nTry as single file." 
