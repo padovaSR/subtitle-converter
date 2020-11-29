@@ -36,7 +36,7 @@ class TreeDialog(wx.Dialog):
         self.caption = caption
         self.root_name = root_name
         
-        self.SetSize((339, 334))
+        self.SetSize((439, 434))
         self.SetTitle(self.caption)
         _icon = wx.NullIcon
         _icon.CopyFromBitmap(
