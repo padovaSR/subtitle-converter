@@ -53,6 +53,18 @@ class ConverterFrame(wx.Frame):
         self.file.Append(self.fopen)
 
         self.file.AppendSeparator()
+
+        self.openMulti = wx.MenuItem(
+            self.file,
+            wx.ID_ANY,
+            "&OpenMultiple..\t"+keyS["OpenMultiple"],
+            "Otvori multi_file dijalog",
+            wx.ITEM_NORMAL
+        )
+        self.openMulti.SetBitmap(wx.ArtProvider.GetBitmap(wx.ART_FOLDER_OPEN, wx.ART_MENU))
+        self.file.Append(self.openMulti)
+        
+        self.file.AppendSeparator()
         self.reload = wx.MenuItem(
             self.file,
             wx.ID_ANY,
