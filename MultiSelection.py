@@ -34,6 +34,7 @@ class MultiFiles(wx.Dialog):
         
         self.dp0 = wx.DirPickerCtrl(self, style=wx.DIRP_USE_TEXTCTRL)
         self.dp0.SetTextCtrlProportion(2)
+        self.dp0.SetInitialDirectory(os.path.abspath("%userprofile%\Documents"))
         self.sizer_3.Add(self.dp0, 0, wx.ALL|wx.EXPAND, 6)
         
         self.sizer_4 = wx.BoxSizer(wx.HORIZONTAL)
@@ -104,7 +105,19 @@ class MultiFiles(wx.Dialog):
         if event.Id == self.dp0.Id: self.path = event.GetPath()
         self.choices.clear()
         if self.path:
-            if not self.checkbox_5.IsChecked():
+            if self.checkbox_5.IsChecked():
+                for r, d, sfiles in os.walk(self.path):
+                    for file in sfiles:
+                        current_file = join(r, file)
+                        if current_file:
+                            if self.SF and self.getSuffix(current_file) in self.SF:
+                                if any(current_file.endswith(x.lower()) for x in self.SF):
+                                    self.choices.append(current_file)
+                                else:
+                                    self.choices.append(current_file)
+                            elif not self.SF:
+                                self.choices.append(current_file)                
+            else:
                 with os.scandir(self.path) as files:
                     for x in files:
                         if x.is_file():
@@ -116,19 +129,7 @@ class MultiFiles(wx.Dialog):
                                     else:
                                         self.choices.append(current_file)
                                 elif not self.SF:
-                                    self.choices.append(current_file)
-            else:
-                for r, d, sfiles in os.walk(self.path):
-                    for file in sfiles:
-                        current_file = join(r, file)
-                        if current_file:
-                            if self.SF and self.getSuffix(current_file) in self.SF:
-                                if any(current_file.endswith(x.lower()) for x in self.SF):
-                                    self.choices.append(current_file)
-                                else:
-                                    self.choices.append(current_file)
-                            elif not self.SF:
-                                self.choices.append(current_file)
+                                    self.choices.append(current_file)                
             self.populateListBox()
             self.button_OK.SetFocus()
         event.Skip()
@@ -141,8 +142,10 @@ class MultiFiles(wx.Dialog):
         if self.choices:
             self.list_box.InsertItems(self.choices, 0)
         
-    def GetSelections(self):
-        return self.list_box.GetSelections()
+    def GetSelectedFiles(self):
+        ''''''  
+        selections = self.list_box.GetCheckedItems()
+        return [self.choices[x] for x in selections]
 
     def EvtChBox(self, event):
         state = self.select_all.IsChecked()
