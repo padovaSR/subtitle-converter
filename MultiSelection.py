@@ -86,9 +86,9 @@ class MultiFiles(wx.Dialog):
         self.Centre()
         
         self.path = None
+        self.SF = {}
         self.checkBoxList = [self.checkbox_1, self.checkbox_2, self.checkbox_3, self.checkbox_6]
         self.sEntry = {self.checkbox_1: ".srt", self.checkbox_2: ".sub", self.checkbox_3: ".txt", self.checkbox_6: ".zip"}
-        self.SF = [self.sEntry[x] for x in self.checkBoxList if x.IsChecked()]
         
         self.Bind(wx.EVT_DIRPICKER_CHANGED, self.OnPickFileDir, self.dp0)
         self.Bind(wx.EVT_CHECKBOX, self.OnPickFileDir, self.checkbox_5)
