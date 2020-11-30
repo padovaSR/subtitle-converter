@@ -2,13 +2,14 @@
 # -*- coding: UTF-8 -*-
 
 import os
+from os.path import basename as baseName
 import codecs
 import re
 import zipfile
 from collections import namedtuple 
 from text_processing import codelist
 from choice_dialog import MultiChoice
-from settings import chreg, baseName, filePath, FILE_SETTINGS, BYTES_TEXT, name_data
+from settings import chreg, filePath, FILE_SETTINGS, BYTES_TEXT, name_data
 import logging.config
 
 from codecs import BOM_UTF8
