@@ -166,8 +166,9 @@ def bufferText(intext, buffer):
 
 def normalizeText(code_in, path, data=None):
     '''text normalization'''
-    error = 'strict'
+    error = "strict"
     # error="surogateescape"
+    # error = "replace"
     if code_in in codelist:
         error = 'surrogatepass'
     try:
@@ -178,7 +179,8 @@ def normalizeText(code_in, path, data=None):
         text_normalized = unicodedata.normalize('NFKC', text)
         return text_normalized
     except Exception as e:
-        logger.exception(f"NormalizeText error: {e})")
+        logger.exception(f"NormalizeText: {path} - {e})")
+        pass
     
 def rplStr(in_text):
 
