@@ -18,6 +18,7 @@
 #
 
 import os
+from os.path import basename as baseName
 import pickle
 import shutil
 import zipfile
@@ -26,7 +27,7 @@ from pydispatch import dispatcher
 from errors_check import checkErrors
 from File_processing import FileOpened
 from text_processing import normalizeText, bufferText
-from settings import WORK_TEXT, PREVIOUS, FILE_HISTORY, BYTES_TEXT, filePath, baseName, lenZip, droppedText
+from settings import WORK_TEXT, PREVIOUS, FILE_HISTORY, BYTES_TEXT, filePath, lenZip, droppedText
 import logging.config
 
 import wx
