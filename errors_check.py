@@ -3,8 +3,9 @@
 #
 
 import os
+from os.path import basename as baseName
 import re
-from settings import filePath, baseName
+from settings import filePath
 from showError import showMeError
 
 import wx
