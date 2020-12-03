@@ -12,7 +12,7 @@ import wx
 class MultiFiles(wx.Dialog):
     def __init__(self, parent, id=wx.ID_ANY):
         wx.Dialog.__init__(
-            self, parent, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
+            self, parent, style=wx.DEFAULT_DIALOG_STYLE|wx.MAXIMIZE_BOX|wx.MINIMIZE_BOX|wx.RESIZE_BORDER
         )
 
         self.SetSize((760, 598))
@@ -182,10 +182,10 @@ class MultiFiles(wx.Dialog):
     def disableCheckBox(self, event):
         ''''''
         if event.Id == self.checkbox_4.Id:
-            self.OnPickFileDir(event)
             if self.checkbox_4.IsChecked():
                 for c in self.checkBoxList:
                     c.SetValue(0)
+                self.OnPickFileDir(event)
         else:
             if any(x.IsChecked() for x in self.checkBoxList):
                 self.checkbox_4.SetValue(0)
