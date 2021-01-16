@@ -88,7 +88,7 @@ logging.config.fileConfig(
 logger = logging.getLogger(__name__)
 
 
-VERSION = "v0.5.9.0_alpha15"
+VERSION = "v0.5.9.0_alpha16"
 
 
 class MyFrame(ConverterFrame):
@@ -236,7 +236,7 @@ class MyFrame(ConverterFrame):
         self.text_1.Bind(wx.EVT_TEXT, self.removeFiles, id=-1, id2=wx.ID_ANY)
         self.text_1.Bind(wx.EVT_TEXT, self.writeText, self.text_1)
         # self.text_1.Bind(wx.EVT_LEFT_DOWN, self.newText, id=wx.ID_ANY)
-        self.text_1.Bind(wx.EVT_TEXT_ENTER, self.newText, id=wx.ID_ANY)
+        self.text_1.Bind(wx.EVT_TEXT, self.newText, id=wx.ID_ANY)
         self.Bind(
             wx.EVT_MENU_RANGE, self.onFileHistory, id=wx.ID_FILE1, id2=wx.ID_FILE9,
         )
@@ -490,12 +490,16 @@ class MyFrame(ConverterFrame):
                 real_path = "".join(MultipleFiles)
                 self.real_path.append(real_path)
                 self.real_dir = os.path.dirname(real_path)
+                fileHandle(MultipleFiles, self.text_1)
+            elif len(MultipleFiles) == 0:
+                dlg.Destroy()
             else:
                 for fpath in MultipleFiles:
                     self.real_path.append(fpath)
                 self.real_dir = os.path.dirname(self.real_path[-1])
-            fileHandle(MultipleFiles, self.text_1)
+                fileHandle(MultipleFiles, self.text_1)
             dlg.Destroy()
+
             if BT:
                 self.real_path.clear()
                 self.tmpPath.clear()
