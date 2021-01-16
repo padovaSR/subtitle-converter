@@ -42,8 +42,8 @@ def myMerger(subs_in, max_time, max_char, _gap):
         'Darkstar test appliance',
     )
     
-    parni = [x for x in subs[1::2]]
-    neparni = [x for x in subs[0::2]]
+    parni = subs[1::2]
+    neparni = subs[0::2]
     
     def merge_lines(inPar, inNepar):
         re_pattern = re.compile(r'<[^<]*>')
@@ -68,8 +68,8 @@ def myMerger(subs_in, max_time, max_char, _gap):
                 new_j.append(Subtitle(first.index, first.start, first.end, first.content))
                 new_j.append(Subtitle(second.index, second.start, second.end, second.content))
 
-        parni = [x for x in new_j[1::2]]
-        neparni = [x for x in new_j[0::2]]
+        parni = new_j[1::2]
+        neparni = new_j[0::2]
 
         return new_j, parni, neparni
     
