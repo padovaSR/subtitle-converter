@@ -88,7 +88,7 @@ logging.config.fileConfig(
 logger = logging.getLogger(__name__)
 
 
-VERSION = "v0.5.9.0_alpha16"
+VERSION = "v0.5.9.0_alpha17"
 
 
 class MyFrame(ConverterFrame):
@@ -449,7 +449,7 @@ class MyFrame(ConverterFrame):
     def newText(self, event):
         """"""
         tval = self.text_1.GetValue()
-        if not tval.startswith('Files ') and not PREVIOUS and len(tval) > 40:
+        if not tval.startswith('Files ') and not self.real_path and not PREVIOUS and len(tval) > 40:
             try:
                 text = self.text_1.GetValue()
                 place = self.text_1.GetInsertionPoint()
@@ -2898,7 +2898,7 @@ class MyFrame(ConverterFrame):
         if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
             if self.ShowDialog() is False:
                 return
-
+        
         # get the file based on the menu ID
         fileNum = event.GetId() - wx.ID_FILE1
         path = self.filehistory.GetHistoryFile(fileNum)
@@ -2908,14 +2908,16 @@ class MyFrame(ConverterFrame):
         
         self.tmpPath.clear()
         BT.clear()
+        PREVIOUS.clear()
         self.real_path.clear()
         
         # add it back to the history so it will be moved up the list
         self.filehistory.AddFileToHistory(path)
         self.real_path.append(path)
         self.real_dir = os.path.dirname(path)
-        fileHandle([path], self.text_1)
-
+        
+        fileHandle(path, self.text_1)
+        
         self.pre_suffix = PREVIOUS[0].psuffix
         enc = PREVIOUS[0].enc
         self.enableTool()
