@@ -164,8 +164,9 @@ def fileHandle(infiles, text_control, fdrop=False):
                 if os.path.dirname(name) == "tmp":
                     text = open(tmp_path, "rb").read()
                 os.remove(tmp_path)
-            if os.path.isfile(name): shutil.copy(name, tmp_path)
+            if os.path.isfile(name):
+                shutil.copy(name, tmp_path)
             else: open(tmp_path, "wb").write(text)
-            enc = file_go(name, name)
+            enc = file_go(tmp_path, name)
             if fdrop is True:
                 dispatcher.send("TMP_PATH", message=tmp_path, msg=[name, enc, False])
