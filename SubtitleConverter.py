@@ -548,7 +548,7 @@ class MyFrame(ConverterFrame):
 
             fileHandle(filepath, self.text_1)
             
-            ## If Open -> multiple files:
+            ## Open multiple files
             if BT:
                 self.real_path.clear()
                 self.tmpPath.clear()
@@ -556,6 +556,7 @@ class MyFrame(ConverterFrame):
                 self.SetStatusText("", 1)
                 self.enableTool()
                 self.multipleTools()
+            ## Not MultiFiles
             if PREVIOUS:
                 l = self.fromPrevious("Open")
                 self.tmpPath.append(l.tpath)
