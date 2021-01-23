@@ -156,6 +156,7 @@ def fileHandle(infiles, text_control, fdrop=False):
                         dispatcher.send("TMP_PATH", message=outfile, msg=[rfile, enc, True])
                     logger.debug('FileHandler: Ready for multiple files.')
         elif not zipfile.is_zipfile(name):
+            ## Single file only
             ## name = real path
             BYTES_TEXT.clear()
             FILE_HISTORY.append(name)
