@@ -109,7 +109,8 @@ class FileOpened:
     
     def getByteText(self):
         """"""
-        return open(self.path, "rb").read().replace(b"\r\n", b"\n")
+        with open(self.path, "rb") as dat_file:
+            return dat_file.read().replace(b"\r\n", b"\n")
         
     def findCode(self):
         ''''''
