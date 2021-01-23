@@ -31,35 +31,35 @@ def showMeError(infile, in_text, outfile, kode):
         cb3_s = pickle.load(f)
 
     subs = list(srt.parse(in_text, ignore_errors=True))
-
+    
     if len(subs) > 0:
 
-        st = "LINIJE SA GREŠKAMA:\n"
+        st = "LINIJE SA GREŠKAMA:\n\n"
         if kode == 'windows-1251':
-            st = "ЛИНИЈЕ СА ГРЕШКАМА:\n"
+            st = "ЛИНИЈЕ СА ГРЕШКАМА:\n\n"
             kode = "utf-8"
         FP = re.compile(r"\?")
         count = 0
         sl = []
-        sl.append(st)
         for i in subs:
             t = i.content
             FE = re.findall(FP, t)
             if FE:
-                t = t.replace('¬', '?')
-                sl.append(srt.Subtitle(i.index, i.start, i.end, t))
+                sub = srt.Subtitle(i.index, i.start, i.end, t.replace("¬", "?"))
+                sl.append(sub)
                 count += 1
         if count > 0:
             try:
                 with open(outfile, "w", encoding=kode) as f:
-                    f.write(srt.compose(sl))
+                    subs_data = srt.compose(sl, reindex=False)
+                    f.write(st+subs_data)
             except Exception as e:
                 logger.debug(
-                    f"ErrorFile, unexpected error: {e}"
+                    f"W_ErrorFile, unexpected error: {e}"
                 )
 
             if os.path.isfile(outfile):
-                logger.debug(f"ErrorFile: {outfile}")
+                logger.debug(f": {outfile}")
             if cb3_s is True:
                 webbrowser.open(outfile)
     else:
