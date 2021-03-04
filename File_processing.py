@@ -30,6 +30,13 @@ class FileOpened:
         self.path = path
         self.multi = multi
 
+        self.ErrorDlg = wx.MessageDialog(
+            None,
+            f"UnicodeDecodeError\n\nPogrešno kodiranje, pokušajte drugo kodiranje,\ni opciju ReloadFile",
+            "SubtitleConverter",
+            style=wx.OK | wx.ICON_ERROR,
+        )
+
     def isCompressed(self):
 
         # basepath = 'tmp'
@@ -88,24 +95,23 @@ class FileOpened:
     @staticmethod
     def fCodeList():
         """"""
-        kodek = FILE_SETTINGS["CB_value"]
-
-        if kodek != 'auto': added = kodek
-        else: added = 'utf-8'
-        return [
-            added,
-            'utf-8',
-            'windows-1250',
-            'windows-1251',
-            'windows-1252',
-            'UTF-16LE',
-            "UTF-16BE",
-            'utf-8-sig',
-            'iso-8859-1',
-            'iso-8859-2',
-            'utf-16',
-            'ascii',
-        ]
+        kodek = FILE_SETTINGS["CB_value"].strip()
+        if kodek == "auto":
+            return [
+                'utf-8',
+                'windows-1250',
+                'windows-1251',
+                'windows-1252',
+                'UTF-16LE',
+                "UTF-16BE",
+                'utf-8-sig',
+                'iso-8859-1',
+                'iso-8859-2',
+                'utf-16',
+                'ascii',
+            ]
+        else:
+            return [kodek]
     
     def getByteText(self):
         """"""
@@ -124,7 +130,11 @@ class FileOpened:
                         fh.readlines()
                         fh.seek(0)
                 except:
-                    pass
+                    if  FILE_SETTINGS["CB_value"].strip() == "auto":
+                        pass
+                    else:
+                        if self.ErrorDlg.ShowModal() == wx.ID_OK:
+                            self.ErrorDlg.Destroy()
                 else:
                     logger.debug(f'{baseName(self.path)}: {enc}')
                     break
@@ -142,7 +152,11 @@ class FileOpened:
                 try:
                     dat.decode(enc)
                 except:
-                    pass
+                    if FILE_SETTINGS["CB_value"].strip() == "auto":
+                        pass
+                    else:
+                        if self.ErrorDlg.ShowModal() == wx.ID_OK:
+                            self.ErrorDlg.Destroy()
                 else:
                     logger.debug(f"{baseName(self.path)}: {enc}")
                     break        
