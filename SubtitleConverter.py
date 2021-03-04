@@ -88,7 +88,7 @@ logging.config.fileConfig(
 logger = logging.getLogger(__name__)
 
 
-VERSION = "v0.5.9.0_alpha17"
+VERSION = "v0.5.9.0_alpha18"
 
 
 class MyFrame(ConverterFrame):
@@ -179,7 +179,7 @@ class MyFrame(ConverterFrame):
             self.to_cyrillic,
             self.to_utf8,
             self.transcrib,
-            self.change, 
+            self.change,
         ]
 
         ## MENU EVENTS ##############################################################################
@@ -294,7 +294,7 @@ class MyFrame(ConverterFrame):
         nlist = checkErrors(self.text_1.GetValue())
         if nlist:
             for i in nlist:
-                self.text_1.SetStyle(i[0], i[1], wx.TextAttr("BLUE", "YELLOW"))
+                self.text_1.SetStyle(i[0], i[1], wx.TextAttr("YELLOW", "BLUE"))
                 self.text_1.SetInsertionPoint(i[1])
 
     def enKode(self, message, msg):
@@ -370,6 +370,7 @@ class MyFrame(ConverterFrame):
             if not i.IsEnabled(): i.Enable(True)
             
         if PREVIOUS:
+            self.reload.Enable(True)
             if PREVIOUS[0].enc == "windows-1251":
                 self.to_ansi.Enable(False)
                 self.frame_toolbar.EnableTool(1003, False)
@@ -2469,7 +2470,8 @@ class MyFrame(ConverterFrame):
 
         dlg.SetFilename(tpath)
 
-        def data_out(filein): return open(filein, 'rb').read()
+        def data_out(filein):
+            with open(filein, "rb") as f: return f.read()
             
         if dlg.ShowModal() == wx.ID_OK:
             name = dlg.GetPath()    ## Zip file name ##
@@ -2942,7 +2944,7 @@ class MyFrame(ConverterFrame):
             i.Enable(False)
 
     def undoAction(self, event):
-        '''Undo text'''
+        '''Undo changes'''
         
         path = self.tmpPath[0]
         actions = [x.action for x in PREVIOUS]
