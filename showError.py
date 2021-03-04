@@ -25,13 +25,14 @@ import logging.config
 
 logger = logging.getLogger(__name__)
 
+
 def showMeError(infile, in_text, outfile, kode):
 
     with open(os.path.join('resources', 'var', 'fixer_cb3.data'), 'rb') as f:
         cb3_s = pickle.load(f)
 
     subs = list(srt.parse(in_text, ignore_errors=True))
-    
+
     if len(subs) > 0:
 
         st = "LINIJE SA GREŠKAMA:\n\n"
@@ -52,19 +53,13 @@ def showMeError(infile, in_text, outfile, kode):
             try:
                 with open(outfile, "w", encoding=kode) as f:
                     subs_data = srt.compose(sl, reindex=False)
-                    f.write(st+subs_data)
+                    f.write(st + subs_data)
             except Exception as e:
-                logger.debug(
-                    f"W_ErrorFile, unexpected error: {e}"
-                )
+                logger.debug(f"W_ErrorFile, unexpected error: {e}")
 
             if os.path.isfile(outfile):
                 logger.debug(f": {outfile}")
             if cb3_s is True:
                 webbrowser.open(outfile)
     else:
-        logger.debug(
-            f'showMeError: No subtitles found in {os.path.basename(infile)}'
-        )
-
-
+        logger.debug(f'showMeError: No subtitles found in {os.path.basename(infile)}')
