@@ -58,7 +58,7 @@ def fileHandle(infiles, text_control, fdrop=False):
         if fdrop is False:
             if nlist:
                 for i in nlist:
-                    text_control.SetStyle(i[0], i[1], wx.TextAttr("BLUE", "YELLOW"))
+                    text_control.SetStyle(i[0], i[1], wx.TextAttr("YELLOW", "BLUE"))
                     text_control.SetInsertionPoint(i[1])
         PREVIOUS.clear()
         addPrevious("Open", enc, text, "", infile, rfile)
