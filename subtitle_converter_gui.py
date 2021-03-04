@@ -683,6 +683,7 @@ class ConverterFrame(wx.Frame):
             " iso-8859-1",
             " iso-8859-2",
             " iso-8859-5",
+            " ascii", 
             " latin",
             " latin2",
         ]
