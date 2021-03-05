@@ -23,7 +23,6 @@ from zamenaImena import (
     dictionary_2,
     searchReplc,
 )
-import wx
 import logging.config
 
 logger = logging.getLogger(__name__)
@@ -172,9 +171,6 @@ def normalizeText(code_in, path, data=None):
     # error = "replace"
     if code_in in codelist:
         error = 'surrogatepass'
-    ErrorDlg = wx.MessageDialog(
-        None, f"UnicodeDecodeError\n\nPogrešno kodiranje.", "SubtitleConverter", style=wx.OK | wx.ICON_ERROR,
-    )
     if path:
         try:
             with open(path, 'r', encoding=code_in, errors=error) as f:
@@ -228,6 +224,7 @@ def rplStr(in_text):
             .replace(b'\xe2\x82\xac\xe2\x80\x9d', b'\xe2\x80\x94')
             .replace(b'\xef\xbb\xbf', b'')
             .replace(b'\xc5\xb8\xc5\x92', b'')
+            .replace(b"\xc2\x81", b"")
         )
         # .replace(b'\x9e', b'\xc5\xbe') \xe2\x96\xa0 = ■
         if mp:
