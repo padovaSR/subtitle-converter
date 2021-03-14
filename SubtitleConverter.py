@@ -30,8 +30,7 @@ from collections import namedtuple
 from operator import itemgetter
 from io import BytesIO
 from pydispatch import dispatcher
-from itertools import chain
-from more_itertools import unique_justseen
+from itertools import chain, groupby
 from Manual import MyManual
 from zip_confirm import TreeDialog
 from MultiSelection import MultiFiles
@@ -2887,7 +2886,7 @@ class MyFrame(ConverterFrame):
     def rwFileHistory(self, hfile):
         """"""
         logfile = open(log_file_history, "w", encoding="utf-8", newline="\r\n")
-        file_set = list(unique_justseen(hfile))
+        file_set = list(map(next, map(itemgetter(1), groupby(hfile))))
         if len(file_set) > 12:
             file_set = file_set[-12:]
         for paths in file_set:
