@@ -6,9 +6,8 @@ from io import StringIO
 import os
 import re
 import pickle
-from more_itertools import unique_everseen
 import zipfile
-from collections import defaultdict 
+from collections import defaultdict, OrderedDict 
 
 chreg = re.compile("¬")
 
@@ -45,8 +44,8 @@ def lenZip(infile):
         
 def sortList(inlist):
     """"""
-    return list(unique_everseen(inlist))
-
+    return list(OrderedDict.fromkeys(inlist))
+    
 with open(log_file_history, encoding="utf-8") as f:
     for line in f:
         line = line.strip()
