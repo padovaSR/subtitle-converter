@@ -5,7 +5,7 @@ Program za obradu srt i txt fajlova.
 ## Requirements:
 * [Python](http://www.python.org/) version 3.8
 * [wxPython](https://wxpython.org/) version 4.1.0 or newer
-* Libraries: [srt](https://github.com/cdown/srt),  [PyDispatcher](https://pypi.org/project/PyDispatcher/), [more_itertools](https://github.com/more-itertools/more-itertools)
+* Libraries: [srt](https://github.com/cdown/srt),  [PyDispatcher](https://pypi.org/project/PyDispatcher/)
 ### To install requirements:
 
 Windows: 
