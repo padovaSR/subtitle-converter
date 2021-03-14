@@ -1,4 +1,3 @@
 wxPython
 srt
-more_itertools
 PyDispatcher
