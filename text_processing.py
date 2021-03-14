@@ -255,6 +255,7 @@ def fixI(in_text):
             .replace(b'\xc5\xb8\xc5\x92', b'')
             .replace(b'\xd0\x94\xa0', b'\x44')
             .replace(b'\xc2\xa0', b' ')
+            .replace(b"\xc2\x81", b"")
             .replace(b"\xc4\x8f\xc2\xbb\xc5\xbc", b"")
         )
         # .replace(b'\xc7\x88', b'\x4c\x6a') \
