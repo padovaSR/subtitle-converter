@@ -171,3 +171,19 @@ def fileHandle(infiles, text_control, fdrop=False):
             enc = file_go(tmp_path, name)
             if fdrop is True:
                 dispatcher.send("TMP_PATH", message=tmp_path, msg=[name, enc, False])
+                
+class FileDrop(wx.FileDropTarget):
+    '''Drop target functionality for files'''
+    
+    def __init__(self, window):
+        wx.FileDropTarget.__init__(self)
+        self.window = window
+        
+    def OnDropFiles(self, x, y, filenames):
+        '''When files are dropped, handle them'''
+        
+        lfiles = [x for x in filenames]
+        
+        fileHandle(lfiles, self.window, fdrop=True)
+        
+        return True
