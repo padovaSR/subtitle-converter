@@ -80,6 +80,4 @@ name_data = preSuffix()
 FILE_SETTINGS=defaultdict(str)
 
 with open(os.path.join("resources", "var", "dialog_settings.db.dat"), "rb") as f:
-    data = pickle.load(f)
-    
-FILE_SETTINGS.update(data)
+    FILE_SETTINGS.update(pickle.load(f))
