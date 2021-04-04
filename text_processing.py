@@ -518,7 +518,7 @@ def rm_dash(text_in):
     f_rpl = re.compile(r'^((.*?\n.*?){1})\n')
     spaceS_r = re.compile(r' {2,}')
     pe_r = re.compile(r"^\s*(?<=.)| +$", re.M)
-    cs_r = re.compile(r"(?<=\W\s)- +\b|^\s*- +")
+    cs_r = re.compile(r"(?<=\W\s)- +\b|^\s*- +", re.M)
     ct_r = re.compile(r"</*font.*?>", re.I)
     sp_n = 0
 
