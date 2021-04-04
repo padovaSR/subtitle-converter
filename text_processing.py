@@ -518,8 +518,7 @@ def rm_dash(text_in):
     f_rpl = re.compile(r'^((.*?\n.*?){1})\n')
     spaceS_r = re.compile(r' {2,}')
     pe_r = re.compile(r"^\s*(?<=.)| +$", re.M)
-    cs_r = re.compile(r'\B- +')
-    cs_r1 = re.compile(r'\B-')
+    cs_r = re.compile(r"(?<=\W\s)- +\b|^\s*- +")
     ct_r = re.compile(r"</*font.*?>", re.I)
     sp_n = 0
 
@@ -568,7 +567,7 @@ def rm_dash(text_in):
             for i in subs:
                 n = poravnLine(i.content)
                 if cb5_s is False and sp_n >= 3:
-                    n = cs_r1.sub(r'- ', n)
+                    n = cs_r.sub(r'- ', n)
                 new_s.append(srt.Subtitle(i.index, i.start, i.end, n))
             text = srt.compose(new_s)
         else:
