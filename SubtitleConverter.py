@@ -86,7 +86,7 @@ logging.config.fileConfig(
 logger = logging.getLogger(__name__)
 
 
-VERSION = "v0.5.9.0_alpha18"
+VERSION = "v0.5.9.0_alpha19"
 
 
 class MyFrame(ConverterFrame):
@@ -297,7 +297,6 @@ class MyFrame(ConverterFrame):
 
     def enKode(self, message, msg):
 
-        self.enableTool()
         self.clearUndoRedo()
 
         rlPath = msg[0]
@@ -448,7 +447,7 @@ class MyFrame(ConverterFrame):
     def newText(self, event):
         """"""
         tval = self.text_1.GetValue()
-        if not tval.startswith('Files ') and not self.real_path and not PREVIOUS and len(tval) > 40:
+        if not tval.startswith('Files ') and not [self.undo, self.real_path, PREVIOUS] and len(tval) > 40:
             try:
                 text = self.text_1.GetValue()
                 place = self.text_1.GetInsertionPoint()
