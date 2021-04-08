@@ -447,32 +447,33 @@ class MyFrame(ConverterFrame):
     def newText(self, event):
         """"""
         tval = self.text_1.GetValue()
-        if not tval.startswith('Files ') and not [self.undo, self.real_path, PREVIOUS] and len(tval) > 40:
-            try:
-                text = self.text_1.GetValue()
-                place = self.text_1.GetInsertionPoint()
-                self.tmpPath.clear()
-                self.real_path.clear()
-                self.real_path.append(filePath(os.getcwd(), "Untitled.txt"))
-                PREVIOUS.clear()
-                addPrevious(
-                    "Open",
-                    "utf-8",
-                    text,
-                    "",
-                    "tmp/Untitled.txt",
-                    filePath(os.getcwd(), "Untitled.txt"),
-                )
-                self.text_1.SetInsertionPoint(place)
-                self.tmpPath.append("tmp/Untitled.txt")
-                self.real_dir = os.getcwd()
-                self.newEnc = "utf-8"
-                self.SetStatusText("Untitled.txt")
-                self.SetStatusText("UTF-8", 1)
-                self.enableTool()
-                self.undo.Enable()
-            except Exception as e:
-                logger.debug(f"newText: {e}")
+        if not all([self.real_path, PREVIOUS]):
+            if not tval.startswith('Files ') and self.UndoText and len(tval) > 40:
+                try:
+                    text = self.text_1.GetValue()
+                    place = self.text_1.GetInsertionPoint()
+                    self.tmpPath.clear()
+                    self.real_path.clear()
+                    self.real_path.append(filePath(os.getcwd(), "Untitled.txt"))
+                    PREVIOUS.clear()
+                    addPrevious(
+                        "Open",
+                        "utf-8",
+                        text,
+                        "",
+                        "tmp/Untitled.txt",
+                        filePath(os.getcwd(), "Untitled.txt"),
+                    )
+                    self.text_1.SetInsertionPoint(place)
+                    self.tmpPath.append("tmp/Untitled.txt")
+                    self.real_dir = os.getcwd()
+                    self.newEnc = "utf-8"
+                    self.SetStatusText("Untitled.txt")
+                    self.SetStatusText("UTF-8", 1)
+                    self.enableTool()
+                    self.undo.Enable()
+                except Exception as e:
+                    logger.debug(f"newText: {e}")
         event.Skip()
         
     def getMultipleFiles(self, event):
