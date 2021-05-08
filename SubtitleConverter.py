@@ -297,8 +297,6 @@ class MyFrame(ConverterFrame):
 
     def enKode(self, message, msg):
 
-        self.clearUndoRedo()
-
         rlPath = msg[0]
         logger.debug(f"Droped <enKode> real_path: {rlPath}")
         tpath = message
