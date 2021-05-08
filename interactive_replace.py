@@ -333,9 +333,9 @@ class FindReplace(wx.Dialog):
     def onReplace(self, event):
         ''''''
         self.replaceCurrent()
-        while len(self.Replaced) == 0:
+        while not self.Replaced:
             c = self.getValues(self.subs)
-            if c is None or c == 0:
+            if c is None or not c:
                 break
         for x in set(self.ReplacedAll):
             self.textStyle(self.text_2, self.text_2.GetValue(), "RED", "YELLOW", x)
