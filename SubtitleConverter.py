@@ -446,7 +446,7 @@ class MyFrame(ConverterFrame):
         """"""
         tval = self.text_1.GetValue()
         if not all([self.real_path, PREVIOUS]):
-            if not tval.startswith('Files ') and self.UndoText and len(tval) > 40:
+            if not tval.startswith('Files ') and self.UndoText and len(tval)> 40:
                 try:
                     text = self.text_1.GetValue()
                     place = self.text_1.GetInsertionPoint()
@@ -517,7 +517,7 @@ class MyFrame(ConverterFrame):
     def onOpen(self, event):
         ''''''
         tval = self.text_1.GetValue()
-        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
+        if not tval.startswith('Files ') and len(tval) > 0 and not PREVIOUS:
             if self.ShowDialog() is False:
                 return
         
@@ -566,7 +566,7 @@ class MyFrame(ConverterFrame):
     def onReload(self, event):
         
         tval = self.text_1.GetValue()
-        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
+        if not tval.startswith('Files ') and len(tval) > 0 and not PREVIOUS:
             if self.ShowDialog() is False:
                 return
         
@@ -598,7 +598,7 @@ class MyFrame(ConverterFrame):
     def onReloadText(self, event):
         ''''''
         tval = self.text_1.GetValue()
-        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
+        if not tval.startswith('Files ') and len(tval) > 0 and not PREVIOUS:
             if self.ShowDialog() is False:
                 return
         
@@ -725,7 +725,7 @@ class MyFrame(ConverterFrame):
             value2_s = ex['cyr_utf8_txt']
         
         tval = self.text_1.GetValue()
-        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
+        if not tval.startswith('Files ') and len(tval)> 0 and not PREVIOUS:
             if self.ShowDialog() is False:
                 return
         
@@ -894,7 +894,7 @@ class MyFrame(ConverterFrame):
             value4_s = ex['lat_ansi_srt']
 
         tval = self.text_1.GetValue()
-        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
+        if not tval.startswith('Files ') and len(tval)> 0 and not PREVIOUS:
             if self.ShowDialog() is False:
                 return
         
@@ -1232,7 +1232,7 @@ class MyFrame(ConverterFrame):
             value_s = ex["cyr_utf8_srt"]
 
         tval = self.text_1.GetValue()
-        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
+        if not tval.startswith('Files ') and len(tval) > 0 and not PREVIOUS:
             if self.ShowDialog() is False:
                 return
 
@@ -1378,7 +1378,7 @@ class MyFrame(ConverterFrame):
             value1_s = ex['lat_utf8_srt']
 
         tval = self.text_1.GetValue()
-        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
+        if not tval.startswith('Files ') and len(tval)> 0 and not PREVIOUS:
             if self.ShowDialog() is False:
                 return
 
@@ -1510,7 +1510,7 @@ class MyFrame(ConverterFrame):
     def onCyrToANSI(self, event):
 
         tval = self.text_1.GetValue()
-        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
+        if not tval.startswith('Files ') and len(tval)> 0 and not PREVIOUS:
             if self.ShowDialog() is False:
                 return
         
@@ -1645,7 +1645,7 @@ class MyFrame(ConverterFrame):
     def onCyrToUTF(self, event):
 
         tval = self.text_1.GetValue()
-        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
+        if not tval.startswith('Files ') and len(tval)> 0 and not PREVIOUS:
             if self.ShowDialog() is False:
                 return
         
@@ -1783,7 +1783,7 @@ class MyFrame(ConverterFrame):
     def onFixSubs(self):
 
         tval = self.text_1.GetValue()
-        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
+        if not tval.startswith('Files ') and len(tval)> 0 and not PREVIOUS:
             if self.ShowDialog() is False:
                 return
         
@@ -1876,7 +1876,7 @@ class MyFrame(ConverterFrame):
             value1_s = ex['cleanup']
 
         tval = self.text_1.GetValue()
-        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
+        if not tval.startswith('Files ') and len(tval) > 0 and not PREVIOUS:
             if self.ShowDialog() is False:
                 return
         
@@ -1954,7 +1954,7 @@ class MyFrame(ConverterFrame):
             value1_s = ex['transcribe']
 
         tval = self.text_1.GetValue()
-        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
+        if not tval.startswith('Files ') and len(tval) > 0 and not PREVIOUS:
             if self.ShowDialog() is False:
                 return
         
@@ -2029,7 +2029,7 @@ class MyFrame(ConverterFrame):
     def onRepSpecial(self, event):
         
         tval = self.text_1.GetValue()
-        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
+        if not tval.startswith('Files ') and len(tval) > 0 and not PREVIOUS:
             if self.ShowDialog() is False:
                 return
        
@@ -2081,7 +2081,7 @@ class MyFrame(ConverterFrame):
     def applyRegex(self, event):
         
         tval = self.text_1.GetValue()
-        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
+        if not tval.startswith('Files ') and len(tval) > 0 and not PREVIOUS:
             if self.ShowDialog() is False:
                 return
         
@@ -2163,7 +2163,7 @@ class MyFrame(ConverterFrame):
     def onMergeLines(self, event):
         
         tval = self.text_1.GetValue()
-        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
+        if not tval.startswith('Files ') and len(tval) > 0 and not PREVIOUS:
             if self.ShowDialog() is False:
                 return
         
@@ -2659,8 +2659,8 @@ class MyFrame(ConverterFrame):
 
         if (
             not tval.startswith('Files ')
-            and len(tval) > 0
-            and self.save.IsEnabled()
+            and len(tval) > 0 and not PREVIOUS
+           
             and PREVIOUS[-1].action != "toCyrUTF8"
         ):
             dl1 = wx.MessageBox(
@@ -2894,7 +2894,7 @@ class MyFrame(ConverterFrame):
     def onFileHistory(self, event):
         ''''''
         tval = self.text_1.GetValue()
-        if not tval.startswith('Files ') and len(tval) > 0 and self.save.IsEnabled():
+        if not tval.startswith('Files ') and len(tval) > 0 and not PREVIOUS:
             if self.ShowDialog() is False:
                 return
         
