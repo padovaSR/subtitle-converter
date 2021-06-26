@@ -40,7 +40,7 @@ from File_Handler import fileHandle, addPrevious, FileDrop
 from file_settings import FileSettings
 from merger_settings import Settings
 from fixer_settings import FixerSettings
-from merge import myMerger, FixSubGaps
+from merge import myMerger, FixSubGaps, ShrinkGap
 from zamenaImena import shortcutsKey 
 from interactive_replace import FindReplace 
 from settings import BYTES_TEXT as BT
@@ -1821,17 +1821,17 @@ class MyFrame(ConverterFrame):
                 if cb8_s != True:
                     m = 0
                     s1 = 0
-                    while True:
-                        subs = list(srt.parse(WORK_TEXT.getvalue(), ignore_errors=True))
-                        x, y = FixSubGaps(inlist=subs, mingap=_gap).powerSubs()
-                        m += x
-                        s1 += y
-                        if x == 0:
-                            break
+                    subs = list(srt.parse(WORK_TEXT.getvalue(), ignore_errors=True))
+                    x, y = FixSubGaps(inlist=subs, mingap=_gap).powerSubs()
+                    m += x
+                    s1 += y
+                    subs = list(srt.parse(WORK_TEXT.getvalue(), True))
+                    g = ShrinkGap(subs, mingap=_gap)
+                    m += g
                 else: logger.debug("Fixer: Remove gaps not enabled.")
             try:
                 if not cb8_s:
-                    text = srt.compose(srt.parse(WORK_TEXT.getvalue(), ignore_errors=True))
+                    text = srt.compose(srt.parse(WORK_TEXT.getvalue(), True))
                 else:
                     text = WORK_TEXT.getvalue()
             except Exception as e:
