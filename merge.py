@@ -119,7 +119,7 @@ class FixSubGaps:
             if start_1 < end_1: overlap += 1
             gap = start_1 - end_1
             if gap < mingap:
-                gaps += 1            
+                gaps += 1
                 new_end = DT.timedelta(milliseconds=(start_1-Left))
                 new_s.append(Subtitle(FSUB[0].index, FSUB[0].start, new_end, FSUB[0].content))
             else: new_s.append(FSUB[0])
@@ -146,3 +146,32 @@ class FixSubGaps:
                 
         return new_f
 
+def ShrinkGap(inlist, mingap=1):
+    """"""
+    pairs = zip_longest(inlist[0:], inlist[1:])
+    gaps = 0
+    new_l = []
+    new_l.append(inlist[0])
+    for SUB in pairs:
+        try:
+            f_end = mTime(SUB[0].end)
+            end_1 = mTime(SUB[1].end)
+            start_1 = mTime(SUB[1].start)
+            gap = start_1 - f_end
+            diference = gap - mingap
+            if diference <=126 and not diference < 0:
+                gaps += 1
+                new_start = DT.timedelta(milliseconds=(start_1-diference/2))
+                new_end = DT.timedelta(milliseconds=(end_1+diference/2))
+                new_l.append(Subtitle(SUB[1].index, new_start, new_end, SUB[1].content))
+            else:
+                new_l.append(SUB[1])
+        except Exception as e:
+            logger.debug(f"ShrinkGap: {e}")
+    
+    new_l = list(dict.fromkeys(new_l))
+    WORK_TEXT.truncate(0)
+    WORK_TEXT.write(srt.compose(new_l))
+    WORK_TEXT.seek(0)        
+    
+    return gaps
