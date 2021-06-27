@@ -1798,8 +1798,10 @@ class MyFrame(ConverterFrame):
                 data = pickle.load(sp)
                 ex = data['key1']
                 cb1_s = ex['fixgap']
+                cb_sh = ex["shrinkgap"]
                 cb8_s = ex['nuliranje']
                 _gap = ex["mingap"]
+                mgap = ex["maxgap"]
                 fx = data['key5']
                 value1_s = fx['fixed_subs']
         except Exception as e:
@@ -1825,10 +1827,11 @@ class MyFrame(ConverterFrame):
                     x, y = FixSubGaps(inlist=subs, mingap=_gap).powerSubs()
                     m += x
                     s1 += y
-                    subs = list(srt.parse(WORK_TEXT.getvalue(), True))
-                    g = ShrinkGap(subs, mingap=_gap)
-                    m += g
                 else: logger.debug("Fixer: Remove gaps not enabled.")
+            if cb_sh is True:
+                subs = list(srt.parse(WORK_TEXT.getvalue(), True))
+                g = ShrinkGap(subs, maxgap=mgap, mingap=_gap)
+                m += g            
             try:
                 if not cb8_s:
                     text = srt.compose(srt.parse(WORK_TEXT.getvalue(), True))
