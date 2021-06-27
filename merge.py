@@ -146,7 +146,7 @@ class FixSubGaps:
                 
         return new_f
 
-def ShrinkGap(inlist, mingap=1):
+def ShrinkGap(inlist, maxgap, mingap=1):
     """"""
     dsub = Subtitle(
             inlist[-1].index + 1,
@@ -163,7 +163,7 @@ def ShrinkGap(inlist, mingap=1):
             start_1 = mTime(SUB[1].start)
             gap = start_1 - end_1 
             diference = gap - mingap
-            if diference <=150 and diference > 0:
+            if diference <=maxgap and diference > 0:
                 gaps += 1
                 new_start = DT.timedelta(milliseconds=(start_1-diference/2))
                 new_end = DT.timedelta(milliseconds=(end_1+diference/2))
@@ -172,12 +172,12 @@ def ShrinkGap(inlist, mingap=1):
             else:
                 new_l.extend((SUB[0], SUB[1]))
         new_f.append(new_l[0])
-        for SUB in zip_longest(new_l[1::2], new_l[2::2]):
+        for SUB in zip(new_l[1::2], new_l[2::2]):
             end_1 = mTime(SUB[0].end)
             start_1 = mTime(SUB[1].start)
             gap = start_1 - end_1 
             diference = gap - mingap
-            if diference <=150 and diference > 0:
+            if diference <=maxgap and diference > 0:
                 gaps += 1
                 new_start = DT.timedelta(milliseconds=(start_1-diference/2))
                 new_end = DT.timedelta(milliseconds=(end_1+diference/2))
