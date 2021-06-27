@@ -19,7 +19,7 @@ class FixerSettings(wx.Dialog):
         # begin wxGlade: MyDialog.__init__
         kwds["style"] = kwds.get("style", 0) | wx.DEFAULT_DIALOG_STYLE
         wx.Dialog.__init__(self, *args, **kwds)
-        self.SetSize((340, 258))
+        self.SetSize((340, 270))
         self.SetTitle("Fixer Settings")
         _icon = wx.NullIcon
         _icon.CopyFromBitmap(
@@ -40,7 +40,7 @@ class FixerSettings(wx.Dialog):
         sizer_3.Add(
             self.cbx_8, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT | wx.TOP, 5
         )
-        sizer_3.Add((18, 18), 0, 0, 0)
+        sizer_3.Add((27, 18), 0, 0, 0)
 
         self.mingap = wx.lib.intctrl.IntCtrl(self, size=(50, -1))
         sizer_3.Add(self.mingap, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 3)
@@ -49,6 +49,24 @@ class FixerSettings(wx.Dialog):
         sizer_3.Add(self.label_1, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT|wx.RIGHT, 5)
         
         sizer_3.Add((64, 20), 0, 0, 0)
+
+        sizer_4 = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_1.Add(sizer_4, 0, wx.EXPAND|wx.TOP|wx.LEFT, 5)
+        
+        self.cbx_n = wx.CheckBox(self, wx.ID_ANY, "Smanji gapove veličine do:  ")
+        self.cbx_n.SetMinSize((158, 15))
+        sizer_4.Add(
+            self.cbx_n, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT | wx.TOP, 5
+        )
+        sizer_4.Add((10, 18), 0, 0, 0)
+
+        self.maxgap = wx.lib.intctrl.IntCtrl(self, size=(50, -1))
+        sizer_4.Add(self.maxgap, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 3)
+
+        self.label_n = wx.StaticText(self, wx.ID_ANY, "(ms)")
+        sizer_4.Add(self.label_n, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT|wx.RIGHT, 5)
+        
+        sizer_4.Add((64, 20), 0, 0, 0)
 
         self.cbx_7 = wx.CheckBox(
             self, wx.ID_ANY, "Poravnaj linije teksta", style=wx.CHK_2STATE
@@ -102,9 +120,6 @@ class FixerSettings(wx.Dialog):
                     os.path.join('resources', 'var', 'dialog_settings.db.dat'), "rb"
                 ) as sp: data = pickle.load(sp)
                 ex = data['key1']
-            except Exception as e:
-                logger.debug(f"fixerSetting error: {e}")
-            else:
                 self.cbx_1.SetValue(ex["nuliranje"])
                 self.cbx_2.SetValue(ex["kolor"])
                 self.cbx_3.SetValue(ex["italik"])
@@ -113,9 +128,13 @@ class FixerSettings(wx.Dialog):
                 self.cbx_6.SetValue(ex["crtice"])
                 self.cbx_7.SetValue(ex["linije"])
                 self.cbx_8.SetValue(ex["fixgap"])
+                self.cbx_n.SetValue(ex["shrinkgap"])
                 self.mingap.SetValue(ex["mingap"])
-
-            for i in [self.cbx_8, self.mingap, self.label_1]:
+                self.maxgap.SetValue(ex["maxgap"])
+            except Exception as e:
+                logger.debug(f"fixerSetting error: {e}")
+                
+            for i in [self.cbx_8, self.mingap, self.label_1, self.cbx_n, self.maxgap, self.label_n]:
                 if self.cbx_1.IsChecked(): i.Disable()
                     
         static_line_1 = wx.StaticLine(self, wx.ID_ANY)
@@ -149,7 +168,7 @@ class FixerSettings(wx.Dialog):
 
     def EvtChBox(self, event):
         """"""
-        for i in [self.cbx_8, self.mingap, self.label_1]:
+        for i in [self.cbx_8, self.mingap, self.label_1, self.cbx_n, self.maxgap, self.label_n]:
             if self.cbx_1.IsChecked():
                 i.Disable()
             else: i.Enable()
@@ -172,7 +191,9 @@ class FixerSettings(wx.Dialog):
             'crtice': self.cbx_6.GetValue(),
             'linije': self.cbx_7.GetValue(),
             'fixgap': self.cbx_8.GetValue(),
+            'shrinkgap': self.cbx_n.GetValue(),
             'mingap': self.mingap.GetValue(),
+            'maxgap': self.maxgap.GetValue(),
         }
 
         FILE_SETTINGS["key1"] = sdict
