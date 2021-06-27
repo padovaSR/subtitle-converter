@@ -148,30 +148,48 @@ class FixSubGaps:
 
 def ShrinkGap(inlist, mingap=1):
     """"""
-    pairs = zip_longest(inlist[0:], inlist[1:])
+    dsub = Subtitle(
+            inlist[-1].index + 1,
+            DT.timedelta(milliseconds=(mTime(inlist[-1].start) + 6000)),
+            DT.timedelta(milliseconds=(mTime(inlist[-1].end) + 11000)),
+            'Darkstar testings',
+        )        
     gaps = 0
     new_l = []
-    new_l.append(inlist[0])
-    for SUB in pairs:
-        try:
-            f_end = mTime(SUB[0].end)
-            end_1 = mTime(SUB[1].end)
+    new_f = []
+    try:
+        for SUB in zip_longest(inlist[0::2], inlist[1::2], fillvalue=dsub):
+            end_1 = mTime(SUB[0].end)
             start_1 = mTime(SUB[1].start)
-            gap = start_1 - f_end
+            gap = start_1 - end_1 
             diference = gap - mingap
-            if diference <=126 and not diference < 0:
+            if diference <=150 and diference > 0:
                 gaps += 1
                 new_start = DT.timedelta(milliseconds=(start_1-diference/2))
                 new_end = DT.timedelta(milliseconds=(end_1+diference/2))
-                new_l.append(Subtitle(SUB[1].index, new_start, new_end, SUB[1].content))
+                new_l.append(Subtitle(SUB[0].index, SUB[0].start, new_end, SUB[0].content))
+                new_l.append(Subtitle(SUB[1].index, new_start, SUB[1].end, SUB[1].content))
             else:
-                new_l.append(SUB[1])
-        except Exception as e:
-            logger.debug(f"ShrinkGap: {e}")
+                new_l.extend((SUB[0], SUB[1]))
+        new_f.append(new_l[0])
+        for SUB in zip_longest(new_l[1::2], new_l[2::2]):
+            end_1 = mTime(SUB[0].end)
+            start_1 = mTime(SUB[1].start)
+            gap = start_1 - end_1 
+            diference = gap - mingap
+            if diference <=150 and diference > 0:
+                gaps += 1
+                new_start = DT.timedelta(milliseconds=(start_1-diference/2))
+                new_end = DT.timedelta(milliseconds=(end_1+diference/2))
+                new_f.append(Subtitle(SUB[0].index, SUB[0].start, new_end, SUB[0].content))
+                new_f.append(Subtitle(SUB[1].index, new_start, SUB[1].end, SUB[1].content))
+            else:
+                new_f.extend((SUB[0], SUB[1]))
+    except Exception as e:
+        logger.debug(f"ShrinkGap: {e}")
     
-    new_l = list(dict.fromkeys(new_l))
     WORK_TEXT.truncate(0)
-    WORK_TEXT.write(srt.compose(new_l))
+    WORK_TEXT.write(srt.compose(new_f))
     WORK_TEXT.seek(0)        
     
     return gaps
