@@ -187,7 +187,8 @@ def ShrinkGap(inlist, maxgap, mingap=1):
                 new_f.extend((SUB[0], SUB[1]))
     except Exception as e:
         logger.debug(f"ShrinkGap: {e}")
-    if new_f[-1].content == "Darkstar testings": new_f.remove(new_f[-1])
+        for i in new_f[-4:]:
+            if i.content == "Darkstar testings": new_f.remove(i)
     WORK_TEXT.truncate(0)
     WORK_TEXT.write(srt.compose(new_f))
     WORK_TEXT.seek(0)        
