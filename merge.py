@@ -172,7 +172,7 @@ def ShrinkGap(inlist, maxgap, mingap=1):
             else:
                 new_l.extend((SUB[0], SUB[1]))
         new_f.append(new_l[0])
-        for SUB in zip(new_l[1::2], new_l[2::2]):
+        for SUB in zip_longest(new_l[1::2], new_l[2::2], fillvalue=dsub):
             end_1 = mTime(SUB[0].end)
             start_1 = mTime(SUB[1].start)
             gap = start_1 - end_1 
@@ -187,7 +187,7 @@ def ShrinkGap(inlist, maxgap, mingap=1):
                 new_f.extend((SUB[0], SUB[1]))
     except Exception as e:
         logger.debug(f"ShrinkGap: {e}")
-    
+    if new_f[-1].content == "Darkstar testings": new_f.remove(new_f[-1])
     WORK_TEXT.truncate(0)
     WORK_TEXT.write(srt.compose(new_f))
     WORK_TEXT.seek(0)        
