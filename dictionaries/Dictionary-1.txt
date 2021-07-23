@@ -840,3 +840,5 @@ Zoe=>Zoi
 Zoey=>Zoi
 hurricane=>uragan
 Sonny=>Sani
+this=>ovo
+a job=>posao
