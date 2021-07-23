@@ -37,6 +37,7 @@ class MultiFiles(wx.Dialog):
 
         self.dp0 = wx.DirPickerCtrl(self, style=wx.DIRP_USE_TEXTCTRL)
         self.dp0.SetTextCtrlProportion(2)
+        self.dp0.SetInitialDirectory(os.path.expanduser("~\Documents"))
         self.sizer_3.Add(self.dp0, 0, wx.ALL | wx.EXPAND, 6)
 
         self.sizer_4 = wx.BoxSizer(wx.HORIZONTAL)
