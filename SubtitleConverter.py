@@ -21,6 +21,7 @@
 import os
 from os.path import basename as baseName
 import sys
+sys.path.insert(0, "./utils")
 import srt
 import re
 import shutil
@@ -44,6 +45,7 @@ from merge import myMerger, FixSubGaps, ShrinkGap
 from zamenaImena import shortcutsKey 
 from interactive_replace import FindReplace 
 from settings import BYTES_TEXT as BT
+from renamer import FilesRename
 from settings import (
     filePath,
     PREVIOUS,
@@ -86,7 +88,7 @@ logging.config.fileConfig(
 logger = logging.getLogger(__name__)
 
 
-VERSION = "v0.5.9.0_alpha19"
+VERSION = "v0.5.9.0_alpha20"
 
 
 class MyFrame(ConverterFrame):
