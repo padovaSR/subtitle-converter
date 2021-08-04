@@ -140,7 +140,7 @@ class FilesRename(wx.Dialog):
         self.Layout()
 
         self.Bind(wx.EVT_TEXT, self.textChanged, self.text_2)
-        self.Bind(wx.EVT_DIRPICKER_CHANGED, self.getNames, self.text_1)
+        # self.Bind(wx.EVT_DIRPICKER_CHANGED, self.getNames, self.text_1)
         self.dirPicker1.Bind(wx.EVT_DIRPICKER_CHANGED, self.getNames)
 
     def getNames(self, event):
