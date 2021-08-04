@@ -417,7 +417,8 @@ class MyFrame(ConverterFrame):
             self.cyr_to_ansi,
             self.cyr_to_utf,
             self.export_zip,
-            self.to_ansi, 
+            self.to_ansi,
+            self.fixer, 
         ]:
             i.Enable(True)
 
@@ -1791,8 +1792,90 @@ class MyFrame(ConverterFrame):
         
         path, entered_enc = self.PathEnc()
 
-        if len(BT) >= 1: return
-
+        if len(BT) >= 1:
+            self.multipleTools()
+            self.fixMultiple()
+        else:
+            try:
+                with open(
+                    filePath('resources', 'var', 'dialog_settings.db.dat'), "rb",
+                ) as sp:
+                    data = pickle.load(sp)
+                    ex = data['key1']
+                    cb1_s = ex['fixgap']
+                    cb_sh = ex["shrinkgap"]
+                    cb8_s = ex['nuliranje']
+                    _gap = ex["mingap"]
+                    mgap = ex["maxgap"]
+                    fx = data['key5']
+                    value1_s = fx['fixed_subs']
+            except Exception as e:
+                logger.debug(f"FixSubtitle error: {e}")
+    
+            self.pre_suffix = value1_s
+            self.newEnc = entered_enc
+            
+            if self.text_1.IsModified(): text = self.text_1.GetValue()
+            else: text = WORK_TEXT.getvalue()
+                    
+            subs = list(srt.parse(text, ignore_errors=True))
+    
+            if len(subs) == 0:
+                logger.debug("Fixer: No subtitles found.")
+            else:
+                text = ""
+                if cb1_s is True:
+                    if cb8_s != True:
+                        m = 0
+                        s1 = 0
+                        subs = list(srt.parse(WORK_TEXT.getvalue(), ignore_errors=True))
+                        x, y = FixSubGaps(inlist=subs, mingap=_gap).powerSubs()
+                        m += x
+                        s1 += y
+                    else: logger.debug("Fixer: Remove gaps not enabled.")
+                if cb_sh is True:
+                    subs = list(srt.parse(WORK_TEXT.getvalue(), True))
+                    g = ShrinkGap(subs, maxgap=mgap, mingap=_gap)
+                    m += g            
+                try:
+                    if not cb8_s:
+                        text = srt.compose(srt.parse(WORK_TEXT.getvalue(), True))
+                    else:
+                        text = WORK_TEXT.getvalue()
+                except Exception as e:
+                    logger.debug(f"FixSubtitle, unexpected error: {e}")
+    
+                text = rm_dash(text)
+    
+                bufferText(text, WORK_TEXT)
+                self.text_1.SetValue(text)
+    
+                self.bytesToBuffer(text, entered_enc)
+                
+                if cb1_s is True:
+                    if cb8_s != True:
+                        if s1 > 1:
+                            m1 = f'\nPreklopljenih linija: [ {s1} ]'
+                            logger.debug(m1)
+                        else:
+                            m1 = ''
+                        logger.debug(f'Fixer: Popravljenih gapova: {m}')
+                        if m >= 0:
+                            sDlg = wx.MessageDialog(
+                                self,
+                                f'Subtitle fix\n\nPopravljenih gapova: [ {m} ]\n{m1}',
+                                'SubtitleConverter',
+                                wx.OK | wx.ICON_INFORMATION,
+                            )
+                            sDlg.ShowModal()
+    
+            addPrevious(
+                "FixSubtitle", self.newEnc, text, self.pre_suffix, path, self.real_path[-1]
+            )
+            self.postAction(path)
+    
+    def fixMultiple(self):
+        """"""
         try:
             with open(
                 filePath('resources', 'var', 'dialog_settings.db.dat'), "rb",
@@ -1810,66 +1893,68 @@ class MyFrame(ConverterFrame):
             logger.debug(f"FixSubtitle error: {e}")
 
         self.pre_suffix = value1_s
-        self.newEnc = entered_enc
-        
-        if self.text_1.IsModified(): text = self.text_1.GetValue()
-        else: text = WORK_TEXT.getvalue()
-                
-        subs = list(srt.parse(text, ignore_errors=True))
+        self.tmpPath.clear()
+        self.pre_suffix = value1_s
 
-        if len(subs) == 0:
-            logger.debug("Fixer: No subtitles found.")
-        else:
-            text = ""
-            if cb1_s is True:
-                if cb8_s != True:
-                    m = 0
-                    s1 = 0
-                    subs = list(srt.parse(WORK_TEXT.getvalue(), ignore_errors=True))
-                    x, y = FixSubGaps(inlist=subs, mingap=_gap).powerSubs()
-                    m += x
-                    s1 += y
-                else: logger.debug("Fixer: Remove gaps not enabled.")
-            if cb_sh is True:
-                subs = list(srt.parse(WORK_TEXT.getvalue(), True))
-                g = ShrinkGap(subs, maxgap=mgap, mingap=_gap)
-                m += g            
-            try:
-                if not cb8_s:
-                    text = srt.compose(srt.parse(WORK_TEXT.getvalue(), True))
-                else:
-                    text = WORK_TEXT.getvalue()
-            except Exception as e:
-                logger.debug(f"FixSubtitle, unexpected error: {e}")
+        f_text = ["Files Processed:\n\n"]
 
-            text = rm_dash(text)
-
-            bufferText(text, WORK_TEXT)
-            self.text_1.SetValue(text)
-
-            self.bytesToBuffer(text, entered_enc)
+        for i in range(len(BT)):
+            path, entered_enc, text = self.getPathEnc(i)
+            self.real_dir = os.path.dirname(path)
+            self.newEnc = entered_enc
+            text = normalizeText(entered_enc, None, text)
+            if not text: text = f"{path}\nText is not SRT format.\nTry as single file."
             
-            if cb1_s is True:
-                if cb8_s != True:
-                    if s1 > 1:
-                        m1 = f'\nPreklopljenih linija: [ {s1} ]'
-                        logger.debug(m1)
+            nam, b = newName(path, self.pre_suffix, multi=True)
+            newF = '{0}{1}'.format(filePath(self.real_dir, nam), b)
+            
+            subs = list(srt.parse(text, ignore_errors=True))
+    
+            if len(subs) == 0:
+                logger.debug("Fixer: No subtitles found.")
+            else:
+                if cb1_s is True:
+                    if cb8_s != True:
+                        m = 0
+                        s1 = 0
+                        subs = list(srt.parse(text, ignore_errors=True))
+                        x, y = FixSubGaps(inlist=subs, mingap=_gap).powerSubs()
+                        m += x
+                        s1 += y
+                    else: logger.debug("Fixer: Remove gaps not enabled.")
+                if cb_sh is True:
+                    subs = list(srt.parse(text, True))
+                    g = ShrinkGap(subs, maxgap=mgap, mingap=_gap)
+                    m += g            
+                try:
+                    if not cb8_s:
+                        text = srt.compose(srt.parse(text, True))
                     else:
-                        m1 = ''
-                    logger.debug(f'Fixer: Popravljenih gapova: {m}')
-                    if m >= 0:
-                        sDlg = wx.MessageDialog(
-                            self,
-                            f'Subtitle fix\n\nPopravljenih gapova: [ {m} ]\n{m1}',
-                            'SubtitleConverter',
-                            wx.OK | wx.ICON_INFORMATION,
-                        )
-                        sDlg.ShowModal()
+                        text = text
+                except Exception as e:
+                    logger.debug(f"FixSubtitle, unexpected error: {e}")
 
-        addPrevious(
-            "FixSubtitle", self.newEnc, text, self.pre_suffix, path, self.real_path[-1]
-        )
-        self.postAction(path)
+                text = rm_dash(text)
+                
+                if cb1_s is True:
+                    if cb8_s != True:
+                        if s1 > 1:
+                            m1 = f'\nPreklopljenih linija: [ {s1} ]'
+                            logger.debug(m1)
+                        else:
+                            m1 = ''
+                        logger.debug(f'Fixer: Popravljenih gapova: {m}')                
+            
+            writeToFile(text, newF, self.newEnc, multi=True)
+
+            f_text.append(baseName(newF)+"    \n")
+            
+            self.SetStatusText(baseName(newF))
+        
+        self.multipleTools()
+        addPrevious("FixSubtitle", self.newEnc, "", self.pre_suffix, "", "")
+        self.SetStatusText('Multiple files done.')
+        self.SetStatusText(printEncoding(self.newEnc), 1)        
         
     def onCleanup(self, event):
         
