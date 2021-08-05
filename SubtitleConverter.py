@@ -1892,7 +1892,6 @@ class MyFrame(ConverterFrame):
         except Exception as e:
             logger.debug(f"FixSubtitle error: {e}")
 
-        self.pre_suffix = value1_s
         self.tmpPath.clear()
         self.pre_suffix = value1_s
 
@@ -1946,11 +1945,11 @@ class MyFrame(ConverterFrame):
                         logger.debug(f'Fixer: Popravljenih gapova: {m}')                
             
             writeToFile(text, newF, self.newEnc, multi=True)
-
+            
             f_text.append(baseName(newF)+"    \n")
             
             self.SetStatusText(baseName(newF))
-        
+        self.displayText(f_text)
         self.multipleTools()
         addPrevious("FixSubtitle", self.newEnc, "", self.pre_suffix, "", "")
         self.SetStatusText('Multiple files done.')
