@@ -6,9 +6,6 @@
 import wx
 import os
 
-import sys
-sys.path.append("../")
-
 import pickle
 import logging.config
 from settings import FILE_SETTINGS, name_data
