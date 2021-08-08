@@ -23,9 +23,6 @@ from itertools import zip_longest
 from srt import Subtitle
 import logging.config
 
-import sys
-sys.path.append("../")
-
 from settings import WORK_TEXT
 
 logger = logging.getLogger(__name__)
