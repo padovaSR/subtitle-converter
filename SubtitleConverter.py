@@ -34,7 +34,6 @@ from itertools import chain, groupby
 from Manual import MyManual
 from zip_confirm import TreeDialog
 from MultiSelection import MultiFiles
-
 from file_settings import FileSettings
 from merger_settings import Settings
 from fixer_settings import FixerSettings
@@ -57,7 +56,7 @@ from settings import (
 from TextFileProc import (
     ConvertText,
     ChangeEncoding,
-    rm_dash, 
+    rm_dash,
     fixI,
     rplStr,
     bufferText,
@@ -68,7 +67,18 @@ from TextFileProc import (
     cleanUp,
     cleanLine,
     doReplace,
-    zameniImena, 
+    zameniImena,
+    droppedText,
+    checkErrors,
+    checkChars,
+    checkFile,
+    displayError,
+    newName,
+    nameDialog,
+    writeToFile,
+    fileHandle,
+    addPrevious,
+    FileDrop,
 )
 
 import logging
