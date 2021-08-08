@@ -16,17 +16,19 @@ logger = logging.getLogger(__name__)
 
 def listFiles(folderIn):
     """"""
-    file_list = []
+    subs_list = []
+    vids_list = []
     c = 0
-    file_suffix = (".srt", ".sub", ".txt")    
     with os.scandir(folderIn) as it:
         for entry in it:
             if not entry.name.startswith('.') and entry.is_file():
-                if os.path.splitext(entry)[1].lower() in file_suffix:
+                if entry.name.lower().endswith((".srt", ".sub", ".txt")):
                     c += 1
                     name = f"{c} • {entry.name}"
-                    file_list.append(name)
-    return file_list
+                    subs_list.append(name)
+                if entry.name.lower().endswith((".mp4", ".mkv", ".avi")):
+                    vids_list.append(entry.name)
+    return subs_list, vids_list
 
 class FilesRename(wx.Dialog):
     def __init__(self, parent, id=wx.ID_ANY):
@@ -145,7 +147,7 @@ class FilesRename(wx.Dialog):
 
     def getNames(self, event):
         sourcePath = event.GetPath()
-        fl = listFiles(sourcePath)
+        fl,vl = listFiles(sourcePath)
         try:
             for i in fl:
                 self.text_1.AppendText(i+"\n")
