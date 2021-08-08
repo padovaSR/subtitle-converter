@@ -8,9 +8,6 @@ import wx
 import wx.lib.intctrl
 import os
 
-import sys
-sys.path.append("../")
-
 import pickle
 from settings import FILE_SETTINGS
 import logging.config
