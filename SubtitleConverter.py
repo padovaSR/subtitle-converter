@@ -21,7 +21,6 @@
 import os
 from os.path import basename as baseName
 import sys
-sys.path.insert(0, "./utils")
 import srt
 import re
 import shutil
@@ -35,9 +34,7 @@ from itertools import chain, groupby
 from Manual import MyManual
 from zip_confirm import TreeDialog
 from MultiSelection import MultiFiles
-from errors_check import checkErrors, checkChars, checkFile, displayError
-from File_processing import newName, nameDialog, writeToFile
-from File_Handler import fileHandle, addPrevious, FileDrop
+
 from file_settings import FileSettings
 from merger_settings import Settings
 from fixer_settings import FixerSettings
@@ -55,10 +52,9 @@ from settings import (
     name_data,
     log_file_history,
     printEncoding,
-    droppedText, 
 )
 
-from text_processing import (
+from TextFileProc import (
     ConvertText,
     ChangeEncoding,
     rm_dash, 
