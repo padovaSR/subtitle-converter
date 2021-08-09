@@ -22,7 +22,6 @@ import shutil
 import zipfile
 from collections import namedtuple
 from pydispatch import dispatcher
-from errors_check import checkErrors
 from settings import WORK_TEXT, PREVIOUS, FILE_HISTORY, BYTES_TEXT, filePath, lenZip, droppedText
 import codecs
 import zipfile
