@@ -20,6 +20,7 @@ from os.path import basename as baseName
 import pickle
 import shutil
 import zipfile
+import webbrowser
 from collections import namedtuple
 from pydispatch import dispatcher
 from settings import WORK_TEXT, PREVIOUS, FILE_HISTORY, BYTES_TEXT, filePath, lenZip, droppedText
@@ -54,7 +55,6 @@ from zamenaImena import (
 )
 
 from settings import filePath
-from showError import showMeError
 
 import wx
 
@@ -333,7 +333,6 @@ def remTag(text_in):
 
     return text_in
 
-
 def zameniImena(text_in):
 
     if len(list(srt.parse(text_in))) == 0:
@@ -385,7 +384,6 @@ def zameniImena(text_in):
 
     return much, t_out6[0]
 
-
 def doReplace(text_in):
 
     robj_r = re.compile("(%s)" % "|".join(map(re.escape, searchReplc.keys())))
@@ -405,7 +403,6 @@ def doReplace(text_in):
         much = t_out[1]
         logger.debug(f'DoReplace, zamenjeno [{much}] objekata')
         return much, t_out[0]
-
 
 def cleanUp(text_in):
 
@@ -697,19 +694,13 @@ def poravnLine(intext):
                     if (dw[0] + prvaS) <= (drugaS - dw[0]) + 2:
                         c = c1 + 1
                         s1 = movPos(s1, c)
-
                     sub = s1
-                else:
-                    sub = s1
-            else:
-                sub = s1
-        else:
-            sub = s1
-    else:
-        sub = n
+                else: sub = s1
+            else: sub = s1
+        else: sub = s1
+    else: sub = n
 
     return sub
-
 
 class FileOpened:
     ''''''
@@ -994,7 +985,6 @@ def writeToFile(text, path, enc, multi=False, ask=False):
         logger.debug(f"writeToFile, LookupError: {e}")
     except Exception as e:
         logger.debug(f"writeToFile, Unexpected error: {e}")
-
         
         
 def addPrevious(action, enc=None, content=None, psuffix=None, tpath=None, rpath=None):
@@ -1314,3 +1304,41 @@ def displayError(text, tctrl, rdir, path, new_enc, multi=False):
                 tctrl.SetInsertionPoint(i[1])
                 
     return text
+
+def showMeError(infile, in_text, outfile, kode):
+
+    with open(os.path.join('resources', 'var', 'fixer_cb3.data'), 'rb') as f:
+        cb3_s = pickle.load(f)
+
+    subs = list(srt.parse(in_text, ignore_errors=True))
+
+    if len(subs) > 0:
+
+        st = "LINIJE SA GREŠKAMA:\n\n"
+        if kode == 'windows-1251':
+            st = "ЛИНИЈЕ СА ГРЕШКАМА:\n\n"
+            kode = "utf-8"
+        FP = re.compile(r"\?")
+        count = 0
+        sl = []
+        for i in subs:
+            t = i.content
+            FE = re.findall(FP, t)
+            if FE:
+                sub = srt.Subtitle(i.index, i.start, i.end, t.replace("¬", "?"))
+                sl.append(sub)
+                count += 1
+        if count > 0:
+            try:
+                with open(outfile, "w", encoding=kode) as f:
+                    subs_data = srt.compose(sl, reindex=False)
+                    f.write(st + subs_data)
+            except Exception as e:
+                logger.debug(f"W_ErrorFile, unexpected error: {e}")
+
+            if os.path.isfile(outfile):
+                logger.debug(f": {outfile}")
+            if cb3_s is True:
+                webbrowser.open(outfile)
+    else:
+        logger.debug(f'showMeError: No subtitles found in {os.path.basename(infile)}')
