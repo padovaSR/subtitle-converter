@@ -20,32 +20,37 @@ import os
 from os.path import basename as baseName
 import pickle
 import shutil
-import zipfile
 import webbrowser
-from collections import namedtuple,  defaultdict
+from collections import namedtuple, defaultdict
 from pydispatch import dispatcher
-from settings import WORK_TEXT, PREVIOUS, FILE_HISTORY, BYTES_TEXT, filePath, lenZip, droppedText
+from settings import (
+    WORK_TEXT,
+    PREVIOUS,
+    FILE_HISTORY,
+    BYTES_TEXT,
+    filePath,
+    lenZip,
+    droppedText,
+    chreg,
+    FILE_SETTINGS,
+    name_data, 
+)
 import codecs
 import zipfile
-from collections import namedtuple 
 from choice_dialog import MultiChoice
-from settings import chreg, filePath, FILE_SETTINGS, BYTES_TEXT, name_data
 
 from codecs import BOM_UTF8
 
 import re
 import unicodedata
 import srt
-import pickle
 from textwrap import TextWrapper
-from settings import filePath
 
 import wx
 
 import logging.config
 
 logger = logging.getLogger(__name__)
-
 
 codelist = [
     'utf-8',
@@ -1344,7 +1349,6 @@ def remBom(infile):
                 chunk = fp.read(buffer_size)
             fp.seek(-bom_length, os.SEEK_CUR)
             fp.truncate()
-
 
 def dict_fromFile(text_in, delim):
     if not os.path.exists(text_in):
