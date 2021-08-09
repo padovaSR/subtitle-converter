@@ -38,7 +38,6 @@ from file_settings import FileSettings
 from merger_settings import Settings
 from fixer_settings import FixerSettings
 from merge import myMerger, FixSubGaps, ShrinkGap
-from zamenaImena import shortcutsKey 
 from interactive_replace import FindReplace 
 from settings import BYTES_TEXT as BT
 from renamer import FilesRename
@@ -79,6 +78,7 @@ from TextFileProc import (
     fileHandle,
     addPrevious,
     FileDrop,
+    shortcutsKey, 
 )
 
 import logging
