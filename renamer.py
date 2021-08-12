@@ -28,11 +28,12 @@ def listFiles(folderIn):
                     if EP.search(entry.name):
                         subs_list.append(entry.name)
                         SUBS.append(os.path.join(folderIn, entry.name))
+                        SUBS.sort()
                 if entry.name.lower().endswith((".mp4", ".mkv", ".avi")):
                     if EP.search(entry.name):
                         vids_list.append(entry.name)
     ext = os.path.splitext(basename(subs_list[0]))[1]
-    return subs_list, vids_list, ext
+    return sorted(subs_list), sorted(vids_list), ext
 
 def newFiles(subs=[], vids=[], ext=".srt"):
     """"""
