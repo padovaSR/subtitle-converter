@@ -5,6 +5,7 @@
 # Modified by padovaSR
 
 import os
+from os.path import basename 
 import re
 import shutil
 import logging.config
@@ -19,6 +20,7 @@ def listFiles(folderIn):
     """"""
     subs_list = []
     vids_list = []
+    ext = ""
     with os.scandir(folderIn) as it:
         for entry in it:
             if not entry.name.startswith('.') and entry.is_file():
@@ -29,16 +31,17 @@ def listFiles(folderIn):
                 if entry.name.lower().endswith((".mp4", ".mkv", ".avi")):
                     if EP.search(entry.name):
                         vids_list.append(entry.name)
-    return subs_list, vids_list
+    ext = os.path.splitext(basename(subs_list[0]))[1]
+    return subs_list, vids_list, ext
 
-def newFiles(subs=[], vids=[]):
+def newFiles(subs=[], vids=[], ext=".srt"):
     """"""
     new = []
     for pair in zip(subs, vids):
         a = re.match(r"\d\d", str(EP.search(pair[1])))
         b = re.match(r"\d\d", str(EP.search(pair[0])))
         if a == b:
-            new.append(f"{os.path.splitext(pair[1])[0]}.srt")
+            new.append(f"{os.path.splitext(pair[1])[0]}{ext}")
     return new
     
 class FilesRename(wx.Dialog):
@@ -151,14 +154,15 @@ class FilesRename(wx.Dialog):
         self.SetEscapeId(self.button_CANCEL.GetId())
 
         self.Layout()
-
-        self.button_OK.Bind(wx.EVT_BUTTON, self.renameFiles, self.button_OK)
+        
+        self.button_CANCEL.Bind(wx.EVT_BUTTON, self.onCancel)
+        self.button_OK.Bind(wx.EVT_BUTTON, self.renameFiles)
         self.dirPicker1.Bind(wx.EVT_DIRPICKER_CHANGED, self.getNames)
 
     def getNames(self, event):
         sourcePath = event.GetPath()
-        fl,vl = listFiles(sourcePath)
-        new = newFiles(fl, vl)
+        fl,vl,ext = listFiles(sourcePath)
+        new = newFiles(fl, vl, ext)
         try:
             for i in fl:
                 self.text_1.AppendText(f"{i}\n")
@@ -176,9 +180,16 @@ class FilesRename(wx.Dialog):
                 line = self.text_2.GetLineText(i)
                 new_name = os.path.join(os.path.dirname(SUBS[i]), line)
                 shutil.move(SUBS[i], new_name)
+                logger.debug(f"{basename(SUBS[i])} -> {basename(new_name)}")
             except Exception as e:
                 logger.debug(f"{e}")
+        SUBS.clear()
         self.Destroy()
+        
+    def onCancel(self, event):
+        """"""
+        self.Destroy()
+        
 
 class MyApp(wx.App):
     def OnInit(self):
