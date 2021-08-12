@@ -195,6 +195,7 @@ class MyFrame(ConverterFrame):
         self.Bind(wx.EVT_MENU, self.onSave, id=self.save.GetId())
         self.Bind(wx.EVT_MENU, self.onSaveAs, id=self.save_as.GetId())
         self.Bind(wx.EVT_MENU, self.exportZIP, id=self.export_zip.GetId())
+        self.Bind(wx.EVT_MENU, self.onRename, id=self.rename_srt.GetId())
         self.Bind(wx.EVT_MENU, self.onCloseFile, id=self.close.GetId())
         self.Bind(wx.EVT_MENU, self.onQuit, id=self.quit_program.GetId())
         #############################################################################################
@@ -2709,7 +2710,14 @@ class MyFrame(ConverterFrame):
             return f"{baseName(p)}{suffix}"
         else:
             return baseName(path)
-
+        
+    def onRename(self, event):
+        """"""
+        dlg = FilesRename(None)
+        if dlg.ShowModal() == wx.ID_OK:
+            dlg.Destroy()
+        event.Skip()    
+        
     def bytesToBuffer(self, text, enc):
         '''Returns byte'''
 
