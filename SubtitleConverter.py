@@ -94,7 +94,7 @@ logging.config.fileConfig(
 logger = logging.getLogger(__name__)
 
 
-VERSION = "v0.5.9.0_alpha20"
+VERSION = "v0.5.9.0_alpha21"
 
 
 class MyFrame(ConverterFrame):
@@ -2713,8 +2713,12 @@ class MyFrame(ConverterFrame):
         
     def onRename(self, event):
         """"""
+        s_text = ["Reneamed files:\n\n"]
         dlg = FilesRename(None)
         if dlg.ShowModal() == wx.ID_OK:
+            files = dlg.RenamedSubs()
+            s_text.extend(files)
+            self.displayText(s_text)
             dlg.Destroy()
         event.Skip()    
         
