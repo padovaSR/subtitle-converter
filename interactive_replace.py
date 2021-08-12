@@ -9,7 +9,7 @@ import srt
 from srt import Subtitle
 from pydispatch import dispatcher 
 from collections import defaultdict 
-from zamenaImena import dict_fromFile
+from TextFileProc import dict_fromFile
 from settings import WORK_TEXT
 import logging.config
 
