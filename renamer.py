@@ -6,26 +6,41 @@
 
 import os
 import re
+import shutil
 import logging.config
 import wx
 
 logger = logging.getLogger(__name__)
 
+EP = re.compile(r"e\s*\d{2}|episode\s*\d{2}|ep\s*\d{2}|epizoda\s*\d{2}", re.I)
+SUBS = []
+
 def listFiles(folderIn):
     """"""
     subs_list = []
     vids_list = []
-    c = 0
     with os.scandir(folderIn) as it:
         for entry in it:
             if not entry.name.startswith('.') and entry.is_file():
                 if entry.name.lower().endswith((".srt", ".sub", ".txt")):
-                    c += 1
-                    subs_list.append(f"{c} • {entry.name}")
+                    if EP.search(entry.name):
+                        subs_list.append(entry.name)
+                        SUBS.append(os.path.join(folderIn, entry.name))
                 if entry.name.lower().endswith((".mp4", ".mkv", ".avi")):
-                    vids_list.append(entry.name)
+                    if EP.search(entry.name):
+                        vids_list.append(entry.name)
     return subs_list, vids_list
 
+def newFiles(subs=[], vids=[]):
+    """"""
+    new = []
+    for pair in zip(subs, vids):
+        a = re.match(r"\d\d", str(EP.search(pair[1])))
+        b = re.match(r"\d\d", str(EP.search(pair[0])))
+        if a == b:
+            new.append(f"{os.path.splitext(pair[1])[0]}.srt")
+    return new
+    
 class FilesRename(wx.Dialog):
     def __init__(self, parent, id=wx.ID_ANY):
         wx.Dialog.__init__(
@@ -132,39 +147,45 @@ class FilesRename(wx.Dialog):
 
         self.SetSizer(self.sizer_1)
 
-        self.SetAffirmativeId(self.button_OK.GetId())
+        # self.SetAffirmativeId(self.button_OK.GetId())
         self.SetEscapeId(self.button_CANCEL.GetId())
 
         self.Layout()
 
-        self.Bind(wx.EVT_TEXT, self.textChanged, self.text_2)
-        # self.Bind(wx.EVT_DIRPICKER_CHANGED, self.getNames, self.text_1)
+        self.button_OK.Bind(wx.EVT_BUTTON, self.renameFiles, self.button_OK)
         self.dirPicker1.Bind(wx.EVT_DIRPICKER_CHANGED, self.getNames)
 
     def getNames(self, event):
         sourcePath = event.GetPath()
         fl,vl = listFiles(sourcePath)
+        new = newFiles(fl, vl)
         try:
             for i in fl:
-                # i = i.lstrip("1234567890 •")
                 self.text_1.AppendText(f"{i}\n")
-            for i in vl:
+            for i in new:
                 self.text_2.AppendText(f"{i}\n")
         except Exception as e:
             logger.debug(f"Error: {e}")
         event.Skip()
 
-    def textChanged(self, event):
-
-        event.Skip()
-
+    def renameFiles(self, event):
+        ''''''
+        n = self.text_2.GetNumberOfLines()
+        for i in range(0, n):
+            try:
+                line = self.text_2.GetLineText(i)
+                new_name = os.path.join(os.path.dirname(SUBS[i]), line)
+                shutil.move(SUBS[i], new_name)
+            except Exception as e:
+                logger.debug(f"{e}")
+        self.Destroy()
 
 class MyApp(wx.App):
     def OnInit(self):
         self.dialog = FilesRename(None, wx.ID_ANY)
         self.SetTopWindow(self.dialog)
         self.dialog.ShowModal()
-        self.dialog.Destroy()
+        # self.dialog.Destroy()
         return True
 
 if __name__ == "__main__":
