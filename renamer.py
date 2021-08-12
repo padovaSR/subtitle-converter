@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 EP = re.compile(r"e\s*\d{2}|episode\s*\d{2}|ep\s*\d{2}|epizoda\s*\d{2}", re.I)
 SUBS = []
+RENAMED = []
 
 def listFiles(folderIn):
     """"""
@@ -175,17 +176,23 @@ class FilesRename(wx.Dialog):
 
     def renameFiles(self, event):
         ''''''
+        RENAMED.clear()
         n = self.text_2.GetNumberOfLines()
         for i in range(0, n):
             try:
                 line = self.text_2.GetLineText(i)
                 new_name = os.path.join(os.path.dirname(SUBS[i]), line)
                 shutil.move(SUBS[i], new_name)
+                RENAMED.append(f"{basename(new_name)}\n")
                 logger.debug(f"{basename(SUBS[i])} -> {basename(new_name)}")
             except Exception as e:
                 logger.debug(f"{e}")
         SUBS.clear()
-        self.Destroy()
+        event.Skip()
+        
+    def RenamedSubs(self):
+        """"""
+        return RENAMED
         
     def onCancel(self, event):
         """"""
