@@ -13,7 +13,7 @@ import wx
 
 logger = logging.getLogger(__name__)
 
-EP = re.compile(r"ep*i*z*s*d*o*d*e*a*\s*\W*\d{,2}", re.I)
+EP = re.compile(r"ep*i*z*s*d*o*d*e*a*\s*\W*\s*\d{,2}", re.I)
 SUBS = []
 RENAMED = []
 
