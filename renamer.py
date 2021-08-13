@@ -13,7 +13,7 @@ import wx
 
 logger = logging.getLogger(__name__)
 
-EP = re.compile(r"ep*i*z*s*d*o*d*e*a*\s*\W*\s*\d{,2}", re.I)
+EP = re.compile(r"ep*i*z*s*o*d*e*a*\s*\W*\s*\d{,2}", re.I)
 SUBS = []
 RENAMED = []
 
@@ -112,7 +112,8 @@ class FilesRename(wx.Dialog):
         self.window_1 = wx.SplitterWindow(
             self.panel_1, wx.ID_ANY, style=wx.SP_3D | wx.SP_LIVE_UPDATE
         )
-        self.window_1.SetMinimumPaneSize(20)
+        self.window_1.SetMinimumPaneSize(50)
+        self.window_1.SetSashGravity(0.5)
         self.sizer_2.Add(self.window_1, 1, wx.ALL | wx.EXPAND, 3)
 
         self.text_1 = wx.TextCtrl(
