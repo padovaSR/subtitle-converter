@@ -36,13 +36,12 @@ def listFiles(folderIn):
         if not vids_list:
             dlg = wx.RichMessageDialog(
                 None,
-                "Missing File\n\nUnable to find video files.\nFile required as reference.\nSelect different folder.",
+                "Missing File\n\nUnable to find video files.\nFile required as reference.",
                 "Renamer",
                 style=wx.OK,
             )
             if dlg.ShowModal() == wx.ID_OK:
                 dlg.Destroy()
-                return
     ext = os.path.splitext(basename(subs_list[0]))[1]
     return sorted(subs_list), sorted(vids_list), ext
 
@@ -174,16 +173,15 @@ class FilesRename(wx.Dialog):
 
     def getNames(self, event):
         sourcePath = event.GetPath()
+        fl,vl,ext = listFiles(sourcePath)
+        new = newFiles(fl, vl, ext) 
         try:
-            fl,vl,ext = listFiles(sourcePath)
-            new = newFiles(fl, vl, ext)            
             for i in fl:
                 self.text_1.AppendText(f"{i}\n")
             for i in new:
                 self.text_2.AppendText(f"{i}\n")
         except Exception as e:
             logger.debug(f"Error: {e}")
-            self.dirPicker1.SetPath("")
         event.Skip()
 
     def renameFiles(self, event):
