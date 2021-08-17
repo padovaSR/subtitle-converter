@@ -172,6 +172,8 @@ class FilesRename(wx.Dialog):
         self.dirPicker1.Bind(wx.EVT_DIRPICKER_CHANGED, self.getNames)
 
     def getNames(self, event):
+        self.text_1.Clear()
+        self.text_2.Clear()
         sourcePath = event.GetPath()
         fl,vl,ext = listFiles(sourcePath)
         new = newFiles(fl, vl, ext) 
