@@ -13,25 +13,25 @@ import wx
 
 logger = logging.getLogger(__name__)
 
-EP = re.compile(r"ep*i*z*s*o*d*e*a*\s*\W*\s*\d{,2}", re.I)
-SUBS = []
-RENAMED = []
+ep = re.compile(r"ep*i*z*s*o*d*e*a*\s*\W*\s*\d{,2}|^\d{1,2}\.srt", (re.I|re.M))
+l_subs = []
+renamed = []
 
-def listFiles(folderIn):
+def listFiles(folderIn, s):
     """"""
     subs_list = []
     vids_list = []
-    ext = ""
+    l_subs.clear()
     with os.scandir(folderIn) as it:
         for entry in it:
             if not entry.name.startswith('.') and entry.is_file():
-                if entry.name.lower().endswith((".srt", ".sub", ".txt")):
-                    if EP.search(entry.name):
+                if entry.name.lower().endswith(s):
+                    if ep.search(entry.name):
                         subs_list.append(entry.name)
-                        SUBS.append(os.path.join(folderIn, entry.name))
-                        SUBS.sort()
+                        l_subs.append(os.path.join(folderIn, entry.name))
+                        l_subs.sort()
                 if entry.name.lower().endswith((".mp4", ".mkv", ".avi")):
-                    if EP.search(entry.name):
+                    if ep.search(entry.name):
                         vids_list.append(entry.name)
         if not vids_list:
             dlg = wx.RichMessageDialog(
@@ -42,15 +42,14 @@ def listFiles(folderIn):
             )
             if dlg.ShowModal() == wx.ID_OK:
                 dlg.Destroy()
-    ext = os.path.splitext(basename(subs_list[0]))[1]
-    return sorted(subs_list), sorted(vids_list), ext
+    return sorted(subs_list), sorted(vids_list)
 
-def newFiles(subs=[], vids=[], ext=".srt"):
+def newFiles(subs=[], vids=[], ext=None):
     """"""
     new = []
     for pair in zip(subs, vids):
-        a = re.match(r"\d\d", str(EP.search(pair[1])))
-        b = re.match(r"\d\d", str(EP.search(pair[0])))
+        a = re.match(r"\d{1,2}", str(ep.search(pair[1])))
+        b = re.match(r"\d{1,2}", str(ep.search(pair[0])))
         if a == b:
             new.append(f"{os.path.splitext(pair[1])[0]}{ext}")
     return new
@@ -145,7 +144,20 @@ class FilesRename(wx.Dialog):
         self.text_2.SetFocus()
 
         self.sizer_3 = wx.StdDialogButtonSizer()
-        self.sizer_1.Add(self.sizer_3, 0, wx.ALIGN_RIGHT | wx.BOTTOM, 4)
+        self.sizer_1.Add(self.sizer_3, 0, wx.BOTTOM | wx.EXPAND | wx.RIGHT, 4)
+        
+        self.sizer_4 = wx.BoxSizer(wx.HORIZONTAL)
+        self.sizer_3.Add(self.sizer_4, 1, wx.EXPAND, 0)
+    
+        self.cb_1 = wx.CheckBox(self, wx.ID_ANY, "*.srt")
+        self.cb_1.SetValue(1)
+        self.sizer_4.Add(self.cb_1, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT | wx.RIGHT, 4)
+        
+        self.cb_2 = wx.CheckBox(self, wx.ID_ANY, "*.sub")
+        self.sizer_4.Add(self.cb_2, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT | wx.RIGHT, 4)
+
+        self.cb_3 = wx.CheckBox(self, wx.ID_ANY, "*.txt")
+        self.sizer_4.Add(self.cb_3, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT | wx.RIGHT, 4)        
 
         self.button_OK = wx.Button(self, wx.ID_OK, "")
         self.button_OK.SetDefault()
@@ -162,21 +174,23 @@ class FilesRename(wx.Dialog):
 
         self.SetSizer(self.sizer_1)
 
-        # self.SetAffirmativeId(self.button_OK.GetId())
         self.SetEscapeId(self.button_CANCEL.GetId())
 
         self.Layout()
         
+        self.suffix = ".srt"
+        
         self.button_CANCEL.Bind(wx.EVT_BUTTON, self.onCancel)
         self.button_OK.Bind(wx.EVT_BUTTON, self.renameFiles)
         self.dirPicker1.Bind(wx.EVT_DIRPICKER_CHANGED, self.getNames)
+        self.Bind(wx.EVT_CHECKBOX, self.onCheckBox)
 
     def getNames(self, event):
         self.text_1.Clear()
         self.text_2.Clear()
-        sourcePath = event.GetPath()
-        fl,vl,ext = listFiles(sourcePath)
-        new = newFiles(fl, vl, ext) 
+        sourcePath = self.dirPicker1.GetPath()
+        fl,vl = listFiles(sourcePath, self.suffix)
+        new = newFiles(fl, vl, self.suffix) 
         try:
             for i in fl:
                 self.text_1.AppendText(f"{i}\n")
@@ -188,23 +202,35 @@ class FilesRename(wx.Dialog):
 
     def renameFiles(self, event):
         ''''''
-        RENAMED.clear()
+        renamed.clear()
         n = self.text_2.GetNumberOfLines()
         for i in range(0, n):
             try:
                 line = self.text_2.GetLineText(i)
-                new_name = os.path.join(os.path.dirname(SUBS[i]), line)
-                shutil.move(SUBS[i], new_name)
-                RENAMED.append(f"{basename(new_name)}\n")
-                logger.debug(f"{basename(SUBS[i])} -> {basename(new_name)}")
+                new_name = os.path.join(os.path.dirname(l_subs[i]), line)
+                shutil.move(l_subs[i], new_name)
+                renamed.append(f"{line}\n")
+                logger.debug(f"{basename(l_subs[i])} -> {line}")
             except Exception as e:
                 logger.debug(f"{e}")
-        SUBS.clear()
+        l_subs.clear()
         event.Skip()
+        
+    def onCheckBox(self, event):
+        cb = event.GetEventObject()
+        for i in [self.cb_1, self.cb_2, self.cb_3]: i.SetValue(0)
+        cb.SetValue(1)
+        
+        if self.dirPicker1.GetPath():
+            self.suffix = cb.GetLabel().strip("*")
+            self.getNames(event)
+        else:
+            logger.debug("No selected directory")
+        event.Skip()        
         
     def RenamedSubs(self):
         """"""
-        return RENAMED
+        return renamed
         
     def onCancel(self, event):
         """"""
