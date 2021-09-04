@@ -188,7 +188,7 @@ def bufferText(intext, buffer):
     buffer.write(intext)
     buffer.seek(0)
 
-def normalizeText(code_in, path, data=None):
+def normalizeText(code_in, path, data):
     '''text normalization'''
     error = "strict"
     # error="surogateescape"
@@ -976,7 +976,7 @@ def writeToFile(text, path, enc, multi=False, ask=False):
         logger.debug(f"writeToFile, Unexpected error: {e}")
         
         
-def addPrevious(action, enc=None, content=None, psuffix=None, tpath=None, rpath=None):
+def addPrevious(action, enc="utf-8", content="empty", psuffix="empty", tpath="empty", rpath="empty"):
     '''This function creates namedtuple'''
     prev = namedtuple("prev", ["action", "enc", "content", "psuffix", "tpath", "rpath"])
     PREVIOUS.append(prev(action, enc, content, psuffix, tpath, rpath))
@@ -989,7 +989,7 @@ def fileHandle(infiles, text_control, fdrop=False):
     
     def file_go(infile, rfile):
         enc = FileOpened(infile).findCode()
-        text = normalizeText(enc, infile)
+        text = normalizeText(enc, infile, data=None)
         text = text.replace("\r\n", "\n")
         bufferText(text, WORK_TEXT)
         text = WORK_TEXT.getvalue()
