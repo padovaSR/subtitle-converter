@@ -94,7 +94,7 @@ logging.config.fileConfig(
 logger = logging.getLogger(__name__)
 
 
-VERSION = "v0.5.9.0_alpha21"
+VERSION = "v0.5.9.0_alpha22"
 
 
 class MyFrame(ConverterFrame):
@@ -3168,7 +3168,7 @@ class MyFrame(ConverterFrame):
         if len(self.RedoText) > 62: self.RedoText = self.RedoText[1:]
         event.Skip()
 
-    def addHistory(self, position, text, l=[], k=None):
+    def addHistory(self, position, text, l, k):
         '''This function creates namedtuple'''
         hist = namedtuple("hist", ["position", "text", "k"])
         l.append(hist(position, text, k))        
