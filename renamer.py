@@ -13,7 +13,7 @@ import wx
 
 logger = logging.getLogger(__name__)
 
-ep = re.compile(r"ep*i*z*s*o*d*e*a*\s*\W*\s*\d{,2}|^\d{1,2}\.srt", (re.I|re.M))
+EP = re.compile(r"ep*i*z*s*o*d*e*a*\s*\W*\s*\d{,2}|^\d{1,2}\.srt", (re.I|re.M))
 l_subs = []
 renamed = []
 
@@ -26,12 +26,12 @@ def listFiles(folderIn, s):
         for entry in it:
             if not entry.name.startswith('.') and entry.is_file():
                 if entry.name.lower().endswith(s):
-                    if ep.search(entry.name):
+                    if EP.search(entry.name):
                         subs_list.append(entry.name)
                         l_subs.append(os.path.join(folderIn, entry.name))
                         l_subs.sort()
                 if entry.name.lower().endswith((".mp4", ".mkv", ".avi")):
-                    if ep.search(entry.name):
+                    if EP.search(entry.name):
                         vids_list.append(entry.name)
         if not vids_list:
             dlg = wx.RichMessageDialog(
@@ -48,8 +48,8 @@ def newFiles(subs=[], vids=[], ext=None):
     """"""
     new = []
     for pair in zip(subs, vids):
-        a = re.match(r"\d{1,2}", str(ep.search(pair[1])))
-        b = re.match(r"\d{1,2}", str(ep.search(pair[0])))
+        a = re.match(r"\d{1,2}", str(EP.search(pair[1])))
+        b = re.match(r"\d{1,2}", str(EP.search(pair[0])))
         if a == b:
             new.append(f"{os.path.splitext(pair[1])[0]}{ext}")
     return new
