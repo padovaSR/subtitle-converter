@@ -123,10 +123,14 @@ class FilesRename(wx.Dialog):
             wx.ID_ANY,
             wx.Bitmap(join("resources","icons","reload.png"), wx.BITMAP_TYPE_ANY),
         )
-        self.bm_button_1.SetMinSize((24, 24))
+        # self.bm_button_1.SetMinSize((24, 24))
         self.bm_button_1.SetToolTip("Reload folder")
         self.bm_button_1.Enable(False)
-        sizer_5.Add(self.bm_button_1, 0, wx.RIGHT|wx.TOP|wx.BOTTOM, 3)
+        sizer_5.Add(
+            self.bm_button_1,
+            0,
+            wx.ALIGN_CENTER_VERTICAL | wx.RIGHT | wx.TOP | wx.BOTTOM, 3, 
+        )
 
         self.window_1 = wx.SplitterWindow(
             self.panel_1, wx.ID_ANY, style=wx.SP_3D | wx.SP_LIVE_UPDATE
