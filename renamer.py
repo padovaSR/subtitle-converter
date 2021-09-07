@@ -5,7 +5,7 @@
 # Modified by padovaSR
 
 import os
-from os.path import basename 
+from os.path import basename, join 
 import re
 import shutil
 import logging.config
@@ -68,9 +68,7 @@ class FilesRename(wx.Dialog):
         self.SetTitle("Rename Utility")
         _icon = wx.NullIcon
         _icon.CopyFromBitmap(
-            wx.Bitmap(
-                os.path.join("resources", "icons", "icon_d.png"), wx.BITMAP_TYPE_ANY
-            )
+            wx.Bitmap(join("resources","icons","icon_d.png"), wx.BITMAP_TYPE_ANY)
         )
         self.SetIcon(_icon)
         self.SetFocus()
@@ -104,7 +102,10 @@ class FilesRename(wx.Dialog):
             )
         )
         self.sizer_2.Add(self.label_1, 0, wx.EXPAND | wx.LEFT | wx.TOP, 3)
-
+        
+        sizer_5 = wx.BoxSizer(wx.HORIZONTAL)
+        self.sizer_2.Add(sizer_5, 0, wx.EXPAND, 0)
+        
         self.dirPicker1 = wx.DirPickerCtrl(
             self.panel_1,
             wx.ID_ANY,
@@ -115,7 +116,17 @@ class FilesRename(wx.Dialog):
             wx.DIRP_DEFAULT_STYLE | wx.DIRP_USE_TEXTCTRL,
         )
         self.dirPicker1.SetFocus()
-        self.sizer_2.Add(self.dirPicker1, 0, wx.ALL | wx.EXPAND, 4)
+        sizer_5.Add(self.dirPicker1, 1, wx.ALL|wx.EXPAND, 4)
+        
+        self.bm_button_1 = wx.BitmapButton(
+            self.panel_1,
+            wx.ID_ANY,
+            wx.Bitmap(join("resources","icons","reload.png"), wx.BITMAP_TYPE_ANY),
+        )
+        self.bm_button_1.SetMinSize((24, 24))
+        self.bm_button_1.SetToolTip("Reload folder")
+        self.bm_button_1.Enable(False)
+        sizer_5.Add(self.bm_button_1, 0, wx.RIGHT|wx.TOP|wx.BOTTOM, 3)
 
         self.window_1 = wx.SplitterWindow(
             self.panel_1, wx.ID_ANY, style=wx.SP_3D | wx.SP_LIVE_UPDATE
@@ -184,6 +195,7 @@ class FilesRename(wx.Dialog):
         self.button_OK.Bind(wx.EVT_BUTTON, self.renameFiles)
         self.dirPicker1.Bind(wx.EVT_DIRPICKER_CHANGED, self.getNames)
         self.Bind(wx.EVT_CHECKBOX, self.onCheckBox)
+        self.Bind(wx.EVT_BUTTON, self.onReload, self.bm_button_1)
 
     def getNames(self, event):
         self.text_1.Clear()
@@ -198,6 +210,7 @@ class FilesRename(wx.Dialog):
                 self.text_2.AppendText(f"{i}\n")
         except Exception as e:
             logger.debug(f"Error: {e}")
+        self.bm_button_1.Enable(True)
         event.Skip()
 
     def renameFiles(self, event):
@@ -228,6 +241,11 @@ class FilesRename(wx.Dialog):
             logger.debug("No selected directory")
         event.Skip()        
         
+    def onReload(self, event):
+        self.getNames(event)
+        self.text_2.SetFocus()
+        event.Skip()    
+    
     def RenamedSubs(self):
         """"""
         return renamed
