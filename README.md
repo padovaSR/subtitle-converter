@@ -16,6 +16,10 @@ Linux:
 ```sh
 pip install -r /path/to/requirements.txt
 ```
+### Watch the video:
+<p align="left">
+  <a href="https://youtu.be/GwLhXvX8xfI" target="_blank"><img src="https://i9.ytimg.com/vi/GwLhXvX8xfI/sddefault.jpg?v=6145bddc&sqp=CPDMn4oG&rs=AOn4CLDGpZ8XJWVOgNHQ9QIxn75nOrVzSw" width="400"></a>
+</p>
 
 ## Download Binaries
 
