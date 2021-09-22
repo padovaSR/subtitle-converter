@@ -118,7 +118,7 @@ class ConverterFrame(wx.Frame):
         self.rename_srt = wx.MenuItem(
             self.file,
             wx.ID_ANY,
-            "&Rename subtitles\t" + keyS["Rename_subs"],
+            "&Rename subtitles\t" + keyS["Rename subtitles"],
             "Mass-rename subtitle files",
         )
         self.rename_srt.SetBitmap(
