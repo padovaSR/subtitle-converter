@@ -2899,31 +2899,32 @@ class MyFrame(ConverterFrame):
 
         if dlg.ShowModal() == wx.ID_OK:
             dlg.ToMenuBar(self)
-
-            shortcutsKey.update([(key, self.sc[key]) for key in self.sc.keys()])
-
-            i_list = list(shortcutsKey.keys())
-
-            with open(
-                filePath("resources", "shortcut_keys.cfg"), "r", encoding="utf-8"
-            ) as cf:
-                new_f = ""
-                for line in cf:
-                    if any(line.startswith(n) for n in i_list):
-                        x = line.split("=")
-                        s = f"{x[0].strip()}={shortcutsKey[x[0].strip()]}\n"
-                        new_f += s
-                    else:
-                        new_f += line
-
-            with open(
-                filePath("resources", "shortcut_keys.cfg"),
-                "w",
-                encoding="utf-8",
-                newline="\r\n",
-            ) as cf:
-                cf.write(new_f)
-            
+            try:
+                shortcutsKey.update([(key, self.sc[key]) for key in self.sc.keys()])
+    
+                i_list = list(shortcutsKey.keys())
+    
+                with open(
+                    filePath("resources", "shortcut_keys.cfg"), "r", encoding="utf-8"
+                ) as cf:
+                    new_f = ""
+                    for line in cf:
+                        if any(line.startswith(n) for n in i_list):
+                            x = line.split("=")
+                            s = f"{x[0].strip()}={shortcutsKey[x[0].strip()]}\n"
+                            new_f += s
+                        else:
+                            new_f += line
+                with open(
+                    filePath("resources", "shortcut_keys.cfg"),
+                    "w",
+                    encoding="utf-8",
+                    newline="\r\n",
+                ) as cf:
+                    cf.write(new_f)
+            except Exception as e:
+                logger.debug(f"editShortcuts: {e}")
+                
             dlg.Destroy()
         
         event.Skip()
