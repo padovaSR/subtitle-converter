@@ -74,12 +74,10 @@ class FilesRename(wx.Dialog):
         self.SetFocus()
 
         self.sizer_1 = wx.BoxSizer(wx.VERTICAL)
-        self.textFont = wx.Font(
-            10,
+        self.textFont = wx.Font(10,
             wx.FONTFAMILY_SWISS,
             wx.FONTSTYLE_NORMAL,
-            wx.FONTWEIGHT_NORMAL,
-            0,
+            wx.FONTWEIGHT_NORMAL, 0,
             "Franklin Gothic Medium",
         )
 
@@ -92,12 +90,10 @@ class FilesRename(wx.Dialog):
             self.panel_1, wx.ID_ANY, "Izaberi folder", style=wx.ALIGN_LEFT
         )
         self.label_1.SetFont(
-            wx.Font(
-                9,
+            wx.Font(9,
                 wx.FONTFAMILY_SWISS,
                 wx.FONTSTYLE_NORMAL,
-                wx.FONTWEIGHT_NORMAL,
-                0,
+                wx.FONTWEIGHT_NORMAL, 0,
                 "Franklin Gothic Medium",
             )
         )
@@ -127,8 +123,7 @@ class FilesRename(wx.Dialog):
         self.bm_button_1.SetToolTip("Reload folder")
         self.bm_button_1.Enable(False)
         sizer_5.Add(
-            self.bm_button_1,
-            0,
+            self.bm_button_1, 0,
             wx.ALIGN_CENTER_VERTICAL | wx.RIGHT | wx.TOP | wx.BOTTOM, 3, 
         )
 
@@ -138,11 +133,10 @@ class FilesRename(wx.Dialog):
         self.window_1.SetMinimumPaneSize(50)
         self.window_1.SetSashGravity(0.5)
         self.sizer_2.Add(self.window_1, 1, wx.ALL | wx.EXPAND, 3)
-
+        
         self.text_1 = wx.TextCtrl(
             self.window_1,
-            wx.ID_ANY,
-            "",
+            wx.ID_ANY, "",
             style=wx.TE_DONTWRAP | wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH,
         )
         self.text_1.SetFont(self.textFont)
@@ -150,8 +144,7 @@ class FilesRename(wx.Dialog):
 
         self.text_2 = wx.TextCtrl(
             self.window_1,
-            wx.ID_ANY,
-            "",
+            wx.ID_ANY, "",
             style=wx.TE_DONTWRAP | wx.TE_MULTILINE | wx.TE_RICH,
         )
         self.text_2.SetFont(self.textFont)
@@ -183,7 +176,7 @@ class FilesRename(wx.Dialog):
 
         self.sizer_3.Realize()
 
-        self.window_1.SplitVertically(self.text_1, self.text_2)
+        self.window_1.SplitHorizontally(self.text_1, self.text_2)
 
         self.panel_1.SetSizer(self.sizer_2)
 
