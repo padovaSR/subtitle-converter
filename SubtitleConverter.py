@@ -94,7 +94,7 @@ logging.config.fileConfig(
 logger = logging.getLogger(__name__)
 
 
-VERSION = "v0.5.9.0_alpha22"
+VERSION = "v0.5.9.0_alpha23"
 
 
 class MyFrame(ConverterFrame):
@@ -2097,12 +2097,20 @@ class MyFrame(ConverterFrame):
 
         if error_text:
             ErrorDlg = wx.MessageDialog(
-                self, error_text, "SubtitleConverter", wx.OK | wx.ICON_ERROR,
+                self,
+                error_text,
+                "SubtitleConverter",
+                wx.OK | wx.ICON_ERROR,
             )
             ErrorDlg.ShowModal()
 
             addPrevious(
-                "Transcribe", self.newEnc, text, self.pre_suffix, path, self.real_path[-1]
+                "Transcribe",
+                self.newEnc,
+                text,
+                self.pre_suffix,
+                path,
+                self.real_path[-1],
             )
                     
         self.postAction(path)
