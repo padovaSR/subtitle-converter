@@ -190,9 +190,9 @@ def bufferText(intext, buffer):
 
 def normalizeText(code_in, path, data):
     '''text normalization'''
-    error = "strict"
+    # error = "strict"
     # error="surogateescape"
-    # error = "replace"
+    error = "replace"
     if code_in in codelist:
         error = 'surrogatepass'
     if path:
@@ -249,6 +249,8 @@ def rplStr(in_text):
             .replace(b'\xef\xbb\xbf', b'')
             .replace(b'\xc5\xb8\xc5\x92', b'')
             .replace(b"\xc2\x81", b"")
+            .replace(b"\xc2\x90", b"")
+            .replace(b"\xef\xbf\xbd", b"")            
         )
         # .replace(b'\x9e', b'\xc5\xbe') \xe2\x96\xa0 = ■
         if mp:
@@ -281,6 +283,8 @@ def fixI(in_text):
             .replace(b'\xc2\xa0', b' ')
             .replace(b"\xc2\x81", b"")
             .replace(b"\xc4\x8f\xc2\xbb\xc5\xbc", b"")
+            .replace(b"\xc2\x90", b"")
+            .replace(b"\xef\xbf\xbd", b"")            
         )
         # .replace(b'\xc7\x88', b'\x4c\x6a') \
         # .replace(b'\xc7\x8b', b'\x4e\x6a').replace(b'\xc7\x89', b'\x6c\x6a').replace(b'\xc7\x8c', b'\x6e\x6a')
