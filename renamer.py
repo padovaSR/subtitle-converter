@@ -165,7 +165,7 @@ class FilesRename(wx.Dialog):
         self.sizer_4.Add(self.cb_2, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT | wx.RIGHT, 4)
 
         self.cb_3 = wx.CheckBox(self, wx.ID_ANY, "*.txt")
-        self.sizer_4.Add(self.cb_3, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT | wx.RIGHT, 4)        
+        self.sizer_4.Add(self.cb_3, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT | wx.RIGHT, 4)
 
         self.button_OK = wx.Button(self, wx.ID_OK, "")
         self.button_OK.SetDefault()
@@ -217,7 +217,7 @@ class FilesRename(wx.Dialog):
         for i in range(0, n):
             try:
                 line = self.text_2.GetLineText(i)
-                new_name = os.path.join(os.path.dirname(l_subs[i]), line)
+                new_name = join(os.path.dirname(l_subs[i]), line)
                 shutil.move(l_subs[i], new_name)
                 renamed.append(f"{line}\n")
                 logger.debug(f"{basename(l_subs[i])} -> {line}")
