@@ -708,7 +708,7 @@ class FileOpened:
 
         self.ErrorDlg = wx.MessageDialog(
             None,
-            f"UnicodeDecodeError\n\nPogrešno kodiranje, pokušajte drugo kodiranje,\ni opciju ReloadFile",
+            f"UnicodeDecodeError\n\nDetektovane greške u tekstu,\nako je previše grešaka\npokušajte drugo kodiranje,\ni opciju ReloadFile",
             "SubtitleConverter",
             style=wx.OK | wx.ICON_ERROR,
         )
