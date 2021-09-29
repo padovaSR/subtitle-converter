@@ -94,7 +94,7 @@ logging.config.fileConfig(
 logger = logging.getLogger(__name__)
 
 
-VERSION = "v0.5.9.0_alpha23"
+VERSION = "v0.5.9.0_a24"
 
 
 class MyFrame(ConverterFrame):
@@ -598,6 +598,7 @@ class MyFrame(ConverterFrame):
                 if len(self.real_path) > 1:
                     self.real_path.clear()
                     self.real_path.append(self.fromPrevious("Open")[5])
+                self.enableTool()
                 logger.debug(f'Reloaded {baseName(path)}, encoding: {enc}')
                 self.SetStatusText(printEncoding(enc), 1)        
             else:
