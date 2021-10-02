@@ -2402,10 +2402,8 @@ class MyFrame(ConverterFrame):
 
                 def data_out(buffer, f_path):
                     if f_path:
-                        f = open(f_path, 'rb')
-                        b_data = f.read()
-                        f.close()
-                        return b_data
+                        with open(f_path, "rb") as f:
+                            return f.read()
                     if buffer:
                         a_data = buffer.getvalue()
                         if type(a_data) is str:
@@ -2436,11 +2434,11 @@ class MyFrame(ConverterFrame):
                             text = remTag(text)
                             writeToFile(text, fpath, PREVIOUS[-2].enc, multi=False, ask=True)
                         else:
-                            if f_enc in ["utf-8", "utf-8-sig"]:
+                            if f_enc in ("utf-8", "utf-8-sig"):
                                 n_enc = "windows-1250"
                             else: n_enc = f_enc
-                            text = open(fpath, "r", encoding=f_enc).read()
-                            text = remTag(text)
+                            with open(fpath, "r", encoding=f_enc) as text:
+                                text = remTag(text.read())
                             writeToFile(text, fpath, n_enc, multi=False, ask=True)                            
 
                     tUTF = filePath("tmp", baseName(self.cyrUTF)) # cyr_UTF-8
@@ -2579,17 +2577,17 @@ class MyFrame(ConverterFrame):
             
             if PREVIOUS[-1].action == 'toCYR_multiple':
 
-                tl = [x.path for x in BT if x.enc in ["utf-8", "utf-8-sig"]]
+                tl = [x.path for x in BT if x.enc in ("utf-8", "utf-8-sig")]
                 if tl:
                     dlg = wx.MessageDialog(
                         self,
                         "Originalni tekstovi su utf-8:\n\n{0}".format(
-                            "".join([baseName(x) + "   \n" for x in tl])
+                            "".join([baseName(x)+"   \n" for x in tl])
                         ),
                         "Latinični tekst",
                         wx.OK | wx.ICON_INFORMATION,
                     )
-                    dlg.ShowModal()
+                    dlg.ShowModal()                   
                 
                 innames = []
                 info = []
