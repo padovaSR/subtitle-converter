@@ -207,7 +207,10 @@ def normalizeText(code_in, path, data):
             if c > 0:
                 ErrorDlg = wx.MessageDialog(
                     None,
-                    "UnicodeDecodeError\n\nDetektovane greške u tekstu!\nPretražite tekst [�,ð...]\n ili je encoding možda pogrešan",
+                    f"UnicodeDecodeError\n\n"
+                    f"Detektovane greške u tekstu!\n"
+                    f"Pretražite tekst [�,ð...]\n"
+                    f"ili je encoding možda pogrešan",
                     "SubtitleConverter",
                     style=wx.OK | wx.ICON_ERROR,
                 )
@@ -725,7 +728,11 @@ class FileOpened:
 
         self.ErrorDlg = wx.MessageDialog(
             None,
-            f"UnicodeDecodeError\n\nDetektovane greške u tekstu,\nako je previše grešaka\npokušajte drugo kodiranje,\ni opciju ReloadFile",
+            f"UnicodeDecodeError\n\n"
+            f"Detektovane greške u tekstu,\n"
+            f"ako je previše grešaka\n"
+            f"pokušajte drugo kodiranje,\n"
+            f"i opciju ReloadFile",
             "SubtitleConverter",
             style=wx.OK | wx.ICON_ERROR,
         )
