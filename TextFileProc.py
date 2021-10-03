@@ -195,10 +195,9 @@ def normalizeText(code_in, path, data):
     error = "replace"
     if code_in in codelist:
         error = 'surrogatepass'
-    s = "аеио"
-    if not BYTES_TEXT:
-        with open(path, "rb") as f:
-            content = f.read()
+    if path:
+        with open(path, "rb") as f: content = f.read()
+        s = "аеио"
         if code_in == "windows-1251":
             c = 0
             for i in s:
@@ -208,13 +207,12 @@ def normalizeText(code_in, path, data):
             if c > 0:
                 ErrorDlg = wx.MessageDialog(
                     None,
-                    f"UnicodeDecodeError\n\nDetektovane greške u tekstu!\nPretražite tekst [�,ð...]\n ili je encoding možda pogrešan",
+                    "UnicodeDecodeError\n\nDetektovane greške u tekstu!\nPretražite tekst [�,ð...]\n ili je encoding možda pogrešan",
                     "SubtitleConverter",
                     style=wx.OK | wx.ICON_ERROR,
                 )
                 if ErrorDlg.ShowModal() == wx.ID_OK:
                     ErrorDlg.Destroy()
-    if path:
         try:
             with open(path, 'r', encoding=code_in, errors=error) as f:
                 text = f.read()
