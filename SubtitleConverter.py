@@ -354,7 +354,7 @@ class MyFrame(ConverterFrame):
         """"""
         text = WORK_TEXT.getvalue()
         self.text_1.SetValue(text)
-        for x in set(message):
+        for x in set():
             ctext = re.compile(r"\b"+x+r"\b")
             for m in re.finditer(ctext, self.text_1.GetValue()):
                 self.text_1.SetStyle(m.start(), m.end(), wx.TextAttr(wx.RED, wx.YELLOW))        
@@ -375,7 +375,7 @@ class MyFrame(ConverterFrame):
             
         if PREVIOUS:
             self.reload.Enable(True)
-            if PREVIOUS[0].enc == "windows-1251":
+            if PREVIOUS[0].action == "toCYR":
                 self.to_ansi.Enable(False)
                 self.frame_toolbar.EnableTool(1003, False)
             for i in [self.save, self.save_as]:
@@ -388,7 +388,7 @@ class MyFrame(ConverterFrame):
                             self.save.Enable()
                             self.save_as.Enable()
                             self.frame_toolbar.EnableTool(1010, True)  ## 1010=Save
-
+                            
     def disableTool(self):
 
         self.frame_toolbar.EnableTool(wx.ID_CLOSE, False)
