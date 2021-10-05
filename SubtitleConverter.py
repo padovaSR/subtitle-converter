@@ -354,7 +354,7 @@ class MyFrame(ConverterFrame):
         """"""
         text = WORK_TEXT.getvalue()
         self.text_1.SetValue(text)
-        for x in set():
+        for x in set(message):
             ctext = re.compile(r"\b"+x+r"\b")
             for m in re.finditer(ctext, self.text_1.GetValue()):
                 self.text_1.SetStyle(m.start(), m.end(), wx.TextAttr(wx.RED, wx.YELLOW))        
