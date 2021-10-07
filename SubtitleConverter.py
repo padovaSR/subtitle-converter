@@ -316,10 +316,7 @@ class MyFrame(ConverterFrame):
         self.real_dir = os.path.dirname("".join(rlPath))
 
         self.real_path = [rlPath]
-        if enc == "windows-1251":
-            self.to_ansi.Enable(False)
-            self.frame_toolbar.EnableTool(1003, False)
-
+        
     def updateUI(self):
         self.curClr = wx.BLACK
         with open(filePath('resources', 'var', 'dialog_settings.db.dat'), "rb") as s:
@@ -570,7 +567,7 @@ class MyFrame(ConverterFrame):
                 self.SetStatusText(baseName(l.tpath))
                 self.SetStatusText(printEncoding(l.enc), 1)
                 self.enableTool()
-
+                
         event.Skip()
 
     def onReload(self, event):
@@ -3061,6 +3058,7 @@ class MyFrame(ConverterFrame):
         actions = [x.action for x in PREVIOUS]
         if PREVIOUS:
             self.REDO_A.append(PREVIOUS[-1])
+            PREVIOUS.pop()
         else:
             return
         if not "Open" in actions:
@@ -3069,8 +3067,7 @@ class MyFrame(ConverterFrame):
             if PREVIOUS[-1].action == "Open" and len(PREVIOUS) == 2:
                 PREVIOUS.reverse()
             prev_items = PREVIOUS[len(PREVIOUS) - 2]
-            if len(PREVIOUS) > 2:
-                PREVIOUS.pop()
+            #if len(PREVIOUS) > 2: PREVIOUS.pop()
 
         entered_enc = prev_items.enc
         
@@ -3110,7 +3107,7 @@ class MyFrame(ConverterFrame):
         event.Skip()
 
     def redoAction(self, event):
-        '''Redo text'''
+        '''Redo complete action'''
 
         path = self.tmpPath[0]
         prev = self.REDO_A.pop()
@@ -3131,6 +3128,7 @@ class MyFrame(ConverterFrame):
         self.postAction(path)
         self.SetStatusText(printEncoding(prev.enc), 1)
         self.pre_suffix = prev.psuffix
+        PREVIOUS.pop()
         addPrevious(
             prev.action, prev.enc, text, self.pre_suffix, path, self.real_path[-1]
         )
@@ -3228,22 +3226,22 @@ class MyFrame(ConverterFrame):
             
         event.Skip()
             def onAbout(self, event):
-        text = '''SubtitleConverter\n\n\
-        Jednostavna wxPython aplikacija \n\
-        za konvertovanje srt i txt fajlova\n\
-        i transkripciju engleskih imena i pojmova.\n\n\
-        Program ima ove opcije:\n\
-        -Preslovljavanje latinice u ćirilicu i promena kodnog rasporeda. \n\
-        -Konvertovanje unikode u ANSI format.\n\
-        -Konvertovanje ANSI u unikode.\n\
-        -Default izlazni kodeci su cp1250, 1251 i utf-8.\n\
-        -Zamena engleskih imena u titlu odgovarajućim iz rečnika.\n\
-         Default izlazni kodek je UTF-8.\n\
-        -Mogućnost dodavanja novih definicija za transkripciju u rečnicima. \n\
-        -Program konvertuje titlove sa ćiriličnim pismom u latinicu.\n\n\
-        Autor: padovaSR\n\
-        https://github.com/padovaSR\n\
-        License: GNU GPL v2'''
+        text = (f"SubtitleConverter\n\n"
+        f"Jednostavna wxPython aplikacija\n"
+        f"za konvertovanje srt i txt fajlova\n"
+        f"i transkripciju engleskih imena i pojmova.\n\n"
+        f"Program ima ove opcije:\n"
+        f"-Preslovljavanje latinice u ćirilicu i promena kodnog rasporeda.\n"
+        f"-Konvertovanje unikode u ANSI format.\n"
+        f"-Konvertovanje ANSI u unikode.\n"
+        f"-Default izlazni kodeci su cp1250, 1251 i utf-8.\n"
+        f"-Zamena engleskih imena u titlu odgovarajućim iz rečnika.\n"
+        f" Default enkoding je UTF-8.\n"
+        f"-Mogućnost dodavanja novih definicija za transkripciju u rečnicima.\n"
+        f"-Program konvertuje titlove sa ćiriličnim pismom u latinicu.\n\n"
+        f"Autor: padovaSR\n"
+        f"https://github.com/padovaSR\n"
+        f"License: GNU GPL v2")
         AboutDlg = wx.MessageDialog(
             self, text, f"SubtitleConverter {VERSION}", wx.OK | wx.ICON_INFORMATION
         )
