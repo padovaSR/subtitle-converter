@@ -5,7 +5,7 @@
 # Modified by padovaSR
 
 import os
-from os.path import basename, join 
+from os.path import basename, join, dirname, split, splitext
 import re
 import shutil
 import logging.config
@@ -187,6 +187,7 @@ class FilesRename(wx.Dialog):
         self.Layout()
         
         self.suffix = ".srt"
+        self.vid_suffix = ".mkv"
         
         self.button_CANCEL.Bind(wx.EVT_BUTTON, self.onCancel)
         self.button_OK.Bind(wx.EVT_BUTTON, self.renameFiles)
@@ -199,7 +200,8 @@ class FilesRename(wx.Dialog):
         self.text_2.Clear()
         sourcePath = self.dirPicker1.GetPath()
         fl,vl = listFiles(sourcePath, self.suffix)
-        new = newFiles(fl, vl, self.suffix) 
+        new = newFiles(fl, vl, self.suffix)
+        self.vid_suffix = splitext(vl[0])[1]
         try:
             for i in fl:
                 self.text_1.AppendText(f"{i}\n")
@@ -214,12 +216,20 @@ class FilesRename(wx.Dialog):
         ''''''
         renamed.clear()
         n = self.text_2.GetNumberOfLines()
+        if n > 1:
+            pl_name = f"{split(dirname(l_subs[0]))[1]}.m3u"
+            pl_file = join(dirname(l_subs[0]), pl_name)
+            with open(pl_file, "w", encoding="utf-8") as f:
+                f.write(f"#{basename(pl_file)[:-4]} Playlist\n")            
         for i in range(0, n):
             try:
                 line = self.text_2.GetLineText(i)
                 new_name = join(os.path.dirname(l_subs[i]), line)
                 shutil.move(l_subs[i], new_name)
                 renamed.append(f"{line}\n")
+                if n > 2:
+                    with open(pl_file, "a", encoding="utf-8") as f:
+                        f.write(f"{splitext(line)[0]}{self.vid_suffix}\n")                
                 logger.debug(f"{basename(l_subs[i])} -> {line}")
             except Exception as e:
                 logger.debug(f"{e}")
