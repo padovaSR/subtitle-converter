@@ -311,10 +311,8 @@ class MyFrame(ConverterFrame):
         tpath = message
         if type(tpath) is list:
             tpath = tpath[-1]
-        enc = msg[1]
-
+        # enc = msg[1]
         self.real_dir = os.path.dirname("".join(rlPath))
-
         self.real_path = [rlPath]
         
     def updateUI(self):
