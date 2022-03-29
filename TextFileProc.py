@@ -197,10 +197,9 @@ def normalizeText(code_in, path, data):
         error = 'surrogatepass'
     if path:
         with open(path, "rb") as f: content = f.read()
-        s = "аеио"
         if code_in == "windows-1251":
             c = 0
-            for i in s:
+            for i in "аеио":
                 if content.find(i.encode("cp1251")) < 0:
                     c += 1
                     code_in = "windows-1250"
