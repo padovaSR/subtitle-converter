@@ -199,8 +199,8 @@ def normalizeText(code_in, path, data):
         with open(path, "rb") as f: content = f.read()
         if code_in == "windows-1251":
             c = 0
-            for i in "аеио":
-                if content.find(i.encode("cp1251")) < 0:
+            for i in "аеио".encode("cp1251"):
+                if content.find(i) < 0:
                     c += 1
                     code_in = "windows-1250"
             if c > 0:
