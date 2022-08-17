@@ -81,8 +81,8 @@ class TreeDialog(wx.Dialog):
         self.chbox_4.SetValue(1)
         szr_3.Add(self.chbox_4, 0, wx.ALL | wx.EXPAND, 5)
 
-        tID = wx.NewIdRef()
-        self.tree = wx.TreeCtrl(self, tID)
+        # tID = wx.NewIdRef()
+        self.tree = wx.TreeCtrl(self, wx.ID_ANY)
 
         self.tree.SetMinSize((315, 200))
         self.tree.SetToolTip("Struktura foldera")
