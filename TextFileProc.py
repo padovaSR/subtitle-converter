@@ -451,7 +451,7 @@ def cleanUp(text_in):
     RL = re.compile(
         r"\d+\n\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}(?=\n\s*\d+\n*?)"
     )
-
+    r_dash = re.compile(r"^\s*-\s*$", re.M)
     # def opFile(in_text):
     # return in_text.replace(']:', ']').replace('):', ')').replace('}:', '}').replace('  ', ' ')
 
@@ -470,7 +470,8 @@ def cleanUp(text_in):
         fp13 = reg_S9.sub("\n", fp11)
         fp13 = RL.sub("\n", fp13)
         fp14 = regN.sub('', fp13)
-        fp15 = reg8a.sub('', fp14)
+        fp14a = r_dash.sub('', fp14)
+        fp15 = reg8a.sub('', fp14a)
 
         return fp15
 
