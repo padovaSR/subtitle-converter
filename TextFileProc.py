@@ -547,6 +547,7 @@ def rm_dash(text_in):
             cb5_s = ex['crtice_sp']
             cb6_s = ex['spejsevi']
             cb7_s = ex['kolor']
+            cb_nl = ex['breaks']
             cb8_s = ex['nuliranje']
     except IOError as e:
         logger.debug("FixSubtitle, I/O error({0}): {1}".format(e.errno, e.strerror))
@@ -621,7 +622,17 @@ def rm_dash(text_in):
 
     if cb3_s is True:
         text = remSel(text, ct_r, "")
-
+        
+    if cb_nl is True:
+        subs = list(srt.parse(text, ignore_errors=True))
+        new_s = []
+        for i in subs:
+            t = i.content
+            if re.search(r"\n(?=[a-zA-Z -])", t, re.M):
+                t = t.replace("\n", " ")
+            new_s.append(srt.Subtitle(i.index, i.start, i.end, t))
+        text = srt.compose(new_s)
+            
     if cb8_s is True:
         if not cb1_s:
             try:
