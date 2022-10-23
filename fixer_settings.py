@@ -104,6 +104,12 @@ class FixerSettings(wx.Dialog):
         )
         self.cbx_2.SetMinSize((46, 15))
         sizer_1.Add(self.cbx_2, 0, wx.EXPAND | wx.LEFT | wx.TOP, 5)
+        
+        self.cbx_nl = wx.CheckBox(
+            self, wx.ID_ANY, "Ukloni nove linije u tekstu (new line '\\n')", style=wx.CHK_2STATE
+        )
+        self.cbx_nl.SetMinSize((46, 15))
+        sizer_1.Add(self.cbx_nl, 0, wx.EXPAND | wx.LEFT | wx.TOP, 5)        
 
         self.cbx_1 = wx.CheckBox(
             self, wx.ID_ANY, "Nuliranje vremena celog titla", style=wx.CHK_2STATE
@@ -122,6 +128,7 @@ class FixerSettings(wx.Dialog):
                 ) as sp: data = pickle.load(sp)
                 ex = data['key1']
                 self.cbx_1.SetValue(ex["nuliranje"])
+                self.cbx_nl.SetValue(ex["breaks"])
                 self.cbx_2.SetValue(ex["kolor"])
                 self.cbx_3.SetValue(ex["italik"])
                 self.cbx_4.SetValue(ex["spejsevi"])
@@ -185,6 +192,7 @@ class FixerSettings(wx.Dialog):
         ## cbx_4=Suvišni spejsevicbx_3=Suvišni italik tagovi, cbx_2=Kolor tagovi, cbx_1=Nuliranje
         sdict = {
             'nuliranje': self.cbx_1.GetValue(),
+            'breaks': self.cbx_nl.GetValue(),
             'kolor': self.cbx_2.GetValue(),
             'italik': self.cbx_3.GetValue(),
             'spejsevi': self.cbx_4.GetValue(),
