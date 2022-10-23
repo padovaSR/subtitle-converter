@@ -106,7 +106,7 @@ class FixerSettings(wx.Dialog):
         sizer_1.Add(self.cbx_2, 0, wx.EXPAND | wx.LEFT | wx.TOP, 5)
         
         self.cbx_nl = wx.CheckBox(
-            self, wx.ID_ANY, "Ukloni nove linije u tekstu (new line '\\n')", style=wx.CHK_2STATE
+            self, wx.ID_ANY, "Ukloni prelom redova u tekstu (line-breaks '\\n')", style=wx.CHK_2STATE
         )
         self.cbx_nl.SetMinSize((46, 15))
         sizer_1.Add(self.cbx_nl, 0, wx.EXPAND | wx.LEFT | wx.TOP, 5)        
