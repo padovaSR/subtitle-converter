@@ -83,4 +83,3 @@ FILE_SETTINGS=defaultdict(str)
 
 with open(os.path.join("resources", "var", "dialog_settings.db.dat"), "rb") as f:
     FILE_SETTINGS.update(pickle.load(f))
-print("FS: ", FILE_SETTINGS)
