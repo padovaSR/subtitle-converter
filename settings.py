@@ -68,8 +68,9 @@ def preSuffix():
     with open(os.path.join("resources", "var", "m_extensions.pkl"), "rb") as f:
         value_m = pickle.load(f)  #  Merger suffix
 
-    with open(os.path.join('resources', 'var', 'tcf.pkl'), 'rb') as tf:
-        oformat = pickle.load(tf)  # TXT suffix
+    with open(os.path.join('resources', 'var', 'dialog_settings.db.dat'), 'rb') as tf:
+        data = pickle.load(tf)
+        oformat = data["utf8_txt"]# TXT suffix
 
     return [added, value2_s, value5_s, value_m, oformat, ex]
 
