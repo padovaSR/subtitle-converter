@@ -1335,8 +1335,7 @@ def displayError(text, tctrl, rdir, path, new_enc, multi=False):
 
 def showMeError(infile, in_text, outfile, kode):
 
-    with open(os.path.join('resources', 'var', 'fixer_cb3.data'), 'rb') as f:
-        cb3_s = pickle.load(f)
+    cb3_s = FILE_SETTINGS["ShowLog"]
 
     subs = list(srt.parse(in_text, ignore_errors=True))
 
