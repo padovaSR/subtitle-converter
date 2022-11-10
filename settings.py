@@ -70,8 +70,9 @@ def preSuffix():
 
     with open(os.path.join('resources', 'var', 'dialog_settings.db.dat'), 'rb') as tf:
         data = pickle.load(tf)
-        oformat = data["Preferences"]["utf8_txt"]# TXT suffix
-
+        try:
+            oformat = data["Preferences"]["utf8_txt"]# TXT suffix
+        except: oformat = False
     return [added, value2_s, value5_s, value_m, oformat, ex]
 
 name_data = preSuffix()
@@ -82,3 +83,4 @@ FILE_SETTINGS=defaultdict(str)
 
 with open(os.path.join("resources", "var", "dialog_settings.db.dat"), "rb") as f:
     FILE_SETTINGS.update(pickle.load(f))
+print("FS: ", FILE_SETTINGS)
