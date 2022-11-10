@@ -1335,7 +1335,7 @@ def displayError(text, tctrl, rdir, path, new_enc, multi=False):
 
 def showMeError(infile, in_text, outfile, kode):
 
-    cb3_s = FILE_SETTINGS["ShowLog"]
+    cb3_s = FILE_SETTINGS["Preferences"]["ShowLog"]
 
     subs = list(srt.parse(in_text, ignore_errors=True))
 
