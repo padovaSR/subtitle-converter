@@ -738,17 +738,18 @@ class ConverterFrame(wx.Frame):
         sizer_1.Add(self.text_1, 1, wx.ALL | wx.EXPAND, 3)
 
         self.panel_1.SetSizer(sizer_1)
-
-        menu_dict = FILE_SETTINGS["Preferences"]
-
-        if menu_dict["bom_utf8"] is True:
-            self.preferences.Check(1011, check=True)
-        if menu_dict["utf8_txt"] is True:
-            self.preferences.Check(1012, check=True)
-        if menu_dict["ShowLog"] is True:
-            self.preferences.Check(1013, check=True)
-        if menu_dict["preprocess"] is True:
-            self.preferences.Check(1014, check=True)
+        try:
+            menu_dict = FILE_SETTINGS["Preferences"]
+            if menu_dict["bom_utf8"] is True:
+                self.preferences.Check(1011, check=True)
+            if menu_dict["utf8_txt"] is True:
+                self.preferences.Check(1012, check=True)
+            if menu_dict["ShowLog"] is True:
+                self.preferences.Check(1013, check=True)
+            if menu_dict["preprocess"] is True:
+                self.preferences.Check(1014, check=True)
+        except Exception as e:
+            logger.debug(f"{e}")
 
         self.Layout()
 
