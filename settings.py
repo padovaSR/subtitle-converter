@@ -79,7 +79,6 @@ name_data = preSuffix()
 # shelve : key1=fixer, key2=merger, key3=PATHs, key4=font_data, key5=files_settings
 
 FILE_SETTINGS=defaultdict(str)
-pl = ["utf8_txt", "bom_utf8", "preprocess", "ShowLog" ]
 
 with open(os.path.join("resources", "var", "dialog_settings.db.dat"), "rb") as f:
     FILE_SETTINGS.update(pickle.load(f))
