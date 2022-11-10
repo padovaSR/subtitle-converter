@@ -2843,15 +2843,16 @@ class MyFrame(ConverterFrame):
     def onPreferences(self, event):
 
         ''''''
-        FILE_SETTINGS["Preferences"] = {
-            "utf8_txt": self.preferences.IsChecked(1012),
-            "bom_utf8": self.preferences.IsChecked(1011),
-            "preprocess": self.preferences.IsChecked(1014),
-            "ShowLog": self.preferences.IsChecked(1013),
-        }
+        if event.Id in [1011, 1012, 1013, 1014]:
+            FILE_SETTINGS["Preferences"] = {
+                "utf8_txt": self.preferences.IsChecked(1012),
+                "bom_utf8": self.preferences.IsChecked(1011),
+                "preprocess": self.preferences.IsChecked(1014),
+                "ShowLog": self.preferences.IsChecked(1013),
+            }
 
-        with open(join("resources", "var", "dialog_settings.db.dat"), "wb") as f:
-            pickle.dump(FILE_SETTINGS, f)        
+            with open(join("resources", "var", "dialog_settings.db.dat"), "wb") as f:
+                pickle.dump(FILE_SETTINGS, f)
         
         event.Skip()
 
