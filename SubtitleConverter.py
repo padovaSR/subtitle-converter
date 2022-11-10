@@ -94,7 +94,7 @@ logging.config.fileConfig(
 logger = logging.getLogger(__name__)
 
 
-VERSION = "v0.5.9.0_a24"
+VERSION = "v0.5.9.0_a25"
 
 
 class MyFrame(ConverterFrame):
@@ -218,10 +218,7 @@ class MyFrame(ConverterFrame):
         self.Bind(wx.EVT_MENU, self.onCyrToUTF, id=self.cyr_to_utf.GetId())
         self.Bind(wx.EVT_MENU, self.onMergeLines, id=self.merger.GetId())
         #############################################################################################
-        self.Bind(wx.EVT_MENU, self.onPreferences, id=1011)
-        self.Bind(wx.EVT_MENU, self.onPreferences, id=1012)
-        self.Bind(wx.EVT_MENU, self.onPreferences, id=1013)
-        self.Bind(wx.EVT_MENU, self.onPreferences, id=1014)
+        for menu_id in range(1011, 1015): self.Bind(wx.EVT_MENU, self.onPreferences, id=menu_id)        
         self.Bind(wx.EVT_MENU, self.editShortcuts, id=self.shortcuts.GetId())
         self.Bind(wx.EVT_MENU, self.onAbout, id = self.about.GetId())
         self.Bind(wx.EVT_MENU, self.onManual, id=self.manual.GetId())
@@ -2844,9 +2841,8 @@ class MyFrame(ConverterFrame):
         event.Skip()
 
     def onPreferences(self, event):
-
         ''''''
-        if event.Id in [1011, 1012, 1013, 1014]:
+        if event.Id in range(1011, 1015):
             FILE_SETTINGS["Preferences"] = {
                 "utf8_txt": self.preferences.IsChecked(1012),
                 "bom_utf8": self.preferences.IsChecked(1011),
