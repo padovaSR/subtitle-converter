@@ -218,7 +218,10 @@ class MyFrame(ConverterFrame):
         self.Bind(wx.EVT_MENU, self.onCyrToUTF, id=self.cyr_to_utf.GetId())
         self.Bind(wx.EVT_MENU, self.onMergeLines, id=self.merger.GetId())
         #############################################################################################
-        self.Bind(wx.EVT_MENU, self.onPreferences, id=-1)
+        self.Bind(wx.EVT_MENU, self.onPreferences, id=1011)
+        self.Bind(wx.EVT_MENU, self.onPreferences, id=1012)
+        self.Bind(wx.EVT_MENU, self.onPreferences, id=1013)
+        self.Bind(wx.EVT_MENU, self.onPreferences, id=1014)
         self.Bind(wx.EVT_MENU, self.editShortcuts, id=self.shortcuts.GetId())
         self.Bind(wx.EVT_MENU, self.onAbout, id = self.about.GetId())
         self.Bind(wx.EVT_MENU, self.onManual, id=self.manual.GetId())
