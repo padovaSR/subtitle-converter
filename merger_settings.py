@@ -63,9 +63,9 @@ class Settings(wx.Dialog):
         self.button_1 = wx.Button(self, wx.ID_CLOSE, "")
         self.button_2 = wx.Button(self, wx.ID_SAVE, "")
 
-        # with open(os.path.join('resources','var','dialog_settings.db.dat'), "rb") as sp:
-        # p = pickle.load(sp)
-        # ex = p['key2']
+        #with open(os.path.join('resources','var','dialog_settings.db.dat'), "rb") as sp:
+            #p = pickle.load(sp)
+        #ex = p['key2']
         try:
             ex = FILE_SETTINGS["key2"]
             lineLenght = ex['l_lenght']
@@ -188,30 +188,29 @@ class Settings(wx.Dialog):
 
     def onSaveSettings(self, event):
         ''''''
-        line_Lenght = self.spin_ctrl_1.GetValue()
-        max_Char = self.spin_ctrl_2.GetValue()
-        max_Gap = self.spin_ctrl_3.GetValue()
-        file_suffix = self.tctrl_1.GetValue()
-
-        FILE_SETTINGS["key2"].update(
-            {
-                "l_lenght": line_Lenght,
-                "m_char": max_Char,
-                "m_gap": max_Gap,
-                "f_suffix": file_suffix,
+        FILE_SETTINGS["key2"]= {
+                "l_lenght": self.spin_ctrl_1.GetValue(),
+                "m_char": self.spin_ctrl_2.GetValue(),
+                "m_gap": self.spin_ctrl_3.GetValue(),
+                "f_suffix": self.tctrl_1.GetValue(),
             }
-        )
-        with open("os.path.join('resources', 'var', 'dialog_settings.db", "wb") as d:
+        
+        with open(os.path.join("resources", "var", "dialog_settings.db.dat"), "wb") as d:
             pickle.dump(FILE_SETTINGS, d)
 
-        name_data[3] = file_suffix
+        name_data[3] = self.tctrl_1.GetValue()
 
         with open(os.path.join("resources", "var", "m_extensions.pkl"), "wb") as f:
-            pickle.dump(file_suffix, f)
+            pickle.dump(self.tctrl_1.GetValue(), f)
 
-            self.Destroy()
+        self.Destroy()
+        
         event.Skip()
 
+    def getValues(self):
+        """"""
+        return FILE_SETTINGS["key2"]
+        
     def onCloseSettings(self, event):
         self.Destroy()
         event.Skip()
