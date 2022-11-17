@@ -18,12 +18,9 @@ class ConverterFrame(wx.Frame):
     def __init__(self, *args):
         wx.Frame.__init__(self, *args, style=wx.DEFAULT_FRAME_STYLE)
         try:
-            with open(
-                filePath("resources", "var", "set_size.pkl"), "rb"
-            ) as wf:
-                size_dict = pickle.load(wf)
-                w = size_dict["W"]
-                h = size_dict["H"]
+            size_dict = FILE_SETTINGS["FrameSize"]
+            w = size_dict["W"]
+            h = size_dict["H"]
             self.SetSize((w, h))
         except Exception as e:
             logger.debug(f"SetSize error: {e}")
