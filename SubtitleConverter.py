@@ -108,34 +108,20 @@ class MyFrame(ConverterFrame):
             (*.sub)|*.sub|Text File (*.txt)|*.txt|All Files (*.*)|*.*"
         )
 
-        with open(filePath('resources', 'var', 'dialog_settings.db.dat'), "rb") as s:
-            data = pickle.load(s)
-            ex = data['key4']
-            new_font = ex['new_font']
-            fontSize = int(ex['fontSize'])
-            fC = ex['fontColour']
-            bl = ex['weight']
-
-        if bl == 92:
-            weight = wx.FONTWEIGHT_BOLD
-        else:
-            weight = wx.FONTWEIGHT_NORMAL
-
+        ex = FILE_SETTINGS['key4']
+        
         self.text_1.SetFont(
             wx.Font(
-                fontSize,
+                ex['fontSize'],
                 wx.FONTFAMILY_DEFAULT,
                 wx.FONTSTYLE_NORMAL,
-                weight,
+                ex['weight'],
                 0,
-                new_font,
+                ex['new_font'],
             )
         )
         self.curFont = self.text_1.GetFont()
-        self.curClr = wx.Colour((fC[0], fC[1], fC[2], fC[3]))
-        self.text_1.SetForegroundColour(self.curClr)
-        self.text_1.SetFont(self.curFont)
-        self.curClr = self.text_1.GetForegroundColour()
+        self.curClr = wx.Colour(ex['fontColour'])
         self.updateUI()
 
         self.dont_show = False
@@ -315,34 +301,9 @@ class MyFrame(ConverterFrame):
         self.real_path = [rlPath]
         
     def updateUI(self):
-        self.curClr = wx.BLACK
-        with open(filePath('resources', 'var', 'dialog_settings.db.dat'), "rb") as s:
-            data = pickle.load(s)
-            ex = data['key4']
-            new_font = ex['new_font']
-            fontSize = int(ex['fontSize'])
-            fC = ex['fontColour']
-            bl = ex['weight']
-
-        if bl == 92:
-            weight = wx.FONTWEIGHT_BOLD
-        else:
-            weight = wx.FONTWEIGHT_NORMAL
-
-        self.text_1.SetFont(
-            wx.Font(
-                fontSize,
-                wx.FONTFAMILY_DEFAULT,
-                wx.FONTSTYLE_NORMAL,
-                weight,
-                0,
-                new_font,
-            )
-        )
-
-        self.curClr = wx.Colour((fC[0], fC[1], fC[2], fC[3]))
         self.text_1.SetFont(self.curFont)
         self.text_1.SetForegroundColour(self.curClr)
+        self.Layout()
     
     def updateText(self, message):
         """"""
@@ -2915,17 +2876,25 @@ class MyFrame(ConverterFrame):
             data = dlg.GetFontData()
             font = data.GetChosenFont()
             colour = data.GetColour()
-            bld = font.GetWeight()
-            logger.debug(
-                'Selected font: "%s", %d points, color %s'
-                % (font.GetFaceName(), font.GetPointSize(), colour.Get())
-            )
-
+            winf = font.GetWeight()
+            logger.debug(f"Selected font: {font.GetFaceName()}, {font.GetPointSize()} points, colour {colour.Get()}")
+            
+            FontWeights = {
+                300: wx.FONTWEIGHT_LIGHT,
+                400: wx.FONTWEIGHT_NORMAL,
+                500: wx.FONTWEIGHT_MEDIUM,
+                600: wx.FONTWEIGHT_SEMIBOLD,
+                700: wx.FONTWEIGHT_BOLD,
+            }            
+            if winf in FontWeights:
+                font_weight = FontWeights[winf]
+            else:
+                font_weight = wx.FONTWEIGHT_NORMAL
             fdict = {
                 'new_font': font.GetFaceName(),
                 'fontSize': font.GetPointSize(),
                 'fontColour': colour.Get(),
-                'weight': bld,
+                'weight': font_weight,
             }
 
             FILE_SETTINGS["key4"].update(fdict)
@@ -2936,9 +2905,8 @@ class MyFrame(ConverterFrame):
                 pickle.dump(FILE_SETTINGS, s)
 
             self.curFont = font
-            self.curClr = colour
+            self.curClr = fdict["fontColour"]
             self.updateUI()
-            # Don't destroy the dialog until you get everything you need from the dialog
         dlg.Destroy()
         event.Skip()
 
