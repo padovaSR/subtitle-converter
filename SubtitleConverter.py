@@ -111,7 +111,6 @@ class MyFrame(ConverterFrame):
 
         ex = FILE_SETTINGS['key4']
         try:
-                
             self.text_1.SetFont(
                 wx.Font(
                     ex['fontSize'],
@@ -156,8 +155,7 @@ class MyFrame(ConverterFrame):
         ###################################
 
         self.sc = {}
-        self.fsize = {}
-
+        
         self.filehistory = wx.FileHistory()
         self.filehistory.UseMenu(self.file_sub)
         self.filehistory.AddFilesToMenu()
@@ -2813,8 +2811,8 @@ class MyFrame(ConverterFrame):
 
     def onClose(self, event):
 
-        with open(filePath("resources", "var", "set_size.pkl"), "wb") as wf:
-            pickle.dump(self.fsize, wf)
+        with open(filePath("resources", "var", "dialog_settings.db.dat"), "wb") as wf:
+            pickle.dump(FILE_SETTINGS, wf)
 
         self.rwFileHistory(FILE_HISTORY)
 
@@ -2825,8 +2823,8 @@ class MyFrame(ConverterFrame):
 
     def onQuit(self, event):
         ''''''
-        with open(filePath("resources", "var", "set_size.pkl"), "wb") as wf:
-            pickle.dump(self.fsize, wf)
+        with open(filePath("resources", "var", "dialog_settings.db.dat"), "wb") as wf:
+            pickle.dump(FILE_SETTINGS, wf)
 
         self.rwFileHistory(FILE_HISTORY)
         if os.path.isfile(droppedText):
@@ -3023,9 +3021,8 @@ class MyFrame(ConverterFrame):
     def size_frame(self, event):
         """"""
         width, height = event.GetSize()
-
-        self.fsize["W"] = width
-        self.fsize["H"] = height
+        
+        FILE_SETTINGS["FrameSize"] = {"W": width, "H": height}
 
         event.Skip()
 
@@ -3443,7 +3440,6 @@ class MyApp(wx.App):
             "dialog_settings.db.dat",
             "m_extensions.pkl",
             "obsE.pkl",
-            "set_size.pkl",
         ]
         r_list = ["shortcut_keys.cfg", "Regex_def.config"]
         v_paths = [filePath("resources", "var", x) for x in v_list]
