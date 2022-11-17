@@ -38,14 +38,14 @@ from file_settings import FileSettings
 from merger_settings import Settings
 from fixer_settings import FixerSettings
 from merge import myMerger, FixSubGaps, ShrinkGap
-from interactive_replace import FindReplace 
+from interactive_replace import FindReplace
 from settings import BYTES_TEXT as BT
 from renamer import FilesRename
 from settings import (
     filePath,
     PREVIOUS,
     FILE_HISTORY,
-    WORK_TEXT, 
+    WORK_TEXT,
     FILE_SETTINGS,
     name_data,
     log_file_history,
@@ -78,7 +78,7 @@ from TextFileProc import (
     fileHandle,
     addPrevious,
     FileDrop,
-    shortcutsKey, 
+    shortcutsKey,
 )
 
 import logging
@@ -100,26 +100,30 @@ VERSION = "v0.5.9.0_a25"
 class MyFrame(ConverterFrame):
     def __init__(self, *args):
         ConverterFrame.__init__(self, *args)
-        
+
         self.SetTitle(f"SubtitleConverter {VERSION}")
 
         self.wildcard = (
-            "SubRip (*.zip; *.srt; *.txt)|*.zip;*.srt;*.txt|MicroDVD" "\
+            "SubRip (*.zip; *.srt; *.txt)|*.zip;*.srt;*.txt|MicroDVD"
+            "\
             (*.sub)|*.sub|Text File (*.txt)|*.txt|All Files (*.*)|*.*"
         )
 
         ex = FILE_SETTINGS['key4']
-        
-        self.text_1.SetFont(
-            wx.Font(
-                ex['fontSize'],
-                wx.FONTFAMILY_DEFAULT,
-                wx.FONTSTYLE_NORMAL,
-                ex['weight'],
-                0,
-                ex['new_font'],
+        try:
+                
+            self.text_1.SetFont(
+                wx.Font(
+                    ex['fontSize'],
+                    wx.FONTFAMILY_DEFAULT,
+                    wx.FONTSTYLE_NORMAL,
+                    ex['weight'],
+                    0,
+                    ex['new_font'],
+                )
             )
-        )
+        except:
+            pass
         self.curFont = self.text_1.GetFont()
         self.curClr = wx.Colour(ex['fontColour'])
         self.updateUI()
@@ -129,14 +133,14 @@ class MyFrame(ConverterFrame):
         self.multiFile = False
 
         self.bytesText = BytesIO()
-        
+
         self.utf8_latText = {}
 
         self.location = "tmp"
         self.cyrUTF = r""
         self.pre_suffix = r""
         self.newEnc = ""
-        
+
         self.tmpPath = []
         self.real_path = []
         self.real_dir = r""
@@ -146,7 +150,7 @@ class MyFrame(ConverterFrame):
         ## Undo-Redo ######################
         self.UNDO_A = []
         self.REDO_A = []
-        
+
         self.UndoText = []
         self.RedoText = []
         ###################################
@@ -204,14 +208,15 @@ class MyFrame(ConverterFrame):
         self.Bind(wx.EVT_MENU, self.onCyrToUTF, id=self.cyr_to_utf.GetId())
         self.Bind(wx.EVT_MENU, self.onMergeLines, id=self.merger.GetId())
         #############################################################################################
-        for menu_id in range(1011, 1015): self.Bind(wx.EVT_MENU, self.onPreferences, id=menu_id)        
+        for menu_id in range(1011, 1015):
+            self.Bind(wx.EVT_MENU, self.onPreferences, id=menu_id)
         self.Bind(wx.EVT_MENU, self.editShortcuts, id=self.shortcuts.GetId())
-        self.Bind(wx.EVT_MENU, self.onAbout, id = self.about.GetId())
+        self.Bind(wx.EVT_MENU, self.onAbout, id=self.about.GetId())
         self.Bind(wx.EVT_MENU, self.onManual, id=self.manual.GetId())
         self.Bind(wx.EVT_MENU, self.onFixerSettings, id=self.fixer.GetId())
         self.Bind(wx.EVT_MENU, self.onSelectFont, id=self.fonts.GetId())
         self.Bind(wx.EVT_MENU, self.onFileSettings, id=83)
-        self.Bind(wx.EVT_MENU, self.onMergerSettings, id=self.merger_pref.GetId())        
+        self.Bind(wx.EVT_MENU, self.onMergerSettings, id=self.merger_pref.GetId())
         ## TOOLBAR EVENTS ###########################################################################
         self.Bind(wx.EVT_TOOL, self.onOpen, id=1001)
         self.Bind(wx.EVT_TOOL, self.onSave, id=1010)
@@ -222,15 +227,22 @@ class MyFrame(ConverterFrame):
         self.Bind(wx.EVT_TOOL, self.onRepSpecial, id=1006)
         self.Bind(wx.EVT_TOOL, self.onCleanup, id=1007)
         self.Bind(wx.EVT_TOOL, self.onQuit, id=1008)
-        self.searchCtrl1.Bind(wx.EVT_SEARCHCTRL_SEARCH_BTN, self.searchText, id=self.searchCtrl1.GetId())
-        self.searchCtrl1.Bind(wx.EVT_TEXT, self.searchChange, id=self.searchCtrl1.GetId())
+        self.searchCtrl1.Bind(
+            wx.EVT_SEARCHCTRL_SEARCH_BTN, self.searchText, id=self.searchCtrl1.GetId()
+        )
+        self.searchCtrl1.Bind(
+            wx.EVT_TEXT, self.searchChange, id=self.searchCtrl1.GetId()
+        )
         ## Events other #############################################################################
         self.text_1.Bind(wx.EVT_TEXT, self.removeFiles, id=-1, id2=wx.ID_ANY)
         self.text_1.Bind(wx.EVT_TEXT, self.writeText, self.text_1)
         # self.text_1.Bind(wx.EVT_LEFT_DOWN, self.newText, id=wx.ID_ANY)
         self.text_1.Bind(wx.EVT_TEXT, self.newText, id=wx.ID_ANY)
         self.Bind(
-            wx.EVT_MENU_RANGE, self.onFileHistory, id=wx.ID_FILE1, id2=wx.ID_FILE9,
+            wx.EVT_MENU_RANGE,
+            self.onFileHistory,
+            id=wx.ID_FILE1,
+            id2=wx.ID_FILE9,
         )
         self.comboBox1.Bind(wx.EVT_COMBOBOX, self.onChoice, id=-1, id2=wx.ID_ANY)
         self.Bind(wx.EVT_MENU, self.toCyrUTF8, id=82)
@@ -251,23 +263,24 @@ class MyFrame(ConverterFrame):
         self.text_1.SetDropTarget(dt)
         ##=========================================================================================##
         FILE_SETTINGS["CB_value"] = self.comboBox1.GetValue()
-        
+
         for i in FILE_HISTORY:
             if os.path.isfile(i):
                 self.filehistory.AddFileToHistory(i)
-            else: FILE_HISTORY.remove(i)
+            else:
+                FILE_HISTORY.remove(i)
         ##=========================================================================================##
         self.disableTool()
 
         dispatcher.connect(self.updateStatus, signal="TMP_PATH", sender=dispatcher.Any)
         dispatcher.connect(self.enKode, signal="TMP_PATH", sender=dispatcher.Any)
         dispatcher.connect(self.updateText, signal="DIALOG", sender=dispatcher.Any)
-        
+
     def updateStatus(self, message, msg):
         ''''''
         self.enableTool()
         self.clearUndoRedo()
-        
+
         if msg[2] is True:
             self.multiFile = True
             self.SetStatusText('Multiple files ready for processing')
@@ -277,7 +290,7 @@ class MyFrame(ConverterFrame):
             enc = printEncoding(msg[1])
             if type(path) is list:
                 path = path[-1]
-            self.filehistory.AddFileToHistory(FILE_HISTORY[len(FILE_HISTORY)-1])
+            self.filehistory.AddFileToHistory(FILE_HISTORY[len(FILE_HISTORY) - 1])
             self.SetStatusText(baseName(path))
             self.SetStatusText(enc, 1)
             self.tmpPath = [path]
@@ -299,20 +312,20 @@ class MyFrame(ConverterFrame):
         # enc = msg[1]
         self.real_dir = os.path.dirname("".join(rlPath))
         self.real_path = [rlPath]
-        
+
     def updateUI(self):
         self.text_1.SetFont(self.curFont)
         self.text_1.SetForegroundColour(self.curClr)
         self.Layout()
-    
+
     def updateText(self, message):
         """"""
         text = WORK_TEXT.getvalue()
         self.text_1.SetValue(text)
         for x in set(message):
-            ctext = re.compile(r"\b"+x+r"\b")
+            ctext = re.compile(r"\b" + x + r"\b")
             for m in re.finditer(ctext, self.text_1.GetValue()):
-                self.text_1.SetStyle(m.start(), m.end(), wx.TextAttr(wx.RED, wx.YELLOW))        
+                self.text_1.SetStyle(m.start(), m.end(), wx.TextAttr(wx.RED, wx.YELLOW))
                 self.text_1.SetInsertionPoint(m.end())
 
     def enableTool(self):
@@ -326,8 +339,9 @@ class MyFrame(ConverterFrame):
             self.frame_toolbar.EnableTool(i, True)
 
         for i in self.menu_items:
-            if not i.IsEnabled(): i.Enable(True)
-            
+            if not i.IsEnabled():
+                i.Enable(True)
+
         if PREVIOUS:
             self.reload.Enable(True)
             if PREVIOUS[0].action == "toCYR":
@@ -343,7 +357,7 @@ class MyFrame(ConverterFrame):
                             self.save.Enable()
                             self.save_as.Enable()
                             self.frame_toolbar.EnableTool(1010, True)  ## 1010=Save
-                            
+
     def disableTool(self):
 
         self.frame_toolbar.EnableTool(wx.ID_CLOSE, False)
@@ -365,8 +379,10 @@ class MyFrame(ConverterFrame):
             self.reloadtext,
         ]
 
-        for i in new_items: i.Enable(False)
-        for t in self.menu_items: t.Enable(False)
+        for i in new_items:
+            i.Enable(False)
+        for t in self.menu_items:
+            t.Enable(False)
 
     def multipleTools(self):
 
@@ -380,7 +396,7 @@ class MyFrame(ConverterFrame):
             self.cyr_to_utf,
             self.export_zip,
             self.to_ansi,
-            self.fixer, 
+            self.fixer,
         ]:
             i.Enable(True)
 
@@ -392,13 +408,14 @@ class MyFrame(ConverterFrame):
 
         for i in [wx.ID_SAVE, wx.ID_SAVEAS, wx.ID_CLOSE]:
             self.menubar1.Enable(i, True)
-        
+
         for i in [self.reload, self.undo_action, self.redo_action, self.reloadtext]:
             i.Enable(True)
 
         self.frame_toolbar.EnableTool(1010, True)  # Save
 
-        if not self.REDO_A: self.redo_action.Enable(False)
+        if not self.REDO_A:
+            self.redo_action.Enable(False)
 
         if (
             any([PREVIOUS[-1].action == x for x in ("toCYR", "toCyrUTF8")])
@@ -411,7 +428,7 @@ class MyFrame(ConverterFrame):
         """"""
         tval = self.text_1.GetValue()
         if not all([self.real_path, PREVIOUS]):
-            if not tval.startswith('Files ') and self.UndoText and len(tval)> 40:
+            if not tval.startswith('Files ') and self.UndoText and len(tval) > 40:
                 try:
                     text = self.text_1.GetValue()
                     place = self.text_1.GetInsertionPoint()
@@ -438,7 +455,7 @@ class MyFrame(ConverterFrame):
                 except Exception as e:
                     logger.debug(f"newText: {e}")
         event.Skip()
-        
+
     def getMultipleFiles(self, event):
         '''openMulti event'''
         dlg = MultiFiles(None)
@@ -446,7 +463,7 @@ class MyFrame(ConverterFrame):
             self.tmpPath.clear()
             self.real_path.clear()
             PREVIOUS.clear()
-            self.clearUndoRedo()            
+            self.clearUndoRedo()
             MultipleFiles = dlg.GetSelectedFiles()
             if len(MultipleFiles) == 1:
                 real_path = "".join(MultipleFiles)
@@ -474,7 +491,7 @@ class MyFrame(ConverterFrame):
                 self.tmpPath.append(l.tpath)
                 self.SetStatusText(baseName(l.tpath))
                 self.SetStatusText(printEncoding(l.enc), 1)
-                self.enableTool()                
+                self.enableTool()
         else:
             dlg.Destroy()
         event.Skip()
@@ -485,7 +502,7 @@ class MyFrame(ConverterFrame):
         if not tval.startswith('Files ') and len(tval) > 0 and not PREVIOUS:
             if self.ShowDialog() is False:
                 return
-        
+
         dlgOpen = wx.FileDialog(
             self,
             "Otvori novi fajl",
@@ -509,7 +526,7 @@ class MyFrame(ConverterFrame):
             dlgOpen.Destroy()
 
             fileHandle(filepath, self.text_1)
-            
+
             ## Open multiple files
             if BT:
                 self.real_path.clear()
@@ -525,16 +542,16 @@ class MyFrame(ConverterFrame):
                 self.SetStatusText(baseName(l.tpath))
                 self.SetStatusText(printEncoding(l.enc), 1)
                 self.enableTool()
-                
+
         event.Skip()
 
     def onReload(self, event):
-        
+
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and not PREVIOUS:
             if self.ShowDialog() is False:
                 return
-        
+
         if PREVIOUS:
             if zipfile.is_zipfile(self.real_path[0]):
                 zfile = zipfile.ZipFile(self.real_path[0])
@@ -555,19 +572,19 @@ class MyFrame(ConverterFrame):
                     self.real_path.append(self.fromPrevious("Open")[5])
                 self.enableTool()
                 logger.debug(f'Reloaded {baseName(path)}, encoding: {enc}')
-                self.SetStatusText(printEncoding(enc), 1)        
+                self.SetStatusText(printEncoding(enc), 1)
             else:
                 self.reload.Enable(False)
                 return
         event.Skip()
-        
+
     def onReloadText(self, event):
         ''''''
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and not PREVIOUS:
             if self.ShowDialog() is False:
                 return
-        
+
         if PREVIOUS:
             path = self.fromPrevious("Open")[4]
             if os.path.isfile(droppedText):
@@ -582,10 +599,10 @@ class MyFrame(ConverterFrame):
                 enc = self.fromPrevious("Open")[1]
                 self.text_1.SetValue(text)
                 bufferText(text, WORK_TEXT)
-                
-            self.REDO_A.clear() 
+
+            self.REDO_A.clear()
             logger.debug(f'Text reloaded from: {baseName(path)}; {enc}')
-            
+
             self.SetStatusText(printEncoding(enc), 1)
             self.clearUndoRedo()
             addPrevious("Open", enc, text, self.pre_suffix, path, self.real_path[-1])
@@ -593,17 +610,20 @@ class MyFrame(ConverterFrame):
         event.Skip()
 
     def onSave(self, event):
-        
+
         tpath, enc = self.PathEnc()
         if tpath and enc:
             fname, nsuffix = newName(tpath, self.pre_suffix)
             # Puna putanja sa imenom novog fajla
             outpath = nameDialog(fname, nsuffix, self.real_dir)
             if outpath:
-                if self.text_1.IsModified(): text = self.text_1.GetValue()
-                else: text = WORK_TEXT.getvalue()
-                if not text: text = self.fromPrevious("Open")[2]
-                
+                if self.text_1.IsModified():
+                    text = self.text_1.GetValue()
+                else:
+                    text = WORK_TEXT.getvalue()
+                if not text:
+                    text = self.fromPrevious("Open")[2]
+
                 v = writeToFile(text, outpath, enc, ask=True)
                 if os.path.isfile(outpath) and v is True:
                     logger.debug(f"File saved: {outpath}")
@@ -612,11 +632,11 @@ class MyFrame(ConverterFrame):
                         self,
                         "Fajl je uspešno sačuvan\n{}".format(fpath),
                         'SubtitleConverter',
-                        wx.OK | wx.ICON_INFORMATION
+                        wx.OK | wx.ICON_INFORMATION,
                     )
                     sDlg.ShowModal()
                     FILE_HISTORY.append(outpath)
-                    self.filehistory.AddFileToHistory(outpath)                
+                    self.filehistory.AddFileToHistory(outpath)
                     self.reload.Enable(True)
                     self.reloadtext.Enable(True)
                     self.SetStatusText(baseName(outpath))
@@ -631,7 +651,7 @@ class MyFrame(ConverterFrame):
         event.Skip()
 
     def onSaveAs(self, event):
-        
+
         sas_wildcard = "SubRip (*.srt)|*.srt|MicroDVD (*.sub)|*.sub|Text File\
         (*.txt)|*.txt|All Files (*.*)|*.*"
         real_dir = self.real_dir
@@ -657,18 +677,19 @@ class MyFrame(ConverterFrame):
         dlg.SetFilename(fname)
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
-            if self.text_1.IsModified(): text = self.text_1.GetValue()
-            else: text = WORK_TEXT.getvalue()
-            if not text: text = text = self.fromPrevious("Open")[2]
-            
+            if self.text_1.IsModified():
+                text = self.text_1.GetValue()
+            else:
+                text = WORK_TEXT.getvalue()
+            if not text:
+                text = text = self.fromPrevious("Open")[2]
+
             v = writeToFile(text, path, self.newEnc, multi=False)
             if os.path.isfile(path) and v is True:
                 logger.debug(f"File saved sucessfully. {path}")
                 sDlg = wx.MessageDialog(
                     self,
-                    'Fajl je uspešno sačuvan\n{}'.format(
-                        baseName(path)
-                    ),
+                    'Fajl je uspešno sačuvan\n{}'.format(baseName(path)),
                     'SubtitleConverter',
                     wx.OK | wx.ICON_INFORMATION,
                 )
@@ -682,66 +703,73 @@ class MyFrame(ConverterFrame):
 
     def toCyrillic(self, event):
 
-        with open(
-            filePath("resources", "var", "dialog_settings.db.dat"), "rb"
-        ) as sp:
+        with open(filePath("resources", "var", "dialog_settings.db.dat"), "rb") as sp:
             data = pickle.load(sp)
             ex = data['key5']
             value1_s = ex['cyr_ansi_srt']
             value2_s = ex['cyr_utf8_txt']
-        
+
         tval = self.text_1.GetValue()
-        if not tval.startswith('Files ') and len(tval)> 0 and not PREVIOUS:
+        if not tval.startswith('Files ') and len(tval) > 0 and not PREVIOUS:
             if self.ShowDialog() is False:
                 return
-        
+
         path, entered_enc = self.PathEnc()
-        
-        if self.preferences.IsChecked(1011):  
+
+        if self.preferences.IsChecked(1011):
             utf8_enc = 'utf-8-sig'
-        else: utf8_enc = 'utf-8'        
-        
+        else:
+            utf8_enc = 'utf-8'
+
         if len(BT) >= 1:
             self.multipleTools()
             self.toCyrillic_multiple()
 
         else:
-            if self.text_1.IsModified(): text = self.text_1.GetValue()
-            else: text = WORK_TEXT.getvalue()
-            
+            if self.text_1.IsModified():
+                text = self.text_1.GetValue()
+            else:
+                text = WORK_TEXT.getvalue()
+
             self.newEnc = 'windows-1251'
             self.pre_suffix = value1_s
-            
+
             self.utf8_latText[baseName(path)] = (
                 remTag(text)
                 .encode(encoding="utf-8", errors="surrogatepass")
                 .replace(b"\n", b"\r\n")
             )
-            if text: text = text.replace('?', '¬')
+            if text:
+                text = text.replace('?', '¬')
 
             utf_name, suffix = newName(path, value2_s, multi=False)
             utf_path = filePath(self.real_dir, (utf_name + suffix))
-            
+
             pvalue = self.preferences.IsChecked(1014)
-            if pvalue is True: text = preLatin(text_in=text)
-            
+            if pvalue is True:
+                text = preLatin(text_in=text)
+
             text, msg = ConvertText(text).changeLetters(preProc=pvalue)
-            
+
             cyr_path = path
             self.cyrUTF = utf_path
-            
+
             writeToFile(text, utf_path, utf8_enc, ask=True)
-            
+
             text_ansi = ConvertText(text).toCyrANSI(self.newEnc)
-            
+
             error_text = checkFile(path, cyr_path, text_ansi)
             text_ansi = displayError(
-                text, self.text_1, self.real_dir, path, self.newEnc,
+                text,
+                self.text_1,
+                self.real_dir,
+                path,
+                self.newEnc,
             )
-            
+
             bufferText(text_ansi, WORK_TEXT)
             self.bytesToBuffer(text_ansi, self.newEnc)
-            
+
             if error_text:
                 ErrorDlg = wx.MessageDialog(
                     self,
@@ -750,7 +778,7 @@ class MyFrame(ConverterFrame):
                     wx.OK | wx.ICON_ERROR,
                 )
                 ErrorDlg.ShowModal()
-                
+
             addPrevious(
                 "toCYR",
                 self.newEnc,
@@ -760,46 +788,46 @@ class MyFrame(ConverterFrame):
                 self.real_path[-1],
             )
             self.postAction(path)
-            
+
         event.Skip()
 
     def toCyrillic_multiple(self):
 
-        with open(
-            filePath("resources", "var", "file_ext.pkl"), "rb"
-        ) as f:
+        with open(filePath("resources", "var", "file_ext.pkl"), "rb") as f:
             ex = pickle.load(f)  # ["key5"]
             value1_s = ex['cyr_ansi_srt']
             value2_s = ex['cyr_utf8_txt']
 
         if self.preferences.IsChecked(1011):
             utf8_enc = 'utf-8-sig'
-        else: utf8_enc = 'utf-8'        
-        
+        else:
+            utf8_enc = 'utf-8'
+
         self.newEnc = 'windows-1251'
         self.pre_suffix = value1_s
         f_text = ["Files Processed:\n\n"]
 
         self.tmpPath.clear()
         self.cyrUTFmulti.clear()
-        
+
         pvalue = self.preferences.IsChecked(1014)
         self.utf8_latText.clear()
-        
+
         for i in range(len(BT)):
             path, entered_enc, text = self.getPathEnc(i)
             self.real_dir = os.path.dirname(path)
-            
+
             file_suffix = os.path.splitext(path)[-1]
-            
+
             text = normalizeText(entered_enc, None, text)
-        
+
             self.utf8_latText[baseName(path)] = (
                 remTag(text)
                 .encode(encoding="utf-8", errors="surrogatepass")
                 .replace(b"\n", b"\r\n")
             )
-            if text: text = text.replace('?', '¬')
+            if text:
+                text = text.replace('?', '¬')
 
             utfText, suffix = newName(path, value2_s, multi=True)
 
@@ -807,16 +835,16 @@ class MyFrame(ConverterFrame):
             self.cyrUTFmulti.append(utf_path)
 
             text, msg = ConvertText(text).changeLetters(preProc=pvalue)
-            
+
             writeToFile(text, utf_path, utf8_enc, multi=True)
-            
+
             cyr_name, cyr_suffix = newName(path, value1_s, multi=True)
             cyr_path = filePath(self.real_dir, cyr_name + file_suffix)
-            
+
             self.tmpPath.append(cyr_path)
-            
+
             text_ansi = ConvertText(text).toCyrANSI(self.newEnc)
-            
+
             error_text = checkFile(utf_path, cyr_path, text_ansi, multi=True)
             text = displayError(
                 text_ansi,
@@ -826,10 +854,10 @@ class MyFrame(ConverterFrame):
                 self.newEnc,
                 multi=True,
             )
-            
+
             writeToFile(text, cyr_path, self.newEnc, multi=True)
-            
-            f_text.append(baseName(cyr_path)+"    \n")
+
+            f_text.append(baseName(cyr_path) + "    \n")
 
             if error_text:
                 ErrorDlg = wx.MessageDialog(
@@ -842,9 +870,9 @@ class MyFrame(ConverterFrame):
                 self.Error_Text = error_text
 
             self.SetStatusText(baseName(cyr_path))
-            
+
         self.displayText(intext=f_text)
-    
+
         addPrevious("toCYR_multiple", self.newEnc, "", file_suffix, "", "")
         self.SetStatusText('Multiple files done.')
         self.SetStatusText(self.newEnc, 1)
@@ -853,19 +881,19 @@ class MyFrame(ConverterFrame):
         self.to_ansi.Enable(False)
 
     def toANSI(self, event):
-        
+
         with open(filePath("resources", "var", "dialog_settings.db.dat"), "rb") as sp:
             data = pickle.load(sp)
             ex = data['key5']
             value4_s = ex['lat_ansi_srt']
 
         tval = self.text_1.GetValue()
-        if not tval.startswith('Files ') and len(tval)> 0 and not PREVIOUS:
+        if not tval.startswith('Files ') and len(tval) > 0 and not PREVIOUS:
             if self.ShowDialog() is False:
                 return
-        
+
         path, entered_enc = self.PathEnc()
-        
+
         if len(BT) >= 1:
             self.multipleTools()
             self.toANSI_multiple()
@@ -879,10 +907,7 @@ class MyFrame(ConverterFrame):
                     self,
                     f"Tekst je već enkoding {entered_enc.upper()}.\nNastaviti?",
                     "SubtitleConverter",
-                    style=wx.OK
-                    | wx.CANCEL
-                    | wx.CANCEL_DEFAULT
-                    | wx.ICON_INFORMATION,
+                    style=wx.OK | wx.CANCEL | wx.CANCEL_DEFAULT | wx.ICON_INFORMATION,
                 )
                 if InfoDlg.ShowModal() == wx.ID_CANCEL:
                     return
@@ -890,16 +915,18 @@ class MyFrame(ConverterFrame):
                     InfoDlg.Destroy()
 
             def ansiAction(inpath):
-                
+
                 if entered_enc != 'windows-1251':
                     logger.debug(f'toANSI: {baseName(inpath)}, {entered_enc}')
 
-                if self.text_1.IsModified(): text = self.text_1.GetValue()
-                else: text = WORK_TEXT.getvalue()
-                
+                if self.text_1.IsModified():
+                    text = self.text_1.GetValue()
+                else:
+                    text = WORK_TEXT.getvalue()
+
                 text = text.replace('?', '¬')
                 text = fixI(text)
-                text,msg = rplStr(text)
+                text, msg = rplStr(text)
                 text = ChangeEncoding(text).toANSI(self.newEnc)
                 error_text = checkFile(inpath, inpath, text)
                 text = displayError(
@@ -917,7 +944,7 @@ class MyFrame(ConverterFrame):
                     )
                     msginfo.ShowModal()
                     bufferText(text, WORK_TEXT)
-                    
+
                 return text, error_text
 
             def postAnsi():
@@ -928,39 +955,53 @@ class MyFrame(ConverterFrame):
                 self.reload.Enable(True)
                 self.frame_toolbar.EnableTool(1010, True)  # Save
                 self.frame_toolbar.EnableTool(101, True)
-                for i in [self.undo_action, self.redo_action, self.reloadtext, self.reload]:
+                for i in [
+                    self.undo_action,
+                    self.redo_action,
+                    self.reloadtext,
+                    self.reload,
+                ]:
                     i.Enable(True)
-                addPrevious("toANSI", self.newEnc, text, self.pre_suffix, path, self.real_path[-1])
-                
+                addPrevious(
+                    "toANSI",
+                    self.newEnc,
+                    text,
+                    self.pre_suffix,
+                    path,
+                    self.real_path[-1],
+                )
+
             def dialog1(text_1):
                 ErrorDlg = wx.MessageDialog(
                     self,
                     text_1,
                     "SubtitleConverter",
-                    style=wx.OK
-                    | wx.CANCEL
-                    | wx.CANCEL_DEFAULT
-                    | wx.ICON_INFORMATION,
+                    style=wx.OK | wx.CANCEL | wx.CANCEL_DEFAULT | wx.ICON_INFORMATION,
                 )
                 if ErrorDlg.ShowModal() == wx.ID_OK:
                     return True
 
             text = self.text_1.GetValue()
             zbir_slova, procent, chars = checkChars(text, path)
-            ertext = "Greška:\n\nTekst sadrži ćiriliči alfabet.\n\n{}\n{}\n\nNastaviti?\n"
-            
+            ertext = (
+                "Greška:\n\nTekst sadrži ćiriliči alfabet.\n\n{}\n{}\n\nNastaviti?\n"
+            )
+
             if zbir_slova > 1000 and procent >= 90:
-                err_text =\
-                "Greška:\n\nTekst sadrži ćiriliči alfabet.\n\n{0} procenta teksta:\n[{1}...]\n"\
-                .format(procent, ",".join(chars)[:34])
+                err_text = "Greška:\n\nTekst sadrži ćiriliči alfabet.\n\n{0} procenta teksta:\n[{1}...]\n".format(
+                    procent, ",".join(chars)[:34]
+                )
                 ErrorDlg = wx.MessageDialog(
-                    self, err_text, "SubtitleConverter", style=wx.OK | wx.ICON_ERROR,
+                    self,
+                    err_text,
+                    "SubtitleConverter",
+                    style=wx.OK | wx.ICON_ERROR,
                 )
                 if ErrorDlg.ShowModal() == wx.ID_OK:
                     ErrorDlg.Destroy()
                     self.to_ansi.Enable(False)
                     self.frame_toolbar.EnableTool(1003, False)
-                    return            
+                    return
 
             ##=====================================================================================##
             if zbir_slova == 0 and procent == 0:
@@ -987,10 +1028,7 @@ class MyFrame(ConverterFrame):
                             self,
                             "Too many errors!\n\nAre you sure you want to proceed?\n",
                             "SubtitleConverter",
-                            style=wx.CANCEL
-                            | wx.CANCEL_DEFAULT
-                            | wx.OK
-                            | wx.ICON_ERROR,
+                            style=wx.CANCEL | wx.CANCEL_DEFAULT | wx.OK | wx.ICON_ERROR,
                         )
                         if ErrorDlg.ShowModal() == wx.ID_CANCEL:
                             return
@@ -1027,42 +1065,38 @@ class MyFrame(ConverterFrame):
 
     def toANSI_multiple(self):
 
-        with open(
-            filePath("resources", "var", "file_ext.pkl"), "rb"
-        ) as f:
+        with open(filePath("resources", "var", "file_ext.pkl"), "rb") as f:
             ex = pickle.load(f)  # ["key5"]
             value4_s = ex['lat_ansi_srt']
 
         self.tmpPath.clear()
         f_text = ["Files Processed:\n\n"]
-        
+
         self.newEnc = 'windows-1250'
         self.pre_suffix = value4_s
-        
+
         ErTxt = "Greška:\n\n{0}\nsadrži ćiriliči alfabet.\n{1}\n{2}\n\nNastaviti?\n"
-        
+
         for i in range(len(BT)):
             path, entered_enc, text = self.getPathEnc(i)
             self.real_dir = os.path.dirname(path)
             fpath = baseName(path)
-            
+
             if entered_enc == 'windows-1251':
                 logger.debug(
                     f"------------------------------------------------------\n\
                 Encoding is windows-1251! {fpath}"
                 )
-                f_text.append(fpath + " __skipped_"+"    \n")
+                f_text.append(fpath + " __skipped_" + "    \n")
                 continue
 
             text = normalizeText(entered_enc, None, text)
-            
+
             zbir_slova, procent, chars = checkChars(text, path)
 
             def ansiAction(path, text_in):
                 if entered_enc != 'windows-1251':
-                    logger.debug(
-                        'ToANSI, next input encoding: {}'.format(entered_enc)
-                    )
+                    logger.debug('ToANSI, next input encoding: {}'.format(entered_enc))
                 try:
                     if not text_in:
                         text_in = (
@@ -1071,7 +1105,7 @@ class MyFrame(ConverterFrame):
                     if text_in:
                         text = text_in.replace('?', '¬')
                     text = fixI(text)
-                    text,msg = rplStr(text)
+                    text, msg = rplStr(text)
                     text = ChangeEncoding(text).toANSI(self.newEnc)
                     nam, b = newName(path, self.pre_suffix, multi=True)
                     newF = filePath(self.real_dir, nam + b)
@@ -1079,20 +1113,17 @@ class MyFrame(ConverterFrame):
                     return newF, text
                 except Exception as e:
                     logger.debug(f"{baseName(path)}: {e}")
-                    
+
             def postAnsi():
                 self.SetStatusText(baseName(newF))
                 self.SetStatusText(self.newEnc, 1)
-                
+
             def dialog1(text_1):
                 ErrorDlg = wx.MessageDialog(
                     self,
                     text_1,
                     "SubtitleConverter",
-                    style=wx.OK
-                    | wx.CANCEL
-                    | wx.CANCEL_DEFAULT
-                    | wx.ICON_INFORMATION,
+                    style=wx.OK | wx.CANCEL | wx.CANCEL_DEFAULT | wx.ICON_INFORMATION,
                 )
                 if ErrorDlg.ShowModal() == wx.ID_OK:
                     return True
@@ -1103,14 +1134,22 @@ class MyFrame(ConverterFrame):
                 error_text = checkFile(path, newF, text, True)
 
                 text = displayError(
-                    text, self.text_1, self.real_dir, path, self.newEnc, multi=True,
+                    text,
+                    self.text_1,
+                    self.real_dir,
+                    path,
+                    self.newEnc,
+                    multi=True,
                 )
                 writeToFile(text, newF, self.newEnc, True)
 
-                f_text.append(baseName(newF)+"    \n")
+                f_text.append(baseName(newF) + "    \n")
                 if error_text:
                     ErrorDlg = wx.MessageDialog(
-                        self, error_text, "SubtitleConverter", wx.OK | wx.ICON_ERROR,
+                        self,
+                        error_text,
+                        "SubtitleConverter",
+                        wx.OK | wx.ICON_ERROR,
                     )
                     ErrorDlg.ShowModal()
                 postAnsi()
@@ -1121,9 +1160,7 @@ class MyFrame(ConverterFrame):
                 )
                 self.SetStatusText(u'Greška u ulaznom fajlu.')
                 f_procent = f"Najmanje {procent} % teksta.\nIli najmanje [ {zbir_slova} ] znakova"
-                dlg = dialog1(
-                    ErTxt.format(baseName(path), f_procent, ",".join(chars))
-                )
+                dlg = dialog1(ErTxt.format(baseName(path), f_procent, ",".join(chars)))
                 if dlg is True:
                     if procent >= 50:
                         ErrorDlg = wx.MessageDialog(
@@ -1138,11 +1175,16 @@ class MyFrame(ConverterFrame):
                     error_text = checkFile(path, newF, text, True)
 
                     text = displayError(
-                        text, self.text_1, self.real_dir, path, self.newEnc, True,
+                        text,
+                        self.text_1,
+                        self.real_dir,
+                        path,
+                        self.newEnc,
+                        True,
                     )
                     writeToFile(text, newF, self.newEnc, True)
 
-                    f_text.append(baseName(newF)+"    \n")
+                    f_text.append(baseName(newF) + "    \n")
                     if error_text:
                         ErrorDlg = wx.MessageDialog(
                             self,
@@ -1158,18 +1200,21 @@ class MyFrame(ConverterFrame):
                     f'ToANSI: Cyrillic alfabet u tekstu: {entered_enc} cyrillic'
                 )
                 f_zbir = f"Najmanje [ {zbir_slova} ] znakova."
-                dlg = dialog1(
-                    ErTxt.format(baseName(path), f_zbir, ",".join(chars))
-                )
+                dlg = dialog1(ErTxt.format(baseName(path), f_zbir, ",".join(chars)))
 
                 if dlg is True:
                     newF, text = ansiAction(path, text)
                     error_text = checkFile(path, path, text, multi=True)
 
-                    f_text.append(baseName(newF)+"    \n")
+                    f_text.append(baseName(newF) + "    \n")
 
                     text = displayError(
-                        text, self.text_1, self.real_dir, path, self.newEnc, True,
+                        text,
+                        self.text_1,
+                        self.real_dir,
+                        path,
+                        self.newEnc,
+                        True,
                     )
                     writeToFile(text, newF, self.newEnc, multi=True)
 
@@ -1182,7 +1227,7 @@ class MyFrame(ConverterFrame):
                         )
                         ErrorDlg.ShowModal()
                     postAnsi()
-                    
+
         self.displayText(intext=f_text)
         addPrevious("toANSI_multiple", self.newEnc, "", self.pre_suffix, "", "")
         self.SetStatusText('Multiple files done.')
@@ -1190,9 +1235,7 @@ class MyFrame(ConverterFrame):
 
     def toCyrUTF8(self, event):
         ''''''
-        with open(
-            filePath("resources", "var", "dialog_settings.db.dat"), "rb"
-        ) as sp:
+        with open(filePath("resources", "var", "dialog_settings.db.dat"), "rb") as sp:
             data = pickle.load(sp)
             ex = data['key5']
             value_s = ex["cyr_utf8_srt"]
@@ -1206,27 +1249,32 @@ class MyFrame(ConverterFrame):
 
         if self.preferences.IsChecked(1011):
             utf8_enc = 'utf-8-sig'
-        else: utf8_enc = 'utf-8'
-        
+        else:
+            utf8_enc = 'utf-8'
+
         if len(BT) >= 1:
             self.multipleTools()
             self.toCyrUTF8_multiple()
 
         else:
-            if self.text_1.IsModified(): text = self.text_1.GetValue()
-            else: text = WORK_TEXT.getvalue()
-            
+            if self.text_1.IsModified():
+                text = self.text_1.GetValue()
+            else:
+                text = WORK_TEXT.getvalue()
+
             self.newEnc = utf8_enc
             self.pre_suffix = value_s
-            
-            if text: text = text.replace('?', '¬')
+
+            if text:
+                text = text.replace('?', '¬')
 
             utf_name, suffix = newName(path, value_s, multi=False)
             utf_path = filePath(self.real_dir, (utf_name + suffix))
-            
+
             pvalue = self.preferences.IsChecked(1014)
-            if pvalue is True: text = preLatin(text_in=text)
-            
+            if pvalue is True:
+                text = preLatin(text_in=text)
+
             text = ChangeEncoding(text).toUTF_8(self.newEnc)
             text, msg = ConvertText(text).changeLetters(preProc=pvalue)
             cyr_path = path
@@ -1234,13 +1282,13 @@ class MyFrame(ConverterFrame):
 
             error_text = checkFile(path, cyr_path, text)
             text = displayError(text, self.text_1, self.real_dir, path, self.newEnc)
-            
+
             bufferText(text, WORK_TEXT)
-            
+
             self.bytesToBuffer(text, self.newEnc)
 
             writeToFile(text, utf_path, utf8_enc, ask=True)
-            
+
             if error_text:
                 ErrorDlg = wx.MessageDialog(
                     self,
@@ -1249,7 +1297,7 @@ class MyFrame(ConverterFrame):
                     wx.OK | wx.ICON_ERROR,
                 )
                 ErrorDlg.ShowModal()
-                
+
             addPrevious(
                 "toCyrUTF8",
                 self.newEnc,
@@ -1258,32 +1306,31 @@ class MyFrame(ConverterFrame):
                 path,
                 self.real_path[-1],
             )
-            
+
             self.postAction(path)
-                
+
         event.Skip()
-        
+
     def toCyrUTF8_multiple(self):
         """"""
-        with open(
-            filePath("resources", "var", "file_ext.pkl"), "rb"
-        ) as f:
+        with open(filePath("resources", "var", "file_ext.pkl"), "rb") as f:
             ex = pickle.load(f)  # ["key5"]
             value_s = ex["cyr_utf8_srt"]
 
-        if self.preferences.IsChecked(1011):  
+        if self.preferences.IsChecked(1011):
             utf8_enc = 'utf-8-sig'
-        else: utf8_enc = 'utf-8'        
-        
+        else:
+            utf8_enc = 'utf-8'
+
         self.newEnc = utf8_enc
         self.pre_suffix = value_s
         f_text = ["Files Processed:\n\n"]
 
         self.tmpPath.clear()
         self.cyrUTFmulti.clear()
-        
+
         pvalue = self.preferences.IsChecked(1014)
-        
+
         for i in range(len(BT)):
             path, entered_enc, text = self.getPathEnc(i)
             self.real_dir = os.path.dirname(path)
@@ -1292,16 +1339,17 @@ class MyFrame(ConverterFrame):
             text = normalizeText(entered_enc, None, text)
             if not text:
                 text = f"{path}\nText nije SRT format.\nPokušaj pojedinačni fajl."
-            if text: text = text.replace('?', '¬')
+            if text:
+                text = text.replace('?', '¬')
 
             utfText, suffix = newName(path, value_s, multi=True)
 
             utf_path = filePath(self.real_dir, utfText + suffix)
             self.cyrUTFmulti.append(utf_path)
-            
+
             text = ChangeEncoding(text).toUTF_8(self.newEnc)
-            text,msg = ConvertText(text).changeLetters(preProc=pvalue)
-            
+            text, msg = ConvertText(text).changeLetters(preProc=pvalue)
+
             cyr_name, cyr_suffix = newName(path, value_s, multi=True)
             cyr_path = filePath(self.real_dir, cyr_name + file_suffix)
 
@@ -1322,20 +1370,23 @@ class MyFrame(ConverterFrame):
 
             if error_text:
                 ErrorDlg = wx.MessageDialog(
-                    self, error_text, "SubtitleConverter", wx.OK | wx.ICON_ERROR,
+                    self,
+                    error_text,
+                    "SubtitleConverter",
+                    wx.OK | wx.ICON_ERROR,
                 )
                 ErrorDlg.ShowModal()
                 self.Error_Text = error_text
 
             self.SetStatusText(baseName(cyr_path))
-        
+
         self.displayText(intext=f_text)
-        
+
         self.SetStatusText(printEncoding(self.newEnc), 1)
         addPrevious("toCyrUTF8_multiple", self.newEnc, "", file_suffix, "", "")
         self.SetStatusText('Multiple files done.')
         self.multipleTools()
-        
+
     def toUTF(self, event):
 
         with open(filePath("resources", "var", "dialog_settings.db.dat"), "rb") as sp:
@@ -1344,7 +1395,7 @@ class MyFrame(ConverterFrame):
             value1_s = ex['lat_utf8_srt']
 
         tval = self.text_1.GetValue()
-        if not tval.startswith('Files ') and len(tval)> 0 and not PREVIOUS:
+        if not tval.startswith('Files ') and len(tval) > 0 and not PREVIOUS:
             if self.ShowDialog() is False:
                 return
 
@@ -1362,7 +1413,8 @@ class MyFrame(ConverterFrame):
 
             if self.preferences.IsChecked(1011):
                 self.newEnc = 'utf-8-sig'
-            else: self.newEnc = 'utf-8'
+            else:
+                self.newEnc = 'utf-8'
 
             if (
                 entered_enc == "utf-8"
@@ -1372,9 +1424,11 @@ class MyFrame(ConverterFrame):
                 code = printEncoding(entered_enc)
                 logger.debug(f"toUTF: Encoding is {entered_enc}.")
 
-            if self.text_1.IsModified(): text = self.text_1.GetValue()
-            else: text = WORK_TEXT.getvalue()
-            
+            if self.text_1.IsModified():
+                text = self.text_1.GetValue()
+            else:
+                text = WORK_TEXT.getvalue()
+
             text = ChangeEncoding(text).toUTF_8(new_enc=self.newEnc)
             text = fixI(text)
             self.text_1.SetValue(text)
@@ -1400,11 +1454,10 @@ class MyFrame(ConverterFrame):
             self.postAction(path)
 
         event.Skip()
+
     def toUTF_multiple(self):
-        
-        with open(
-            filePath("resources", "var", "file_ext.pkl"), "rb"
-        ) as f:
+
+        with open(filePath("resources", "var", "file_ext.pkl"), "rb") as f:
             ex = pickle.load(f)  # ["key5"]
             value1_s = ex["lat_utf8_srt"]
 
@@ -1413,17 +1466,20 @@ class MyFrame(ConverterFrame):
 
         if self.preferences.IsChecked(1011):
             self.newEnc = 'utf-8-sig'
-        else: self.newEnc = 'utf-8'
+        else:
+            self.newEnc = 'utf-8'
         entered_enc = ""
         f_text = ["Files Processed:\n\n"]
 
         for i in range(len(BT)):
             path, entered_enc, text = self.getPathEnc(i)
             self.real_dir = os.path.dirname(path)
-            
+
             text = normalizeText(entered_enc, None, text)
-            if not text: text = f"{path}\nText is not SRT format.\nTry as single file."
-            if text: text = text.replace('?', '¬')
+            if not text:
+                text = f"{path}\nText is not SRT format.\nTry as single file."
+            if text:
+                text = text.replace('?', '¬')
 
             nam, b = newName(path, self.pre_suffix, multi=True)
             newF = '{0}{1}'.format(filePath(self.real_dir, nam), b)
@@ -1431,7 +1487,7 @@ class MyFrame(ConverterFrame):
             text = fproc.toUTF_8(self.newEnc)
             text = fixI(text)
             self.tmpPath.append(newF)  # VAZNO
-            
+
             error_text = checkFile(path, newF, text, multi=True)
 
             text = displayError(
@@ -1445,7 +1501,7 @@ class MyFrame(ConverterFrame):
 
             writeToFile(text, newF, self.newEnc, multi=True)
 
-            f_text.append(baseName(newF)+"    \n")
+            f_text.append(baseName(newF) + "    \n")
             if error_text:
                 ErrorDlg = wx.MessageDialog(
                     self,
@@ -1455,7 +1511,7 @@ class MyFrame(ConverterFrame):
                 )
                 ErrorDlg.ShowModal()
             self.SetStatusText(baseName(newF))
-        
+
         self.displayText(intext=f_text)
         self.multipleTools()
         if entered_enc == "windows-1251":
@@ -1468,7 +1524,7 @@ class MyFrame(ConverterFrame):
                 wx.OK | wx.ICON_INFORMATION,
             )
             msginfo.ShowModal()
-        
+
         addPrevious("toUTF_multiple", self.newEnc, "", self.pre_suffix, "", "")
         self.SetStatusText('Multiple files done.')
         self.SetStatusText(printEncoding(self.newEnc), 1)
@@ -1476,11 +1532,14 @@ class MyFrame(ConverterFrame):
     def onCyrToANSI(self, event):
 
         tval = self.text_1.GetValue()
-        if not tval.startswith('Files ') and len(tval)> 0 and not PREVIOUS:
+        if not tval.startswith('Files ') and len(tval) > 0 and not PREVIOUS:
             if self.ShowDialog() is False:
                 return
-        
-        with open(filePath("resources","var","dialog_settings.db.dat"), "rb",) as sp:
+
+        with open(
+            filePath("resources", "var", "dialog_settings.db.dat"),
+            "rb",
+        ) as sp:
             data = pickle.load(sp)
             ex = data['key5']
             value1_s = ex['lat_ansi_srt']
@@ -1494,18 +1553,21 @@ class MyFrame(ConverterFrame):
             self.pre_suffix = value1_s
 
             self.newEnc = 'windows-1250'
-            
-            if self.text_1.IsModified(): text = self.text_1.GetValue()
-            else: text = WORK_TEXT.getvalue()
-            
-            if text: text = text.replace('?', '¬')
-                
+
+            if self.text_1.IsModified():
+                text = self.text_1.GetValue()
+            else:
+                text = WORK_TEXT.getvalue()
+
+            if text:
+                text = text.replace('?', '¬')
+
             pvalue = self.preferences.IsChecked(1014)
             text, msg = ConvertText(text).changeLetters(pvalue, True)
             cyr_path = path
-            
+
             text = ChangeEncoding(text).toANSI(self.newEnc)
-            
+
             error_text = checkFile(path, cyr_path, text, multi=False)
             text = displayError(
                 text,
@@ -1528,10 +1590,10 @@ class MyFrame(ConverterFrame):
 
             bufferText(text, WORK_TEXT)
             self.bytesToBuffer(text, self.newEnc)
-            
+
             if os.path.exists(self.cyrUTF):
                 os.remove(self.cyrUTF)
-            
+
             addPrevious(
                 "cyrToANSI",
                 self.newEnc,
@@ -1542,21 +1604,19 @@ class MyFrame(ConverterFrame):
             )
             self.postAction(path)
         event.Skip()
-    
+
     def cyrToANSI_multiple(self):
 
-        with open(
-            filePath("resources", "var", "file_ext.pkl"), "rb"
-        ) as f:
+        with open(filePath("resources", "var", "file_ext.pkl"), "rb") as f:
             ex = pickle.load(f)  # ["key5"]
             value1_s = ex["lat_ansi_srt"]
-        
+
         self.tmpPath.clear()
         self.pre_suffix = value1_s
         self.newEnc = 'windows-1250'
-        
+
         f_text = ["Files Processed:\n\n"]
-        
+
         pvalue = self.preferences.IsChecked(1014)
 
         for i in range(len(BT)):
@@ -1564,19 +1624,20 @@ class MyFrame(ConverterFrame):
             self.real_dir = os.path.dirname(path)
             try:
                 text = normalizeText(entered_enc, None, text)
-                
-                if text: text = text.replace('?', '¬')
-                
+
+                if text:
+                    text = text.replace('?', '¬')
+
                 text, msg = ConvertText(text).changeLetters(pvalue, True)
-                
+
                 nam, b = newName(path, self.pre_suffix, True)
                 newF = '{0}{1}'.format(filePath(self.real_dir, nam), b)
 
-                f_text.append(baseName(newF)+"    \n")
+                f_text.append(baseName(newF) + "    \n")
                 self.tmpPath.append(newF)
-                
+
                 text = ChangeEncoding(text).toANSI(self.newEnc)
-                
+
                 error_text = checkFile(path, newF, text, multi=True)
                 text = displayError(
                     text,
@@ -1601,53 +1662,54 @@ class MyFrame(ConverterFrame):
                 self.SetStatusText(f"Processing {baseName(newF)}")
             except Exception as e:
                 logger.debug(f"cyrToANSI error: {e}")
-        
+
         self.displayText(intext=f_text)
         self.multipleTools()
         addPrevious("cyrToANSI_multiple", self.newEnc, "", self.pre_suffix)
         self.SetStatusText('Multiple files done.')
         self.SetStatusText(self.newEnc, 1)
-        
+
     def onCyrToUTF(self, event):
 
         tval = self.text_1.GetValue()
-        if not tval.startswith('Files ') and len(tval)> 0 and not PREVIOUS:
+        if not tval.startswith('Files ') and len(tval) > 0 and not PREVIOUS:
             if self.ShowDialog() is False:
                 return
-        
-        with open(
-            filePath("resources", "var", "dialog_settings.db.dat"), "rb"
-        ) as sp:
+
+        with open(filePath("resources", "var", "dialog_settings.db.dat"), "rb") as sp:
             data = pickle.load(sp)
             ex = data['key5']
             value1_s = ex['lat_utf8_srt']
-        
+
         path, entered_enc = self.PathEnc()
-        
+
         if len(BT) >= 1:
             self.multipleTools()
             self.cyrToUTF_multiple()
-        else:        
-                
+        else:
+
             self.pre_suffix = value1_s
-            
+
             if self.preferences.IsChecked(1011):
                 self.newEnc = 'utf-8-sig'
             else:
                 self.newEnc = 'utf-8'
-            
-            if self.text_1.IsModified(): text = self.text_1.GetValue()
-            else: text = WORK_TEXT.getvalue()
-                    
-            if text: text = text.replace('?', '¬')
-            
+
+            if self.text_1.IsModified():
+                text = self.text_1.GetValue()
+            else:
+                text = WORK_TEXT.getvalue()
+
+            if text:
+                text = text.replace('?', '¬')
+
             pvalue = self.preferences.IsChecked(1014)
-                    
+
             text, msg = ConvertText(text).changeLetters(pvalue, True)
             cyr_path = path
-            
+
             text = ChangeEncoding(text).toUTF_8(self.newEnc)
-            
+
             error_text = checkFile(path, cyr_path, text, multi=False)
             text = displayError(
                 text,
@@ -1670,48 +1732,49 @@ class MyFrame(ConverterFrame):
 
             bufferText(text, WORK_TEXT)
             self.bytesToBuffer(text, self.newEnc)
-            
+
             if os.path.exists(self.cyrUTF):
                 os.remove(self.cyrUTF)
-                        
+
             addPrevious(
                 "cyrToUTF", self.newEnc, text, self.pre_suffix, path, self.real_path[-1]
             )
             self.postAction(path)
         event.Skip()
-        
+
     def cyrToUTF_multiple(self):
-        
-        with open(
-            filePath("resources", "var", "file_ext.pkl"), "rb"
-        ) as f:
+
+        with open(filePath("resources", "var", "file_ext.pkl"), "rb") as f:
             ex = pickle.load(f)  # ["key5"]
             value1_s = ex["lat_utf8_srt"]
 
         f_text = ["Files Processed:\n\n"]
-        
+
         self.pre_suffix = value1_s
         self.tmpPath.clear()
 
         if self.preferences.IsChecked(1011):
             self.newEnc = 'utf-8-sig'
-        else: self.newEnc = 'utf-8'
+        else:
+            self.newEnc = 'utf-8'
 
         pvalue = self.preferences.IsChecked(1014)
-        
+
         for i in range(len(BT)):
             path, entered_enc, text = self.getPathEnc(i)
             self.real_dir = os.path.dirname(path)
-            
+
             text = normalizeText(entered_enc, None, text)
-            if not text: text = f"{path}\nText is not SRT format.\nTry as single file." 
-            if text: text = text.replace('?', '¬')
+            if not text:
+                text = f"{path}\nText is not SRT format.\nTry as single file."
+            if text:
+                text = text.replace('?', '¬')
 
             nam, b = newName(path, self.pre_suffix, True)
             newF = '{0}{1}'.format(filePath(self.real_dir, nam), b)
 
             text, msg = ConvertText(text).changeLetters(pvalue, True)
-            
+
             text = ChangeEncoding(text).toUTF_8(self.newEnc)
 
             error_text = checkFile(path, newF, text, multi=True)
@@ -1724,7 +1787,7 @@ class MyFrame(ConverterFrame):
                 multi=True,
             )
 
-            f_text.append(baseName(newF)+"    \n")
+            f_text.append(baseName(newF) + "    \n")
             self.tmpPath.append(newF)
 
             writeToFile(text, newF, self.newEnc, multi=True)
@@ -1739,20 +1802,20 @@ class MyFrame(ConverterFrame):
                 ErrorDlg.ShowModal()
                 self.Error_Text = error_text
             self.SetStatusText(baseName(path))
-            
+
         self.displayText(intext=f_text)
         self.multipleTools()
         self.SetStatusText(printEncoding(self.newEnc), 1)
         addPrevious("cyrToUTF_multiple", self.newEnc, "", self.pre_suffix)
         self.SetStatusText('Multiple files done.')
-        
+
     def onFixSubs(self):
 
         tval = self.text_1.GetValue()
-        if not tval.startswith('Files ') and len(tval)> 0 and not PREVIOUS:
+        if not tval.startswith('Files ') and len(tval) > 0 and not PREVIOUS:
             if self.ShowDialog() is False:
                 return
-        
+
         path, entered_enc = self.PathEnc()
 
         if len(BT) >= 1:
@@ -1761,7 +1824,8 @@ class MyFrame(ConverterFrame):
         else:
             try:
                 with open(
-                    filePath('resources', 'var', 'dialog_settings.db.dat'), "rb",
+                    filePath('resources', 'var', 'dialog_settings.db.dat'),
+                    "rb",
                 ) as sp:
                     data = pickle.load(sp)
                     ex = data['key1']
@@ -1774,15 +1838,17 @@ class MyFrame(ConverterFrame):
                     value1_s = fx['fixed_subs']
             except Exception as e:
                 logger.debug(f"FixSubtitle error: {e}")
-    
+
             self.pre_suffix = value1_s
             self.newEnc = entered_enc
-            
-            if self.text_1.IsModified(): text = self.text_1.GetValue()
-            else: text = WORK_TEXT.getvalue()
-                    
+
+            if self.text_1.IsModified():
+                text = self.text_1.GetValue()
+            else:
+                text = WORK_TEXT.getvalue()
+
             subs = list(srt.parse(text, ignore_errors=True))
-    
+
             if len(subs) == 0:
                 logger.debug("Fixer: No subtitles found.")
             else:
@@ -1795,11 +1861,12 @@ class MyFrame(ConverterFrame):
                         x, y = FixSubGaps(inlist=subs, mingap=_gap).powerSubs()
                         m += x
                         s1 += y
-                    else: logger.debug("Fixer: Remove gaps not enabled.")
+                    else:
+                        logger.debug("Fixer: Remove gaps not enabled.")
                 if cb_sh is True:
                     subs = list(srt.parse(WORK_TEXT.getvalue(), True))
                     g = ShrinkGap(subs, maxgap=mgap, mingap=_gap)
-                    m += g            
+                    m += g
                 try:
                     if not cb8_s:
                         text = srt.compose(srt.parse(WORK_TEXT.getvalue(), True))
@@ -1807,14 +1874,14 @@ class MyFrame(ConverterFrame):
                         text = WORK_TEXT.getvalue()
                 except Exception as e:
                     logger.debug(f"FixSubtitle, unexpected error: {e}")
-    
+
                 text = rm_dash(text)
-    
+
                 bufferText(text, WORK_TEXT)
                 self.text_1.SetValue(text)
-    
+
                 self.bytesToBuffer(text, entered_enc)
-                
+
                 if cb1_s is True:
                     if cb8_s != True:
                         if s1 > 1:
@@ -1831,17 +1898,23 @@ class MyFrame(ConverterFrame):
                                 wx.OK | wx.ICON_INFORMATION,
                             )
                             sDlg.ShowModal()
-    
+
             addPrevious(
-                "FixSubtitle", self.newEnc, text, self.pre_suffix, path, self.real_path[-1]
+                "FixSubtitle",
+                self.newEnc,
+                text,
+                self.pre_suffix,
+                path,
+                self.real_path[-1],
             )
             self.postAction(path)
-    
+
     def fixMultiple(self):
         """"""
         try:
             with open(
-                filePath('resources', 'var', 'dialog_settings.db.dat'), "rb",
+                filePath('resources', 'var', 'dialog_settings.db.dat'),
+                "rb",
             ) as sp:
                 data = pickle.load(sp)
                 ex = data['key1']
@@ -1865,13 +1938,14 @@ class MyFrame(ConverterFrame):
             self.real_dir = os.path.dirname(path)
             self.newEnc = entered_enc
             text = normalizeText(entered_enc, None, text)
-            if not text: text = f"{path}\nText is not SRT format.\nTry as single file."
-            
+            if not text:
+                text = f"{path}\nText is not SRT format.\nTry as single file."
+
             nam, b = newName(path, self.pre_suffix, multi=True)
             newF = '{0}{1}'.format(filePath(self.real_dir, nam), b)
-            
+
             subs = list(srt.parse(text, ignore_errors=True))
-    
+
             if len(subs) == 0:
                 logger.debug("Fixer: No subtitles found.")
             else:
@@ -1883,11 +1957,12 @@ class MyFrame(ConverterFrame):
                         x, y = FixSubGaps(inlist=subs, mingap=_gap).powerSubs()
                         m += x
                         s1 += y
-                    else: logger.debug("Fixer: Remove gaps not enabled.")
+                    else:
+                        logger.debug("Fixer: Remove gaps not enabled.")
                 if cb_sh is True:
                     subs = list(srt.parse(text, True))
                     g = ShrinkGap(subs, maxgap=mgap, mingap=_gap)
-                    m += g            
+                    m += g
                 try:
                     if not cb8_s:
                         text = srt.compose(srt.parse(text, True))
@@ -1897,7 +1972,7 @@ class MyFrame(ConverterFrame):
                     logger.debug(f"FixSubtitle, unexpected error: {e}")
 
                 text = rm_dash(text)
-                
+
                 if cb1_s is True:
                     if cb8_s != True:
                         if s1 > 1:
@@ -1905,23 +1980,24 @@ class MyFrame(ConverterFrame):
                             logger.debug(m1)
                         else:
                             m1 = ''
-                        logger.debug(f'Fixer: Popravljenih gapova: {m}')                
-            
+                        logger.debug(f'Fixer: Popravljenih gapova: {m}')
+
             writeToFile(text, newF, self.newEnc, multi=True)
-            
-            f_text.append(baseName(newF)+"    \n")
-            
+
+            f_text.append(baseName(newF) + "    \n")
+
             self.SetStatusText(baseName(newF))
         self.displayText(f_text)
         self.multipleTools()
         addPrevious("FixSubtitle", self.newEnc, "", self.pre_suffix, "", "")
         self.SetStatusText('Multiple files done.')
-        self.SetStatusText(printEncoding(self.newEnc), 1)        
-        
+        self.SetStatusText(printEncoding(self.newEnc), 1)
+
     def onCleanup(self, event):
-        
+
         with open(
-            filePath("resources", "var", "dialog_settings.db.dat"), "rb",
+            filePath("resources", "var", "dialog_settings.db.dat"),
+            "rb",
         ) as sp:
             data = pickle.load(sp)
             ex = data['key5']
@@ -1931,38 +2007,40 @@ class MyFrame(ConverterFrame):
         if not tval.startswith('Files ') and len(tval) > 0 and not PREVIOUS:
             if self.ShowDialog() is False:
                 return
-        
+
         path, entered_enc = self.PathEnc()
 
-        if len(BT) >= 1: return
+        if len(BT) >= 1:
+            return
 
         self.newEnc = entered_enc
         self.pre_suffix = value1_s
 
         if self.text_1.IsModified():
             text = self.text_1.GetValue()
-        else: text = WORK_TEXT.getvalue()
-            
+        else:
+            text = WORK_TEXT.getvalue()
+
         try:
             subs = list(srt.parse(text, ignore_errors=True))
             NUM1 = len(subs)
             subs = srt.compose(subs)
-            
+
             text = cleanUp(subs)
 
             N2, text_s = cleanLine(text)
-            
+
             text = cleanUp(text_s)
-            
-            D2, text_s = cleanLine(text)            
+
+            D2, text_s = cleanLine(text)
 
             bufferText(text_s, WORK_TEXT)
             self.text_1.SetValue(text_s)
             logger.debug(f"CleanUp _1: {sys.exc_info()}")
 
             self.bytesToBuffer(text_s, entered_enc)
-            
-            if D2 ==0 and N2 == 0:
+
+            if D2 == 0 and N2 == 0:
                 msginfo = wx.MessageDialog(
                     self,
                     'Subtitle clean\nno changes made.',
@@ -1971,7 +2049,8 @@ class MyFrame(ConverterFrame):
                 )
                 msginfo.ShowModal()
             else:
-                if D2 == 0 and N2 > 0: D2 = N2
+                if D2 == 0 and N2 > 0:
+                    D2 = N2
                 msginfo = wx.MessageDialog(
                     self,
                     f'Subtitles deleted: [{NUM1-D2} ]',
@@ -1979,7 +2058,7 @@ class MyFrame(ConverterFrame):
                     wx.OK | wx.ICON_INFORMATION,
                 )
                 msginfo.ShowModal()
-            
+
             addPrevious(
                 "Cleanup",
                 self.newEnc,
@@ -1993,13 +2072,14 @@ class MyFrame(ConverterFrame):
         except Exception as e:
             logger.debug(f"Cleanup: {e}")
             return
-        
+
         event.Skip()
-        
+
     def onTranscribe(self, event):
-        
+
         with open(
-            filePath("resources", "var", "dialog_settings.db.dat"), "rb",
+            filePath("resources", "var", "dialog_settings.db.dat"),
+            "rb",
         ) as sp:
             data = pickle.load(sp)
             ex = data['key5']
@@ -2009,7 +2089,7 @@ class MyFrame(ConverterFrame):
         if not tval.startswith('Files ') and len(tval) > 0 and not PREVIOUS:
             if self.ShowDialog() is False:
                 return
-        
+
         path, entered_enc = self.PathEnc()
 
         if len(BT) >= 1:
@@ -2019,18 +2099,22 @@ class MyFrame(ConverterFrame):
 
         if self.preferences.IsChecked(1011):
             self.newEnc = 'utf-8-sig'
-        else: self.newEnc = 'utf-8'
+        else:
+            self.newEnc = 'utf-8'
 
-        if self.text_1.IsModified(): text = self.text_1.GetValue()
-        else: text = WORK_TEXT.getvalue()
-            
-        if text: text = text.replace('?', '¬')
+        if self.text_1.IsModified():
+            text = self.text_1.GetValue()
+        else:
+            text = WORK_TEXT.getvalue()
+
+        if text:
+            text = text.replace('?', '¬')
 
         text = ChangeEncoding(text).toUTF_8(self.newEnc)
         text = fixI(text)
-        
+
         num, text = zameniImena(text)
-        
+
         if num > 28 or num < 28 and num > 2:
             msginfo = wx.MessageDialog(
                 self,
@@ -2040,14 +2124,18 @@ class MyFrame(ConverterFrame):
             )
             msginfo.ShowModal()
 
-        text,msg = rplStr(text)
+        text, msg = rplStr(text)
 
         error_text = checkFile(path, path, text)
 
         text = displayError(
-                text, self.text_1, self.real_dir, path, self.newEnc,
-            )
-        
+            text,
+            self.text_1,
+            self.real_dir,
+            path,
+            self.newEnc,
+        )
+
         bufferText(text, WORK_TEXT)
         self.bytesToBuffer(text, self.newEnc)
 
@@ -2068,11 +2156,11 @@ class MyFrame(ConverterFrame):
                 path,
                 self.real_path[-1],
             )
-                    
+
         self.postAction(path)
 
         event.Skip()
-        
+
     def ChangeManualy(self, event):
         """"""
         text = self.text_1.GetValue()
@@ -2081,18 +2169,25 @@ class MyFrame(ConverterFrame):
         dlg.Destroy()
         if PREVIOUS:
             l = PREVIOUS[-1]
-            addPrevious("ChangeManualy", l.enc, WORK_TEXT.getvalue(), l.psuffix, l.tpath, l.rpath)
+            addPrevious(
+                "ChangeManualy",
+                l.enc,
+                WORK_TEXT.getvalue(),
+                l.psuffix,
+                l.tpath,
+                l.rpath,
+            )
             self.newEnc = l.enc
             self.postAction(l.tpath)
         event.Skip()
-        
+
     def onRepSpecial(self, event):
-        
+
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and not PREVIOUS:
             if self.ShowDialog() is False:
                 return
-       
+
         path, entered_enc = self.PathEnc()
 
         if len(BT) >= 1:
@@ -2101,22 +2196,29 @@ class MyFrame(ConverterFrame):
         self.newEnc = entered_enc
         self.pre_suffix = 'rpl'
 
-        if self.text_1.IsModified(): text = self.text_1.GetValue()
-        else: text = WORK_TEXT.getvalue()
-        
+        if self.text_1.IsModified():
+            text = self.text_1.GetValue()
+        else:
+            text = WORK_TEXT.getvalue()
+
         text = text.replace('?', '¬')
 
         num, text_o = doReplace(text)
-        
+
         error_text = checkFile(path, path, text_o, multi=False)
         text_s = displayError(
-            text_o, self.text_1, self.real_dir, path, entered_enc, multi=False,
+            text_o,
+            self.text_1,
+            self.real_dir,
+            path,
+            entered_enc,
+            multi=False,
         )
 
         bufferText(text_s, WORK_TEXT)
-        
+
         self.bytesToBuffer(text_s, entered_enc)
-        
+
         msginfo = wx.MessageDialog(
             self,
             'Zamenjenih objekata\nukupno [ {} ]'.format(num),
@@ -2130,21 +2232,21 @@ class MyFrame(ConverterFrame):
             )
             ErrorDlg.ShowModal()
             self.Error_Text = error_text
-        
+
         self.postAction(path)
         addPrevious(
             "repSpec", self.newEnc, text_s, self.pre_suffix, path, self.real_path[-1]
         )
-        
+
         event.Skip()
-        
+
     def applyRegex(self, event):
-        
+
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and not PREVIOUS:
             if self.ShowDialog() is False:
                 return
-        
+
         path, entered_enc = self.PathEnc()
         self.newEnc = entered_enc
 
@@ -2153,8 +2255,10 @@ class MyFrame(ConverterFrame):
 
         self.pre_suffix = "reg"
 
-        if self.text_1.IsModified(): text = self.text_1.GetValue()
-        else: text = WORK_TEXT.getvalue()
+        if self.text_1.IsModified():
+            text = self.text_1.GetValue()
+        else:
+            text = WORK_TEXT.getvalue()
 
         d_file = filePath("resources", "Regex_def.config")
 
@@ -2174,9 +2278,7 @@ class MyFrame(ConverterFrame):
                 line = line.strip().lower()
 
                 if line and not "replace=" in line:
-                    logger.debug(
-                        f"Apply Regex, missing argument, line {cn}; {d_file}"
-                    )
+                    logger.debug(f"Apply Regex, missing argument, line {cn}; {d_file}")
 
                 x = line.split("replace=")
 
@@ -2191,7 +2293,7 @@ class MyFrame(ConverterFrame):
                 try:
                     if "ignorecase" in reps:
                         reps = reps.replace("ignorecase", "").strip()
-                        rflags = (re.M | re.I)
+                        rflags = re.M | re.I
                         reg_def = re.compile(finds, rflags)
                     else:
                         reg_def = re.compile(finds, re.M)
@@ -2199,44 +2301,43 @@ class MyFrame(ConverterFrame):
                     text = reg_def.sub(reps, text)
 
                 except Exception as e:
-                    error_text = (
-                        f"Regex error\n\n{baseName(d_file)}\n{line}: {cn}\n{e}"
-                    )
+                    error_text = f"Regex error\n\n{baseName(d_file)}\n{line}: {cn}\n{e}"
                     logger.debug(error_text)
                     ErrorDlg = wx.MessageDialog(
                         None, error_text, "SubtitleConverter", wx.OK | wx.ICON_ERROR
                     )
                     ErrorDlg.ShowModal()
-                    
+
         self.text_1.SetValue(text)
         bufferText(text, WORK_TEXT)
-        
+
         self.bytesToBuffer(text, entered_enc)
-        
+
         addPrevious(
             "CustomRegex", self.newEnc, text, self.pre_suffix, path, self.real_path[-1]
         )
         self.postAction(path)
 
         event.Skip()
-    
+
     def onMergeLines(self, event):
-        
+
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and not PREVIOUS:
             if self.ShowDialog() is False:
                 return
-        
+
         path, entered_enc = self.PathEnc()  ## path = tmp/
 
         if len(BT) >= 1:
             return
 
-        self.newEnc = entered_enc  
+        self.newEnc = entered_enc
 
         try:
             with open(
-                filePath('resources', 'var', 'dialog_settings.db.dat'), "rb",
+                filePath('resources', 'var', 'dialog_settings.db.dat'),
+                "rb",
             ) as sp:
                 data = pickle.load(sp)
                 ex = data['key2']
@@ -2248,8 +2349,10 @@ class MyFrame(ConverterFrame):
             logger.debug(f"Merger, unexpected error: {e}")
 
         try:
-            if self.text_1.IsModified(): text = self.text_1.GetValue()
-            else: text = WORK_TEXT.getvalue()
+            if self.text_1.IsModified():
+                text = self.text_1.GetValue()
+            else:
+                text = WORK_TEXT.getvalue()
             subs_a = list(srt.parse(text, ignore_errors=True))
         except Exception as e:
             logger.debug(f"Merger _1, unexpected error: {e}")
@@ -2270,7 +2373,10 @@ class MyFrame(ConverterFrame):
         if len(subs_a) > 0:
 
             myMerger(
-                subs_in=subs_a, max_time=lineLenght, max_char=maxChar, _gap=maxGap,
+                subs_in=subs_a,
+                max_time=lineLenght,
+                max_char=maxChar,
+                _gap=maxGap,
             )
 
             b1 = len(list(srt.parse(WORK_TEXT.getvalue(), ignore_errors=True)))
@@ -2279,7 +2385,7 @@ class MyFrame(ConverterFrame):
             text = WORK_TEXT.getvalue()
             text = srt.compose(srt.parse(text, ignore_errors=True))
             bufferText(text, WORK_TEXT)
-            
+
             self.bytesToBuffer(text, entered_enc)
             self.text_1.SetValue(text)
 
@@ -2288,9 +2394,7 @@ class MyFrame(ConverterFrame):
             except ZeroDivisionError as e:
                 logger.debug(f"Merger Error: {e}")
             else:
-                logger.debug(
-                    f"Merger: Spojenih linija ukupno: {a1-b1}, ili {prf} %"
-                )
+                logger.debug(f"Merger: Spojenih linija ukupno: {a1-b1}, ili {prf} %")
                 sDlg = wx.MessageDialog(
                     self,
                     f"Merged file:\n\nSpojenih linija ukupno: {a1-b1}, ili {prf} %",
@@ -2300,9 +2404,9 @@ class MyFrame(ConverterFrame):
                 sDlg.ShowModal()
             addPrevious(
                 "Merger", self.newEnc, text, self.pre_suffix, path, self.real_path[-1]
-            )            
+            )
             self.postAction(path)
-            
+
         event.Skip()
 
     def exportZIP(self, event):
@@ -2372,7 +2476,8 @@ class MyFrame(ConverterFrame):
                     f_enc = self.fromPrevious("Open").enc
 
                     a, p, l = checkChars(
-                        self.fromPrevious("Open").content[0:1000], path, 
+                        self.fromPrevious("Open").content[0:1000],
+                        path,
                     )
                     if p > 80:
                         dlg = wx.MessageDialog(
@@ -2384,19 +2489,25 @@ class MyFrame(ConverterFrame):
                         dlg.ShowModal()
 
                     if len(PREVIOUS) >= 2:
-                        if PREVIOUS[-2].action == "toANSI" or PREVIOUS[-2].enc == "windows-1250":
+                        if (
+                            PREVIOUS[-2].action == "toANSI"
+                            or PREVIOUS[-2].enc == "windows-1250"
+                        ):
                             text = PREVIOUS[-2].content
                             text = remTag(text)
-                            writeToFile(text, fpath, PREVIOUS[-2].enc, multi=False, ask=True)
+                            writeToFile(
+                                text, fpath, PREVIOUS[-2].enc, multi=False, ask=True
+                            )
                         else:
                             if f_enc in ("utf-8", "utf-8-sig"):
                                 n_enc = "windows-1250"
-                            else: n_enc = f_enc
+                            else:
+                                n_enc = f_enc
                             with open(fpath, "r", encoding=f_enc) as text:
                                 text = remTag(text.read())
-                            writeToFile(text, fpath, n_enc, multi=False, ask=True)                            
+                            writeToFile(text, fpath, n_enc, multi=False, ask=True)
 
-                    tUTF = filePath("tmp", baseName(self.cyrUTF)) # cyr_UTF-8
+                    tUTF = filePath("tmp", baseName(self.cyrUTF))  # cyr_UTF-8
                     try:
                         shutil.copy(self.cyrUTF, tUTF)
                     except Exception as e:
@@ -2410,7 +2521,7 @@ class MyFrame(ConverterFrame):
                     utf8_lat = utf8_name + s
                     info2 = baseName(tUTF)  # cyrUTF-8
                     nname, s = newName(fpath, "", False)
-                    info1 = nname + s       # latFile original
+                    info1 = nname + s  # latFile original
                     izbor = [cyr_file, info2, info1, utf8_lat]
                     l = [i for i, x in enumerate(izbor) if izbor.count(x) > 1]
                     if l:
@@ -2423,12 +2534,14 @@ class MyFrame(ConverterFrame):
                     if dlg.ShowModal() == wx.ID_OK:
                         response = dlg.GetSelections()
                         files = [izbor[x] for x in response]
-                        
-                        zdata = data_out(None, fpath)                       ## latFile original
-                        tzdata = data_out(None, tUTF)                       ## cyrUTF-8
-                        cyrdata = data_out(self.bytesText, None)            ## cyrillic text binary
-                        utf8ldata = self.utf8_latText[tpath]                ## latFile utf-8
-                        
+
+                        zdata = data_out(None, fpath)  ## latFile original
+                        tzdata = data_out(None, tUTF)  ## cyrUTF-8
+                        cyrdata = data_out(
+                            self.bytesText, None
+                        )  ## cyrillic text binary
+                        utf8ldata = self.utf8_latText[tpath]  ## latFile utf-8
+
                         data_v = [cyrdata, tzdata, zdata, utf8ldata]
                         zip_data = [data_v[x] for x in response]
                         if not files:
@@ -2460,9 +2573,7 @@ class MyFrame(ConverterFrame):
                         files = [nname + s]
                 try:
                     with zipfile.ZipFile(name, 'w') as fzip:
-                        for i, x in zip(
-                            files, zip_data
-                            ):
+                        for i, x in zip(files, zip_data):
                             if not i:
                                 continue
                             if len(x) == 0:
@@ -2493,13 +2604,11 @@ class MyFrame(ConverterFrame):
 
     def exportZIPmultiple(self):
         ''''''
-        tpath = baseName(BT[0].path[:-4])   ## BT=BYTES_TEXT
+        tpath = baseName(BT[0].path[:-4])  ## BT=BYTES_TEXT
         epattern = re.compile(r"episode\s*-*\d*", re.I)
         tpath = epattern.sub("", tpath)
         tpath = re.sub(r"(?<=s\d\d)e\d{1,2}", "", tpath, count=1, flags=re.I)
-        tpath = (
-            tpath.replace(" 1 ", "").replace("x01", "").replace("  ", " ")
-        )
+        tpath = tpath.replace(" 1 ", "").replace("x01", "").replace("  ", " ")
 
         sas_wildcard = "ZipArchive (*.zip)|*.zip|All Files (*.*)|*.*"
 
@@ -2512,7 +2621,7 @@ class MyFrame(ConverterFrame):
         LatANSI = ndata["Lat-ansi"]
         LatUTF = ndata["Lat-utf8"]
         psuff = ndata["lat_utf8_srt"]
-        
+
         dlg = wx.FileDialog(
             self,
             message="Export file as ZIP",
@@ -2525,11 +2634,12 @@ class MyFrame(ConverterFrame):
         dlg.SetFilename(tpath)
 
         def data_out(filein):
-            with open(filein, "rb") as f: return f.read()
-            
+            with open(filein, "rb") as f:
+                return f.read()
+
         if dlg.ShowModal() == wx.ID_OK:
-            name = dlg.GetPath()    ## Zip file name ##
-            
+            name = dlg.GetPath()  ## Zip file name ##
+
             if PREVIOUS[-1].action == 'toCYR_multiple':
 
                 tl = [x.path for x in BT if x.enc in ("utf-8", "utf-8-sig")]
@@ -2537,13 +2647,13 @@ class MyFrame(ConverterFrame):
                     dlg = wx.MessageDialog(
                         self,
                         "Originalni tekstovi su utf-8:\n\n{0}".format(
-                            "".join([baseName(x)+"   \n" for x in tl])
+                            "".join([baseName(x) + "   \n" for x in tl])
                         ),
                         "Latinični tekst",
                         wx.OK | wx.ICON_INFORMATION,
                     )
-                    dlg.ShowModal()                   
-                
+                    dlg.ShowModal()
+
                 innames = []
                 info = []
                 zlist = []
@@ -2553,34 +2663,34 @@ class MyFrame(ConverterFrame):
                 try:
                     for x in self.utf8_latText.keys():
                         nname, s = newName(x, psuff)
-                        utf8_names.append(nname+s)
-                    
+                        utf8_names.append(nname + s)
+
                     for i, x in zip(self.tmpPath, self.cyrUTFmulti):
-    
-                        izbor_ansi.append(i)    ## CYR-ANSI 
-                        izbor_utf8.append(x)    ## CYR-UTF-8
-                        
+
+                        izbor_ansi.append(i)  ## CYR-ANSI
+                        izbor_utf8.append(x)  ## CYR-UTF-8
+
                     lat_files = [BT[x].path for x in range(len(BT))]
-                    
+
                     zlist_a = [data_out(x) for x in izbor_ansi]
                     zlist_b = [data_out(x) for x in izbor_utf8]
                     zlist_c = [x.content.replace(b"\n", b"\r\n") for x in BT]
                     zlist_utf = [x for x in self.utf8_latText.values()]
-                    
+
                     info1 = [filePath(CyrANSI, baseName(x)) for x in izbor_ansi]
                     info2 = [filePath(CyrUTF, baseName(x)) for x in izbor_utf8]
                     info3 = [filePath(LatANSI, baseName(x)) for x in lat_files]
                     lt_utf8 = [filePath(LatUTF, x) for x in utf8_names]
-                
+
                     innames.extend((info1, info2, info3, lt_utf8))
-                    l1=[info1, info2, info3, lt_utf8]
-                    l2=[zlist_a, zlist_b, zlist_c, zlist_utf]                    
+                    l1 = [info1, info2, info3, lt_utf8]
+                    l2 = [zlist_a, zlist_b, zlist_c, zlist_utf]
                 except Exception as e:
                     logger.debug(f"ZIP-Cyr: {e}")
-                
+
                 if len(self.cyrUTFmulti) == 1:
-                    info = [info1+info2+info3+lt_utf8]
-                    zlist = [zlist_a+zlist_b+zlist_c+zlist_utf]
+                    info = [info1 + info2 + info3 + lt_utf8]
+                    zlist = [zlist_a + zlist_b + zlist_c + zlist_utf]
                 else:
                     cdlg = TreeDialog(
                         self,
@@ -2589,13 +2699,14 @@ class MyFrame(ConverterFrame):
                         innames,
                     )
                     if cdlg.ShowModal() == wx.ID_OK:
-                        
+
                         selections = cdlg.GetSelections()
-                        
+
                         info = list(chain.from_iterable([l1[x] for x in selections]))
-                        zlist = list(chain.from_iterable([l2[x] for x in  selections]))
-                        
-                        if cdlg.makeFolder() is False: info = [baseName(x) for x in info]
+                        zlist = list(chain.from_iterable([l2[x] for x in selections]))
+
+                        if cdlg.makeFolder() is False:
+                            info = [baseName(x) for x in info]
                     else:
                         logger.debug(f"ZIP canceled; {baseName(name)}")
                         return
@@ -2603,17 +2714,11 @@ class MyFrame(ConverterFrame):
                 zlist = []
                 try:
                     izbor = [
-                        filePath("tmp", x)
-                        if not x.startswith("tmp")
-                        else x
+                        filePath("tmp", x) if not x.startswith("tmp") else x
                         for x in self.tmpPath
                         if not x.endswith(".zip")
                     ]
-                    info = [
-                        baseName(x)
-                        for x in self.tmpPath
-                        if not x.endswith(".zip")
-                    ]
+                    info = [baseName(x) for x in self.tmpPath if not x.endswith(".zip")]
                     for i, x in zip(self.tmpPath, izbor):
                         if not os.path.exists(x) and not i.endswith(".zip"):
                             shutil.copy(i, x)
@@ -2628,12 +2733,14 @@ class MyFrame(ConverterFrame):
             try:
                 with zipfile.ZipFile(name, 'w') as fzip:
                     for i, x in zip(info, zlist):
-                        if not i: continue
+                        if not i:
+                            continue
                         fzip.writestr(i, x, zipfile.ZIP_DEFLATED)
-                
-                if any(self.tmpPath+self.cyrUTFmulti):
-                    for i in self.tmpPath+self.cyrUTFmulti:
-                        if os.path.isfile(i): os.remove(i)
+
+                if any(self.tmpPath + self.cyrUTFmulti):
+                    for i in self.tmpPath + self.cyrUTFmulti:
+                        if os.path.isfile(i):
+                            os.remove(i)
                         logger.debug(f"Delete {i}")
             except Exception as e:
                 logger.debug(f"Export ZIP_final error: {e}")
@@ -2672,7 +2779,7 @@ class MyFrame(ConverterFrame):
             return f"{baseName(p)}{suffix}"
         else:
             return baseName(path)
-        
+
     def onRename(self, event):
         """"""
         s_text = ["Reneamed files:\n\n"]
@@ -2682,14 +2789,15 @@ class MyFrame(ConverterFrame):
             s_text.extend(files)
             self.displayText(s_text)
             dlg.Destroy()
-        event.Skip()    
-        
+        event.Skip()
+
     def bytesToBuffer(self, text, enc):
         '''Returns byte'''
 
         if enc in codelist:
             error = 'surrogatepass'
-        else: error = 'replace'
+        else:
+            error = 'replace'
         try:
             self.bytesText.truncate(0)
             self.bytesText.seek(0)
@@ -2728,8 +2836,8 @@ class MyFrame(ConverterFrame):
 
         if (
             not tval.startswith('Files ')
-            and len(tval) > 0 and not PREVIOUS
-           
+            and len(tval) > 0
+            and not PREVIOUS
             and PREVIOUS[-1].action != "toCyrUTF8"
         ):
             dl1 = wx.MessageBox(
@@ -2765,7 +2873,7 @@ class MyFrame(ConverterFrame):
                 fileData[fname] = os.stat(fname).st_mtime
             sortedFiles = sorted(fileData.items(), key=itemgetter(1))
             if sortedFiles:
-                delete = len(sortedFiles)-30
+                delete = len(sortedFiles) - 30
                 for x in range(0, delete):
                     os.remove(sortedFiles[x][0])
                     logger.debug(f"removed: {sortedFiles[x][0]}")
@@ -2813,21 +2921,21 @@ class MyFrame(ConverterFrame):
 
             with open(join("resources", "var", "dialog_settings.db.dat"), "wb") as f:
                 pickle.dump(FILE_SETTINGS, f)
-        
+
         event.Skip()
 
     def onShortcutChanged(self, event):
-        
+
         shortcut = event.GetShortcut()
         newAccel = event.GetAccelerator()
         if newAccel == "Disabled":
             newAccel = ""
         self.sc[shortcut.label] = newAccel
-        
+
         event.Skip()
-        
+
     def editShortcuts(self, event):
-        
+
         dlg = SE.ShortcutEditor(self)
         dlg.FromMenuBar(self)
         dlg.Bind(SE.EVT_SHORTCUT_CHANGED, self.onShortcutChanged)
@@ -2836,9 +2944,9 @@ class MyFrame(ConverterFrame):
             dlg.ToMenuBar(self)
             try:
                 shortcutsKey.update([(key, self.sc[key]) for key in self.sc.keys()])
-    
+
                 i_list = list(shortcutsKey.keys())
-    
+
                 with open(
                     filePath("resources", "shortcut_keys.cfg"), "r", encoding="utf-8"
                 ) as cf:
@@ -2859,9 +2967,9 @@ class MyFrame(ConverterFrame):
                     cf.write(new_f)
             except Exception as e:
                 logger.debug(f"editShortcuts: {e}")
-                
+
             dlg.Destroy()
-        
+
         event.Skip()
 
     def onSelectFont(self, event):
@@ -2877,15 +2985,17 @@ class MyFrame(ConverterFrame):
             font = data.GetChosenFont()
             colour = data.GetColour()
             winf = font.GetWeight()
-            logger.debug(f"Selected font: {font.GetFaceName()}, {font.GetPointSize()} points, colour {colour.Get()}")
-            
+            logger.debug(
+                f"Selected font: {font.GetFaceName()}, {font.GetPointSize()} points, colour {colour.Get()}"
+            )
+
             FontWeights = {
                 300: wx.FONTWEIGHT_LIGHT,
                 400: wx.FONTWEIGHT_NORMAL,
                 500: wx.FONTWEIGHT_MEDIUM,
                 600: wx.FONTWEIGHT_SEMIBOLD,
                 700: wx.FONTWEIGHT_BOLD,
-            }            
+            }
             if winf in FontWeights:
                 font_weight = FontWeights[winf]
             else:
@@ -2911,7 +3021,7 @@ class MyFrame(ConverterFrame):
         event.Skip()
 
     def size_frame(self, event):
-
+        """"""
         width, height = event.GetSize()
 
         self.fsize["W"] = width
@@ -2929,7 +3039,7 @@ class MyFrame(ConverterFrame):
     def getPathEnc(self, n):
         """"""
         return BT[n].path, BT[n].enc, BT[n].content
-        
+
     def rwFileHistory(self, hfile):
         """"""
         logfile = open(log_file_history, "w", encoding="utf-8", newline="\r\n")
@@ -2947,26 +3057,26 @@ class MyFrame(ConverterFrame):
         if not tval.startswith('Files ') and len(tval) > 0 and not PREVIOUS:
             if self.ShowDialog() is False:
                 return
-        
+
         # get the file based on the menu ID
         fileNum = event.GetId() - wx.ID_FILE1
         path = self.filehistory.GetHistoryFile(fileNum)
         if not os.path.exists(path):
             logger.debug(f"FileHistory: not found {path}")
             return
-        
+
         self.tmpPath.clear()
         BT.clear()
         PREVIOUS.clear()
         self.real_path.clear()
-        
+
         # add it back to the history so it will be moved up the list
         self.filehistory.AddFileToHistory(path)
         self.real_path.append(path)
         self.real_dir = os.path.dirname(path)
-        
+
         fileHandle(path, self.text_1)
-        
+
         self.pre_suffix = PREVIOUS[0].psuffix
         enc = PREVIOUS[0].enc
         self.enableTool()
@@ -2991,7 +3101,7 @@ class MyFrame(ConverterFrame):
 
     def undoAction(self, event):
         '''Undo changes'''
-        
+
         path = self.tmpPath[0]
         actions = [x.action for x in PREVIOUS]
         if PREVIOUS:
@@ -3005,10 +3115,10 @@ class MyFrame(ConverterFrame):
             if PREVIOUS[-1].action == "Open" and len(PREVIOUS) == 2:
                 PREVIOUS.reverse()
             prev_items = PREVIOUS[len(PREVIOUS) - 2]
-            #if len(PREVIOUS) > 2: PREVIOUS.pop()
+            # if len(PREVIOUS) > 2: PREVIOUS.pop()
 
         entered_enc = prev_items.enc
-        
+
         if prev_items:
             text = prev_items.content
             bufferText(text, WORK_TEXT)
@@ -3027,7 +3137,7 @@ class MyFrame(ConverterFrame):
         self.SetStatusText(enc, 1)
         ## None pre_suffix za početni tekst
         self.pre_suffix = prev_items.psuffix
-        
+
         addPrevious(
             prev_items.action,
             entered_enc,
@@ -3077,46 +3187,52 @@ class MyFrame(ConverterFrame):
         """"""
         if len(self.RedoText) == 0:
             self.addHistory(
-                self.text_1.GetInsertionPoint(), self.text_1.GetValue(), self.RedoText)
-            
+                self.text_1.GetInsertionPoint(), self.text_1.GetValue(), self.RedoText
+            )
+
         self.redo.Enable()
         ## UndoText
         if self.UndoText:
-            self.UndoText=sorted(set(self.UndoText), key=self.UndoText.index)
-            self.RedoText.append(self.UndoText[len(self.UndoText)-1])
-            self.text_1.SetValue(self.UndoText[len(self.UndoText)-1].text)
+            self.UndoText = sorted(set(self.UndoText), key=self.UndoText.index)
+            self.RedoText.append(self.UndoText[len(self.UndoText) - 1])
+            self.text_1.SetValue(self.UndoText[len(self.UndoText) - 1].text)
             self.text_1.SetInsertionPoint(
-                self.UndoText[len(self.UndoText)-1].position
+                self.UndoText[len(self.UndoText) - 1].position
             )
-            if len(self.UndoText) >= 2: self.UndoText = self.UndoText[:-1]
-                        
-        if not self.UndoText: self.undo.Enable(False)
-        if len(self.UndoText) > 62: self.UndoText = self.UndoText[1:]
+            if len(self.UndoText) >= 2:
+                self.UndoText = self.UndoText[:-1]
+
+        if not self.UndoText:
+            self.undo.Enable(False)
+        if len(self.UndoText) > 62:
+            self.UndoText = self.UndoText[1:]
         self.reloadtext.Enable()
         self.reload.Enable()
         event.Skip()
-        
+
     def onRedo(self, event):
         """"""
         if self.RedoText:
-            self.RedoText=sorted(set(self.RedoText), key=self.RedoText.index)
+            self.RedoText = sorted(set(self.RedoText), key=self.RedoText.index)
             self.UndoText.append(self.RedoText[-1])
-            self.text_1.SetValue(self.RedoText[len(self.RedoText)-1].text)
+            self.text_1.SetValue(self.RedoText[len(self.RedoText) - 1].text)
             self.text_1.SetInsertionPoint(
-                self.RedoText[len(self.RedoText)-1].position
+                self.RedoText[len(self.RedoText) - 1].position
             )
-            
+
             self.RedoText = self.RedoText[:-1]
-                
-        if not self.RedoText: self.redo.Enable(False)
-        if len(self.RedoText) > 62: self.RedoText = self.RedoText[1:]
+
+        if not self.RedoText:
+            self.redo.Enable(False)
+        if len(self.RedoText) > 62:
+            self.RedoText = self.RedoText[1:]
         event.Skip()
 
     def addHistory(self, position, text, l, k):
         '''This function creates namedtuple'''
         hist = namedtuple("hist", ["position", "text", "k"])
-        l.append(hist(position, text, k))        
-        
+        l.append(hist(position, text, k))
+
     def ShowDialog(self):
 
         if self.dont_show:
@@ -3137,7 +3253,7 @@ class MyFrame(ConverterFrame):
             if dlg.IsCheckBoxChecked():
                 self.dont_show = True
             return False
-    
+
     def displayText(self, intext=[]):
         """"""
         if self.hideDialog is True:
@@ -3151,89 +3267,93 @@ class MyFrame(ConverterFrame):
             if dlg.IsCheckBoxChecked():
                 self.hideDialog = True
             dlg.Destroy()
-            
+
     def onChoice(self, event):
-        
+
         ctrl = event.GetEventObject()
         value = ctrl.GetValue()
-        
+
         FILE_SETTINGS["CB_value"] = value
-        
+
         with open(filePath('resources', 'var', 'obsE.pkl'), 'wb') as f:
             pickle.dump(value, f)
-            
+
         event.Skip()
-            def onAbout(self, event):
-        text = (f"SubtitleConverter\n\n"
-        f"Jednostavna wxPython aplikacija\n"
-        f"za konvertovanje srt i txt fajlova\n"
-        f"i transkripciju engleskih imena i pojmova.\n\n"
-        f"Program ima ove opcije:\n"
-        f"-Preslovljavanje latinice u ćirilicu i promena kodnog rasporeda.\n"
-        f"-Konvertovanje unikode u ANSI format.\n"
-        f"-Konvertovanje ANSI u unikode.\n"
-        f"-Default izlazni kodeci su cp1250, 1251 i utf-8.\n"
-        f"-Zamena engleskih imena u titlu odgovarajućim iz rečnika.\n"
-        f" Default enkoding je UTF-8.\n"
-        f"-Mogućnost dodavanja novih definicija za transkripciju u rečnicima.\n"
-        f"-Program konvertuje titlove sa ćiriličnim pismom u latinicu.\n\n"
-        f"Autor: padovaSR\n"
-        f"https://github.com/padovaSR\n"
-        f"License: GNU GPL v2")
+
+    def onAbout(self, event):
+        text = (
+            f"SubtitleConverter\n\n"
+            f"Jednostavna wxPython aplikacija\n"
+            f"za konvertovanje srt i txt fajlova\n"
+            f"i transkripciju engleskih imena i pojmova.\n\n"
+            f"Program ima ove opcije:\n"
+            f"-Preslovljavanje latinice u ćirilicu i promena kodnog rasporeda.\n"
+            f"-Konvertovanje unikode u ANSI format.\n"
+            f"-Konvertovanje ANSI u unikode.\n"
+            f"-Default izlazni kodeci su cp1250, 1251 i utf-8.\n"
+            f"-Zamena engleskih imena u titlu odgovarajućim iz rečnika.\n"
+            f" Default enkoding je UTF-8.\n"
+            f"-Mogućnost dodavanja novih definicija za transkripciju u rečnicima.\n"
+            f"-Program konvertuje titlove sa ćiriličnim pismom u latinicu.\n\n"
+            f"Autor: padovaSR\n"
+            f"https://github.com/padovaSR\n"
+            f"License: GNU GPL v2"
+        )
         AboutDlg = wx.MessageDialog(
             self, text, f"SubtitleConverter {VERSION}", wx.OK | wx.ICON_INFORMATION
         )
         AboutDlg.ShowModal()
         event.Skip()
-        
+
     def onManual(self, event):
         dlg = MyManual(None)
         dlg.Show()
-        event.Skip()        
-    
+        event.Skip()
+
     def EvtKey(self, event):
         """"""
-        #keycode = event.GetKeyCode()
-        
-        #if not self.text_1.GetValue().startswith("Files ") and not any(
-            #[keycode == x for x in (306, 307, 308, 311, 314, 315, 316, 317)]
-        #):
-            #if any(keycode == x for x in [13, 32, 46]):
-                #k = keycode
-            #else: k = None
-            #self.addHistory(
-                #self.text_1.GetInsertionPoint(),
-                #self.text_1.GetValue(),
-                #l=self.UndoText,
-                #k=k,
-            #)
-            #self.UndoText = sorted(set(self.UndoText), key=self.UndoText.index)
-            #if (
-                #any(self.UndoText[-1].k == x for x in [13, 32, 46])
-                #and len(self.UndoText) > 0
-            #):
-                #for i in self.UndoText:
-                    #if i.k != 32:
-                        #self.UndoText.remove(i)
-            #self.undo.Enable()
+        # keycode = event.GetKeyCode()
+
+        # if not self.text_1.GetValue().startswith("Files ") and not any(
+        # [keycode == x for x in (306, 307, 308, 311, 314, 315, 316, 317)]
+        # ):
+        # if any(keycode == x for x in [13, 32, 46]):
+        # k = keycode
+        # else: k = None
+        # self.addHistory(
+        # self.text_1.GetInsertionPoint(),
+        # self.text_1.GetValue(),
+        # l=self.UndoText,
+        # k=k,
+        # )
+        # self.UndoText = sorted(set(self.UndoText), key=self.UndoText.index)
+        # if (
+        # any(self.UndoText[-1].k == x for x in [13, 32, 46])
+        # and len(self.UndoText) > 0
+        # ):
+        # for i in self.UndoText:
+        # if i.k != 32:
+        # self.UndoText.remove(i)
+        # self.undo.Enable()
         event.Skip()
-        
+
     def EvtChar(self, event):
         ''''''
         keycode = event.GetUnicodeKey()
         # print(keycode)
-        #controlDown = event.CmdDown()
-        #altDown = event.AltDown()
-        #shiftDown = event.ShiftDown()
-        
+        # controlDown = event.CmdDown()
+        # altDown = event.AltDown()
+        # shiftDown = event.ShiftDown()
+
         self.find = []
-            
+
         if not self.text_1.GetValue().startswith("Files ") and not any(
             [keycode == x for x in (306, 307, 308, 311, 314, 316)]
         ):
             if any(keycode == x for x in [13, 32, 46, 33, 63]):
                 k = keycode
-            else: k = None
+            else:
+                k = None
             self.addHistory(
                 self.text_1.GetInsertionPoint(),
                 self.text_1.GetValue(),
@@ -3248,22 +3368,25 @@ class MyFrame(ConverterFrame):
                 for i in self.UndoText:
                     if i.k != 32:
                         self.UndoText.remove(i)
-            self.undo.Enable()        
+            self.undo.Enable()
         event.Skip()
 
     def writeText(self, event):
         """"""
         text = self.text_1.GetValue()
         bufferText(text, WORK_TEXT)
-        
+
         event.Skip()
-        
+
     def searchText(self, event):
         """"""
         if not self.find:
             s_text = event.GetString()
             text2 = self.text_1.GetValue()
-            new = [(m.start(), m.end()) for m in re.finditer(re.compile(r"\b"+s_text+r"\b"), text2)]
+            new = [
+                (m.start(), m.end())
+                for m in re.finditer(re.compile(r"\b" + s_text + r"\b"), text2)
+            ]
             self.find = iter(new)
         try:
             p = next(self.find)
@@ -3273,16 +3396,17 @@ class MyFrame(ConverterFrame):
             logger.debug("Iterator exhausted")
             self.find = []
         event.Skip()
-        
+
     def searchChange(self, event):
         """"""
         self.find = []
         self.text_1.SetValue(self.text_1.GetValue())
         event.Skip()
-        
+
+
 class MyApp(wx.App):
     def remOnstart(self):
-        
+
         f_list = [
             "r_text0.pkl",
             "droped0.pkl",
@@ -3291,17 +3415,17 @@ class MyApp(wx.App):
             "rpath0.pkl",
             "dialog_settings.db.bak",
             "dialog_settings.db.dir",
-            "txt0.pkl"
+            "txt0.pkl",
         ]
         for x in f_list:
-            file_path = filePath("resources","var",x)
+            file_path = filePath("resources", "var", x)
             if os.path.isfile(file_path):
                 os.remove(file_path)
 
         if not os.path.isdir('tmp'):
             os.mkdir('tmp')
 
-        b_file = filePath("resources","var","presuffix_list.bak")
+        b_file = filePath("resources", "var", "presuffix_list.bak")
         if os.path.exists(b_file):
             with open(b_file, "r", encoding="utf-8") as f:
                 lines = f.readlines()
@@ -3324,7 +3448,7 @@ class MyApp(wx.App):
         r_list = ["shortcut_keys.cfg", "Regex_def.config"]
         v_paths = [filePath("resources", "var", x) for x in v_list]
         r_paths = [filePath("resources", x) for x in r_list]
-        logs = filePath("resources","var","log","mainlog.ini")
+        logs = filePath("resources", "var", "log", "mainlog.ini")
         v_list.append(logs)
         m_list = [x for x in (v_paths + r_paths) if not os.path.isfile(x)]
 
@@ -3336,7 +3460,7 @@ class MyApp(wx.App):
                 None, error_text, "SubConverter", wx.OK | wx.ICON_ERROR
             )
             ErrorDlg.ShowModal()
-    
+
     def OnInit(self):
         self.frame = MyFrame(None, wx.ID_ANY, "")
         self.SetTopWindow(self.frame)
