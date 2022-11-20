@@ -2982,22 +2982,11 @@ class MyFrame(ConverterFrame):
             data = dlg.GetFontData()
             font = data.GetChosenFont()
             colour = data.GetColour()
-            winf = font.GetWeight()
+            font_weight = font.GetWeight()
             logger.debug(
                 f"Selected font: {font.GetFaceName()}, {font.GetPointSize()} points, colour {colour.Get()}"
             )
 
-            FontWeights = {
-                300: wx.FONTWEIGHT_LIGHT,
-                400: wx.FONTWEIGHT_NORMAL,
-                500: wx.FONTWEIGHT_MEDIUM,
-                600: wx.FONTWEIGHT_SEMIBOLD,
-                700: wx.FONTWEIGHT_BOLD,
-            }
-            if winf in FontWeights:
-                font_weight = FontWeights[winf]
-            else:
-                font_weight = wx.FONTWEIGHT_NORMAL
             fdict = {
                 'new_font': font.GetFaceName(),
                 'fontSize': font.GetPointSize(),
@@ -3006,11 +2995,6 @@ class MyFrame(ConverterFrame):
             }
 
             FILE_SETTINGS["key4"].update(fdict)
-
-            with open(
-                filePath('resources', 'var', 'dialog_settings.db.dat'), "wb"
-            ) as s:
-                pickle.dump(FILE_SETTINGS, s)
 
             self.curFont = font
             self.curClr = fdict["fontColour"]
