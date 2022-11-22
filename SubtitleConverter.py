@@ -1821,19 +1821,13 @@ class MyFrame(ConverterFrame):
             self.fixMultiple()
         else:
             try:
-                with open(
-                    filePath('resources', 'var', 'dialog_settings.db.dat'),
-                    "rb",
-                ) as sp:
-                    data = pickle.load(sp)
-                    ex = data['key1']
-                    cb1_s = ex['fixgap']
-                    cb_sh = ex["shrinkgap"]
-                    cb8_s = ex['nuliranje']
-                    _gap = ex["mingap"]
-                    mgap = ex["maxgap"]
-                    fx = data['key5']
-                    value1_s = fx['fixed_subs']
+                ex = FILE_SETTINGS['key1']
+                cb1_s = ex['fixgap']
+                cb_sh = ex["shrinkgap"]
+                cb8_s = ex['nuliranje']
+                _gap = ex["mingap"]
+                mgap = ex["maxgap"]
+                value1_s = FILE_SETTINGS['key5']['fixed_subs']
             except Exception as e:
                 logger.debug(f"FixSubtitle error: {e}")
 
@@ -1910,19 +1904,13 @@ class MyFrame(ConverterFrame):
     def fixMultiple(self):
         """"""
         try:
-            with open(
-                filePath('resources', 'var', 'dialog_settings.db.dat'),
-                "rb",
-            ) as sp:
-                data = pickle.load(sp)
-                ex = data['key1']
-                cb1_s = ex['fixgap']
-                cb_sh = ex["shrinkgap"]
-                cb8_s = ex['nuliranje']
-                _gap = ex["mingap"]
-                mgap = ex["maxgap"]
-                fx = data['key5']
-                value1_s = fx['fixed_subs']
+            ex = FILE_SETTINGS['key1']
+            cb1_s = ex['fixgap']
+            cb_sh = ex["shrinkgap"]
+            cb8_s = ex['nuliranje']
+            _gap = ex["mingap"]
+            mgap = ex["maxgap"]
+            value1_s = FILE_SETTINGS['key5']['fixed_subs']
         except Exception as e:
             logger.debug(f"FixSubtitle error: {e}")
 
