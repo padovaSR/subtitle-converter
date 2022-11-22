@@ -549,8 +549,8 @@ class ConverterFrame(wx.Frame):
         for i in range(len(frame_statusbar_fields)):
             self.frame_statusbar.SetStatusText(frame_statusbar_fields[i], i)
 
-        ## Tool Bar ###############################################################################
-        self.frame_toolbar = wx.ToolBar(self, -1, style=wx.TB_DEFAULT_STYLE)
+        ## ToolBar ###############################################################################
+        self.frame_toolbar = self.CreateToolBar(wx.TB_DEFAULT_STYLE|wx.TB_NODIVIDER, wx.ID_ANY)
         self.frame_toolbar.AddTool(
             1001,
             "Open",
