@@ -6,9 +6,8 @@
 
 import wx
 import wx.lib.intctrl
-import os
+from os.path import join
 
-import pickle
 from settings import FILE_SETTINGS
 import logging.config
 
@@ -23,50 +22,42 @@ class FixerSettings(wx.Dialog):
         self.SetSize((340, 270))
         self.SetTitle("Fixer Settings")
         _icon = wx.NullIcon
-        _icon.CopyFromBitmap(
-            wx.Bitmap(
-                os.path.join("resources", "icons", "tool.ico"),
-                wx.BITMAP_TYPE_ANY,
-            )
-        )
+        _icon.CopyFromBitmap(wx.Bitmap(join("resources", "icons", "tool.ico"), wx.BITMAP_TYPE_ANY,))
         self.SetIcon(_icon)
 
         sizer_1 = wx.BoxSizer(wx.VERTICAL)
 
         sizer_3 = wx.BoxSizer(wx.HORIZONTAL)
-        sizer_1.Add(sizer_3, 0, wx.EXPAND|wx.TOP|wx.LEFT, 5)
+        sizer_1.Add(sizer_3, 0, wx.EXPAND | wx.TOP | wx.LEFT, 5)
 
         self.cbx_8 = wx.CheckBox(self, wx.ID_ANY, "Popravi gapove na:  ")
         self.cbx_8.SetMinSize((140, 15))
-        sizer_3.Add(
-            self.cbx_8, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT | wx.TOP, 5
-        )
+        sizer_3.Add(self.cbx_8, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT | wx.TOP, 5)
         sizer_3.Add((27, 18), 0, 0, 0)
 
         self.mingap = wx.lib.intctrl.IntCtrl(self, size=(50, -1))
         sizer_3.Add(self.mingap, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 3)
 
         self.label_1 = wx.StaticText(self, wx.ID_ANY, "(ms)")
-        sizer_3.Add(self.label_1, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT|wx.RIGHT, 5)
-        
+        sizer_3.Add(self.label_1, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT | wx.RIGHT, 5)
+
         sizer_3.Add((64, 20), 0, 0, 0)
 
         sizer_4 = wx.BoxSizer(wx.HORIZONTAL)
-        sizer_1.Add(sizer_4, 0, wx.EXPAND|wx.TOP|wx.LEFT, 5)
-        
+        sizer_1.Add(sizer_4, 0, wx.EXPAND | wx.TOP | wx.LEFT, 5)
+
         self.cbx_n = wx.CheckBox(self, wx.ID_ANY, "Smanji gapove veličine do:  ")
+        self.cbx_n.SetToolTip(f"Smanji gapove do zadate vrednosti na\ndrugu manju vrednost u ms")
         self.cbx_n.SetMinSize((158, 15))
-        sizer_4.Add(
-            self.cbx_n, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT | wx.TOP, 5
-        )
+        sizer_4.Add(self.cbx_n, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT | wx.TOP, 5)
         sizer_4.Add((10, 18), 0, 0, 0)
 
         self.maxgap = wx.lib.intctrl.IntCtrl(self, size=(50, -1))
         sizer_4.Add(self.maxgap, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 3)
 
         self.label_n = wx.StaticText(self, wx.ID_ANY, "(ms)")
-        sizer_4.Add(self.label_n, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT|wx.RIGHT, 5)
-        
+        sizer_4.Add(self.label_n, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT | wx.RIGHT, 5)
+
         sizer_4.Add((64, 20), 0, 0, 0)
 
         self.cbx_7 = wx.CheckBox(
@@ -104,12 +95,15 @@ class FixerSettings(wx.Dialog):
         )
         self.cbx_2.SetMinSize((46, 15))
         sizer_1.Add(self.cbx_2, 0, wx.EXPAND | wx.LEFT | wx.TOP, 5)
-        
+
         self.cbx_nl = wx.CheckBox(
-            self, wx.ID_ANY, "Ukloni prelom redova u tekstu (line-breaks '\\n')", style=wx.CHK_2STATE
+            self,
+            wx.ID_ANY,
+            "Ukloni prelom redova u tekstu (line-breaks '\\n')",
+            style=wx.CHK_2STATE,
         )
         self.cbx_nl.SetMinSize((46, 15))
-        sizer_1.Add(self.cbx_nl, 0, wx.EXPAND | wx.LEFT | wx.TOP, 5)        
+        sizer_1.Add(self.cbx_nl, 0, wx.EXPAND | wx.LEFT | wx.TOP, 5)
 
         self.cbx_1 = wx.CheckBox(
             self, wx.ID_ANY, "Nuliranje vremena celog titla", style=wx.CHK_2STATE
@@ -117,34 +111,37 @@ class FixerSettings(wx.Dialog):
         self.cbx_1.SetForegroundColour(wx.Colour(255, 0, 0))
         self.cbx_1.SetToolTip("\n Carefully, think twice :-)\n \n")
         sizer_1.Add(self.cbx_1, 0, wx.EXPAND | wx.LEFT | wx.TOP, 5)
-        
-        t1 = os.path.join('resources', 'var', 'dialog_settings.db.dat')
+
         ## cbx_8=GAP, cbx7=Poravnaj linie, cbx_6=Crtice na početku, cbx_5=Spejs iza crtice,
         ## cbx_4=Suvišni spejsevi, cbx_3=Suvišni italik tagovi, cbx_2=Kolor tagovi, cbx_1=Nuliranje
-        if os.path.exists(t1):
-            try:
-                with open(
-                    os.path.join('resources', 'var', 'dialog_settings.db.dat'), "rb"
-                ) as sp: data = pickle.load(sp)
-                ex = data['key1']
-                self.cbx_1.SetValue(ex["nuliranje"])
-                self.cbx_nl.SetValue(ex["breaks"])
-                self.cbx_2.SetValue(ex["kolor"])
-                self.cbx_3.SetValue(ex["italik"])
-                self.cbx_4.SetValue(ex["spejsevi"])
-                self.cbx_5.SetValue(ex["crtice_sp"])
-                self.cbx_6.SetValue(ex["crtice"])
-                self.cbx_7.SetValue(ex["linije"])
-                self.cbx_8.SetValue(ex["fixgap"])
-                self.cbx_n.SetValue(ex["shrinkgap"])
-                self.mingap.SetValue(ex["mingap"])
-                self.maxgap.SetValue(ex["maxgap"])
-            except Exception as e:
-                logger.debug(f"fixerSetting error: {e}")
-                
-            for i in [self.cbx_8, self.mingap, self.label_1, self.cbx_n, self.maxgap, self.label_n]:
-                if self.cbx_1.IsChecked(): i.Disable()
-                    
+        try:
+            ex = FILE_SETTINGS['key1']
+            self.cbx_1.SetValue(ex["nuliranje"])
+            self.cbx_nl.SetValue(ex["breaks"])
+            self.cbx_2.SetValue(ex["kolor"])
+            self.cbx_3.SetValue(ex["italik"])
+            self.cbx_4.SetValue(ex["spejsevi"])
+            self.cbx_5.SetValue(ex["crtice_sp"])
+            self.cbx_6.SetValue(ex["crtice"])
+            self.cbx_7.SetValue(ex["linije"])
+            self.cbx_8.SetValue(ex["fixgap"])
+            self.cbx_n.SetValue(ex["shrinkgap"])
+            self.mingap.SetValue(ex["mingap"])
+            self.maxgap.SetValue(ex["maxgap"])
+        except Exception as e:
+            logger.debug(f"fixerSetting error: {e}")
+
+        for i in [
+            self.cbx_8,
+            self.mingap,
+            self.label_1,
+            self.cbx_n,
+            self.maxgap,
+            self.label_n,
+        ]:
+            if self.cbx_1.IsChecked():
+                i.Disable()
+
         static_line_1 = wx.StaticLine(self, wx.ID_ANY)
         sizer_1.Add(static_line_1, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
 
@@ -176,12 +173,20 @@ class FixerSettings(wx.Dialog):
 
     def EvtChBox(self, event):
         """"""
-        for i in [self.cbx_8, self.mingap, self.label_1, self.cbx_n, self.maxgap, self.label_n]:
+        for i in [
+            self.cbx_8,
+            self.mingap,
+            self.label_1,
+            self.cbx_n,
+            self.maxgap,
+            self.label_n,
+        ]:
             if self.cbx_1.IsChecked():
                 i.Disable()
-            else: i.Enable()
+            else:
+                i.Enable()
         event.Skip()
-    
+
     def on_cancel(self, event):
         self.Destroy()
         event.Skip()
@@ -190,7 +195,7 @@ class FixerSettings(wx.Dialog):
         ''''''
         ## cbx_8=GAP, cbx7=Poravnaj linie, cbx_6=Crtice na početku, cbx_5=Spejs iza crtice,
         ## cbx_4=Suvišni spejsevicbx_3=Suvišni italik tagovi, cbx_2=Kolor tagovi, cbx_1=Nuliranje
-        sdict = {
+        FILE_SETTINGS["key1"] = {
             'nuliranje': self.cbx_1.GetValue(),
             'breaks': self.cbx_nl.GetValue(),
             'kolor': self.cbx_2.GetValue(),
@@ -204,14 +209,6 @@ class FixerSettings(wx.Dialog):
             'mingap': self.mingap.GetValue(),
             'maxgap': self.maxgap.GetValue(),
         }
-
-        FILE_SETTINGS["key1"] = sdict
-
-        with open(
-            os.path.join('resources', 'var', 'dialog_settings.db.dat'), "wb"
-        ) as s:
-            pickle.dump(FILE_SETTINGS, s)
-
         self.EndModal(True)
 
     def onClose(self, event):
@@ -227,8 +224,6 @@ class MyApp(wx.App):
         self.dialog.Destroy()
         return True
 
-
-# end of class MyApp
 
 if __name__ == "__main__":
     app = MyApp(0)
