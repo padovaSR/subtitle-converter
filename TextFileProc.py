@@ -535,20 +535,16 @@ def rm_dash(text_in):
 
     # fix settings ------------------------------------------------------------------------------
     try:
-        with open(
-            os.path.join('resources', 'var', 'dialog_settings.db.dat'), "rb"
-        ) as sp:
-            data = pickle.load(sp)
-            ex = data['key1']
-            cb1_s = ex['fixgap']
-            cb2_s = ex['linije']
-            cb3_s = ex['italik']
-            cb4_s = ex['crtice']
-            cb5_s = ex['crtice_sp']
-            cb6_s = ex['spejsevi']
-            cb7_s = ex['kolor']
-            cb_nl = ex['breaks']
-            cb8_s = ex['nuliranje']
+        ex = FILE_SETTINGS['key1']
+        cb1_s = ex['fixgap']
+        cb2_s = ex['linije']
+        cb3_s = ex['italik']
+        cb4_s = ex['crtice']
+        cb5_s = ex['crtice_sp']
+        cb6_s = ex['spejsevi']
+        cb7_s = ex['kolor']
+        cb_nl = ex['breaks']
+        cb8_s = ex['nuliranje']
     except IOError as e:
         logger.debug("FixSubtitle, I/O error({0}): {1}".format(e.errno, e.strerror))
     except Exception as e:
@@ -1210,40 +1206,9 @@ def checkFile(path, newfile, text_s, multi=False):
         
 def checkErrors(text_in):
     
-    fpaterns = '|'.join(
-        [
-            'ï»¿Å',
-            'Ä',
-            'Å½',
-            'Ä',
-            'Ä',
-            'Å¡',
-            'Ä',
-            'Å¾',
-            'Ä',
-            'Ä',
-            "ď»ż",
-            "Ĺ˝",
-            'Ĺ ',
-            'ĹĄ',
-            'Ĺž',
-            'Ä',
-            'Å ',
-            'Ä‡',
-            'Ä¿',
-            'Ä²',
-            'Ä³',
-            'Å¿',
-            'Ã¢â',
-            "�",
-            "Д†",
-            "Д‡",
-            "Ť",
-            "Lˇ",
-            "ï»¿",
-            "ð",
-        ]
-    )
+    fpaterns =\
+        '|'.join(['ï»¿Å','Ä','Å½','Ä','Ä','Å¡','Ä','Å¾','Ä','Ä',"ď»ż","Ĺ˝",'Ĺ',\
+        'ĹĄ','Ĺž','Ä','Å','Ä‡','Ä¿','Ä²','Ä³','Å¿','Ã¢â',"�","Д†","Д‡","Ť","Lˇ","ï»¿","ð", "¿"])
     
     MOJIBAKE_SYMBOL_RE = re.compile(
         '[ÂÃĂ][\x80-\x9f€ƒ‚„†‡ˆ‰‹Œ“•˜œŸ¡¢£¤¥¦§¨ª«¬¯°±²³µ¶·¸¹º¼½¾¿ˇ˘˝]|'
