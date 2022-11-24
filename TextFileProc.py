@@ -733,7 +733,8 @@ class FileOpened:
         self.path = path
         self.multi = multi
 
-        self.ErrorDlg = wx.MessageDialog(
+    def ErrorDlg(self):
+        return wx.MessageDialog(
             None,
             f"UnicodeDecodeError\n\n"
             f"Detektovane greške u tekstu,\n"
@@ -1223,14 +1224,11 @@ def checkErrors(text_in):
     l1 = []; l2 = []
     try:
         for match in re.finditer(MOJIBAKE_SYMBOL_RE, text_in):
-            begin = match.start()
-            end = match.end()
-            l1.append(begin)
-            l2.append(end)
-        f_list = [(x,y) for x, y in zip(l1, l2)]
-        return f_list
+            l1.append(match.start())
+            l2.append(match.end())
+        return [(x,y) for x, y in zip(l1, l2)]
     except Exception as e:
-        logger.debug("CheckErrors ({0}):".format(e))
+        logger.debug(f"CheckErrors: ({e})")
         return []
     
 def checkChars(text, path=None):
