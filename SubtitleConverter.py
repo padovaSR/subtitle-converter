@@ -160,22 +160,6 @@ class MyFrame(ConverterFrame):
         self.filehistory.UseMenu(self.file_sub)
         self.filehistory.AddFilesToMenu()
 
-        self.menu_items = [
-            self.cleaner,
-            self.cyr_to_ansi,
-            self.cyr_to_utf,
-            self.export_zip,
-            self.fixer,
-            self.merger,
-            self._regex,
-            self.specials,
-            self.to_ansi,
-            self.to_cyrillic,
-            self.to_utf8,
-            self.transcrib,
-            self.change,
-        ]
-
         ## MENU EVENTS ##############################################################################
         self.Bind(wx.EVT_MENU, self.onOpen, id=self.fopen.GetId())
         self.Bind(wx.EVT_MENU, self.getMultipleFiles, id=self.openMulti.GetId())
@@ -268,6 +252,21 @@ class MyFrame(ConverterFrame):
             else:
                 FILE_HISTORY.remove(i)
         ##=========================================================================================##
+        self.menu_items = [
+            self.cleaner,
+            self.cyr_to_ansi,
+            self.cyr_to_utf,
+            self.export_zip,
+            self.fixer,
+            self.merger,
+            self._regex,
+            self.specials,
+            self.to_ansi,
+            self.to_cyrillic,
+            self.to_utf8,
+            self.transcrib,
+            self.change,
+        ]        
         self.disableTool()
 
         dispatcher.connect(self.updateStatus, signal="TMP_PATH", sender=dispatcher.Any)
@@ -426,7 +425,7 @@ class MyFrame(ConverterFrame):
         """"""
         tval = self.text_1.GetValue()
         if not all([self.real_path, PREVIOUS]):
-            if not tval.startswith('Files ') and self.UndoText and len(tval) > 40:
+            if not tval.startswith('Files ') and self.UndoText:
                 try:
                     text = self.text_1.GetValue()
                     place = self.text_1.GetInsertionPoint()
@@ -450,6 +449,9 @@ class MyFrame(ConverterFrame):
                     self.SetStatusText("UTF-8", 1)
                     self.enableTool()
                     self.undo.Enable()
+                    self.save.Enable()
+                    self.save_as.Enable()
+                    self.frame_toolbar.EnableTool(1010, True)  ## 1010=Save
                 except Exception as e:
                     logger.debug(f"newText: {e}")
         event.Skip()
@@ -700,12 +702,10 @@ class MyFrame(ConverterFrame):
         event.Skip()
 
     def toCyrillic(self, event):
-
-        with open(filePath("resources", "var", "dialog_settings.db.dat"), "rb") as sp:
-            data = pickle.load(sp)
-            ex = data['key5']
-            value1_s = ex['cyr_ansi_srt']
-            value2_s = ex['cyr_utf8_txt']
+        """"""
+        
+        value1_s = FILE_SETTINGS['key5']['cyr_ansi_srt']
+        value2_s = FILE_SETTINGS['key5']['cyr_utf8_txt']
 
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and not PREVIOUS:
@@ -879,11 +879,9 @@ class MyFrame(ConverterFrame):
         self.to_ansi.Enable(False)
 
     def toANSI(self, event):
+        """"""
 
-        with open(filePath("resources", "var", "dialog_settings.db.dat"), "rb") as sp:
-            data = pickle.load(sp)
-            ex = data['key5']
-            value4_s = ex['lat_ansi_srt']
+        value4_s = FILE_SETTINGS['key5']['lat_ansi_srt']
 
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and not PREVIOUS:
@@ -1233,10 +1231,8 @@ class MyFrame(ConverterFrame):
 
     def toCyrUTF8(self, event):
         ''''''
-        with open(filePath("resources", "var", "dialog_settings.db.dat"), "rb") as sp:
-            data = pickle.load(sp)
-            ex = data['key5']
-            value_s = ex["cyr_utf8_srt"]
+
+        value_s = FILE_SETTINGS['key5']["cyr_utf8_srt"]
 
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and not PREVIOUS:
@@ -1386,11 +1382,8 @@ class MyFrame(ConverterFrame):
         self.multipleTools()
 
     def toUTF(self, event):
-
-        with open(filePath("resources", "var", "dialog_settings.db.dat"), "rb") as sp:
-            data = pickle.load(sp)
-            ex = data['key5']
-            value1_s = ex['lat_utf8_srt']
+        """"""
+        value1_s = FILE_SETTINGS['key5']['lat_utf8_srt']
 
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and not PREVIOUS:
@@ -1534,13 +1527,7 @@ class MyFrame(ConverterFrame):
             if self.ShowDialog() is False:
                 return
 
-        with open(
-            filePath("resources", "var", "dialog_settings.db.dat"),
-            "rb",
-        ) as sp:
-            data = pickle.load(sp)
-            ex = data['key5']
-            value1_s = ex['lat_ansi_srt']
+        value1_s = FILE_SETTINGS['key5']['lat_ansi_srt']
 
         path, entered_enc = self.PathEnc()
 
@@ -1674,10 +1661,7 @@ class MyFrame(ConverterFrame):
             if self.ShowDialog() is False:
                 return
 
-        with open(filePath("resources", "var", "dialog_settings.db.dat"), "rb") as sp:
-            data = pickle.load(sp)
-            ex = data['key5']
-            value1_s = ex['lat_utf8_srt']
+        value1_s = FILE_SETTINGS['key5']['lat_utf8_srt']
 
         path, entered_enc = self.PathEnc()
 
@@ -1980,14 +1964,8 @@ class MyFrame(ConverterFrame):
         self.SetStatusText(printEncoding(self.newEnc), 1)
 
     def onCleanup(self, event):
-
-        with open(
-            filePath("resources", "var", "dialog_settings.db.dat"),
-            "rb",
-        ) as sp:
-            data = pickle.load(sp)
-            ex = data['key5']
-            value1_s = ex['cleanup']
+        """"""
+        value1_s = FILE_SETTINGS['key5']['cleanup']
 
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and not PREVIOUS:
@@ -2062,14 +2040,8 @@ class MyFrame(ConverterFrame):
         event.Skip()
 
     def onTranscribe(self, event):
-
-        with open(
-            filePath("resources", "var", "dialog_settings.db.dat"),
-            "rb",
-        ) as sp:
-            data = pickle.load(sp)
-            ex = data['key5']
-            value1_s = ex['transcribe']
+        """"""
+        value1_s = FILE_SETTINGS['key5']['transcribe']
 
         tval = self.text_1.GetValue()
         if not tval.startswith('Files ') and len(tval) > 0 and not PREVIOUS:
@@ -2321,16 +2293,11 @@ class MyFrame(ConverterFrame):
         self.newEnc = entered_enc
 
         try:
-            with open(
-                filePath('resources', 'var', 'dialog_settings.db.dat'),
-                "rb",
-            ) as sp:
-                data = pickle.load(sp)
-                ex = data['key2']
-                lineLenght = ex['l_lenght']
-                maxChar = ex['m_char']
-                maxGap = ex['m_gap']
-                file_suffix = ex['f_suffix']
+            ex = FILE_SETTINGS['key2']
+            lineLenght = ex['l_lenght']
+            maxChar = ex['m_char']
+            maxGap = ex['m_gap']
+            file_suffix = ex['f_suffix']
         except Exception as e:
             logger.debug(f"Merger, unexpected error: {e}")
 
@@ -2406,13 +2373,8 @@ class MyFrame(ConverterFrame):
             if BT:
                 if len(BT) > 1:
                     return
-            with open(
-                filePath("resources", "var", "dialog_settings.db.dat"), "rb"
-            ) as sp:
-                data = pickle.load(sp)
-                ex = data['key5']
-                value_s = ex["lat_utf8_srt"]
-                value_c = ex["cyr_ansi_srt"]
+            value_s = FILE_SETTINGS['key5']["lat_utf8_srt"]
+            value_c = FILE_SETTINGS['key5']["cyr_ansi_srt"]
             fpath, e = self.PathEnc()
             tpath = baseName(fpath)
             enc = self.newEnc
@@ -2824,7 +2786,6 @@ class MyFrame(ConverterFrame):
             not tval.startswith('Files ')
             and len(tval) > 0
             and not PREVIOUS
-            and PREVIOUS[-1].action != "toCyrUTF8"
         ):
             dl1 = wx.MessageBox(
                 "Current content has not been saved! Proceed?",
@@ -2961,7 +2922,7 @@ class MyFrame(ConverterFrame):
     def onSelectFont(self, event):
         data = wx.FontData()
         data.EnableEffects(True)
-        data.SetColour(self.curClr)  # set colour
+        data.SetColour(self.curClr)
         data.SetInitialFont(self.curFont)
 
         dlg = wx.FontDialog(self, data)
