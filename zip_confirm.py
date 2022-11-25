@@ -20,7 +20,7 @@
 #
 
 import wx
-from os.path import join, basename, dirname 
+from os.path import join, basename, dirname
 import logging.config
 
 logger = logging.getLogger(__name__)
@@ -34,14 +34,12 @@ class TreeDialog(wx.Dialog):
         self.files = files
         self.caption = caption
         self.root_name = root_name
-        
+
         self.SetSize((439, 434))
         self.SetTitle(self.caption)
         _icon = wx.NullIcon
         _icon.CopyFromBitmap(
-            wx.Bitmap(
-                join("resources", "icons", "subConvert.ico"), wx.BITMAP_TYPE_ANY
-            )
+            wx.Bitmap(join("resources", "icons", "subConvert.ico"), wx.BITMAP_TYPE_ANY)
         )
         self.SetIcon(_icon)
         self.SetFocus()
@@ -136,9 +134,7 @@ class TreeDialog(wx.Dialog):
         isz = (16, 16)
         il = wx.ImageList(*isz)
         self.fldrix = il.Add(
-            wx.Bitmap(
-                join("resources", "icons", "a-zip-icon.png"), wx.BITMAP_TYPE_ANY
-            )
+            wx.Bitmap(join("resources", "icons", "a-zip-icon.png"), wx.BITMAP_TYPE_ANY)
         )
         self.fldridx = il.Add(
             wx.ArtProvider.GetBitmap(wx.ART_FOLDER, wx.ART_OTHER, isz)
@@ -173,7 +169,9 @@ class TreeDialog(wx.Dialog):
                 for x in range(len(fItems)):
                     if a == fItems[x]:
                         lfile = self.tree.AppendItem(cItems[x], b)
-                        self.tree.SetItemImage(lfile, self.fileidx, wx.TreeItemIcon_Normal)
+                        self.tree.SetItemImage(
+                            lfile, self.fileidx, wx.TreeItemIcon_Normal
+                        )
             for i in cItems:
                 self.tree.SetItemImage(i, self.fldridx, wx.TreeItemIcon_Normal)
                 self.tree.SetItemImage(i, self.fldropenidx, wx.TreeItemIcon_Expanded)
@@ -189,7 +187,7 @@ class TreeDialog(wx.Dialog):
             for i in cItems:
                 self.tree.SetItemImage(i, self.fileidx, wx.TreeItemIcon_Normal)
             return cItems
-        
+
     def makeFolder(self):
         """"""
         return self.checkbox_1.IsChecked()
