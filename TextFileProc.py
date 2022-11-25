@@ -791,6 +791,8 @@ class FileOpened:
                     else:
                         logger.debug(f'{self.path}: Canceled.')
                         dlg.Destroy()
+                except Exception as e:
+                    logger.debug(f"isCompressed: {e}")
                 finally:
                     dlg.Destroy()
 
