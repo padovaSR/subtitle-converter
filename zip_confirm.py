@@ -20,8 +20,7 @@
 #
 
 import wx
-import os
-from settings import filePath
+from os.path import join, basename, dirname 
 import logging.config
 
 logger = logging.getLogger(__name__)
@@ -41,7 +40,7 @@ class TreeDialog(wx.Dialog):
         _icon = wx.NullIcon
         _icon.CopyFromBitmap(
             wx.Bitmap(
-                filePath("resources", "icons", "subConvert.ico"), wx.BITMAP_TYPE_ANY
+                join("resources", "icons", "subConvert.ico"), wx.BITMAP_TYPE_ANY
             )
         )
         self.SetIcon(_icon)
@@ -138,7 +137,7 @@ class TreeDialog(wx.Dialog):
         il = wx.ImageList(*isz)
         self.fldrix = il.Add(
             wx.Bitmap(
-                filePath("resources", "icons", "a-zip-icon.png"), wx.BITMAP_TYPE_ANY
+                join("resources", "icons", "a-zip-icon.png"), wx.BITMAP_TYPE_ANY
             )
         )
         self.fldridx = il.Add(
@@ -165,12 +164,12 @@ class TreeDialog(wx.Dialog):
     def makeMenu(self, items=[]):
         """"""
         if self.checkbox_1.IsChecked():
-            l = [os.path.dirname(x) for x in items]
+            l = [dirname(x) for x in items]
             fItems = sorted(set(l), key=l.index)
             cItems = [self.tree.AppendItem(self.root, x) for x in fItems]
             for i in items:
-                a = os.path.dirname(i)
-                b = os.path.basename(i)
+                a = dirname(i)
+                b = basename(i)
                 for x in range(len(fItems)):
                     if a == fItems[x]:
                         lfile = self.tree.AppendItem(cItems[x], b)
@@ -186,7 +185,7 @@ class TreeDialog(wx.Dialog):
             fItems.append(items)
             for x in fItems:
                 for i in range(len(x)):
-                    cItems.append(self.tree.AppendItem(self.root, os.path.basename(x[i])))
+                    cItems.append(self.tree.AppendItem(self.root, basename(x[i])))
             for i in cItems:
                 self.tree.SetItemImage(i, self.fileidx, wx.TreeItemIcon_Normal)
             return cItems
