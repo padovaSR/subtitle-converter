@@ -4,8 +4,8 @@
 
 from io import StringIO
 import os
+from os.path import join 
 import re
-import pickle
 import zipfile
 from collections import defaultdict, OrderedDict 
 import json
@@ -58,29 +58,12 @@ with open(log_file_history, encoding="utf-8") as f:
 
 def preSuffix():
     ''''''
-    with open(
-        os.path.join("resources", "var", "presuffix_list.bak"), 'r', encoding='utf-8'
-    ) as l:
-        added = [line.strip("\n") for line in l if line]
-
-    with open(os.path.join("resources", "var", "file_ext.pkl"), "rb") as f:
-        ex = pickle.load(f)
-        value2_s = ex['cyr_utf8_txt']
-        value5_s = ex['lat_utf8_srt']
-
-    with open(os.path.join("resources", "var", "m_extensions.pkl"), "rb") as f:
-        value_m = pickle.load(f)  #  Merger suffix
-
-    with open(settings_file, 'r') as tf:
-        data = json.loads(tf.read())
-        try:
-            oformat = data["Preferences"]["utf8_txt"]# TXT suffix
-        except: oformat = False
-    return [added, value2_s, value5_s, value_m, oformat, ex]
-
-name_data = preSuffix()
+    with open(join("resources", "var", "presuffix_list.bak"), 'r', encoding='utf-8') as l:
+        return [line.strip("\n") for line in l if line]
 
 FILE_SETTINGS=defaultdict(str)
 
 with open(settings_file, "r") as f:
     FILE_SETTINGS.update(json.loads(f.read()))
+
+FILE_SETTINGS["Added_ext"] = preSuffix()
