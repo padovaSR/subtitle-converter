@@ -5,15 +5,6 @@
         "preprocess": true,
         "ShowLog": false
     },
-    "new_font": "Segoe UI",
-    "fontSize": 9,
-    "fontColour": [
-        0,
-        0,
-        0,
-        255
-    ],
-    "weight": 400,
     "key4": {
         "new_font": "Franklin Gothic Medium",
         "fontSize": 10,
@@ -41,7 +32,7 @@
     },
     "key2": {
         "l_lenght": 6000,
-        "m_char": 68,
+        "m_char": 62,
         "m_gap": 600,
         "f_suffix": "_merged"
     },
