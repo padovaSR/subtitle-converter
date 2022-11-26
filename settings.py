@@ -8,12 +8,15 @@ import re
 import pickle
 import zipfile
 from collections import defaultdict, OrderedDict 
+import json
 
 chreg = re.compile("¬")
 
 log_file = os.path.join("resources","var","log","subtitle_converter.log")
 log_file_history = os.path.join("resources","var","log","file.history.log")
 droppedText = os.path.join('resources', 'var', 'r_text0.pkl')
+
+settings_file = os.path.join("resources", "var", "dialog_settings.db.json")
 
 FILE_HISTORY = []
 
@@ -68,8 +71,8 @@ def preSuffix():
     with open(os.path.join("resources", "var", "m_extensions.pkl"), "rb") as f:
         value_m = pickle.load(f)  #  Merger suffix
 
-    with open(os.path.join('resources', 'var', 'dialog_settings.db.dat'), 'rb') as tf:
-        data = pickle.load(tf)
+    with open(settings_file, 'r') as tf:
+        data = json.loads(tf.read())
         try:
             oformat = data["Preferences"]["utf8_txt"]# TXT suffix
         except: oformat = False
@@ -77,9 +80,7 @@ def preSuffix():
 
 name_data = preSuffix()
 
-# shelve : key1=fixer, key2=merger, key3=PATHs, key4=font_data, key5=files_settings
-
 FILE_SETTINGS=defaultdict(str)
 
-with open(os.path.join("resources", "var", "dialog_settings.db.dat"), "rb") as f:
-    FILE_SETTINGS.update(pickle.load(f))
+with open(settings_file, "r") as f:
+    FILE_SETTINGS.update(json.loads(f.read()))
