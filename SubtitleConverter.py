@@ -48,7 +48,6 @@ from settings import (
     FILE_HISTORY,
     WORK_TEXT,
     FILE_SETTINGS,
-    name_data,
     log_file_history,
     printEncoding,
     settings_file, 
@@ -96,7 +95,7 @@ logging.config.fileConfig(
 logger = logging.getLogger(__name__)
 
 
-VERSION = "v0.5.9.0_a25"
+VERSION = "v0.5.9.0_a26"
 
 
 class MyFrame(ConverterFrame):
@@ -3371,10 +3370,8 @@ class MyApp(wx.App):
     def m_files(self):
 
         v_list = [
-            "file_ext.pkl",
             "presuffix_list.bak",
             "dialog_settings.db.json",
-            "m_extensions.pkl",
             "obsE.pkl",
         ]
         r_list = ["shortcut_keys.cfg", "Regex_def.config"]
