@@ -25,6 +25,7 @@ import srt
 import re
 import shutil
 import pickle
+import json
 import zipfile
 from collections import namedtuple
 from operator import itemgetter
@@ -50,6 +51,7 @@ from settings import (
     name_data,
     log_file_history,
     printEncoding,
+    settings_file, 
 )
 
 from TextFileProc import (
@@ -2761,9 +2763,11 @@ class MyFrame(ConverterFrame):
 
     def onClose(self, event):
 
-        with open(filePath("resources", "var", "dialog_settings.db.dat"), "wb") as wf:
-            pickle.dump(FILE_SETTINGS, wf)
-
+        with open(settings_file, "w") as wf:
+            wf.write(json.dumps(FILE_SETTINGS, ensure_ascii=False, indent=4))
+            
+        shutil.copyfile(settings_file, settings_file+".bak")
+        
         self.rwFileHistory(FILE_HISTORY)
 
         if os.path.isfile(droppedText):
@@ -2773,8 +2777,10 @@ class MyFrame(ConverterFrame):
 
     def onQuit(self, event):
         ''''''
-        with open(filePath("resources", "var", "dialog_settings.db.dat"), "wb") as wf:
-            pickle.dump(FILE_SETTINGS, wf)
+        with open(settings_file, "w") as wf:
+            wf.write(json.dumps(FILE_SETTINGS, ensure_ascii=False, indent=4))
+            
+        shutil.copyfile(settings_file, settings_file+".bak")
 
         self.rwFileHistory(FILE_HISTORY)
         if os.path.isfile(droppedText):
@@ -2865,9 +2871,6 @@ class MyFrame(ConverterFrame):
                 "preprocess": self.preferences.IsChecked(1014),
                 "ShowLog": self.preferences.IsChecked(1013),
             }
-
-            with open(join("resources", "var", "dialog_settings.db.dat"), "wb") as f:
-                pickle.dump(FILE_SETTINGS, f)
 
         event.Skip()
 
@@ -3370,7 +3373,7 @@ class MyApp(wx.App):
         v_list = [
             "file_ext.pkl",
             "presuffix_list.bak",
-            "dialog_settings.db.dat",
+            "dialog_settings.db.json",
             "m_extensions.pkl",
             "obsE.pkl",
         ]
