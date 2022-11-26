@@ -32,8 +32,7 @@ from settings import (
     lenZip,
     droppedText,
     chreg,
-    FILE_SETTINGS,
-    name_data, 
+    FILE_SETTINGS, 
 )
 import codecs
 import zipfile
@@ -875,12 +874,12 @@ class FileOpened:
 
 def newName(path, pre_suffix, multi=False):
     ''''''
-    added = name_data[0]
-    value2_s = name_data[1]
-    value5_s = name_data[2]
-    value_m = name_data[3]
-    oformat = name_data[4]
-    ex = name_data[5]
+    added = FILE_SETTINGS["Added_ext"]
+    value2_s = FILE_SETTINGS["key5"]["cyr_utf8_txt"]
+    value5_s = FILE_SETTINGS["key5"]["lat_utf8_srt"]
+    value_m = FILE_SETTINGS["key2"]["f_suffix"]
+    oformat = FILE_SETTINGS["Preferences"]["utf8_txt"]
+    ex = FILE_SETTINGS["key5"]
 
     spattern = re.compile(r"(?:\.srt){2,3}", re.I)
     tpattern = re.compile(r"(?:\.txt){2,3}", re.I)
@@ -964,7 +963,7 @@ def nameDialog(name_entry, sufix_entry, dir_entry):
         dlg.Destroy()
 
         with open(presuffix_l, 'a', encoding='utf-8') as f:
-            matches = ["x264", "x265", "ION", "WEB"]
+            matches = ["x264", "x265", "ION", "ION265","WEB"]
             if not '' in list(ex.values()):
                 presuffix_x = os.path.splitext(os.path.splitext(nameO)[0])[-1] + "\n"
                 if any(x in presuffix_x for x in matches):
