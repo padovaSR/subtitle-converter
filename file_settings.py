@@ -7,7 +7,7 @@ from os.path import join
 import pickle
 import json
 
-from settings import FILE_SETTINGS, name_data
+from settings import FILE_SETTINGS
 import logging.config
 
 import wx
@@ -298,13 +298,6 @@ class FileSettings(wx.Dialog):
 
             with open(join("resources", "var", "dialog_settings.db.json"), "w") as f:
                     f.write(json.dumps(FILE_SETTINGS, ensure_ascii=False, indent=4))
-
-            name_data[1] = s_dict["cyr_utf8_txt"]
-            name_data[2] = s_dict["lat_utf8_srt"]
-            name_data[5] = s_dict
-
-            with open(join("resources", "var", "file_ext.pkl"), "wb") as f:
-                pickle.dump(s_dict, f)
         except Exception as e:
             logger.debug(f"FileSettings: {e}")
         self.Destroy()
