@@ -8,7 +8,7 @@ import os
 
 import pickle
 import logging.config
-from settings import FILE_SETTINGS, name_data
+from settings import FILE_SETTINGS
 
 logger = logging.getLogger(__name__)
 
@@ -191,14 +191,7 @@ class Settings(wx.Dialog):
                 "m_gap": self.spin_ctrl_3.GetValue(),
                 "f_suffix": self.tctrl_1.GetValue(),
             }
-
-        name_data[3] = self.tctrl_1.GetValue()
-
-        with open(os.path.join("resources", "var", "m_extensions.pkl"), "wb") as f:
-            pickle.dump(self.tctrl_1.GetValue(), f)
-
         self.Destroy()
-        
         event.Skip()
 
     def getValues(self):
