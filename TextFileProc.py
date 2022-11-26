@@ -964,8 +964,11 @@ def nameDialog(name_entry, sufix_entry, dir_entry):
         dlg.Destroy()
 
         with open(presuffix_l, 'a', encoding='utf-8') as f:
+            matches = ["x264", "x265", "ION", "WEB"]
             if not '' in list(ex.values()):
                 presuffix_x = os.path.splitext(os.path.splitext(nameO)[0])[-1] + "\n"
+                if any(x in presuffix_x for x in matches):
+                    presuffix_x = ""                
                 if "_" in presuffix_x:
                     presuffix_ = "_" + presuffix_x.split("_")[-1] + "\n"
                 else:
@@ -973,6 +976,8 @@ def nameDialog(name_entry, sufix_entry, dir_entry):
             else:
                 presuffix_x = ""
                 presuffix_ = os.path.splitext(os.path.splitext(nameO)[0])[-1] + "\n"
+                if any(x in presuffix_ for x in matches):
+                    presuffix_x = ""                
             f.write(presuffix_)
         return nameO
     else:
