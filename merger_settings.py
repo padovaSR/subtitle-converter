@@ -63,9 +63,6 @@ class Settings(wx.Dialog):
         self.button_1 = wx.Button(self, wx.ID_CLOSE, "")
         self.button_2 = wx.Button(self, wx.ID_SAVE, "")
 
-        #with open(os.path.join('resources','var','dialog_settings.db.dat'), "rb") as sp:
-            #p = pickle.load(sp)
-        #ex = p['key2']
         try:
             ex = FILE_SETTINGS["key2"]
             lineLenght = ex['l_lenght']
@@ -194,9 +191,6 @@ class Settings(wx.Dialog):
                 "m_gap": self.spin_ctrl_3.GetValue(),
                 "f_suffix": self.tctrl_1.GetValue(),
             }
-        
-        with open(os.path.join("resources", "var", "dialog_settings.db.dat"), "wb") as d:
-            pickle.dump(FILE_SETTINGS, d)
 
         name_data[3] = self.tctrl_1.GetValue()
 
