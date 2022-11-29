@@ -471,7 +471,7 @@ class SettingsDialog(wx.Dialog):
         self.ExampleText = wx.StaticText(
             sbSizer1.GetStaticBox(),
             wx.ID_ANY,
-            u"AaBbCcDdEeČčĆćŽžĐđŠš\tţ",
+            u"AaBbCcDdEeČčĆćŽžĐđŠš",
             wx.DefaultPosition,
             wx.DefaultSize,
             wx.ALIGN_LEFT,
@@ -510,7 +510,7 @@ class SettingsDialog(wx.Dialog):
         except Exception as e:
             logger.debug(f"Settings: {e}")        
 
-        sbSizer1.Add(self.ExampleText, 0, wx.ALL|wx.EXPAND, 12)
+        sbSizer1.Add(self.ExampleText, 1, wx.ALL|wx.EXPAND, 12)
 
         self.panel_3.SetSizer(sbSizer1)
         self.panel_3.Layout()
