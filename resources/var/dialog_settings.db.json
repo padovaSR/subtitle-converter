@@ -11,23 +11,22 @@
         "fontColour": [
             0,
             0,
-            102,
-            204
+            64
         ],
         "weight": 400
     },
     "key5": {
         "cyr_ansi_srt": "cyr",
-        "cyr_utf8_txt": "cyr_utf8",
         "cyr_utf8_srt": "cyr_utf8",
-        "lat_ansi_srt": "lat",
         "lat_utf8_srt": "utf8",
-        "fixed_subs": "fixed",
         "transcribe": "changed",
+        "cyr_utf8_txt": "cyr_utf8",
+        "lat_ansi_srt": "lat",
+        "fixed_subs": "fixed",
         "cleanup": "cln",
         "Cyr-ansi": "Cyr-ansi",
-        "Cyr-utf8": "Cyr-utf8",
         "Lat-ansi": "Lat-ansi",
+        "Cyr-utf8": "Cyr-utf8",
         "Lat-utf8": "Lat-utf8"
     },
     "key2": {
@@ -56,7 +55,7 @@
         "H": 611
     },
     "Added_ext": [
-        ".fixed",
-        "_merged"
+        "_merged",
+        ".fixed"
     ]
 }
