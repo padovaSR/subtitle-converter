@@ -314,6 +314,8 @@ class MyFrame(ConverterFrame):
     def updateUI(self):
         self.text_1.SetFont(self.curFont)
         self.text_1.SetForegroundColour(self.curClr)
+        if sys.platform.startswith("linux"):
+            self.text_1.SetValue(self.text_1.GetValue())
         self.Layout()
 
     def updateText(self, message):
