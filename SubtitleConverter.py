@@ -35,7 +35,7 @@ from itertools import chain, groupby
 from Manual import MyManual
 from zip_confirm import TreeDialog
 from MultiSelection import MultiFiles
-from file_settings import FileSettings
+from settings_dialog import SettingsDialog
 from merger_settings import Settings
 from fixer_settings import FixerSettings
 from merge import myMerger, FixSubGaps, ShrinkGap
@@ -198,7 +198,7 @@ class MyFrame(ConverterFrame):
         self.Bind(wx.EVT_MENU, self.onManual, id=self.manual.GetId())
         self.Bind(wx.EVT_MENU, self.onFixerSettings, id=self.fixer.GetId())
         self.Bind(wx.EVT_MENU, self.onSelectFont, id=self.fonts.GetId())
-        self.Bind(wx.EVT_MENU, self.onFileSettings, id=83)
+        self.Bind(wx.EVT_MENU, self.onMainSettings, id=83)
         self.Bind(wx.EVT_MENU, self.onMergerSettings, id=self.merger_pref.GetId())
         ## TOOLBAR EVENTS ###########################################################################
         self.Bind(wx.EVT_TOOL, self.onOpen, id=1001)
@@ -2842,9 +2842,11 @@ class MyFrame(ConverterFrame):
             entered_enc = PREVIOUS[-1].enc
         return path, entered_enc
 
-    def onFileSettings(self, event):
-        settings_dlg = FileSettings(None)
+    def onMainSettings(self, event):
+        settings_dlg = SettingsDialog(None)
         settings_dlg.ShowModal()
+        self.curClr = settings_dlg.GetColor()
+        self.updateUI()
         settings_dlg.Destroy()
         event.Skip()
 
