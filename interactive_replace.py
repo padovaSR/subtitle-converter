@@ -437,10 +437,21 @@ class FindReplace(wx.Dialog):
     def addSelected(self, event):
         '''button_add event'''
         p = self.text_3.GetSelection()
-        text = self.text_3.GetValue()[p[0]:p[1]]
-        self.text_ADD.SetValue(f"{text}=>")
-        self.text_ADD.SetFocus()
-        self.text_ADD.SetInsertionPointEnd()
+        if p[0] is p[1]:
+            ErrorDlg = wx.MessageDialog(
+                self,
+                f"ValueError\n\n"
+                f"Ništa nije selektovano",
+                "Interactive Replace",
+                style=wx.OK | wx.ICON_ERROR,
+            )
+            if ErrorDlg.ShowModal() == wx.ID_OK:
+                ErrorDlg.Destroy()
+        else:
+            text = self.text_3.GetValue()[p[0]:p[1]]
+            self.text_ADD.SetValue(f"{text}=>")
+            self.text_ADD.SetFocus()
+            self.text_ADD.SetInsertionPointEnd()
         event.Skip()
 
     def textAdded(self, event):
