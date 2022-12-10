@@ -95,7 +95,7 @@ logging.config.fileConfig(
 logger = logging.getLogger(__name__)
 
 
-VERSION = "v0.5.9.0_a26"
+VERSION = "v0.5.9.0_a27"
 
 
 class MyFrame(ConverterFrame):
@@ -794,10 +794,9 @@ class MyFrame(ConverterFrame):
 
     def toCyrillic_multiple(self):
 
-        with open(filePath("resources", "var", "file_ext.pkl"), "rb") as f:
-            ex = pickle.load(f)  # ["key5"]
-            value1_s = ex['cyr_ansi_srt']
-            value2_s = ex['cyr_utf8_txt']
+        ex = FILE_SETTINGS["key5"]  # ["key5"]
+        value1_s = ex['cyr_ansi_srt']
+        value2_s = ex['cyr_utf8_txt']
 
         if self.preferences.IsChecked(1011):
             utf8_enc = 'utf-8-sig'
@@ -1064,9 +1063,8 @@ class MyFrame(ConverterFrame):
 
     def toANSI_multiple(self):
 
-        with open(filePath("resources", "var", "file_ext.pkl"), "rb") as f:
-            ex = pickle.load(f)  # ["key5"]
-            value4_s = ex['lat_ansi_srt']
+        ex = FILE_SETTINGS["key5"]  # ["key5"]
+        value4_s = ex['lat_ansi_srt']
 
         self.tmpPath.clear()
         f_text = ["Files Processed:\n\n"]
@@ -1310,9 +1308,8 @@ class MyFrame(ConverterFrame):
 
     def toCyrUTF8_multiple(self):
         """"""
-        with open(filePath("resources", "var", "file_ext.pkl"), "rb") as f:
-            ex = pickle.load(f)  # ["key5"]
-            value_s = ex["cyr_utf8_srt"]
+        ex = FILE_SETTINGS["key5"]  # ["key5"]
+        value_s = ex["cyr_utf8_srt"]
 
         if self.preferences.IsChecked(1011):
             utf8_enc = 'utf-8-sig'
@@ -1451,9 +1448,8 @@ class MyFrame(ConverterFrame):
 
     def toUTF_multiple(self):
 
-        with open(filePath("resources", "var", "file_ext.pkl"), "rb") as f:
-            ex = pickle.load(f)  # ["key5"]
-            value1_s = ex["lat_utf8_srt"]
+        ex = FILE_SETTINGS["key5"]  # ["key5"]
+        value1_s = ex["lat_utf8_srt"]
 
         self.tmpPath.clear()
         self.pre_suffix = value1_s
@@ -1595,9 +1591,8 @@ class MyFrame(ConverterFrame):
 
     def cyrToANSI_multiple(self):
 
-        with open(filePath("resources", "var", "file_ext.pkl"), "rb") as f:
-            ex = pickle.load(f)  # ["key5"]
-            value1_s = ex["lat_ansi_srt"]
+        ex = FILE_SETTINGS["key5"]  # ["key5"]
+        value1_s = ex["lat_ansi_srt"]
 
         self.tmpPath.clear()
         self.pre_suffix = value1_s
@@ -1729,9 +1724,8 @@ class MyFrame(ConverterFrame):
 
     def cyrToUTF_multiple(self):
 
-        with open(filePath("resources", "var", "file_ext.pkl"), "rb") as f:
-            ex = pickle.load(f)  # ["key5"]
-            value1_s = ex["lat_utf8_srt"]
+        ex = FILE_SETTINGS["key5"]  # ["key5"]
+        value1_s = ex["lat_utf8_srt"]
 
         f_text = ["Files Processed:\n\n"]
 
