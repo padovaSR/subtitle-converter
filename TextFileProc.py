@@ -201,8 +201,8 @@ def normalizeText(code_in, path, data):
             for i in "аеио".encode("cp1251"):
                 if content.find(i) < 0:
                     c += 1
-                    code_in = "windows-1250"
             if c > 0:
+                code_in = "windows-1250"
                 ErrorDlg = wx.MessageDialog(
                     None,
                     f"UnicodeDecodeError\n\n"
