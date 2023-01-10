@@ -1311,24 +1311,17 @@ def showMeError(infile, in_text, outfile, kode):
     subs = list(srt.parse(in_text, ignore_errors=True))
 
     if len(subs) > 0:
-
         st = "LINIJE SA GREŠKAMA:\n\n"
-        if kode == 'windows-1251':
-            st = "ЛИНИЈЕ СА ГРЕШКАМА:\n\n"
-            kode = "utf-8"
         FP = re.compile(r"\?")
-        count = 0
         sl = []
         for i in subs:
             t = i.content
             FE = re.findall(FP, t)
             if FE:
-                sub = srt.Subtitle(i.index, i.start, i.end, t.replace("¬", "?"))
-                sl.append(sub)
-                count += 1
-        if count > 0:
+                sl.append(srt.Subtitle(i.index, i.start, i.end, t.replace("¬", "?")))
+        if len(sl) > 0:
             try:
-                with open(outfile, "w", encoding=kode) as f:
+                with open(outfile, "w", encoding="utf-8") as f:
                     subs_data = srt.compose(sl, reindex=False)
                     f.write(st + subs_data)
             except Exception as e:
