@@ -903,9 +903,9 @@ def newName(path, pre_suffix, multi=False):
     else:
         psufix = n
 
-    if oformat == "txt" and pre_suffix == value5_s:
+    if oformat is True and pre_suffix == value5_s:
         sufix = ".txt"
-    elif oformat == "txt" and pre_suffix == value2_s:
+    elif oformat is True and pre_suffix == value2_s:
         sufix = ".txt"
     ## srt,txt ili neki drugi otvoren
     else: sufix = os.path.splitext(path)[-1]
