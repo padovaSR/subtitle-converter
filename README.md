@@ -1,6 +1,7 @@
 # Subtitle Converter
 
 Program za obradu srt i txt fajlova.
+
 Check out PyQt version: [SubtitleConverter_PyQt](https://github.com/padovaSR/SubtitleConverter_PyQt)
 
 ## Requirements:
