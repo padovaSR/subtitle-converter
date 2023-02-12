@@ -14,7 +14,7 @@ import wx
 logger = logging.getLogger(__name__)
 
 EP = re.compile(r"epi(z|s)od(a|e)-?\s*\W*\s*\d{,2}\.?|s\d{1,2}e\d{1,2}\.?|^\d{1,2}\.srt", (re.I|re.M))
-RP = re.compile(r"\d{4}\.?|(x|h)26(4|5)|N(10|256)", re.I)
+RP = re.compile(r"\d{4}\.?|(x|h)\.?26(4|5)|N(10|265)", re.I)
 l_subs = []
 renamed = []
 
