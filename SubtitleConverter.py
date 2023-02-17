@@ -95,7 +95,7 @@ logging.config.fileConfig(
 logger = logging.getLogger(__name__)
 
 
-VERSION = "v0.5.9.0_a28"
+VERSION = "v0.5.9.0_a29"
 
 
 class MyFrame(ConverterFrame):
