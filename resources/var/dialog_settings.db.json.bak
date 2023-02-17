@@ -11,7 +11,7 @@
         "fontColour": [
             0,
             0,
-            64
+            102
         ],
         "weight": 400
     },
@@ -51,8 +51,8 @@
     },
     "CB_value": " auto",
     "FrameSize": {
-        "W": 663,
-        "H": 611
+        "W": 626,
+        "H": 625
     },
     "Added_ext": [
         "_merged",
