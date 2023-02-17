@@ -23,6 +23,7 @@ import shutil
 import webbrowser
 from collections import namedtuple, defaultdict
 from pydispatch import dispatcher
+from resources.IsCyrillic import checkCyrillicAlphabet 
 from settings import (
     WORK_TEXT,
     PREVIOUS,
@@ -195,25 +196,6 @@ def normalizeText(code_in, path, data):
     if code_in in codelist:
         error = 'surrogatepass'
     if path:
-        with open(path, "rb") as f: content = f.read()
-        if code_in == "windows-1251":
-            c = 0
-            for i in "аеио".encode("cp1251"):
-                if content.find(i) < 0:
-                    c += 1
-            if c > 0:
-                code_in = "windows-1250"
-                ErrorDlg = wx.MessageDialog(
-                    None,
-                    f"UnicodeDecodeError\n\n"
-                    f"Detektovane greške u tekstu!\n"
-                    f"Pretražite tekst [�,ð...]\n"
-                    f"ili je encoding možda pogrešan",
-                    "SubtitleConverter",
-                    style=wx.OK | wx.ICON_ERROR,
-                )
-                if ErrorDlg.ShowModal() == wx.ID_OK:
-                    ErrorDlg.Destroy()
         try:
             with open(path, 'r', encoding=code_in, errors=error) as f:
                 text = f.read()
@@ -829,12 +811,17 @@ class FileOpened:
         
     def findCode(self):
         ''''''
-        data = open(self.path, "rb").read(4)
+        cyr = False
+        data = open(self.path, "rb").read()
+        if checkCyrillicAlphabet(data) > 70:
+            cyr = True        
         if data.startswith(BOM_UTF8):
             return "utf-8-sig"
         else:
             for enc in self.fCodeList():
                 try:
+                    if cyr is True and enc == "windows-1250":
+                        continue                    
                     with codecs.open(self.path, 'r', encoding=enc) as fh:
                         fh.readlines()
                         fh.seek(0)
@@ -847,18 +834,52 @@ class FileOpened:
                 else:
                     logger.debug(f'{baseName(self.path)}: {enc}')
                     break
+            if enc == "windows-1251" and FILE_SETTINGS["CB_value"].strip() == "auto" and cyr is False:
+                with open(self.path, "rb") as file_opened:
+                    content = file_opened.read()
+                    c = 0
+                    for i in "аеиo".encode("windows-1251"):
+                        if content.find(i) < 0:
+                            c += 1
+                    if c > 0:
+                        ErrorDlg = wx.MessageDialog(
+                            None,
+                            f"UnicodeDecodeError\n\n"
+                            f"Detektovane greške u tekstu!\n"
+                            f"Pretražite tekst [�,ð...]\n"
+                            f"ili je encoding možda pogrešan",
+                            "SubtitleConverter",
+                            style=wx.OK | wx.ICON_ERROR,
+                        )
+                        if ErrorDlg.ShowModal() == wx.ID_OK:
+                            ErrorDlg.Destroy()
+                            for real_enc in ["utf-8", "windows-1250"]:
+                                try:
+                                    with codecs.open(self.path, "r", encoding=real_enc) as f:
+                                        f.readlines()
+                                        f.seek(0)
+                                except:
+                                    logger.debug(f"Not {enc}! Trying encoding {real_enc}")
+                                else:
+                                    break
+                            enc = real_enc                        
             self.internEnc = enc
             return enc
     
     def findByteCode(self, n=0):
         """"""
+        cyr = False
         ## n is selecting number for multifile list ##  
         dat = self.internal[n]
+        if checkCyrillicAlphabet(dat) > 70:
+            cyr = True        
         if dat[:4].startswith(BOM_UTF8):
             return "utf-8-sig"
         else:
             for enc in self.fCodeList():
                 try:
+                    if enc == "windows-1250" and cyr is True:
+                        continue
                     dat.decode(enc)
                 except:
                     if FILE_SETTINGS["CB_value"].strip() == "auto":
