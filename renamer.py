@@ -140,7 +140,7 @@ class FilesRename(wx.Dialog):
         )
         self.window_1.SetMinimumPaneSize(50)
         self.window_1.SetSashGravity(0.5)
-        self.sizer_2.Add(self.window_1, 1, wx.ALL | wx.EXPAND, 3)
+        self.sizer_2.Add(self.window_1, 1, wx.ALL | wx.EXPAND, 4)
         
         self.text_1 = wx.TextCtrl(
             self.window_1,
