@@ -5,7 +5,7 @@
 # Modified by padovaSR
 
 import os
-from os.path import basename, join, dirname, split, splitext
+from os.path import basename, join, dirname, split, splitext, normpath
 import re
 import shutil
 import logging.config
@@ -13,12 +13,12 @@ import wx
 
 logger = logging.getLogger(__name__)
 
-EP = re.compile(r"epi(z|s)od(a|e)\s*-?\s*\W*\s*\d{,2}\.?|s\d{1,2}e\d{1,2}\.?|^\d{1,2}\.srt|\d{1,2}\s*x\s*\d{2}|s\d{1,2}\s*x\s*e\d{1,2}", (re.I|re.M))
-RP = re.compile(r"\d{4}\w?\.?|(x|h)\.?26(4|5)|N(10|265)|ddp5\.1\.?|\b\w{2,}\b(?<!\d)|[\.-]|(ION\d{2,3})|(?<=part[.\- ])\d+", re.I)
+EP = re.compile(r"epi(z|s)od(a|e)\s*-?\s*\W*\s*\d{,2}\.?|s\d{1,2}e\d{1,2}\.?|^\d{1,2}\.srt|\d{1,2}\s*x\s*\d{2}|s\d{1,2}\s*x\s*e\d{1,2}|\d{1,2}\.?\s?(ep)i?(z|s)?o?d?(a|e)?", (re.I|re.M))
+RP = re.compile(r"\d{4}\w?\.?|(x|h)\.?26(4|5)|N(10|265)|ddp5\.1\.?|\b\w{2,}\b(?<!\d)|[ \.-]|(ION\d{2,3})|(?<=part[.\- ])\d+|s\d\d?e", re.I)
 l_subs = []
 renamed = []
 
-def listFiles(folderIn, s):
+def listFiles(folderIn, ext):
     """"""
     subs_list = []
     vids_list = []
@@ -26,34 +26,41 @@ def listFiles(folderIn, s):
     with os.scandir(folderIn) as it:
         for entry in it:
             if not entry.name.startswith('.') and entry.is_file():
-                if entry.name.lower().endswith(s):
-                    if EP.search(RP.sub("", entry.name)):
-                        subs_list.append(entry.name)
-                        l_subs.append(os.path.join(folderIn, entry.name))
-                        l_subs.sort()
+                if entry.name.lower().endswith(ext):
+                    subs_list.append(entry.name)
                 if entry.name.lower().endswith((".mp4", ".mkv", ".avi")):
-                    if EP.search(entry.name):
-                        vids_list.append(entry.name)
+                    vids_list.append(entry.name)
         if not vids_list:
             dlg = wx.RichMessageDialog(
-                None,
-                "Missing File\n\nUnable to find video files.\nFile required as reference.",
-                "Renamer",
-                style=wx.OK,
+                    None,
+                    "Missing File\n\nUnable to find video files.\nFile required as reference.",
+                    "Renamer",
+                    style=wx.OK,
             )
             if dlg.ShowModal() == wx.ID_OK:
-                dlg.Destroy()
-    return sorted(subs_list), sorted(vids_list)
+                dlg.Destroy()            
+    return subs_list, vids_list    
 
-def newFiles(subs=[], vids=[], ext=None):
+def reorderFiles(folderIn, subs=[], vids=[]):
     """"""
-    new = []
-    for pair in zip(subs, vids):
-        a = re.match(r"\d{1,2}", str(EP.search(RP.sub("", pair[1]))))
-        b = re.match(r"\d{1,2}", str(EP.search(RP.sub("", pair[0]))))        
-        if a == b:
-            new.append(f"{os.path.splitext(pair[1])[0]}{ext}")
-    return new
+    new_subs_list = []
+    new_vids_list = []
+    try:
+        for subtitle,video in zip(subs, vids):
+            a = re.match(r"\d{1,2}", RP.sub("", EP.search(subtitle).group(0))).group(0)
+            b = re.match(r"\d{1,2}", RP.sub("", EP.search(video).group(0))).group(0)
+            a = int(a.lstrip("0"))
+            if a != 0:
+                a = a-1
+            b = int(b.lstrip("0"))
+            if b != 0:
+                b = b-1
+            new_subs_list.insert(a, subtitle)
+            new_vids_list.insert(b, video)
+            l_subs.insert(a, normpath(join(folderIn, subtitle)))
+    except Exception as e:
+        logger.debug(f"reorderFiles: {e}")
+    return new_subs_list,new_vids_list
     
 class FilesRename(wx.Dialog):
     def __init__(self, parent, id=wx.ID_ANY):
@@ -200,16 +207,18 @@ class FilesRename(wx.Dialog):
         self.text_1.Clear()
         self.text_2.Clear()
         sourcePath = self.dirPicker1.GetPath()
-        fl,vl = listFiles(sourcePath, self.suffix)
-        new = newFiles(fl, vl, self.suffix)
-        self.vid_suffix = splitext(vl[0])[1]
         try:
-            for i in fl:
-                self.text_1.AppendText(f"{i}\n")
-            for i in new:
-                self.text_2.AppendText(f"{i}\n")
+            title_list,video_list = listFiles(sourcePath, self.suffix)
+            new_subs_list,new_vids_list = reorderFiles(sourcePath, title_list, video_list)
+            self.vid_suffix = splitext(video_list[0])[1]
+            renamed_subs_list = [splitext(filename)[0] + ".srt" for filename in new_vids_list]
+        
+            for title_name in new_subs_list:
+                self.text_1.AppendText(f"{title_name}\n")
+            for file_name in renamed_subs_list:
+                self.text_2.AppendText(f"{file_name}\n")
         except Exception as e:
-            logger.debug(f"Error: {e}")
+            logger.debug(f"getNames: {e}")        
         self.bm_button_1.Enable(True)
         event.Skip()
 
