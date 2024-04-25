@@ -60,7 +60,7 @@ def reorderFiles(folderIn, subs=[], vids=[]):
             l_subs.insert(a, normpath(join(folderIn, subtitle)))
     except Exception as e:
         logger.debug(f"reorderFiles: {e}")
-    return new_subs_list,new_vids_list
+    return sorted(new_subs_list), sorted(new_vids_list)
     
 class FilesRename(wx.Dialog):
     def __init__(self, parent, id=wx.ID_ANY):
@@ -226,6 +226,7 @@ class FilesRename(wx.Dialog):
         ''''''
         renamed.clear()
         n = self.text_2.GetNumberOfLines()
+        l_subs = sorted(l_subs)
         if n > 1:
             pl_name = f"{split(dirname(l_subs[0]))[1]}.m3u"
             pl_file = join(dirname(l_subs[0]), pl_name)
