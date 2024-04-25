@@ -5,8 +5,6 @@
 #
 from settings import filePath, FILE_SETTINGS
 from TextFileProc import shortcutsKey
-import pickle
-import os
 import logging.config
 
 import wx
@@ -710,7 +708,7 @@ class ConverterFrame(wx.Frame):
         self.comboBox1.SetSelection(0)
         
         self.frame_toolbar.SetToolBitmapSize((24, 24))
-        self.frame_toolbar.SetMargins((3, 3))
+        self.frame_toolbar.SetMargins((5, 5))
         self.frame_toolbar.SetToolPacking(1)
         self.frame_toolbar.SetToolSeparation(8)
         self.SetToolBar(self.frame_toolbar)
@@ -732,7 +730,7 @@ class ConverterFrame(wx.Frame):
         )
         wx.CallAfter(self.text_1.SetFocus)
 
-        sizer_1.Add(self.text_1, 1, wx.ALL | wx.EXPAND, 3)
+        sizer_1.Add(self.text_1, 1, wx.ALL | wx.EXPAND, 5)
 
         self.panel_1.SetSizer(sizer_1)
         try:
