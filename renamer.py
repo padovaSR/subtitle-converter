@@ -47,20 +47,27 @@ def reorderFiles(folderIn, subs=[], vids=[]):
     new_vids_list = []
     try:
         for subtitle,video in zip(subs, vids):
-            a = re.match(r"\d{1,2}", RP.sub("", EP.search(subtitle).group(0))).group(0)
-            b = re.match(r"\d{1,2}", RP.sub("", EP.search(video).group(0))).group(0)
-            a = int(a.lstrip("0"))
-            if a != 0:
-                a = a-1
-            b = int(b.lstrip("0"))
-            if b != 0:
-                b = b-1
-            new_subs_list.insert(a, subtitle)
-            new_vids_list.insert(b, video)
+            a = int(re.match(r"\d{1,2}", RP.sub("", EP.search(subtitle).group(0))).group(0))
+            b = int(re.match(r"\d{1,2}", RP.sub("", EP.search(video).group(0))).group(0))
+            a = max(0, a - 1)
+            b = max(0, b - 1)
+        
+            # Extend the lists if necessary
+            while len(new_subs_list) <= a:
+                new_subs_list.append(None)
+            while len(new_vids_list) <= b:
+                new_vids_list.append(None)
+            
+            # Insert elements into new lists
+            new_subs_list[a] = subtitle
+            new_vids_list[b] = video
             l_subs.insert(a, normpath(join(folderIn, subtitle)))
+        # Remove trailing None elements
+        new_subs_list = [x for x in new_subs_list if x is not None]
+        new_vids_list = [x for x in new_vids_list if x is not None]
     except Exception as e:
         logger.debug(f"reorderFiles: {e}")
-    return sorted(new_subs_list), sorted(new_vids_list)
+    return new_subs_list, new_vids_list
     
 class FilesRename(wx.Dialog):
     def __init__(self, parent, id=wx.ID_ANY):
@@ -226,7 +233,6 @@ class FilesRename(wx.Dialog):
         ''''''
         renamed.clear()
         n = self.text_2.GetNumberOfLines()
-        l_subs = sorted(l_subs)
         if n > 1:
             pl_name = f"{split(dirname(l_subs[0]))[1]}.m3u"
             pl_file = join(dirname(l_subs[0]), pl_name)
