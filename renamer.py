@@ -30,10 +30,10 @@ def listFiles(folderIn, ext):
                     subs_list.append(entry.name)
                 if entry.name.lower().endswith((".mp4", ".mkv", ".avi")):
                     vids_list.append(entry.name)
-        if not vids_list:
+        if not vids_list or not subs_list:
             dlg = wx.RichMessageDialog(
                     None,
-                    "Missing File\n\nUnable to find video files.\nFile required as reference.",
+                    "Missing File\n\nUnable to find video or *srt files.\nFile required as reference.",
                     "Renamer",
                     style=wx.OK,
             )
@@ -46,25 +46,30 @@ def reorderFiles(folderIn, subs=[], vids=[]):
     new_subs_list = []
     new_vids_list = []
     try:
-        for subtitle,video in zip(subs, vids):
-            a = int(re.match(r"\d{1,2}", RP.sub("", EP.search(subtitle).group(0))).group(0))
-            b = int(re.match(r"\d{1,2}", RP.sub("", EP.search(video).group(0))).group(0))
-            a = max(0, a - 1)
-            b = max(0, b - 1)
-        
-            # Extend the lists if necessary
-            while len(new_subs_list) <= a:
-                new_subs_list.append(None)
-            while len(new_vids_list) <= b:
-                new_vids_list.append(None)
+        if len(subs) > 1 and len(vids) > 1:
+            for subtitle,video in zip(subs, vids):
+                a = int(re.match(r"\d{1,2}", RP.sub("", EP.search(subtitle).group(0))).group(0))
+                b = int(re.match(r"\d{1,2}", RP.sub("", EP.search(video).group(0))).group(0))
+                a = max(0, a - 1)
+                b = max(0, b - 1)
             
-            # Insert elements into new lists
-            new_subs_list[a] = subtitle
-            new_vids_list[b] = video
-            l_subs.insert(a, normpath(join(folderIn, subtitle)))
-        # Remove trailing None elements
-        new_subs_list = [x for x in new_subs_list if x is not None]
-        new_vids_list = [x for x in new_vids_list if x is not None]
+                # Extend the lists if necessary
+                while len(new_subs_list) <= a:
+                    new_subs_list.append(None)
+                while len(new_vids_list) <= b:
+                    new_vids_list.append(None)
+                
+                # Insert elements into new lists
+                new_subs_list[a] = subtitle
+                new_vids_list[b] = video
+                l_subs.insert(a, normpath(join(folderIn, subtitle)))
+            # Remove trailing None elements
+            new_subs_list = [x for x in new_subs_list if x is not None]
+            new_vids_list = [x for x in new_vids_list if x is not None]
+        else:
+            new_subs_list = subs
+            new_vids_list = vids
+            l_subs.append(normpath(join(folderIn, subs[0])))        
     except Exception as e:
         logger.debug(f"reorderFiles: {e}")
     return new_subs_list, new_vids_list
@@ -233,7 +238,7 @@ class FilesRename(wx.Dialog):
         ''''''
         renamed.clear()
         n = self.text_2.GetNumberOfLines()
-        if n > 1:
+        if n > 2:
             pl_name = f"{split(dirname(l_subs[0]))[1]}.m3u"
             pl_file = join(dirname(l_subs[0]), pl_name)
             with open(pl_file, "w", encoding="utf-8") as f:
