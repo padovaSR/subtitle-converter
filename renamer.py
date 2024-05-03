@@ -28,6 +28,7 @@ def listFiles(folderIn, ext):
             if not entry.name.startswith('.') and entry.is_file():
                 if entry.name.lower().endswith(ext):
                     subs_list.append(entry.name)
+                    l_subs.append(entry.name)
                 if entry.name.lower().endswith((".mp4", ".mkv", ".avi")):
                     vids_list.append(entry.name)
         if not vids_list or not subs_list:
@@ -62,7 +63,7 @@ def reorderFiles(folderIn, subs=[], vids=[]):
                 # Insert elements into new lists
                 new_subs_list[a] = subtitle
                 new_vids_list[b] = video
-                l_subs.insert(a, normpath(join(folderIn, subtitle)))
+                l_subs[a] = normpath(join(folderIn, subtitle))
             # Remove trailing None elements
             new_subs_list = [x for x in new_subs_list if x is not None]
             new_vids_list = [x for x in new_vids_list if x is not None]
@@ -208,6 +209,7 @@ class FilesRename(wx.Dialog):
         
         self.suffix = ".srt"
         self.vid_suffix = ".mkv"
+        self.subtitles = l_subs
         
         self.button_CANCEL.Bind(wx.EVT_BUTTON, self.onCancel)
         self.button_OK.Bind(wx.EVT_BUTTON, self.renameFiles)
@@ -239,23 +241,23 @@ class FilesRename(wx.Dialog):
         renamed.clear()
         n = self.text_2.GetNumberOfLines()
         if n > 2:
-            pl_name = f"{split(dirname(l_subs[0]))[1]}.m3u"
-            pl_file = join(dirname(l_subs[0]), pl_name)
+            pl_name = f"{split(dirname(self.subtitles[0]))[1]}.m3u"
+            pl_file = join(dirname(self.subtitles[0]), pl_name)
             with open(pl_file, "w", encoding="utf-8") as f:
                 f.write(f"#{basename(pl_file)[:-4]} Playlist\n")            
         for i in range(0, n):
             try:
                 line = self.text_2.GetLineText(i)
-                new_name = join(os.path.dirname(l_subs[i]), line)
-                shutil.move(l_subs[i], new_name)
+                new_name = join(os.path.dirname(self.subtitles[i]), line)
+                shutil.move(self.subtitles[i], new_name)
                 renamed.append(f"{line}\n")
                 if n > 2:
                     with open(pl_file, "a", encoding="utf-8") as f:
                         f.write(f"{splitext(line)[0]}{self.vid_suffix}\n")                
-                logger.debug(f"{basename(l_subs[i])} -> {line}")
+                logger.debug(f"{basename(self.subtitles[i])} -> {line}")
             except Exception as e:
                 logger.debug(f"{e}")
-        l_subs.clear()
+        self.subtitles.clear()
         event.Skip()
         
     def onCheckBox(self, event):
