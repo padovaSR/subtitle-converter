@@ -49,8 +49,8 @@ def reorderFiles(folderIn, subs=[], vids=[]):
     try:
         if len(subs) > 1 and len(vids) > 1:
             for subtitle,video in zip(subs, vids):
-                a = int(re.match(r"\d{1,2}", RP.sub("", EP.search(subtitle).group(0))).group(0))
-                b = int(re.match(r"\d{1,2}", RP.sub("", EP.search(video).group(0))).group(0))
+                a = int(re.match(r"\d{1,2}", RP.sub("", subtitle)).group(0))
+                b = int(re.match(r"\d{1,2}", RP.sub("", video)).group(0))                
                 a = max(0, a - 1)
                 b = max(0, b - 1)
             
@@ -258,7 +258,19 @@ class FilesRename(wx.Dialog):
             except Exception as e:
                 logger.debug(f"{e}")
         self.subtitles.clear()
+        self.checkRenamed()
         event.Skip()
+        
+    def checkRenamed(self):
+        """"""
+        s_list, v = listFiles(self.dirPicker1.GetPath(), self.suffix)
+        c_renamed = [item.strip() for item in renamed]
+        if s_list and renamed:
+            try:
+                if len(s_list) == len(c_renamed) and set(s_list) == set(c_renamed):
+                    return [item + "\n" for item in s_list]
+            except (TypeError, Exception) as e:
+                logger.debug(f"Error: {e}")
         
     def onCheckBox(self, event):
         cb = event.GetEventObject()
@@ -277,10 +289,6 @@ class FilesRename(wx.Dialog):
         self.text_2.SetFocus()
         event.Skip()    
     
-    def RenamedSubs(self):
-        """"""
-        return renamed
-        
     def onCancel(self, event):
         """"""
         self.Destroy()
