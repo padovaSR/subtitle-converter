@@ -2730,7 +2730,7 @@ class MyFrame(ConverterFrame):
         s_text = ["Reneamed files:\n\n"]
         dlg = FilesRename(None)
         if dlg.ShowModal() == wx.ID_OK:
-            files = dlg.RenamedSubs()
+            files = dlg.checkRenamed()
             s_text.extend(files)
             self.displayText(s_text)
             dlg.Destroy()
