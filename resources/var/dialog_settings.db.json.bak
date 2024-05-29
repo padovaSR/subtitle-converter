@@ -54,8 +54,14 @@
         "W": 626,
         "H": 625
     },
+    "Renamer": {
+        "W": 785,
+        "H": 685,
+        "splitter": 323,
+        "Selected": "C:\\Users\\darkstar\\Desktop\\Test_subs"
+    },
     "Added_ext": [
-        "_merged",
-        ".fixed"
+        ".fixed",
+        "_merged"
     ]
 }
