@@ -41,7 +41,7 @@ from fixer_settings import FixerSettings
 from merge import myMerger, FixSubGaps, ShrinkGap
 from interactive_replace import FindReplace
 from settings import BYTES_TEXT as BT
-from renamer import FilesRename
+from renamer import RenameFiles
 from settings import (
     filePath,
     PREVIOUS,
@@ -95,7 +95,7 @@ logging.config.fileConfig(
 logger = logging.getLogger(__name__)
 
 
-VERSION = "v0.5.9.0_a30"
+VERSION = "v0.5.9.0_a31"
 
 
 class MyFrame(ConverterFrame):
@@ -2728,7 +2728,7 @@ class MyFrame(ConverterFrame):
     def onRename(self, event):
         """"""
         s_text = ["Reneamed files:\n\n"]
-        dlg = FilesRename(None)
+        dlg = RenameFiles(None)
         if dlg.ShowModal() == wx.ID_OK:
             files = dlg.checkRenamed()
             s_text.extend(files)
@@ -2750,9 +2750,7 @@ class MyFrame(ConverterFrame):
             self.bytesText.seek(0)
             btext = self.bytesText.getvalue()
             self.bytesText.seek(0)
-
             return btext
-
         except Exception as e:
             logger.debug(f"bytesToBuffer error: {e}")
 
