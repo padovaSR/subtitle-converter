@@ -7,11 +7,12 @@
 import os
 import re
 import shutil
+import json
 from os.path import basename, join, dirname, split, splitext, normpath
 import wx
 
 
-from settings import FILE_SETTINGS
+from settings import FILE_SETTINGS, settings_file
 
 import logging.config
 logger = logging.getLogger(__name__)
@@ -153,11 +154,8 @@ class RenameFiles(wx.Dialog):
         self.splitter1 = wx.SplitterWindow(
             self, wx.ID_ANY, style=wx.SP_3D|wx.SP_3DSASH|wx.SP_LIVE_UPDATE
         )
-        # Set the position of the splitter
-        self.splitter1.SetSashPosition(self.splitter_pos)        
         self.splitter1.SetSashGravity(0.3)
-        self.splitter1.Bind(wx.EVT_IDLE, self.splitter1OnIdle)
-
+        
         self.panel1 = wx.Panel(
             self.splitter1,
             wx.ID_ANY,
@@ -222,6 +220,9 @@ class RenameFiles(wx.Dialog):
         Sizer4.Fit(self.panel2)
         self.splitter1.SplitVertically(self.panel1, self.panel2, 260)
         Sizer2.Add(self.splitter1, 1, wx.EXPAND, 5)
+        
+        # Set the position of the splitter
+        wx.CallAfter(self.set_splitter_position)        
 
         Sizer1.Add(Sizer2, 1, wx.EXPAND, 5)
 
@@ -280,7 +281,11 @@ class RenameFiles(wx.Dialog):
         self.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.onFileActivated, self.genericDirCtrl.GetTreeCtrl())
         self.Sizer5_Cancel.Bind(wx.EVT_BUTTON, self.onCancel)
         self.Sizer5_OK.Bind(wx.EVT_BUTTON, self.renameFiles)
+        self.Bind(wx.EVT_CLOSE, self.onClose)
 
+    def set_splitter_position(self):
+        self.splitter1.SetSashPosition(self.splitter_pos)    
+    
     def GetsplitterPosition(self, event):
         self.splitter_pos = self.splitter1.GetSashPosition()
         event.Skip()
@@ -390,16 +395,16 @@ class RenameFiles(wx.Dialog):
             except:
                 current_dir = self.get_current_user()
         # Update the FILE_SETTINGS dictionary
-        FILE_SETTINGS["Renamer"] = {"W": width, "H": height, "splitter": self.splitter_pos, "Selected": current_dir}    
-    
+        FILE_SETTINGS["Renamer"] = {"W": width, "H": height, "splitter": self.splitter_pos, "Selected": current_dir}
+        
     def onCancel(self, event):
         self.writeSettings()
         self.Destroy()
         event.Skip()
-
-    def splitter1OnIdle(self, event):
-        self.splitter1.SetSashPosition(260)
-        self.splitter1.Unbind(wx.EVT_IDLE)
+        
+    def onClose(self, event):
+        self.writeSettings()
+        self.Destroy()
 
 
 class MyApp(wx.App):
@@ -407,7 +412,7 @@ class MyApp(wx.App):
         self.dialog = RenameFiles(None)
         self.SetTopWindow(self.dialog)
         self.dialog.ShowModal()
-        self.dialog.Destroy()
+        #self.dialog.Destroy()
         return True
 
 
