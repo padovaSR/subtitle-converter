@@ -27,6 +27,7 @@ import shutil
 import pickle
 import json
 import zipfile
+import inspect
 from collections import namedtuple
 from operator import itemgetter
 from io import BytesIO
@@ -130,6 +131,7 @@ class MyFrame(ConverterFrame):
 
         self.dont_show = False
         self.hideDialog = False
+        self.lastCaller = None
         self.multiFile = False
 
         self.bytesText = BytesIO()
@@ -2758,7 +2760,6 @@ class MyFrame(ConverterFrame):
 
         with open(settings_file, "w") as wf:
             wf.write(json.dumps(FILE_SETTINGS, ensure_ascii=False, indent=4))
-            
         shutil.copyfile(settings_file, settings_file+".bak")
         
         self.rwFileHistory(FILE_HISTORY)
@@ -3184,17 +3185,17 @@ class MyFrame(ConverterFrame):
 
     def displayText(self, intext=[]):
         """"""
-        if self.hideDialog is True:
+        caller_method = inspect.stack()[1].function
+        if self.hideDialog and self.lastCaller == caller_method:
             return
-        dlg = wx.RichMessageDialog(
-            self, "".join(intext), "SubtitleConverter", style=wx.OK
-        )
+        dlg = wx.RichMessageDialog(self, "".join(intext), "SubtitleConverter", style=wx.OK)
         dlg.ShowCheckBox("Sakrij ovaj dijalog")
-
+    
         if dlg.ShowModal() == wx.ID_OK:
             if dlg.IsCheckBoxChecked():
                 self.hideDialog = True
             dlg.Destroy()
+        self.lastCaller = caller_method
 
     def onChoice(self, event):
 
