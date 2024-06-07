@@ -30,7 +30,7 @@ class MyFileDropTarget(wx.TextDropTarget):
             
 class CollectFiles:
     """"""
-    RP = re.compile(r"\d{4}\w?\.?|(x|h)\.?26(4|5)|N(10|265)|ddp5\.1\.?|\b\w{2,}\b(?<!\d)|[ \.-]|(ION\d{2,3})|(?<=part[.\- ])\d+|s\d\d?e", re.I)
+    RP = re.compile(r"\d{4}\w?\.?|(x|h)\.?26(4|5)|N(10|265)|ddp5\.1\.?|\b\w{2,}\b(?<!\d)|[ \.-]|(ION\d{2,3})|(?<=part[.\- ])\d+|s\d+e|([a-z]+\.+){1,5}|\d+\.(?=s[0-9])", re.I)
     
     subtitles = []
     def __init__(self, selected_folder=None):
