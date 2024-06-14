@@ -164,10 +164,12 @@ class RenameFiles(wx.Dialog):
             wx.TAB_TRAVERSAL,
         )
         Sizer3 = wx.BoxSizer(wx.VERTICAL)
-        try:
-            selected_directory = FILE_SETTINGS["Renamer"]["Selected"]
-        except:
-            selected_directory = self.get_current_user()
+        selected_directory = FILE_SETTINGS["Renamer"]["Selected"]
+        if not os.path.exists(selected_directory):
+            try:
+                selected_directory = dirname(selected_directory)
+            except:
+                selected_directory = self.get_current_user()
         self.genericDirCtrl = wx.GenericDirCtrl(
             self.panel1,
             wx.ID_ANY,
@@ -389,11 +391,6 @@ class RenameFiles(wx.Dialog):
         width = size.GetWidth()
         height = size.GetHeight()
         current_dir = self.Label_2.GetLabel()
-        if not os.path.exists(current_dir):
-            try:
-                current_dir = dirname(current_dir)
-            except:
-                current_dir = self.get_current_user()
         # Update the FILE_SETTINGS dictionary
         FILE_SETTINGS["Renamer"] = {"W": width, "H": height, "splitter": self.splitter_pos, "Selected": current_dir}
         
