@@ -353,7 +353,7 @@ class RenameFiles(wx.Dialog):
         if n > 2:
             pl_name = f"{split(dirname(self.subtitles[0]))[1]}.m3u"
             pl_file = join(dirname(self.subtitles[0]), pl_name)
-            with open(pl_file, "w", encoding="utf-8") as f:
+            with open(pl_file, "w", encoding="utf-8", newline="\r\n") as f:
                 f.write(f"#{basename(pl_file)[:-4]} Playlist\n")            
         for i in range(0, n):
             try:
@@ -362,7 +362,7 @@ class RenameFiles(wx.Dialog):
                 shutil.move(self.subtitles[i], new_name)
                 renamed.append(f"{line}\n")
                 if n > 2:
-                    with open(pl_file, "a", encoding="utf-8") as f:
+                    with open(pl_file, "a", encoding="utf-8", newline="\r\n") as f:
                         f.write(f"{splitext(line)[0]}{self.vid_suffix}\n")                
                 logger.debug(f"{basename(self.subtitles[i])} -> {line}")
             except Exception as e:
