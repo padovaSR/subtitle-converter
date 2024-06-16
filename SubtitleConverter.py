@@ -507,10 +507,13 @@ class MyFrame(ConverterFrame):
         if not tval.startswith('Files ') and len(tval) > 0 and not PREVIOUS:
             if self.ShowDialog() is False:
                 return
-
+        predefined_directory = FILE_SETTINGS["Directory"]
+        if not os.path.exists(predefined_directory):
+            predefined_directory = os.path.expanduser("~")
         dlgOpen = wx.FileDialog(
             self,
             "Otvori novi fajl",
+            defaultDir=predefined_directory,
             style=wx.FD_OPEN | wx.FD_MULTIPLE,
             wildcard=self.wildcard,
         )
@@ -528,6 +531,7 @@ class MyFrame(ConverterFrame):
                 for fpath in filepath:
                     self.real_path.append(fpath)
                 self.real_dir = os.path.dirname(self.real_path[-1])
+            FILE_SETTINGS["Directory"] = os.path.normpath(self.real_dir)
             dlgOpen.Destroy()
 
             fileHandle(filepath, self.text_1)
@@ -2733,8 +2737,9 @@ class MyFrame(ConverterFrame):
         dlg = RenameFiles(None)
         if dlg.ShowModal() == wx.ID_OK:
             files = dlg.checkRenamed()
-            s_text.extend(files)
-            self.displayText(s_text)
+            if files:
+                s_text.extend(files)
+                self.displayText(s_text)
             dlg.Destroy()
         event.Skip()
 
