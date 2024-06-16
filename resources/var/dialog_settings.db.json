@@ -51,17 +51,18 @@
     },
     "CB_value": " auto",
     "FrameSize": {
-        "W": 626,
-        "H": 625
+        "W": 645,
+        "H": 662
     },
     "Renamer": {
-        "W": 785,
-        "H": 685,
-        "splitter": 323,
-        "Selected": "C:\\Users\\darkstar\\Desktop\\Test_subs"
+        "W": 926,
+        "H": 743,
+        "splitter": 306,
+        "Selected": "C:\\Users\\darkstar\\Documents"
     },
     "Added_ext": [
-        ".fixed",
-        "_merged"
-    ]
+        "_merged",
+        ".fixed"
+    ],
+    "Directory": "C:\\Users\\darkstar\\Documents"
 }
