@@ -393,6 +393,7 @@ class RenameFiles(wx.Dialog):
         current_dir = self.Label_2.GetLabel()
         # Update the FILE_SETTINGS dictionary
         FILE_SETTINGS["Renamer"] = {"W": width, "H": height, "splitter": self.splitter_pos, "Selected": current_dir}
+        FILE_SETTINGS["Directory"] = normpath(current_dir)
         
     def onCancel(self, event):
         self.writeSettings()
