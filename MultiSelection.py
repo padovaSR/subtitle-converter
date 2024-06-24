@@ -340,7 +340,7 @@ class MultiFiles(wx.Dialog):
     def disableCheckBox(self, event):
         ''''''
         if any(x.IsChecked() for x in self.checkBoxList):
-            self.getFiles(event)
+            self.populate_list(event)
         event.Skip()    
     
     def populate_list(self, event):
