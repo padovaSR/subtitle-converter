@@ -64,5 +64,11 @@
         "_merged",
         ".fixed"
     ],
-    "Directory": "C:\\Users\\darkstar\\Documents"
+    "Directory": "C:\\Users\\darkstar\\Documents",
+    "MultiFiles": {
+        "W": 1171,
+        "H": 880,
+        "splitter": 368,
+        "Selected": "C:\\Users\\darkstar\\Desktop\\SUBS"
+    }
 }
