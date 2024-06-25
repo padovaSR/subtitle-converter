@@ -294,8 +294,7 @@ class MultiFiles(wx.Dialog):
         event.Skip()
 
     def on_item_checked(self, event):
-        '''Update the Select All checkbox state based on the
-        individual items'states'''
+        ''''''
         self.update_selected_count()
         event.Skip()
 
@@ -339,8 +338,12 @@ class MultiFiles(wx.Dialog):
     
     def disableCheckBox(self, event):
         ''''''
-        if any(x.IsChecked() for x in self.checkBoxList):
-            self.populate_list(event)
+        if event.Id == self.checkbox_5.Id:
+            self.select_all.SetValue(0)
+        else:
+            if any(x.IsChecked() for x in self.checkBoxList):
+                self.select_all.SetValue(0)
+                self.populate_list(event)
         event.Skip()    
     
     def populate_list(self, event):
