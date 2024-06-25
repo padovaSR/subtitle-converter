@@ -235,6 +235,7 @@ class MultiFiles(wx.Dialog):
         self.splitter1.Bind(wx.EVT_SPLITTER_SASH_POS_CHANGED, self.GetsplitterPosition)
         self.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.onFileActivated, self.genericDirCtrl.GetTreeCtrl())
         self.Bind(wx.EVT_CHECKBOX, self.populate_list, self.checkbox_5)
+        self.Bind(wx.EVT_CHECKBOX, self.disableCheckBox, self.checkbox_5)
         self.list_box.Bind(wx.EVT_CHECKLISTBOX, self.on_item_checked)
         self.select_all.Bind(wx.EVT_CHECKLISTBOX, self.on_item_checked)
         self.select_all.Bind(wx.EVT_CHECKBOX, self.on_select_all)
