@@ -273,7 +273,7 @@ class MultiFiles(wx.Dialog):
             self.list_box.Clear()
             if self.choices:
                 self.list_box.InsertItems(self.choices, 0)        
-                # Update the selected count label
+                self.select_all.SetValue(0)
                 self.update_selected_count()            
 
     def onFileActivated(self, event):
