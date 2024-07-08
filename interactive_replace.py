@@ -386,16 +386,37 @@ class FindReplace(wx.Dialog):
         event.Skip()
     
     def clearDict(self, _dict, _subs):
-        """"""
-        new_dict = {}
-        robj1 = re.compile(r"\b("+"|".join(map(re.escape, _dict.keys()))+r")\b")
-        t_out1 = robj1.findall(_subs)
-        for i in t_out1:
-            for k, v in _dict.items():
-                if i == k:
-                    new_dict[i] = v
-        self.subs = srt.parse(self.default_subs, ignore_errors=True)
-        return new_dict
+        """
+        Filters a dictionary to include only the keys found in the given subtitles string.
+        Parameters:
+            _dict (dict): The dictionary to filter.
+            _subs (str): The string of subtitles to search for dictionary keys.
+        Returns:
+            dict: A new dictionary containing only the key-value pairs where keys were found in the subtitles.
+        """
+        filtered_dict = {}
+
+        # Compile the regex pattern to find keys in the subtitles
+        pattern = re.compile(
+                r"\b(" + "|".join(map(re.escape, _dict.keys())) + r")\b"
+            )
+
+        # Find all matches of dictionary keys in the subtitles
+        matches = pattern.findall(_subs)
+
+        # Create a new dictionary with only the matched keys
+        for match in matches:
+            if match in _dict:
+                filtered_dict[match] = _dict[match]
+
+        # Parse the default subtitles
+        try:
+            self.subs = srt.parse(self.default_subs, ignore_errors=True)
+        except Exception as e:
+            logger.debug(f"Error parsing subtitles: {e}")
+            self.subs = None
+
+        return filtered_dict    
     
     def GetText(self):
         """"""
