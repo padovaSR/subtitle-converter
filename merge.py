@@ -147,50 +147,66 @@ class FixSubGaps:
         return new_f
 
 def ShrinkGap(inlist, maxgap, mingap=1):
-    """"""
-    dsub = Subtitle(
-            inlist[-1].index + 1,
-            DT.timedelta(milliseconds=(mTime(inlist[-1].start) + 6000)),
-            DT.timedelta(milliseconds=(mTime(inlist[-1].end) + 11000)),
-            'Darkstar testings',
-        )        
+    """Optimize the gap between subtitles in an .srt file."""
+    
     gaps = 0
-    new_l = []
-    new_f = []
+    new_subtitles = []
+
+    def adjust_subtitle_pair(sub1, sub2):
+        """Adjust a pair of subtitles if they are within the gap limit."""
+        nonlocal gaps
+        end_1 = mTime(sub1.end)
+        start_1 = mTime(sub2.start)
+        gap = start_1 - end_1
+        difference = gap - mingap
+
+        # Only adjust if the difference is within limits and won't cause overlap
+        if 0 < difference <= maxgap:
+            gaps += 1
+            half_difference = difference / 2
+
+            # Adjusting times while preventing overlap
+            new_end_1 = end_1 + half_difference
+            new_start_2 = start_1 - half_difference
+
+            # Ensure adjusted times do not cause overlaps
+            if new_end_1 >= new_start_2:
+                return sub1, sub2  # Skip adjustment if it causes overlap
+
+            sub1 = Subtitle(sub1.index, sub1.start, DT.timedelta(milliseconds=new_end_1), sub1.content)
+            sub2 = Subtitle(sub2.index, DT.timedelta(milliseconds=new_start_2), sub2.end, sub2.content)
+
+        return sub1, sub2
+
     try:
-        for SUB in zip_longest(inlist[0::2], inlist[1::2], fillvalue=dsub):
-            end_1 = mTime(SUB[0].end)
-            start_1 = mTime(SUB[1].start)
-            gap = start_1 - end_1 
-            diference = gap - mingap
-            if diference <=maxgap and diference > 0:
-                gaps += 1
-                new_start = DT.timedelta(milliseconds=(start_1-diference/2))
-                new_end = DT.timedelta(milliseconds=(end_1+diference/2))
-                new_l.append(Subtitle(SUB[0].index, SUB[0].start, new_end, SUB[0].content))
-                new_l.append(Subtitle(SUB[1].index, new_start, SUB[1].end, SUB[1].content))
-            else:
-                new_l.extend((SUB[0], SUB[1]))
-        new_f.append(new_l[0])
-        for SUB in zip_longest(new_l[1::2], new_l[2::2], fillvalue=dsub):
-            end_1 = mTime(SUB[0].end)
-            start_1 = mTime(SUB[1].start)
-            gap = start_1 - end_1 
-            diference = gap - mingap
-            if diference <=maxgap and diference > 0:
-                gaps += 1
-                new_start = DT.timedelta(milliseconds=(start_1-diference/2))
-                new_end = DT.timedelta(milliseconds=(end_1+diference/2))
-                new_f.append(Subtitle(SUB[0].index, SUB[0].start, new_end, SUB[0].content))
-                new_f.append(Subtitle(SUB[1].index, new_start, SUB[1].end, SUB[1].content))
-            else:
-                new_f.extend((SUB[0], SUB[1]))
+        # Start with the first subtitle
+        i = 0
+        while i < len(inlist) - 1:
+            sub1 = inlist[i]
+            sub2 = inlist[i + 1]
+
+            # Adjust the pair
+            adjusted_sub1, adjusted_sub2 = adjust_subtitle_pair(sub1, sub2)
+
+            # Add the adjusted first subtitle
+            if i == 0 or new_subtitles[-1] != adjusted_sub1:  # Avoid duplicates
+                new_subtitles.append(adjusted_sub1)
+            
+            # Update for the next loop iteration
+            inlist[i + 1] = adjusted_sub2  # Update the inlist to keep changes
+            
+            i += 1
+
+        # Ensure the last subtitle is included
+        if len(inlist) > 1:
+            new_subtitles.append(inlist[-1])
+
+        # Write the results to the work text
+        WORK_TEXT.truncate(0)
+        WORK_TEXT.write(srt.compose(new_subtitles))
+        WORK_TEXT.seek(0)
+
     except Exception as e:
         logger.debug(f"ShrinkGap: {e}")
-    for i in new_f[-4:]:
-        if i.content == "Darkstar testings": new_f.remove(i)
-    WORK_TEXT.truncate(0)
-    WORK_TEXT.write(srt.compose(new_f))
-    WORK_TEXT.seek(0)        
-    
+
     return gaps
