@@ -1,0 +1,94 @@
+{
+    "Preferences": {
+        "utf8_txt": false,
+        "bom_utf8": true,
+        "ShowLog": false
+    },
+    "key4": {
+        "new_font": "Franklin Gothic Medium",
+        "fontSize": 11,
+        "fontColour": [
+            0,
+            0,
+            64
+        ],
+        "weight": 400
+    },
+    "key5": {
+        "cyr_ansi_srt": "cyr",
+        "cyr_utf8_txt": "cyr_utf8",
+        "cyr_utf8_srt": "cyr_utf8",
+        "lat_ansi_srt": "lat",
+        "lat_utf8_srt": "utf8",
+        "cleanup": "cln",
+        "transcribe": "changed",
+        "fixed_subs": "fixed",
+        "Cyr-ansi": "Cyr-ansi",
+        "Cyr-utf8": "Cyr-utf8",
+        "Lat-ansi": "Lat-ansi",
+        "Lat-utf8": "Lat-utf8"
+    },
+    "key2": {
+        "l_lenght": 6000,
+        "m_char": 60,
+        "m_gap": 600,
+        "f_suffix": "_merged"
+    },
+    "key1": {
+        "nuliranje": false,
+        "breaks": false,
+        "kolor": false,
+        "italik": true,
+        "spejsevi": true,
+        "crtice_sp": true,
+        "crtice": true,
+        "linije": false,
+        "fixgap": true,
+        "shrinkgap": true,
+        "mingap": 62,
+        "maxgap": 430
+    },
+    "CB_value": "auto",
+    "FrameSize": {
+        "W": 750,
+        "H": 680
+    },
+    "Renamer": {
+        "W": 1115,
+        "H": 856,
+        "splitter": 363,
+        "Selected": "C:\\Users\\darkstar\\Desktop\\test_1"
+    },
+    "ChoiceDialog": {
+        "W": 788,
+        "H": 637
+    },
+    "ReplaceDialog": {
+        "W": 1005,
+        "H": 919
+    },
+    "Manual": {
+        "W": 1136,
+        "H": 889
+    },
+    "added_ext": [
+        "_merged",
+        ".fixed"
+    ],
+    "MultiFiles": {
+        "W": 1173,
+        "H": 897,
+        "splitter": 403,
+        "Selected": "C:\\Users\\darkstar\\Desktop\\SUBS"
+    },
+    "Manually": {
+        "W": 721,
+        "H": 740,
+        "Selected": "dictionaries\\Dictionary-1.txt"
+    },
+    "Zip_confirm": {
+        "W": 647,
+        "H": 543
+    },
+    "Directory": "C:\\Users\\darkstar\\Desktop\\SUBS_1"
+}
