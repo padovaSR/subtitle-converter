@@ -19,27 +19,33 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import wx
-from os.path import join, basename, dirname
+from settings import MAIN_SETTINGS, I_PATH 
+from os.path import join, basename, dirname, normpath
 import logging.config
+import wx
 
 logger = logging.getLogger(__name__)
 
 
-class TreeDialog(wx.Dialog):
+class ZipStructure(wx.Dialog):
     def __init__(self, parent, caption, root_name, files=[]):
         wx.Dialog.__init__(
             self, parent, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
         )
         self.files = files
         self.caption = caption
+        #self.caption = "Export ZIP"
         self.root_name = root_name
-
-        self.SetSize((439, 434))
+        try:
+            width = MAIN_SETTINGS["Zip_confirm"]["W"]
+            height = MAIN_SETTINGS["Zip_confirm"]["H"]
+            self.SetSize((width, height))
+        except:
+            self.SetSize((454, 441))
         self.SetTitle(self.caption)
         _icon = wx.NullIcon
         _icon.CopyFromBitmap(
-            wx.Bitmap(join("resources", "icons", "subConvert.ico"), wx.BITMAP_TYPE_ANY)
+            wx.Bitmap(join(I_PATH, "sc.ico"), wx.BITMAP_TYPE_ANY)
         )
         self.SetIcon(_icon)
         self.SetFocus()
@@ -61,20 +67,26 @@ class TreeDialog(wx.Dialog):
             )
         )
         szr_3.Add(self.label_1, 1, wx.ALL | wx.EXPAND, 5)
-
-        self.chbox_1 = wx.CheckBox(self, wx.ID_ANY, "Cyr-ansi", style=wx.CHK_2STATE)
+        
+        key = MAIN_SETTINGS["key5"]
+        
+        basedirs = [key["Cyr-ansi"], key["Cyr-utf8"], key["Lat-ansi"], key["Lat-utf8"]]
+        
+        self.files = self.create_info(basedirs)
+        
+        self.chbox_1 = wx.CheckBox(self, wx.ID_ANY, basedirs[0], style=wx.CHK_2STATE)
         self.chbox_1.SetValue(1)
         szr_3.Add(self.chbox_1, 0, wx.ALIGN_BOTTOM | wx.ALL, 5)
 
-        self.chbox_2 = wx.CheckBox(self, wx.ID_ANY, "Cyr-utf8", style=wx.CHK_2STATE)
+        self.chbox_2 = wx.CheckBox(self, wx.ID_ANY, basedirs[1], style=wx.CHK_2STATE)
         self.chbox_2.SetValue(1)
         szr_3.Add(self.chbox_2, 0, wx.ALL | wx.EXPAND, 5)
 
-        self.chbox_3 = wx.CheckBox(self, wx.ID_ANY, "Lat-ansi", style=wx.CHK_2STATE)
+        self.chbox_3 = wx.CheckBox(self, wx.ID_ANY, basedirs[2], style=wx.CHK_2STATE)
         self.chbox_3.SetValue(1)
         szr_3.Add(self.chbox_3, 0, wx.ALL | wx.EXPAND, 5)
 
-        self.chbox_4 = wx.CheckBox(self, wx.ID_ANY, "Lat-utf8", style=wx.CHK_2STATE)
+        self.chbox_4 = wx.CheckBox(self, wx.ID_ANY, basedirs[3], style=wx.CHK_2STATE)
         self.chbox_4.SetValue(1)
         szr_3.Add(self.chbox_4, 0, wx.ALL | wx.EXPAND, 5)
 
@@ -119,22 +131,24 @@ class TreeDialog(wx.Dialog):
         )
 
         self.SetSizer(szr_1)
-        szr_1.SetSizeHints(self)
+        #szr_1.SetSizeHints(self)
 
-        self.SetAffirmativeId(self.button_OK.GetId())
+        #self.SetAffirmativeId(self.button_OK.GetId())
         self.SetEscapeId(self.button_CANCEL.GetId())
 
         self.Layout()
-
+        
         self.Bind(wx.EVT_BUTTON, self.onQuit, self.button_CANCEL)
         self.Bind(wx.EVT_CLOSE, self.onCancel, id=-1)
         self.Bind(wx.EVT_CHECKBOX, self.rebuildItems, id=-1)
+        self.Bind(wx.EVT_BUTTON, self.onOK, id=self.button_OK.GetId())
+        self.Bind(wx.EVT_SIZE, self.size_frame, id=-1)
         # end wxGlade
 
         isz = (16, 16)
         il = wx.ImageList(*isz)
         self.fldrix = il.Add(
-            wx.Bitmap(join("resources", "icons", "a-zip-icon.png"), wx.BITMAP_TYPE_ANY)
+            wx.Bitmap(join(I_PATH, "x-zip.png"), wx.BITMAP_TYPE_ANY)
         )
         self.fldridx = il.Add(
             wx.ArtProvider.GetBitmap(wx.ART_FOLDER, wx.ART_OTHER, isz)
@@ -156,7 +170,7 @@ class TreeDialog(wx.Dialog):
         """"""
         logger.debug("Building TreeItems")
         return [self.makeMenu(x) for x in self.files]
-
+    
     def makeMenu(self, items=[]):
         """"""
         if self.checkbox_1.IsChecked():
@@ -175,6 +189,7 @@ class TreeDialog(wx.Dialog):
             for i in cItems:
                 self.tree.SetItemImage(i, self.fldridx, wx.TreeItemIcon_Normal)
                 self.tree.SetItemImage(i, self.fldropenidx, wx.TreeItemIcon_Expanded)
+                #self.tree.Expand(i)
             self.tree.Expand(self.root)
             return cItems
         else:
@@ -188,9 +203,27 @@ class TreeDialog(wx.Dialog):
                 self.tree.SetItemImage(i, self.fileidx, wx.TreeItemIcon_Normal)
             return cItems
 
-    def makeFolder(self):
+    def create_info(self, _basedirs):
         """"""
-        return self.checkbox_1.IsChecked()
+        combined_paths = []
+        for dir_name, paths in zip(_basedirs, self.files):
+            # Create a list of normalized joined paths for each directory
+            joined_paths = [normpath(join(dir_name, path)) for path in paths]
+            combined_paths.append(joined_paths)    
+        return combined_paths
+    
+    def makeFolder(self):
+        buttons = [
+                self.chbox_1,
+                self.chbox_2,
+                self.chbox_3,
+                self.chbox_4,
+            ]
+        if self.checkbox_1.IsChecked():
+            # Return the labels of all checkboxes that are checked
+            return [button.GetLabel() for button in buttons if button.IsChecked()]
+        else:
+            return False    
 
     def GetSelections(self):
         """"""
@@ -202,18 +235,41 @@ class TreeDialog(wx.Dialog):
         self.tree.DeleteChildren(self.root)
         makef = [self.files[x] for x in self.GetSelections()]
         self.items = [self.makeMenu(x) for x in makef]
+        for item in self.items:
+            self.tree.Expand(item[0])
+        if event.Id in [
+            self.chbox_1.Id,
+            self.chbox_2.Id,
+            self.chbox_3.Id,
+            self.chbox_4.Id,
+        ]:
+            for item in self.items:
+                self.tree.Collapse(item[0])
         event.Skip()
 
+    def size_frame(self, event):
+        """"""
+        width, height = event.GetSize()
+        MAIN_SETTINGS["Zip_confirm"] = {"W": width, "H": height}
+        event.Skip()    
+    
+    def onOK(self, event):
+        """"""
+        self.EndModal(True)
+        self.Destroy()
+    
     def onCancel(self, event):
         self.Destroy()
-
+        event.Skip()
+        
     def onQuit(self, event):
         self.Destroy()
+        event.Skip()
 
 
 class MyApp(wx.App):
     def OnInit(self):
-        self.dialog = TreeDialog(None, wx.ID_ANY, "", "")
+        self.dialog = ZipStructure(None, wx.ID_ANY, "", "")
         self.SetTopWindow(self.dialog)
         self.dialog.ShowModal()
         self.dialog.Destroy()

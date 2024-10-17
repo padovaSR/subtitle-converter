@@ -7,7 +7,7 @@
 #-------------------------------------------------------------------------------
 
 import re
-from codecs import BOM_UTF8 
+from codecs import BOM_UTF8, BOM_UTF16
 
 import logging.config
 logger = logging.getLogger(__name__)
@@ -18,6 +18,8 @@ def checkCyrillicAlphabet(input_text):
     def decode_text() -> str:
         if input_text[:4].startswith(BOM_UTF8):
             return input_text.decode("utf-8")
+        elif input_text[:4].startswith(BOM_UTF16):
+            return input_text.decode("utf-16")
         else:
             for enc in ["cp1251", "utf-8"]:
                 try:

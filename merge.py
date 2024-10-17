@@ -85,70 +85,80 @@ def myMerger(subs_in, max_time, max_char, _gap):
     WORK_TEXT.write(srt.compose(out_f))
     WORK_TEXT.seek(0)
 
-class FixSubGaps:
-    """"""
-    def __init__(self, inlist=[], mingap=0):
-        """"""
-        self.inlist = inlist
-        self.mingap = mingap
-        self.Left = self.mingap*70/100
-        self.Right = self.mingap*30/100
-        
-    def powerSubs(self):
-        ''''''
-        gaps, overlap, new_list = self.leftGap()
-        new_subs_list = self.rightGap(new_list)
-            
-        WORK_TEXT.truncate(0)
-        WORK_TEXT.write(srt.compose(new_subs_list))
-        WORK_TEXT.seek(0)        
-        return gaps, overlap
+def FixSubGaps(inlist, mingap):
+    """Optimize the gap between subtitles, including fixing overlaps."""
     
-    def leftGap(self):
-        """"""
-        inlist = self.inlist
-        mingap = self.mingap
-        Left = self.Left
-        gaps = 0
-        overlap = 0
-        new_s = []
-        
-        for FSUB in zip(inlist, inlist[1:]):
-            end_1 = mTime(FSUB[0].end)
-            start_1 = mTime(FSUB[1].start)
-            if start_1 < end_1: overlap += 1
-            gap = start_1 - end_1
-            if gap < mingap:
-                gaps += 1
-                new_end = DT.timedelta(milliseconds=(start_1-Left))
-                new_s.append(Subtitle(FSUB[0].index, FSUB[0].start, new_end, FSUB[0].content))
-            else: new_s.append(FSUB[0])
-        new_s.append(inlist[len(inlist)-1])
-        
-        return gaps, overlap, new_s
-        
-    def rightGap(self, in_list):
-        """"""
-        inlist = in_list
-        mingap = self.mingap
-        Right = self.Right
-        new_f = []
-        
-        new_f.append(inlist[0])
-        for FSUB in zip(inlist, inlist[1:]):
-            end_1 = mTime(FSUB[0].end)
-            start_1 = mTime(FSUB[1].start)
-            gap = start_1 - end_1
-            if gap < mingap:
-                new_start = DT.timedelta(milliseconds=(start_1+Right))
-                new_f.append(Subtitle(FSUB[1].index, new_start, FSUB[1].end, FSUB[1].content))
-            else: new_f.append(FSUB[1])
-                
-        return new_f
+    gaps = 0
+    overlaps = 0
+    new_subtitles = []
 
+    def adjust_subtitle_pair(sub1, sub2):
+        """Adjust a pair of subtitles to optimize gaps and fix overlaps."""
+        nonlocal gaps
+        nonlocal overlaps
+
+        end_1 = mTime(sub1.end)
+        start_2 = mTime(sub2.start)
+        gap = start_2 - end_1
+
+        # Handle overlap by adjusting start_2
+        if start_2 < end_1:
+            overlaps += 1
+            # Adjust start of the second subtitle to halfway through the overlap
+            start_2 = end_1 + (end_1 - start_2) / 2
+            sub2 = Subtitle(sub2.index, DT.timedelta(milliseconds=start_2), sub2.end, sub2.content)
+        
+        # Handle small gaps
+        if gap < mingap:
+            gaps += 1
+            # Calculate adjustments to fill the gap
+            adjust_end_1 = end_1 + (gap * 0.7)  # 70% adjustment to sub1 end time
+            adjust_start_2 = start_2 - (gap * 0.3)  # 30% adjustment to sub2 start time
+
+            # Ensure adjusted times do not cause overlaps
+            if adjust_end_1 >= adjust_start_2:
+                adjust_end_1 = (end_1 + start_2) / 2  # Split the difference
+                adjust_start_2 = adjust_end_1 + mingap
+
+            # Update subtitle timings
+            sub1 = Subtitle(sub1.index, sub1.start, DT.timedelta(milliseconds=adjust_end_1), sub1.content)
+            sub2 = Subtitle(sub2.index, DT.timedelta(milliseconds=adjust_start_2), sub2.end, sub2.content)
+
+        return sub1, sub2
+
+    try:
+        # Iterate over subtitle pairs
+        for i in range(len(inlist) - 1):
+            sub1 = inlist[i]
+            sub2 = inlist[i + 1]
+
+            # Adjust the pair
+            adjusted_sub1, adjusted_sub2 = adjust_subtitle_pair(sub1, sub2)
+
+            # Add the adjusted first subtitle
+            if i == 0 or new_subtitles[-1].index != adjusted_sub1.index:  # Avoid duplicates
+                new_subtitles.append(adjusted_sub1)
+            
+            # Update the inlist for the next iteration
+            inlist[i + 1] = adjusted_sub2
+        
+        # Add the last subtitle if not already added
+        if new_subtitles[-1].index != inlist[-1].index:
+            new_subtitles.append(inlist[-1])
+
+        # Write or return the adjusted subtitles
+        WORK_TEXT.truncate(0)
+        WORK_TEXT.write(srt.compose(new_subtitles))
+        WORK_TEXT.seek(0)
+
+    except Exception as e:
+        logger.debug(f"FixGaps: {e}")
+
+    return gaps, overlaps
+    
 def ShrinkGap(inlist, maxgap, mingap=1):
     """Optimize the gap between subtitles in an .srt file."""
-    
+
     gaps = 0
     new_subtitles = []
 
@@ -163,18 +173,29 @@ def ShrinkGap(inlist, maxgap, mingap=1):
         # Only adjust if the difference is within limits and won't cause overlap
         if 0 < difference <= maxgap:
             gaps += 1
-            half_difference = difference / 2
 
-            # Adjusting times while preventing overlap
-            new_end_1 = end_1 + half_difference
-            new_start_2 = start_1 - half_difference
+            # Adjust end time of sub1 by 70% of the difference
+            new_end_1 = end_1 + 0.7 * difference
+
+            # Adjust start time of sub2 by 30% of the difference
+            new_start_2 = start_1 - 0.3 * difference
 
             # Ensure adjusted times do not cause overlaps
             if new_end_1 >= new_start_2:
                 return sub1, sub2  # Skip adjustment if it causes overlap
 
-            sub1 = Subtitle(sub1.index, sub1.start, DT.timedelta(milliseconds=new_end_1), sub1.content)
-            sub2 = Subtitle(sub2.index, DT.timedelta(milliseconds=new_start_2), sub2.end, sub2.content)
+            sub1 = Subtitle(
+                sub1.index,
+                sub1.start,
+                DT.timedelta(milliseconds=new_end_1),
+                sub1.content,
+            )
+            sub2 = Subtitle(
+                sub2.index,
+                DT.timedelta(milliseconds=new_start_2),
+                sub2.end,
+                sub2.content,
+            )
 
         return sub1, sub2
 
@@ -191,10 +212,10 @@ def ShrinkGap(inlist, maxgap, mingap=1):
             # Add the adjusted first subtitle
             if i == 0 or new_subtitles[-1] != adjusted_sub1:  # Avoid duplicates
                 new_subtitles.append(adjusted_sub1)
-            
+
             # Update for the next loop iteration
             inlist[i + 1] = adjusted_sub2  # Update the inlist to keep changes
-            
+
             i += 1
 
         # Ensure the last subtitle is included

@@ -9,7 +9,7 @@
 
 <BODY TEXT="#808080" BGCOLOR="#ebf5fb" LINK="#0000FF" VLINK="#FF0000" ALINK="#000088">
 <a name="top"></a>
-<H1><FONT COLOR="#616B87">Subtitle Converter v-0.5.9</FONT></H1>
+<H1><FONT COLOR="#616B87">Subtitle Converter v-0.6</FONT></H1>
 
 <br>&nbsp;
 
@@ -18,6 +18,8 @@
 <b><a href="#antivirus" style="color:#93BBD5; text-decoration: none">&bull; Antivirus alarm</a></b></br>
 <br>
 <b><a href="#actions" style="color:#93BBD5; text-decoration: none">&bull; Actions</a></b></br>
+<br>
+<b><a href="#kodiranje" style="color:#93BBD5; text-decoration: none">&bull; Kodiranje</a></b></br>
 <br>
 <b><a href="#preslov" style="color:#93BBD5; text-decoration: none">&bull; Preslovljavanje</a></b></br>
 <br>
@@ -29,11 +31,10 @@
 
 <H2>
 <a name="precice"><FONT COLOR="#777F95">Prečice:</FONT></H2></a>
-
-<P><B><FONT COLOR="#777F95">Ctrl+Shift+F</B></FONT>: FileSettings dijalog, predefinisani "pre presufiks" novih fajlova(lat,cyr,utf8...)<br>
-<B><FONT COLOR="#777F95">Ctrl+Shift+Y</B></FONT>: Latinica u Ćirilicu UTF-8<br>
-<br>
-Ostale prečice se mogu uređivati u <b>ShortcutEditoru</b> u meniju <b>Preferences</b></br><P>
+<p>Prečice se mogu uređivati u <b>ShortcutEditoru</b> u meniju <b>Preferences</b>.<br>
+Ili ručno, uređivanjem fajla <b>shortcut_keys.cfg</b> koji se nalazi u <i><b>"resources/var"</b></i> folderu.<br>
+U istom folderu nalazi se fajl <b>I_dialog.conf</b> u kome se ručno uređuju fontovi i prečice dijaloga <i><b>ChangeManually</b></i>.
+</p>
 
 <BR>&nbsp;
 
@@ -48,10 +49,23 @@ https://support.avast.com/en-ww/article/168/</br>
 
 <br>&nbsp;
 
+<a name="kodiranje"><h2><font color="#777F95">Kodiranje</font></h2></a>
+<p>Da bi se fajl otvorio sa ispravnim kodiranjem potrebno je znati kodiranje fajla i ono se može izabrati<br>
+u padajućem meniju "Kodiranje". Za potrebe sajta Titlovi.com gde je za titlove default <b>windows-1250</b> ili <b>UTF-8</b><br>
+dovoljno je izabrati opciju <b>auto</b>. Za unikode fajlove podržana se kodirnja <b>utf-8</b> i <b>utf-16</b>.<br>
+U meniju <b>Actions</b> postoji opcija <i><b>Convert encoding</b></i> kojom se menja enkoding fajla, i prihvata samo ručno izabrano kodiranje. 
+</p>
+
+<br>&nbsp;
+
 <a name="actions"><h2><font color="#777F95">Actions</font></h2></a>
-<p>Akcije iz menija <b>Actions</b> se nastavjaju jedna na drugu. Bilo kojim redom<br>
-Promene će biti sačuvane kao što su prikazane u prozoru programa.<br>
-Postoje opcije u meniju <b>Edit</b>, Undo i Redo akcije.</br></p>
+<p>Akcije iz menija <b>Actions</b> su za preslovljavanje latinice u ćirilicu i obratno.<br>
+Kao i druge akcije za konvertovanje kodne strane teksta ili titla. Promena delova engleskog teksta na osnovu rečnika.<br>
+Promene će biti sačuvane kao što su prikazane u prozoru programa. Novi fajl je kreiran sa dodatnom ekstenzijom<br>
+koja se određuje u podešavanjiama; U meniju <b>Preferences - Settings main</b>.<br>
+Ekstenzije se mogu ostaviti prazne i tada će fajl biti sačuvan pod istim imenom odnosno prepisan.</p>
+<br>
+<a href="#top" style="color:#93BBD5; text-decoration: none">Na vrh</a></b>
 
 <br>&nbsp;
 
@@ -66,18 +80,14 @@ Primer: <b>&lt;signe spécial&gt;</b>. Sadržaj u zagradama neće biti preslovlj
 Slova u zagradama, &lt; &gt;, kojih nema u kodnom rasporedu <b>windows-1251: <font color="#7fb3d5">ŠšđĐĆćČčŽž</font></b>, kao i specijalni znakovi će se sačuvati samo u UTF-8 tekstu,<br>
 Ove zagrade, sve osim samih tagova za tekst (italik, bold, font...), će tokom preslovljavanja biti obrisane i u novom i u originalnom tekstu.<br>
 <br>
-U meniju <b>Preferences</b> označavanjem opcije <b>Lat-Cyr preprocessing</b> uključuje se odnosno isključuje "peglanje" specijalnih znakova<br>
-definisanih u fajlu <b>cp1250.replace.cfg</b>. Isključenjem ove opcije specijalni znaci će biti "selektivno" procesovani i biće transportovani u UTF-8 tekst,<br>
-u ANSI tekstu će se umesto njih pojaviti znaci pitanja: <b>?</b>.<br>
-<br>
 Opcije za preslovljavanje iz Ćirilice u Latinicu nalaze se u meniju <b>Actions: <font color="#7fb3d5">Cyr to latin ansi</font>, <font color="#7fb3d5">Cyr to latin utf8</font></b></br></p>
 
 <br>&nbsp;
 
 <a name="reload"><h2><font color="#777F95">Reload</font></h2></a>
-<p>U meniju <b>File</b> postoji opcija "Reload file" kojom se ponovo otvara i učitava trenutni fajl. Sve promene u fajlu<br>
+<p>U meniju <b>File</b> postoji opcija <i><b>Reload file</b></i> kojom se ponovo otvara i učitava trenutni fajl. Sve promene u fajlu<br>
 koje su nastale u međuvremenu će biti učitane u radni tekst.<br>
-U meniju <b>Edit</b> postoji opcija "Reload text", ova opcija samo ponovo učitava početni tekst a pri tome ne otvara ponovo fajl koji u međuvremenu može biti promenjen.</br></p>
+U istom meniju <b>File</b> postoji i opcija <i><b>Open previous</b></i>, ova opcija ponovo učitava početni fajl koji je bio preimenovan.</br></p>
 
 <br>&nbsp;
 

@@ -1,8 +1,12 @@
-#!/usr/bin/env python3
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
+
+## Python code generated with wxFormBuilder (version 3.10.1-282-g1fa54006)
+## http://www.wxformbuilder.org/
+##
+## modified by padovaSR
 
 from os.path import join
-from settings import FILE_SETTINGS, settings_file
+from settings import MAIN_SETTINGS, I_PATH, main_settings_file
 
 import logging.config
 
@@ -10,549 +14,556 @@ import wx
 
 logger = logging.getLogger(__name__)
 
+## Class SettingsDialog
+
 
 class SettingsDialog(wx.Dialog):
-    def __init__(self, parent, *args):
+    def __init__(self, parent):
         wx.Dialog.__init__(
-            self,
-            parent,
-            id=wx.ID_ANY,
-            pos=wx.DefaultPosition,
-            style=wx.DEFAULT_DIALOG_STYLE,
-      )
+            self, parent, pos=wx.DefaultPosition, style=wx.DEFAULT_DIALOG_STYLE
+        )
+
         self.SetTitle("Podešavanja programa")
-        self.SetSize(415, 435)
+        self.SetSize(540, 570)
         icon = wx.NullIcon
         icon.CopyFromBitmap(
-            wx.Bitmap(join("resources", "icons", "system-run.png"), wx.BITMAP_TYPE_ANY)
-      )
+            wx.Bitmap(join(I_PATH, "system-run.png"), wx.BITMAP_TYPE_ANY)
+        )
         self.SetIcon(icon)
 
         self.SetSizeHints(wx.DefaultSize, wx.DefaultSize)
+
         bSizer1 = wx.BoxSizer(wx.VERTICAL)
 
-        bSizer2 = wx.BoxSizer(wx.HORIZONTAL)
-
-        self.listbook1 = wx.Listbook(
-            self,
-            wx.ID_ANY,
-            wx.DefaultPosition,
-            wx.Size(-1, -1),
-            wx.LB_DEFAULT | wx.LB_LEFT,
-      )
-        self.panel_1 = wx.Panel(
-            self.listbook1,
-            wx.ID_ANY,
-            wx.DefaultPosition,
-            wx.DefaultSize,
-            wx.TAB_TRAVERSAL,
-      )
+        self.m_panel1 = wx.Panel(
+            self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL
+        )
         bSizer3 = wx.BoxSizer(wx.VERTICAL)
 
-        self.staticText0 = wx.StaticText(
-            self.panel_1,
+        self.m_listbook2 = wx.Listbook(
+            self.m_panel1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LB_DEFAULT
+        )
+        self.m_panel5 = wx.Panel(
+            self.m_listbook2,
             wx.ID_ANY,
-            f"Odeđuje se dodatna ekstenzija ispred ekstenzije\n"
-            f"fajla *.srt, *txt... Može se ostaviti prazno polje bez\n"
-            f"spejseva i tada će sačuvani fajl biti prepisan.",
             wx.DefaultPosition,
             wx.DefaultSize,
-            wx.ALIGN_LEFT,
-      )
-        self.staticText0.Wrap(-1)
+            wx.BORDER_THEME | wx.TAB_TRAVERSAL,
+        )
+        bSizer4 = wx.BoxSizer(wx.VERTICAL)
 
-        bSizer3.Add(self.staticText0, 0, wx.ALL | wx.EXPAND, 5)
+        bSizer4.Add((2, 12), 0, 0, 0)
 
-        gSizer1 = wx.GridSizer(8, 2, 5, 5)
+        self.staticText_a = wx.StaticText(
+            self.m_panel5,
+            wx.ID_ANY,
+            f"Određuje se dodatna ekstenzija fajlova: *_cyr, *.lat...\n"
+            f"Mogu se ostaviti prazna polja bez spejseva\n"
+            f"i tada će originalni fajlovi biti prepisani.",
+            wx.DefaultPosition,
+            wx.DefaultSize,
+            0,
+        )
+        self.staticText_a.Wrap(-1)
 
-        self.staticText1 = wx.StaticText(
-            self.panel_1,
+        bSizer4.Add(self.staticText_a, 0, wx.ALIGN_LEFT | wx.LEFT | wx.RIGHT, 48)
+
+        gSizer5 = wx.GridSizer(0, 2, 0, 50)
+        
+        static_font = wx.Font(
+                8,
+                wx.FONTFAMILY_DEFAULT,
+                wx.FONTSTYLE_NORMAL,
+                wx.FONTWEIGHT_NORMAL,
+                False,
+                "Segoe UI Semibold",
+            )
+        
+        self.staticText_1 = wx.StaticText(
+            self.m_panel5, wx.ID_ANY, u"Cyr ANSI", wx.DefaultPosition, wx.DefaultSize, 0
+        )
+        self.staticText_1.Wrap(-1)
+        self.staticText_1.SetFont(static_font)
+
+        gSizer5.Add(self.staticText_1, 0, wx.ALIGN_BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
+
+        self.staticText_2 = wx.StaticText(
+            self.m_panel5,
+            wx.ID_ANY,
+            u"Cyr utf8 txt",
+            wx.DefaultPosition,
+            wx.DefaultSize,
+            0,
+        )
+        self.staticText_2.Wrap(-1)
+        self.staticText_2.SetFont(static_font)
+        gSizer5.Add(self.staticText_2, 0, wx.ALIGN_BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
+
+        self.textCtrl_1 = wx.TextCtrl(
+            self.m_panel5,
+            wx.ID_ANY,
+            wx.EmptyString,
+            wx.DefaultPosition,
+            wx.Size(120, 27),
+            0,
+        )
+        gSizer5.Add(self.textCtrl_1, 0, wx.ALL, 5)
+
+        self.textCtrl_2 = wx.TextCtrl(
+            self.m_panel5,
+            wx.ID_ANY,
+            wx.EmptyString,
+            wx.DefaultPosition,
+            wx.Size(120, 27),
+            0,
+        )
+        gSizer5.Add(self.textCtrl_2, 0, wx.ALL, 5)
+
+        self.staticText_3 = wx.StaticText(
+            self.m_panel5,
+            wx.ID_ANY,
+            u"Cyr utf8 srt",
+            wx.DefaultPosition,
+            wx.DefaultSize,
+            0,
+        )
+        self.staticText_3.Wrap(-1)
+        self.staticText_3.SetFont(static_font)
+        gSizer5.Add(self.staticText_3, 0, wx.ALIGN_BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
+
+        self.staticText_4 = wx.StaticText(
+            self.m_panel5, wx.ID_ANY, u"Lat ANSI", wx.DefaultPosition, wx.DefaultSize, 0
+        )
+        self.staticText_4.Wrap(-1)
+        self.staticText_4.SetFont(static_font)
+        gSizer5.Add(self.staticText_4, 0, wx.ALIGN_BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
+
+        self.textCtrl_3 = wx.TextCtrl(
+            self.m_panel5,
+            wx.ID_ANY,
+            wx.EmptyString,
+            wx.DefaultPosition,
+            wx.Size(120, 27),
+            0,
+        )
+        gSizer5.Add(self.textCtrl_3, 0, wx.ALL, 5)
+
+        self.textCtrl_4 = wx.TextCtrl(
+            self.m_panel5,
+            wx.ID_ANY,
+            wx.EmptyString,
+            wx.DefaultPosition,
+            wx.Size(120, 27),
+            0,
+        )
+        gSizer5.Add(self.textCtrl_4, 0, wx.ALL, 5)
+
+        self.staticText_5 = wx.StaticText(
+            self.m_panel5, wx.ID_ANY, u"Lat utf8", wx.DefaultPosition, wx.DefaultSize, 0
+        )
+        self.staticText_5.Wrap(-1)
+        self.staticText_5.SetFont(static_font)
+        gSizer5.Add(self.staticText_5, 0, wx.ALIGN_BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
+
+        self.staticText_6 = wx.StaticText(
+            self.m_panel5, wx.ID_ANY, u"Cleanup", wx.DefaultPosition, wx.DefaultSize, 0
+        )
+        self.staticText_6.Wrap(-1)
+        self.staticText_6.SetFont(static_font)
+        gSizer5.Add(self.staticText_6, 0, wx.ALIGN_BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
+
+        self.textCtrl_5 = wx.TextCtrl(
+            self.m_panel5,
+            wx.ID_ANY,
+            wx.EmptyString,
+            wx.DefaultPosition,
+            wx.Size(120, 27),
+            0,
+        )
+        gSizer5.Add(self.textCtrl_5, 0, wx.ALL, 5)
+
+        self.textCtrl_6 = wx.TextCtrl(
+            self.m_panel5,
+            wx.ID_ANY,
+            wx.EmptyString,
+            wx.DefaultPosition,
+            wx.Size(120, 27),
+            0,
+        )
+        gSizer5.Add(self.textCtrl_6, 0, wx.ALL, 5)
+
+        self.staticText_7 = wx.StaticText(
+            self.m_panel5,
+            wx.ID_ANY,
+            u"Transcribe",
+            wx.DefaultPosition,
+            wx.DefaultSize,
+            0,
+        )
+        self.staticText_7.Wrap(-1)
+        self.staticText_7.SetFont(static_font)
+        gSizer5.Add(self.staticText_7, 0, wx.ALIGN_BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
+
+        self.staticText_8 = wx.StaticText(
+            self.m_panel5, wx.ID_ANY, u"Fixed", wx.DefaultPosition, wx.DefaultSize, 0
+        )
+        self.staticText_8.Wrap(-1)
+        self.staticText_8.SetFont(static_font)
+        gSizer5.Add(self.staticText_8, 0, wx.ALIGN_BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
+
+        self.textCtrl_7 = wx.TextCtrl(
+            self.m_panel5,
+            wx.ID_ANY,
+            wx.EmptyString,
+            wx.DefaultPosition,
+            wx.Size(120, 27),
+            0,
+        )
+        gSizer5.Add(self.textCtrl_7, 0, wx.ALL, 5)
+
+        self.textCtrl_8 = wx.TextCtrl(
+            self.m_panel5,
+            wx.ID_ANY,
+            wx.EmptyString,
+            wx.DefaultPosition,
+            wx.Size(120, 27),
+            0,
+        )
+        gSizer5.Add(self.textCtrl_8, 0, wx.ALL, 5)
+
+        bSizer4.Add(gSizer5, 1, wx.ALIGN_CENTER_HORIZONTAL | wx.ALL, 5)
+
+        self.m_panel5.SetSizer(bSizer4)
+        self.m_panel5.Layout()
+        bSizer4.Fit(self.m_panel5)
+        self.m_listbook2.AddPage(self.m_panel5, u"Ekstenzije", True)
+        self.m_panel6 = wx.Panel(
+            self.m_listbook2,
+            wx.ID_ANY,
+            wx.DefaultPosition,
+            wx.DefaultSize,
+            wx.BORDER_THEME | wx.TAB_TRAVERSAL,
+        )
+        bSizer41 = wx.BoxSizer(wx.VERTICAL)
+
+        self.staticText_b = wx.StaticText(
+            self.m_panel6,
+            wx.ID_ANY,
+            f"Određuju se imena kreiranih foldera u opciji\n"
+            f"Eksport ZIP multiple.\n"
+            f"Ako je izbrana opcija za kreiranje foldera.",
+            wx.DefaultPosition,
+            wx.DefaultSize,
+            0,
+        )
+        self.staticText_b.Wrap(-1)
+
+        bSizer41.Add(self.staticText_b, 0, wx.ALL | wx.EXPAND, 18)
+
+        fgSizer1 = wx.FlexGridSizer(4, 2, 8, 52)
+        fgSizer1.SetFlexibleDirection(wx.BOTH)
+        fgSizer1.SetNonFlexibleGrowMode(wx.FLEX_GROWMODE_SPECIFIED)
+
+        self.staticText_z1 = wx.StaticText(
+            self.m_panel6,
             wx.ID_ANY,
             u"Ćirilica ANSI",
             wx.DefaultPosition,
             wx.DefaultSize,
             0,
-      )
-        self.staticText1.Wrap(-1)
+        )
+        self.staticText_z1.Wrap(-1)
 
-        gSizer1.Add(
-            self.staticText1,
-            1,
-            wx.ALIGN_LEFT | wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP,
-            5,
-      )
+        fgSizer1.Add(self.staticText_z1, 0, wx.ALIGN_BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 12)
 
-        self.staticText5 = wx.StaticText(
-            self.panel_1,
+        self.staticText_z2 = wx.StaticText(
+            self.m_panel6,
             wx.ID_ANY,
-            u"Ćirilica UTF-8 txt",
+            u"Ćirilica UTF8",
             wx.DefaultPosition,
             wx.DefaultSize,
             0,
-      )
-        self.staticText5.Wrap(-1)
+        )
+        self.staticText_z2.Wrap(-1)
 
-        gSizer1.Add(
-            self.staticText5,
-            1,
-            wx.ALIGN_LEFT | wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP,
-            5,
-      )
+        fgSizer1.Add(self.staticText_z2, 0, wx.ALIGN_BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 12)
 
-        self.textCtrl1 = wx.TextCtrl(
-            self.panel_1,
+        self.textCtrl_z1 = wx.TextCtrl(
+            self.m_panel6,
             wx.ID_ANY,
             wx.EmptyString,
             wx.DefaultPosition,
-            wx.DefaultSize,
+            wx.Size(120, 27),
             0,
-      )
-        gSizer1.Add(
-            self.textCtrl1, 1, wx.ALIGN_LEFT | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5
-      )
+        )
+        fgSizer1.Add(self.textCtrl_z1, 0, wx.BOTTOM | wx.LEFT | wx.RIGHT, 12)
 
-        self.textCtrl5 = wx.TextCtrl(
-            self.panel_1,
+        self.textCtrl_z2 = wx.TextCtrl(
+            self.m_panel6,
             wx.ID_ANY,
             wx.EmptyString,
             wx.DefaultPosition,
-            wx.DefaultSize,
+            wx.Size(120, 27),
             0,
-      )
-        gSizer1.Add(
-            self.textCtrl5, 1, wx.ALIGN_LEFT | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5
-      )
+        )
+        fgSizer1.Add(self.textCtrl_z2, 0, wx.BOTTOM | wx.LEFT | wx.RIGHT, 12)
 
-        self.staticText2 = wx.StaticText(
-            self.panel_1,
-            wx.ID_ANY,
-            u"Ćirilica UTF-8 srt",
-            wx.DefaultPosition,
-            wx.DefaultSize,
-            0,
-      )
-        self.staticText2.Wrap(-1)
-
-        gSizer1.Add(
-            self.staticText2, 1, wx.ALIGN_LEFT | wx.LEFT | wx.RIGHT | wx.TOP, 5
-      )
-
-        self.staticText6 = wx.StaticText(
-            self.panel_1,
+        self.staticText_z3 = wx.StaticText(
+            self.m_panel6,
             wx.ID_ANY,
             u"Latinica ANSI",
             wx.DefaultPosition,
             wx.DefaultSize,
             0,
-      )
-        self.staticText6.Wrap(-1)
+        )
+        self.staticText_z3.Wrap(-1)
 
-        gSizer1.Add(
-            self.staticText6, 0, wx.ALIGN_LEFT | wx.LEFT | wx.RIGHT | wx.TOP, 5
-      )
+        fgSizer1.Add(self.staticText_z3, 0, wx.ALIGN_BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 12)
 
-        self.textCtrl2 = wx.TextCtrl(
-            self.panel_1,
+        self.staticText_z4 = wx.StaticText(
+            self.m_panel6,
+            wx.ID_ANY,
+            u"Latinica UTF8",
+            wx.DefaultPosition,
+            wx.DefaultSize,
+            0,
+        )
+        self.staticText_z4.Wrap(-1)
+
+        fgSizer1.Add(self.staticText_z4, 0, wx.ALIGN_BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 12)
+
+        self.textCtrl_z3 = wx.TextCtrl(
+            self.m_panel6,
             wx.ID_ANY,
             wx.EmptyString,
             wx.DefaultPosition,
-            wx.DefaultSize,
+            wx.Size(120, 27),
             0,
-      )
-        gSizer1.Add(
-            self.textCtrl2, 1, wx.ALIGN_LEFT | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5
-      )
+        )
+        fgSizer1.Add(self.textCtrl_z3, 0, wx.BOTTOM | wx.LEFT | wx.RIGHT, 12)
 
-        self.textCtrl6 = wx.TextCtrl(
-            self.panel_1,
+        self.textCtrl_z4 = wx.TextCtrl(
+            self.m_panel6,
             wx.ID_ANY,
             wx.EmptyString,
             wx.DefaultPosition,
-            wx.DefaultSize,
+            wx.Size(120, 27),
             0,
-      )
-        gSizer1.Add(
-            self.textCtrl6, 1, wx.ALIGN_LEFT | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5
-      )
+        )
+        fgSizer1.Add(self.textCtrl_z4, 0, wx.BOTTOM | wx.LEFT | wx.RIGHT, 12)
 
-        self.staticText3 = wx.StaticText(
-            self.panel_1,
+        bSizer41.Add(fgSizer1, 1, wx.ALL | wx.EXPAND, 12)
+
+        self.m_panel6.SetSizer(bSizer41)
+        self.m_panel6.Layout()
+        bSizer41.Fit(self.m_panel6)
+        self.m_listbook2.AddPage(self.m_panel6, u"Eksport ZIP", False)
+        self.m_panel7 = wx.Panel(
+            self.m_listbook2,
             wx.ID_ANY,
-            u"Latinica UTF-8",
             wx.DefaultPosition,
             wx.DefaultSize,
-            0,
-      )
-        self.staticText3.Wrap(-1)
+            wx.BORDER_THEME | wx.TAB_TRAVERSAL,
+        )
+        wSizer1 = wx.WrapSizer(wx.VERTICAL, wx.WRAPSIZER_DEFAULT_FLAGS)
 
-        gSizer1.Add(
-            self.staticText3, 1, wx.ALIGN_LEFT | wx.LEFT | wx.RIGHT | wx.TOP, 5
-      )
-
-        self.staticText7 = wx.StaticText(
-            self.panel_1,
+        self.staticText_c = wx.StaticText(
+            self.m_panel7,
             wx.ID_ANY,
-            u"Popravljeni titlovi",
-            wx.DefaultPosition,
-            wx.DefaultSize,
-            0,
-      )
-        self.staticText7.Wrap(-1)
-
-        gSizer1.Add(
-            self.staticText7, 1, wx.ALIGN_LEFT | wx.LEFT | wx.RIGHT | wx.TOP, 5
-      )
-
-        self.textCtrl3 = wx.TextCtrl(
-            self.panel_1,
-            wx.ID_ANY,
-            wx.EmptyString,
+            u"Određuje se font i boja fonta",
             wx.DefaultPosition,
             wx.DefaultSize,
             0,
-      )
-        gSizer1.Add(
-            self.textCtrl3, 1, wx.ALIGN_LEFT | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5
-      )
+        )
+        self.staticText_c.Wrap(-1)
 
-        self.textCtrl7 = wx.TextCtrl(
-            self.panel_1,
-            wx.ID_ANY,
-            wx.EmptyString,
-            wx.DefaultPosition,
-            wx.DefaultSize,
-            0,
-      )
-        gSizer1.Add(
-            self.textCtrl7, 1, wx.ALIGN_LEFT | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5
-      )
-
-        self.staticText4 = wx.StaticText(
-            self.panel_1,
-            wx.ID_ANY,
-            u"Transkribovani titlovi",
-            wx.DefaultPosition,
-            wx.DefaultSize,
-            0,
-      )
-        self.staticText4.Wrap(-1)
-
-        gSizer1.Add(
-            self.staticText4, 1, wx.ALIGN_LEFT | wx.LEFT | wx.RIGHT | wx.TOP, 5
-      )
-
-        self.staticText8 = wx.StaticText(
-            self.panel_1,
-            wx.ID_ANY,
-            u"Pročišćeni titlovi",
-            wx.DefaultPosition,
-            wx.DefaultSize,
-            0,
-      )
-        self.staticText8.Wrap(-1)
-
-        gSizer1.Add(
-            self.staticText8, 1, wx.ALIGN_LEFT | wx.LEFT | wx.RIGHT | wx.TOP, 5
-      )
-
-        self.textCtrl4 = wx.TextCtrl(
-            self.panel_1,
-            wx.ID_ANY,
-            wx.EmptyString,
-            wx.DefaultPosition,
-            wx.DefaultSize,
-            0,
-      )
-        gSizer1.Add(
-            self.textCtrl4, 1, wx.ALIGN_LEFT | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5
-      )
-
-        self.textCtrl8 = wx.TextCtrl(
-            self.panel_1,
-            wx.ID_ANY,
-            wx.EmptyString,
-            wx.DefaultPosition,
-            wx.DefaultSize,
-            0,
-      )
-        gSizer1.Add(
-            self.textCtrl8, 1, wx.ALIGN_LEFT | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5
-      )
-
-        bSizer3.Add(gSizer1, 1, wx.ALL | wx.EXPAND, 5)
-
-        self.panel_1.SetSizer(bSizer3)
-        self.panel_1.Layout()
-        bSizer3.Fit(self.panel_1)
-        self.listbook1.AddPage(self.panel_1, u"Ekstenzije", True)
-        self.panel_2 = wx.Panel(
-            self.listbook1,
-            wx.ID_ANY,
-            wx.DefaultPosition,
-            wx.DefaultSize,
-            wx.TAB_TRAVERSAL,
-      )
-        bSizer4 = wx.BoxSizer(wx.VERTICAL)
-
-        self.staticText_F = wx.StaticText(
-            self.panel_2,
-            wx.ID_ANY,
-            f"Imena foldera kreiranih u opciji\n"
-            f"Eksport ZIP multiple. Ako su folderi kreirani.",
-            wx.DefaultPosition,
-            wx.DefaultSize,
-            wx.ALIGN_LEFT,
-      )
-        self.staticText_F.Wrap(-1)
-
-        bSizer4.Add(self.staticText_F, 0, wx.ALL | wx.EXPAND, 5)
-
-        gSizer2 = wx.GridSizer(4, 2, 5, 5)
-
-        self.staticText9 = wx.StaticText(
-            self.panel_2,
-            wx.ID_ANY,
-            u"Ćirilica ANSI",
-            wx.DefaultPosition,
-            wx.DefaultSize,
-            0,
-      )
-        self.staticText9.Wrap(-1)
-
-        gSizer2.Add(
-            self.staticText9, 1, wx.ALIGN_LEFT | wx.LEFT | wx.RIGHT | wx.TOP, 5
-      )
-
-        self.staticText11 = wx.StaticText(
-            self.panel_2, wx.ID_ANY, u"Ćirilica UTF-8", wx.DefaultPosition, wx.DefaultSize, 0
-      )
-        self.staticText11.Wrap(-1)
-
-        gSizer2.Add(
-            self.staticText11, 1, wx.ALIGN_LEFT | wx.LEFT | wx.RIGHT | wx.TOP, 5
-      )
-
-        self.textCtrl9 = wx.TextCtrl(
-            self.panel_2,
-            wx.ID_ANY,
-            wx.EmptyString,
-            wx.DefaultPosition,
-            wx.DefaultSize,
-            0,
-      )
-        gSizer2.Add(
-            self.textCtrl9, 1, wx.ALIGN_LEFT | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5
-      )
-
-        self.textCtrl11 = wx.TextCtrl(
-            self.panel_2,
-            wx.ID_ANY,
-            wx.EmptyString,
-            wx.DefaultPosition,
-            wx.DefaultSize,
-            0,
-      )
-        gSizer2.Add(
-            self.textCtrl11, 0, wx.ALIGN_LEFT | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5
-      )
-
-        self.staticText10 = wx.StaticText(
-            self.panel_2, wx.ID_ANY, u"Latinica ANSI", wx.DefaultPosition, wx.DefaultSize, 0
-      )
-        self.staticText10.Wrap(-1)
-
-        gSizer2.Add(
-            self.staticText10, 1, wx.ALIGN_LEFT | wx.LEFT | wx.RIGHT | wx.TOP, 5
-      )
-
-        self.staticText12 = wx.StaticText(
-            self.panel_2, wx.ID_ANY, u"Latinica UTF-8", wx.DefaultPosition, wx.DefaultSize, 0
-      )
-        self.staticText12.Wrap(-1)
-
-        gSizer2.Add(
-            self.staticText12, 0, wx.ALIGN_LEFT | wx.LEFT | wx.RIGHT | wx.TOP, 5
-      )
-
-        self.textCtrl10 = wx.TextCtrl(
-            self.panel_2,
-            wx.ID_ANY,
-            wx.EmptyString,
-            wx.DefaultPosition,
-            wx.DefaultSize,
-            0,
-      )
-        gSizer2.Add(
-            self.textCtrl10, 0, wx.ALIGN_LEFT | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5
-      )
-
-        self.textCtrl12 = wx.TextCtrl(
-            self.panel_2,
-            wx.ID_ANY,
-            wx.EmptyString,
-            wx.DefaultPosition,
-            wx.DefaultSize,
-            0,
-      )
-        gSizer2.Add(
-            self.textCtrl12, 1, wx.ALIGN_LEFT | wx.BOTTOM | wx.LEFT | wx.RIGHT, 5
-      )
-
-        bSizer4.Add(gSizer2, 0, wx.ALL | wx.EXPAND, 5)
-
-        self.panel_2.SetSizer(bSizer4)
-        self.panel_2.Layout()
-        bSizer4.Fit(self.panel_2)
-        self.listbook1.AddPage(self.panel_2, u"Eksport ZIP", False)
-        
-        self.panel_3 = wx.Panel(
-            self.listbook1,
-            wx.ID_ANY,
-            wx.DefaultPosition,
-            wx.DefaultSize,
-            wx.TAB_TRAVERSAL,
-       )
-        sbSizer1 = wx.StaticBoxSizer(
-            wx.StaticBox(self.panel_3, wx.ID_ANY, wx.EmptyString), wx.VERTICAL
-       )
-    
-        self.staticText15 = wx.StaticText(
-            sbSizer1.GetStaticBox(),
-            wx.ID_ANY,
-            "Izbor boje fonta u tekstu",
-            wx.DefaultPosition,
-            wx.DefaultSize,
-            wx.ALIGN_LEFT,
-       )
-        self.staticText15.Wrap(-1)
-    
-        self.staticText15.SetFont(
+        self.staticText_c.SetFont(
             wx.Font(
                 10,
-                wx.FONTFAMILY_SWISS,
+                wx.FONTFAMILY_DEFAULT,
                 wx.FONTSTYLE_NORMAL,
                 wx.FONTWEIGHT_NORMAL,
                 False,
                 "Franklin Gothic Medium",
-           )
-       )
+            )
+        )
 
-        sbSizer1.Add(self.staticText15, 0, wx.ALL | wx.EXPAND, 5)
+        wSizer1.Add(self.staticText_c, 0, wx.ALL | wx.EXPAND, 12)
+        
+        bSizer5 = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.bpButton1 = wx.BitmapButton(
-            sbSizer1.GetStaticBox(),
+        self.bpButton = wx.BitmapButton(
+            self.m_panel7,
             wx.ID_ANY,
             wx.NullBitmap,
             wx.DefaultPosition,
             wx.DefaultSize,
             wx.BU_AUTODRAW | 0,
-       )
+        )
 
-        self.bpButton1.SetDefault()
-
-        self.bpButton1.SetBitmap(
-            wx.Bitmap(join("resources", "icons", "colors.png"), wx.BITMAP_TYPE_ANY)
-       )
-        self.bpButton1.SetToolTip("Otvara kolor dijalog")
-        sbSizer1.Add(self.bpButton1, 0, wx.ALL, 5)
+        self.bpButton.SetBitmap(
+            wx.Bitmap(join(I_PATH, "colors.png"), wx.BITMAP_TYPE_ANY)
+        )
+        self.bpButton.SetToolTip(u"Dijalog boje fonta")
+        bSizer5.Add(self.bpButton, 0, wx.ALL, 12)
         
-        self.m_staticText17 = wx.StaticText(
-            sbSizer1.GetStaticBox(),
+        self.bpButton1 = wx.BitmapButton(
+            self.m_panel7,
+                    wx.ID_ANY,
+                    wx.NullBitmap,
+                    wx.DefaultPosition,
+                    wx.DefaultSize,
+                    wx.BU_AUTODRAW | 0,
+        )
+        
+        self.bpButton1.SetBitmap(
+                wx.Bitmap(join(I_PATH, "Font-folder.48.png"), wx.BITMAP_TYPE_ANY)
+            )
+        self.bpButton1.SetToolTip(u"Font dijalog")
+    
+        bSizer5.Add(self.bpButton1, 0, wx.ALL, 12)
+        wSizer1.Add(bSizer5, 1, wx.EXPAND, 5)
+
+        self.staticText_c1 = wx.StaticText(
+            self.m_panel7,
             wx.ID_ANY,
             u"Trenutni font:",
             wx.DefaultPosition,
             wx.DefaultSize,
             0,
-       )
-        self.m_staticText17.Wrap(-1)
+        )
+        self.staticText_c1.Wrap(-1)
 
-        sbSizer1.Add(self.m_staticText17, 0, wx.LEFT | wx.RIGHT | wx.TOP, 12)
-        
-        self.ExampleText = wx.StaticText(
-            sbSizer1.GetStaticBox(),
+        self.staticText_c1.SetFont(
+            wx.Font(
+                10,
+                wx.FONTFAMILY_DEFAULT,
+                wx.FONTSTYLE_NORMAL,
+                wx.FONTWEIGHT_NORMAL,
+                False,
+                "Franklin Gothic Medium",
+            )
+        )
+
+        wSizer1.Add(self.staticText_c1, 0, wx.LEFT | wx.RIGHT | wx.TOP, 24)
+
+        wSizer1.Add((2, 24), 0, 0, 5)
+
+        self.staticText_fonts = wx.StaticText(
+            self.m_panel7,
             wx.ID_ANY,
             u"AaBbCcDdEeČčĆćŽžĐđŠš",
             wx.DefaultPosition,
             wx.DefaultSize,
-            wx.ALIGN_LEFT,
-       )
-        self.ExampleText.Wrap(-1)
+            0,
+        )
+        self.staticText_fonts.Wrap(-1)
         
-        ex = FILE_SETTINGS['key4']
-        
-        self.curClr = ex['fontColour']
-        
-        self.ExampleText.SetFont(
+        self.curClr = MAIN_SETTINGS["key4"]["fontColour"]        
+
+        self.staticText_fonts.SetFont(
             wx.Font(
-                16,
+                MAIN_SETTINGS["key4"]["fontSize"],
                 wx.FONTFAMILY_SWISS,
                 wx.FONTSTYLE_NORMAL,
-                wx.FONTWEIGHT_BOLD,
+                MAIN_SETTINGS["key4"]["weight"],
                 False,
-                ex["new_font"],
-           )
-       )
-        self.ExampleText.SetForegroundColour(self.curClr)
+                MAIN_SETTINGS["key4"]["new_font"],                
+            )
+        )
+        self.staticText_fonts.SetForegroundColour(self.curClr)
+        self.curFont = self.staticText_fonts.GetFont()
         try:
-            ex = FILE_SETTINGS["key5"]
-            self.textCtrl1.SetValue(ex['cyr_ansi_srt'])
-            self.textCtrl2.SetValue(ex['cyr_utf8_srt'])
-            self.textCtrl3.SetValue(ex['lat_utf8_srt'])
-            self.textCtrl4.SetValue(ex['transcribe'])
-            self.textCtrl5.SetValue(ex['cyr_utf8_txt'])
-            self.textCtrl6.SetValue(ex['lat_ansi_srt'])
-            self.textCtrl7.SetValue(ex['fixed_subs'])
-            self.textCtrl8.SetValue(ex['cleanup'])
-            self.textCtrl9.SetValue(ex["Cyr-ansi"])
-            self.textCtrl10.SetValue(ex["Lat-ansi"])
-            self.textCtrl11.SetValue(ex["Cyr-utf8"])
-            self.textCtrl12.SetValue(ex["Lat-utf8"])
+            ex = MAIN_SETTINGS["key5"]
+            self.textCtrl_1.SetValue(ex['cyr_ansi_srt'])
+            self.textCtrl_2.SetValue(ex['cyr_utf8_txt'])
+            self.textCtrl_3.SetValue(ex['cyr_utf8_srt'])
+            self.textCtrl_4.SetValue(ex['lat_ansi_srt'])
+            self.textCtrl_5.SetValue(ex['lat_utf8_srt'])
+            self.textCtrl_6.SetValue(ex['cleanup'])
+            self.textCtrl_7.SetValue(ex['transcribe'])
+            self.textCtrl_8.SetValue(ex['fixed_subs'])
+            self.textCtrl_z1.SetValue(ex["Cyr-ansi"])
+            self.textCtrl_z2.SetValue(ex["Cyr-utf8"])
+            self.textCtrl_z3.SetValue(ex["Lat-ansi"])
+            self.textCtrl_z4.SetValue(ex["Lat-utf8"])
         except Exception as e:
             logger.debug(f"Settings: {e}")        
+        
+        wSizer1.Add(
+                    self.staticText_fonts, 0, wx.BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT, 24
+                )        
 
-        sbSizer1.Add(self.ExampleText, 1, wx.ALL|wx.EXPAND, 12)
+        self.m_panel7.SetSizer(wSizer1)
+        self.m_panel7.Layout()
+        wSizer1.Fit(self.m_panel7)
+        self.m_listbook2.AddPage(self.m_panel7, u"Font", False)
 
-        self.panel_3.SetSizer(sbSizer1)
-        self.panel_3.Layout()
-        sbSizer1.Fit(self.panel_3)
-        self.listbook1.AddPage(self.panel_3, u"Boja fonta", False)
-    
-        bSizer2.Add(self.listbook1, 1, wx.ALL | wx.EXPAND, 5)
+        bSizer3.Add(self.m_listbook2, 1, wx.EXPAND | wx.ALL, 5)
 
-        bSizer1.Add(bSizer2, 1, wx.EXPAND, 5)
+        self.m_panel1.SetSizer(bSizer3)
+        self.m_panel1.Layout()
+        bSizer3.Fit(self.m_panel1)
+        bSizer1.Add(self.m_panel1, 1, wx.EXPAND | wx.ALL, 5)
 
-        sdbSizer2 = wx.StdDialogButtonSizer()
-        self.sdbSizer2OK = wx.Button(self, wx.ID_OK)
-        sdbSizer2.AddButton(self.sdbSizer2OK)
-        self.sdbSizer2Cancel = wx.Button(self, wx.ID_CANCEL)
-        sdbSizer2.AddButton(self.sdbSizer2Cancel)
-        sdbSizer2.Realize()
+        m_sdbSizer1 = wx.StdDialogButtonSizer()
+        self.m_sdbSizer1OK = wx.Button(self, wx.ID_OK)
+        m_sdbSizer1.AddButton(self.m_sdbSizer1OK)
+        self.m_sdbSizer1Cancel = wx.Button(self, wx.ID_CANCEL)
+        m_sdbSizer1.AddButton(self.m_sdbSizer1Cancel)
+        m_sdbSizer1.Realize()
+        m_sdbSizer1.SetMinSize(wx.Size(120, 27))
 
-        bSizer1.Add(sdbSizer2, 0, wx.ALL | wx.EXPAND, 5)
-
+        #bSizer1.Add(m_sdbSizer1, 0, wx.BOTTOM | wx.RIGHT | wx.EXPAND, 7)
+        bSizer1.Add(m_sdbSizer1, 0, wx.BOTTOM | wx.EXPAND, 5)
+        
         self.SetSizer(bSizer1)
         self.Layout()
 
         self.Centre(wx.BOTH)
-        
+
         # Connect Events
-        self.bpButton1.Bind(wx.EVT_BUTTON, self.onButton)
-        self.sdbSizer2Cancel.Bind(wx.EVT_BUTTON, self.onCancel)
-        self.sdbSizer2OK.Bind(wx.EVT_BUTTON, self.saveSettings)
+        self.bpButton.Bind(wx.EVT_BUTTON, self.OnColor)
+        self.bpButton1.Bind(wx.EVT_BUTTON, self.OnFont)
+        self.m_sdbSizer1Cancel.Bind(wx.EVT_BUTTON, self.onCancel)
+        self.m_sdbSizer1OK.Bind(wx.EVT_BUTTON, self.saveSettings)
         self.Bind(wx.EVT_CLOSE, self.onClose, id=wx.ID_ANY)
         
-    def onButton(self, event):
+    def OnColor(self, event):
         """"""        
         dlg = wx.ColourDialog(self)
         dlg.GetColourData().SetChooseFull(True)
         if dlg.ShowModal() == wx.ID_OK:
             data = dlg.GetColourData()
             color = data.GetColour().Get(includeAlpha=False)
-            self.ExampleText.SetForegroundColour(color)
+            self.staticText_fonts.SetForegroundColour(color)
             self.curClr = color
             self.Refresh()
         dlg.Destroy() 
         event.Skip()
+        
+    def UpdateUI(self):
+        self.staticText_fonts.SetFont(self.curFont)
+        self.staticText_fonts.SetForegroundColour(self.curClr)
+        self.staticText_fonts.Refresh()
+        
+    def OnFont(self, event):
+        data = wx.FontData()
+        data.EnableEffects(True)
+        data.SetColour(self.curClr)
+        data.SetInitialFont(self.curFont)
+
+        dlg = wx.FontDialog(self, data)
+
+        if dlg.ShowModal() == wx.ID_OK:
+            data = dlg.GetFontData()
+            font = data.GetChosenFont()
+            colour = data.GetColour().Get(includeAlpha=False)
+            
+            self.curFont = font
+            self.curClr = colour
+            self.UpdateUI()        
+        event.Skip()    
 
     def onCancel(self, event):
         self.Destroy()
@@ -565,32 +576,38 @@ class SettingsDialog(wx.Dialog):
         
     def saveSettings(self, event):
         try:
-            FILE_SETTINGS["key5"] = {
-                'cyr_ansi_srt': self.textCtrl1.GetValue(),
-                'cyr_utf8_srt': self.textCtrl2.GetValue(),
-                'lat_utf8_srt': self.textCtrl3.GetValue(),
-                'transcribe': self.textCtrl4.GetValue(),
-                'cyr_utf8_txt': self.textCtrl5.GetValue(),
-                'lat_ansi_srt': self.textCtrl6.GetValue(),
-                'fixed_subs': self.textCtrl7.GetValue(),
-                'cleanup': self.textCtrl8.GetValue(),
-                "Cyr-ansi": self.textCtrl9.GetValue(),
-                "Lat-ansi": self.textCtrl10.GetValue(),
-                "Cyr-utf8": self.textCtrl11.GetValue(),
-                "Lat-utf8": self.textCtrl12.GetValue(),
+            MAIN_SETTINGS["key5"] = {
+                "cyr_ansi_srt": self.textCtrl_1.GetValue(), 
+                "cyr_utf8_txt": self.textCtrl_2.GetValue(), 
+                "cyr_utf8_srt": self.textCtrl_3.GetValue(), 
+                "lat_ansi_srt": self.textCtrl_4.GetValue(), 
+                "lat_utf8_srt": self.textCtrl_5.GetValue(), 
+                "cleanup": self.textCtrl_6.GetValue(), 
+                "transcribe": self.textCtrl_7.GetValue(), 
+                "fixed_subs": self.textCtrl_8.GetValue(), 
+                "Cyr-ansi": self.textCtrl_z1.GetValue(), 
+                "Cyr-utf8": self.textCtrl_z2.GetValue(), 
+                "Lat-ansi": self.textCtrl_z3.GetValue(), 
+                "Lat-utf8": self.textCtrl_z4.GetValue(),                
             }
-            FILE_SETTINGS["key4"]["fontColour"] = self.curClr
+            MAIN_SETTINGS["key4"]["fontColour"] = self.curClr
+            MAIN_SETTINGS["key4"]["fontSize"] = self.curFont.GetPointSize()
+            MAIN_SETTINGS["key4"]["new_font"] = self.curFont.GetFaceName()
+            MAIN_SETTINGS["key4"]["weight"] = self.curFont.GetWeight()
         except Exception as e:
             logger.debug(f"Settings: {e}")        
-        event.Skip()        
+        self.EndModal(True)        
     
     def GetColor(self):
         return self.curClr
+    
+    def GetFont(self):
+        return self.curFont
         
 
 class MyApp(wx.App):
     def OnInit(self):
-        self.dialog = SettingsDialog(None, wx.ID_ANY, "")
+        self.dialog = SettingsDialog(None)
         self.SetTopWindow(self.dialog)
         self.dialog.ShowModal()
         self.dialog.Destroy()
