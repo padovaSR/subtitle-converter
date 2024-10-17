@@ -7,7 +7,7 @@ Check out PyQt version: [SubtitleConverter_PyQt](https://github.com/padovaSR/Sub
 ## Requirements:
 * [Python](http://www.python.org/) version 3.8 or newer
 * [wxPython](https://wxpython.org/) version 4.1.0 or newer
-* Libraries: [srt](https://github.com/cdown/srt),  [PyDispatcher](https://pypi.org/project/PyDispatcher/)
+* Libraries: [srt](https://github.com/cdown/srt)
 ### To install requirements:
 
 Windows: 
