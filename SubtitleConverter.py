@@ -75,6 +75,10 @@ class MainWindow(ConverterFrame):
         
         self.hideDialog = False
         self.lastCaller = None
+        
+        self.findData = wx.FindReplaceData()
+        self.findData.SetFlags(wx.FR_DOWN)        
+        self.find_dialog = None
 
         self.setFontAndStyle()
 
@@ -102,7 +106,8 @@ class MainWindow(ConverterFrame):
         ##------------------------------------------------------------------------------##
         for menu_item in [
             self.undo, self.redo, self.copy, self.paste, self.cut, self.delete, self.select_all]:
-            self.Bind(wx.EVT_MENU, self.EditText, menu_item)        
+            self.Bind(wx.EVT_MENU, self.EditText, menu_item)
+        self.Bind(wx.EVT_MENU, self.OnShowFindReplace, id=self.find_replace.GetId())
         ##------------------------------------------------------------------------------##
         for menu_item in [
             self.italic, self.bold, self.underline, self.color, self.all_caps]:
@@ -1187,6 +1192,147 @@ class MainWindow(ConverterFrame):
             _positions = self.getPositions(changed)
             self.highlight_parts(text=None, positions=_positions)
         event.Skip()
+        
+    def BindFindEvents(self, win):
+        """Bind the find and replace events to the dialog."""
+        win.Bind(wx.EVT_FIND, self.OnFind)
+        win.Bind(wx.EVT_FIND_NEXT, self.OnFind)
+        win.Bind(wx.EVT_FIND_REPLACE, self.OnFind)
+        win.Bind(wx.EVT_FIND_REPLACE_ALL, self.OnFind)
+        win.Bind(wx.EVT_FIND_CLOSE, self.OnFindClose)
+
+    def OnShowFindReplace(self, event):
+        """Show the Find & Replace dialog."""
+        if not self.find_dialog:
+            self.find_dialog = wx.FindReplaceDialog(
+                self, self.findData, "Find & Replace", wx.FR_REPLACEDIALOG
+            )
+            self.BindFindEvents(self.find_dialog)
+        self.find_dialog.Show(True)
+
+    def OnFind(self, evt):
+        """Handle all find/replace events."""
+        map_events = {
+            wx.wxEVT_COMMAND_FIND: "FIND",
+            wx.wxEVT_COMMAND_FIND_NEXT: "FIND_NEXT",
+            wx.wxEVT_COMMAND_FIND_REPLACE: "REPLACE",
+            wx.wxEVT_COMMAND_FIND_REPLACE_ALL: "REPLACE_ALL",
+        }
+        event_type = evt.GetEventType()
+        event_name = map_events.get(event_type, "UNKNOWN")
+
+        find_string = self.findData.GetFindString()
+        replace_string = self.findData.GetReplaceString()
+        text = self.Text_1.GetValue()
+        start_pos = self.Text_1.GetInsertionPoint()
+
+        flags = evt.GetFlags()
+
+        # Apply match case logic
+        if not (flags & wx.FR_MATCHCASE):
+            find_string = find_string.lower()
+            text = text.lower()
+
+        if event_name == "FIND" or event_name == "FIND_NEXT":
+            found_pos = -1  # Default to not found
+
+            while start_pos < len(text):
+                found_pos = text.find(find_string, start_pos)
+
+                if found_pos == -1:
+                    wx.MessageBox(
+                        f"No more occurrences of '{find_string}' found!",
+                        "Info",
+                        wx.OK | wx.ICON_INFORMATION,
+                    )
+                    self.Text_1.SetInsertionPoint(0)  # Reset to start of the document
+                    return
+
+                if flags & wx.FR_WHOLEWORD:
+                    before = found_pos - 1
+                    after = found_pos + len(find_string)
+
+                    if (before >= 0 and text[before].isalnum()) or (
+                        after < len(text) and text[after].isalnum()
+                    ):
+                        start_pos = after
+                        continue
+                break
+
+            if found_pos != -1:
+                self.Text_1.SetInsertionPoint(found_pos)
+                self.Text_1.ShowPosition(found_pos)
+                self.Text_1.SetSelection(found_pos, found_pos + len(find_string))
+
+        elif event_name == "REPLACE":
+            selection_start, selection_end = self.Text_1.GetSelectionRange().Get()
+
+            selected_text = self.Text_1.GetStringSelection()
+
+            if selected_text == find_string:
+                current_style = wx.richtext.RichTextAttr()
+                self.Text_1.GetStyle(selection_start, current_style)
+
+                self.Text_1.Replace(selection_start, selection_end, replace_string)
+
+                self.Text_1.SetStyle(
+                    wx.richtext.RichTextRange(
+                        selection_start, selection_start + len(replace_string)
+                    ),
+                    current_style,
+                )
+                self.Text_1.SetInsertionPoint(selection_start + len(replace_string))
+            else:
+                wx.MessageBox(
+                    f"No text selected or selected text does not match '{find_string}'",
+                    "Error",
+                    wx.OK | wx.ICON_ERROR,
+                )
+
+        elif event_name == "REPLACE_ALL":
+            start_pos = 0
+
+            while start_pos < len(text):
+                found_pos = text.find(find_string, start_pos)
+
+                if found_pos == -1:
+                    break
+
+                if flags & wx.FR_WHOLEWORD:
+                    before = found_pos - 1
+                    after = found_pos + len(find_string)
+
+                    if (before >= 0 and text[before].isalnum()) or (
+                        after < len(text) and text[after].isalnum()
+                    ):
+                        start_pos = after
+                        continue
+                # Perform the replacement
+                selection_start, selection_end = found_pos, found_pos + len(find_string)
+
+                current_style = wx.richtext.RichTextAttr()
+                self.Text_1.GetStyle(selection_start, current_style)
+
+                self.Text_1.Replace(selection_start, selection_end, replace_string)
+                self.Text_1.SetStyle(
+                    wx.richtext.RichTextRange(
+                        selection_start, selection_start + len(replace_string)
+                    ),
+                    current_style,
+                )
+                # Move the search position forward
+                start_pos = selection_start + len(replace_string)
+
+            wx.MessageBox(
+                f"Replaced all occurrences of '{find_string}' with '{replace_string}'",
+                "Info",
+                wx.OK | wx.ICON_INFORMATION,
+            )
+
+    def OnFindClose(self, event):
+        """Close the find dialog when the user finishes."""
+        event.GetDialog().Destroy()
+        self.find_dialog = None
         
     def onManual(self, event):
         dlg = MyManual(None)
