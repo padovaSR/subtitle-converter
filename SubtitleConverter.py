@@ -147,6 +147,7 @@ class MainWindow(ConverterFrame):
         self.Text_1.Bind(wx.EVT_MOUSEWHEEL, self.on_mouse_wheel)
         self.Bind(wx.EVT_MENU_RANGE, self.onFileHistory, id=wx.ID_FILE1, id2=wx.ID_FILE9,)        
         self.Text_1.Bind(wx.EVT_TEXT, self.documentWasModified)
+        self.Text_1.Bind(wx.EVT_TEXT_ENTER, self.setFontAndStyle)
         ##==============================================================================##
          
         MAIN_SETTINGS["CB_value"] = self.comboBox.GetValue()
@@ -883,7 +884,7 @@ class MainWindow(ConverterFrame):
         elif event.Id == self.paste.Id:
             if self.Text_1.CanPaste:
                 self.Text_1.Paste()
-        
+                
         elif event.Id == self.cut.Id:
             if self.Text_1.CanCut:
                 self.Text_1.Cut()
@@ -1270,17 +1271,11 @@ class MainWindow(ConverterFrame):
             selected_text = self.Text_1.GetStringSelection()
 
             if selected_text == find_string:
-                current_style = wx.richtext.RichTextAttr()
-                self.Text_1.GetStyle(selection_start, current_style)
+                # Delete the selected content and write the new string in its place, maintaining style
+                self.Text_1.DeleteSelectedContent()
+                self.Text_1.WriteText(replace_string)
 
-                self.Text_1.Replace(selection_start, selection_end, replace_string)
-
-                self.Text_1.SetStyle(
-                    wx.richtext.RichTextRange(
-                        selection_start, selection_start + len(replace_string)
-                    ),
-                    current_style,
-                )
+                # Move the insertion point after the replacement
                 self.Text_1.SetInsertionPoint(selection_start + len(replace_string))
             else:
                 wx.MessageBox(
@@ -1307,21 +1302,16 @@ class MainWindow(ConverterFrame):
                     ):
                         start_pos = after
                         continue
-                # Perform the replacement
-                selection_start, selection_end = found_pos, found_pos + len(find_string)
 
-                current_style = wx.richtext.RichTextAttr()
-                self.Text_1.GetStyle(selection_start, current_style)
+                # Select the text to be replaced
+                self.Text_1.SetSelection(found_pos, found_pos + len(find_string))
 
-                self.Text_1.Replace(selection_start, selection_end, replace_string)
-                self.Text_1.SetStyle(
-                    wx.richtext.RichTextRange(
-                        selection_start, selection_start + len(replace_string)
-                    ),
-                    current_style,
-                )
-                # Move the search position forward
-                start_pos = selection_start + len(replace_string)
+                # Delete the selected content and write the new string, maintaining style
+                self.Text_1.DeleteSelectedContent()
+                self.Text_1.WriteText(replace_string)
+
+                # Move the search position forward after replacement
+                start_pos = found_pos + len(replace_string)
 
             wx.MessageBox(
                 f"Replaced all occurrences of '{find_string}' with '{replace_string}'",
