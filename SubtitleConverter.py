@@ -322,7 +322,7 @@ class MainWindow(ConverterFrame):
         dlg = MultiFiles(None)
         result = dlg.ShowModal()
         filelist = dlg.GetSelectedFiles()
-        if result ==True:
+        if result == True:
             if filelist:
                 self.OpenFiles(filelist)
         dlg.Destroy()
@@ -516,7 +516,7 @@ class MainWindow(ConverterFrame):
                 handler = ExportZipFile.ExportZip(
                     [self.single_file],
                     self.cyr_utf8,
-                    [FILE_HISTORY[-1]],
+                    [FILE_HISTORY[1]],
                     utf8_ext=ext_4,
                 )
                 all_paths = handler.collectInfoData()
