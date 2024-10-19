@@ -5,8 +5,8 @@ Program za obradu srt i txt fajlova.
 Check out PyQt version: [SubtitleConverter_PyQt](https://github.com/padovaSR/SubtitleConverter_PyQt)
 
 ## Requirements:
-* [Python](http://www.python.org/) version 3.8 or newer
-* [wxPython](https://wxpython.org/) version 4.1.0 or newer
+* [Python](http://www.python.org/) version 3.11 or newer
+* [wxPython](https://wxpython.org/) version 4.2.1 or newer
 * Libraries: [srt](https://github.com/cdown/srt)
 ### To install requirements:
 
