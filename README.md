@@ -26,4 +26,4 @@ pip install -r /path/to/requirements.txt
 ## Download Binaries
 
 * [GitHub Releases](https://github.com/padovaSR/subtitle-converter/releases)
-* [Last Windows build](https://github.com/padovaSR/subtitle-converter/releases/download/v0.5.9_a32/Subtitle.Converter-0.5.9.zip)
+* [Last Windows build](https://github.com/padovaSR/subtitle-converter/releases/download/v0.6.2_a1/SubtitleConverter-v0.6.2_a1.zip)
