@@ -998,6 +998,7 @@ class MainWindow(ConverterFrame):
                 f"Ništa nije selektovano?\n\n" f"Selektujte tekst za formatiranje",
                 "Formatiranje teksta",
             )
+            return
 
         if event.Id == self.italic.Id:
             self.apply_style(selection, "italic")
@@ -1037,9 +1038,9 @@ class MainWindow(ConverterFrame):
         if dlg.ShowModal() == wx.ID_OK:
             data = dlg.GetColourData()
             color = data.GetColour().Get(includeAlpha=False)
+            return color
         dlg.Destroy()
-        return color
-
+        
     def applyColor(self):
         """Temporarily sets the font color of the selected text or the entire TextEdit widget."""
         color = QColorDialog.getColor()
