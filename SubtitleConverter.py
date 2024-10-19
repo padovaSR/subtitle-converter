@@ -320,8 +320,9 @@ class MainWindow(ConverterFrame):
     def onOpenMultiple(self, event):
         """"""
         dlg = MultiFiles(None)
-        if dlg.ShowModal() == wx.ID_OK:
-            filelist = dlg.GetSelectedFiles()
+        result = dlg.ShowModal()
+        filelist = dlg.GetSelectedFiles()
+        if result ==True:
             if filelist:
                 self.OpenFiles(filelist)
         dlg.Destroy()
