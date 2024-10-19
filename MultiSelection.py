@@ -385,8 +385,8 @@ class MultiFiles(wx.Dialog):
         
     def onOK(self, event):
         self.writeSettings()
-        self.Destroy()
-        event.Skip()
+        self.EndModal(True)
+        #self.Destroy()
         
     def onClose(self, event):
         self.writeSettings()
