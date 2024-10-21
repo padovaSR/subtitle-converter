@@ -336,7 +336,7 @@ class MainWindow(ConverterFrame):
             parts_start = positions[0]
             parts_end = positions[1]
         
-        # Internal index and processing function inside highlight_errors
+        # Internal index and processing function inside highlight_parts
         def process_next_error(current_index):
             if current_index < len(parts_start):
                 start = parts_start[current_index]
@@ -345,11 +345,11 @@ class MainWindow(ConverterFrame):
                 # Highlight in red
                 self.Text_1.SetStyle(start, end, wx.TextAttr(wx.RED))
     
-                # Set selection and scroll to the highlighted error
+                # Set selection and scroll to the highlighted part
                 self.Text_1.SetSelection(end, end)
                 self.Text_1.ShowPosition(end)
     
-                # Introduce a delay before processing the next error
+                # Introduce a delay before processing the next
                 if len(parts_start) < 45:
                     wx.CallLater(450, process_next_error, current_index + 1)  # 450ms delay for less than 45 errors
                 elif len(parts_start) > 1000:
@@ -360,7 +360,7 @@ class MainWindow(ConverterFrame):
                 # Finished processing all errors
                 pass
     
-        # Start the process with the first error
+        # Start the process with the first part
         process_next_error(0)                    
 
     def changeEncoding(self, event):
@@ -858,10 +858,6 @@ class MainWindow(ConverterFrame):
         self.OpenFiles(previous_file)
         self.previous.Enable(False)
         event.Skip()
-
-    def findReplace(self):
-        find_replace_dialog = FindReplaceDialog(text_edit=self.text_1)
-        find_replace_dialog.exec()
 
     def EditText(self, event):
         """"""
