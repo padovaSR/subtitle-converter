@@ -16,6 +16,9 @@ else
       echo ""
       read -p "message: [$default] ": var
       var=${var:-$default}
+      # Strip non-printable characters
+      var=$(echo "$var" | tr -cd '[:print:]\n')
+      #echo "Cleaned input: $var"
       echo $var
       git commit -m "$var"
       echo ""
