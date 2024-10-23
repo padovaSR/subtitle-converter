@@ -237,12 +237,7 @@ class ZipStructure(wx.Dialog):
         self.items = [self.makeMenu(x) for x in makef]
         for item in self.items:
             self.tree.Expand(item[0])
-        if event.Id in [
-            self.chbox_1.Id,
-            self.chbox_2.Id,
-            self.chbox_3.Id,
-            self.chbox_4.Id,
-        ]:
+        if event.Id != self.checkbox_1.Id:
             for item in self.items:
                 self.tree.Collapse(item[0])
         event.Skip()
