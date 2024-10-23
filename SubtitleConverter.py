@@ -937,7 +937,7 @@ class MainWindow(ConverterFrame):
         if files:
             if not encoding:
                 encoding = "Multi-enc"
-            M2 = f" Fajlova:  {self.Text_1.GetNumberOfLines()}" 
+            M2 = f" Fajlova:  {self.Text_1.GetNumberOfLines()-1}" 
             self.SetStatusText(f"{printEncoding(encoding)} – {M2}", 1)
         else:
             self.SetStatusText(f"{printEncoding(encoding)} ", 1)
