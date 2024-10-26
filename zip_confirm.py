@@ -172,37 +172,64 @@ class ZipStructure(wx.Dialog):
         return [self.makeMenu(x) for x in self.files]
     
     def makeMenu(self, items=[]):
-        """"""
+        """
+        Populates the wx.TreeCtrl with files and directories based on the state of checkbox_1.
+    
+        When checkbox_1 is checked:
+            - Creates tree items for directories, appends files under their respective directories.
+    
+        When checkbox_1 is unchecked:
+            - Adds files directly under the root without directory nesting.
+    
+        Parameters:
+        items (list): List of file paths to populate the tree.
+    
+        Returns:
+        list: List of appended tree items (directories or files).
+        """
+        
         if self.checkbox_1.IsChecked():
-            l = [dirname(x) for x in items]
-            fItems = sorted(set(l), key=l.index)
-            cItems = [self.tree.AppendItem(self.root, x) for x in fItems]
-            for i in items:
-                a = dirname(i)
-                b = basename(i)
-                for x in range(len(fItems)):
-                    if a == fItems[x]:
-                        lfile = self.tree.AppendItem(cItems[x], b)
-                        self.tree.SetItemImage(
-                            lfile, self.fileidx, wx.TreeItemIcon_Normal
-                        )
-            for i in cItems:
-                self.tree.SetItemImage(i, self.fldridx, wx.TreeItemIcon_Normal)
-                self.tree.SetItemImage(i, self.fldropenidx, wx.TreeItemIcon_Expanded)
-                #self.tree.Expand(i)
+            # Extract directory names and remove duplicates while maintaining order
+            directories = [dirname(x) for x in items]
+            unique_dirs = sorted(set(directories), key=directories.index)
+    
+            # Append directories to the tree
+            dir_items = [self.tree.AppendItem(self.root, d) for d in unique_dirs]
+    
+            # Append files under their respective directories
+            for item in items:
+                directory, filename = dirname(item), basename(item)
+                for i, dir_name in enumerate(unique_dirs):
+                    if directory == dir_name:
+                        file_item = self.tree.AppendItem(dir_items[i], filename)
+                        self.tree.SetItemImage(file_item, self.fileidx, wx.TreeItemIcon_Normal)
+    
+            # Set folder icons for directories
+            for dir_item in dir_items:
+                self.setFolderImages(dir_item)
+    
+            # Expand the root item
             self.tree.Expand(self.root)
-            return cItems
+            return dir_items
+    
         else:
-            fItems = []
+            # Append files directly under the root
             cItems = []
-            fItems.append(items)
-            for x in fItems:
-                for i in range(len(x)):
-                    cItems.append(self.tree.AppendItem(self.root, basename(x[i])))
-            for i in cItems:
-                self.tree.SetItemImage(i, self.fileidx, wx.TreeItemIcon_Normal)
+            # Iterate over each file and add to the root
+            for file in items:
+                file_item = self.tree.AppendItem(self.root, basename(file))
+                cItems.append(file_item)
+    
+            # Set file icon for each item
+            for item in cItems:
+                self.tree.SetItemImage(item, self.fileidx, wx.TreeItemIcon_Normal)
             return cItems
-
+        
+    def setFolderImages(self, item):
+        """Helper to set folder images."""
+        self.tree.SetItemImage(item, self.fldridx, wx.TreeItemIcon_Normal)
+        self.tree.SetItemImage(item, self.fldropenidx, wx.TreeItemIcon_Expanded)
+        
     def create_info(self, _basedirs):
         """"""
         combined_paths = []
