@@ -516,7 +516,7 @@ class MainWindow(ConverterFrame):
                 handler = ExportZipFile.ExportZip(
                     [self.single_file],
                     self.cyr_utf8,
-                    [FILE_HISTORY[1]],
+                    [FILE_HISTORY[-2]],
                     utf8_ext=ext_4,
                 )
                 all_paths = handler.collectInfoData()
@@ -533,8 +533,7 @@ class MainWindow(ConverterFrame):
             ofiles = [MULTI_FILE[x].path for x in range(len(MULTI_FILE))]
             if self.CYR is True and self.cyr_utf8:
                 handler = ExportZipFile.ExportZip(
-                    self.new_files, self.cyr_utf8, ofiles, utf8_ext=ext_4
-                )
+                    self.new_files, self.cyr_utf8, ofiles, utf8_ext=ext_4)
                 all_paths = handler.CreateInfo()
                 FileToSave = handler.file_name(MULTI_FILE[0].path)
                 fileName = self.fileSave_dialog(FileToSave, "Save Zip file")
