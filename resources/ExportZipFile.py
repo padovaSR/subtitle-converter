@@ -22,10 +22,10 @@ class ExportZip:
         self.input_3 = input_3
         self.utf8_ext = utf8_ext
         
-    def WriteZipFile(self, file_name, selections=[], folders=False):
+    def WriteZipFile(self, file_name, selections=[]):
         """"""
         try:
-            files,zdata = self.collectAllData(selections, folders)
+            files,zdata = self.collectAllData(selections, folders=False)
             with zipfile.ZipFile(file_name, 'w') as fzip:
                 for i, x in zip(files, zdata):
                     if not i:
