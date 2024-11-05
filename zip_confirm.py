@@ -170,32 +170,25 @@ class ZipStructure(wx.Dialog):
         """"""
         logger.debug("Building TreeItems")
         return [self.makeMenu(x) for x in self.files]
-    
+        
     def makeMenu(self, items=[]):
         """
         Populates the wx.TreeCtrl with files and directories based on the state of checkbox_1.
-    
         When checkbox_1 is checked:
             - Creates tree items for directories, appends files under their respective directories.
-    
         When checkbox_1 is unchecked:
             - Adds files directly under the root without directory nesting.
-    
         Parameters:
         items (list): List of file paths to populate the tree.
-    
         Returns:
         list: List of appended tree items (directories or files).
         """
-        
         if self.checkbox_1.IsChecked():
             # Extract directory names and remove duplicates while maintaining order
             directories = [dirname(x) for x in items]
             unique_dirs = sorted(set(directories), key=directories.index)
-    
             # Append directories to the tree
             dir_items = [self.tree.AppendItem(self.root, d) for d in unique_dirs]
-    
             # Append files under their respective directories
             for item in items:
                 directory, filename = dirname(item), basename(item)
@@ -203,15 +196,12 @@ class ZipStructure(wx.Dialog):
                     if directory == dir_name:
                         file_item = self.tree.AppendItem(dir_items[i], filename)
                         self.tree.SetItemImage(file_item, self.fileidx, wx.TreeItemIcon_Normal)
-    
             # Set folder icons for directories
             for dir_item in dir_items:
                 self.setFolderImages(dir_item)
-    
             # Expand the root item
             self.tree.Expand(self.root)
             return dir_items
-    
         else:
             # Append files directly under the root
             cItems = []
@@ -219,7 +209,6 @@ class ZipStructure(wx.Dialog):
             for file in items:
                 file_item = self.tree.AppendItem(self.root, basename(file))
                 cItems.append(file_item)
-    
             # Set file icon for each item
             for item in cItems:
                 self.tree.SetItemImage(item, self.fileidx, wx.TreeItemIcon_Normal)
