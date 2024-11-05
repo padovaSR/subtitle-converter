@@ -853,7 +853,7 @@ class MainWindow(ConverterFrame):
 
     def openPrevious(self, event):
         """"""
-        previous_file = FILE_HISTORY[1]
+        previous_file = FILE_HISTORY[-2]
         self.OpenFiles(previous_file)
         self.previous.Enable(False)
         event.Skip()
@@ -1036,22 +1036,6 @@ class MainWindow(ConverterFrame):
             return color
         dlg.Destroy()
         
-    def applyColor(self):
-        """Temporarily sets the font color of the selected text or the entire TextEdit widget."""
-        color = QColorDialog.getColor()
-        # Check if a color was selected
-        if color.isValid():
-            color = color.name()
-            # Get the current cursor position and selection
-            cursor = self.text_1.textCursor()
-            selection = cursor.selectedText()            
-            # If there is a selection, apply the color to the selected text
-            if selection:
-                cursor.insertHtml(f"<span style='color: {color}'>{selection}</span>")
-            # Otherwise, apply the color to the entire text
-            else:
-                self.text_1.setStyleSheet(f"color: {color}")
-
     def setFontAndStyle(self, font=None, color=None):
         """Sets the font and style of the wx.richtext widget."""
         if not font:
@@ -1156,7 +1140,7 @@ class MainWindow(ConverterFrame):
                     for line in cf:
                         if any(line.startswith(n) for n in i_list):
                             x = line.split("=")
-                            s = f"{x[0].strip()}={shortcutsKey[x[0].strip()]}\n"
+                            s = f"{x[0].strip()}={shortcutsKeys[x[0].strip()]}\n"
                             new_f += s
                         else:
                             new_f += line
