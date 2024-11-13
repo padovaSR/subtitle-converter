@@ -86,9 +86,6 @@ class MainWindow(ConverterFrame):
         self.filehistory.UseMenu(self.recent_files)
         self.filehistory.AddFilesToMenu()
         
-        self.default_font_size = self.get_current_font_size()
-        self.zoom_factor = 1  # Zoom step increment for each wheel scroll
-        
         ##==============================================================================##
         self.Bind(wx.EVT_MENU, self.onOpen, id=self.file_open.GetId())
         self.Bind(wx.EVT_MENU, self.SaveFile, id=self.save.GetId())
@@ -158,6 +155,9 @@ class MainWindow(ConverterFrame):
             else:
                 FILE_HISTORY.remove(i)
         self.toolBar1.EnableTool(109, False)
+        
+        self.default_font_size = self.get_current_font_size()
+        self.zoom_factor = 1  # Zoom step increment for each wheel scroll
         
     def on_mouse_wheel(self, event):
         # Check if Ctrl key is pressed
@@ -940,6 +940,7 @@ class MainWindow(ConverterFrame):
             self.SetStatusText(f"{printEncoding(encoding)} – {M2}", 1)
         else:
             self.SetStatusText(f"{printEncoding(encoding)} ", 1)
+
     def apply_style(self, selection, style_keyword, color_rgb=None):
         """
         Applies a style around the selected text based on a keyword.
@@ -982,7 +983,7 @@ class MainWindow(ConverterFrame):
             self.Text_1.WriteText(close_tag)
     
             self.Text_1.Thaw()
- 
+            
     def formatText(self, event):
         """Sets the formating of the selected text."""
 
@@ -1150,14 +1151,15 @@ class MainWindow(ConverterFrame):
                 logger.debug(f"editShortcuts: {e}")
             dlg.Destroy()
         event.Skip()
-        
-    def getPositions(self, values):
+    
+    @staticmethod    
+    def getPositions(current_text, values):
         """"""
         pos_start = []
         pos_end = []
         for x in set(values):
             ctext = re.compile(r"\b" + x + r"\b")
-            for match in re.finditer(ctext, self.Text_1.GetValue()):
+            for match in re.finditer(ctext, current_text):
                 pos_start.append(match.start())
                 pos_end.append(match.end())
         return [pos_start, pos_end]
@@ -1171,7 +1173,7 @@ class MainWindow(ConverterFrame):
         if result == True:
             text = WORK_TEXT.getvalue()
             self.Text_1.SetValue(text)
-            _positions = self.getPositions(changed)
+            _positions = self.getPositions(text, changed)
             self.highlight_parts(text=None, positions=_positions)
         event.Skip()
         
