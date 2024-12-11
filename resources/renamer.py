@@ -10,6 +10,7 @@ import re
 import shutil
 from os.path import basename, join, dirname, split, splitext, normpath
 import wx
+import wx.adv
 
 sys.path.append("../")
 
@@ -34,7 +35,7 @@ class CollectFiles:
     RP =\
         re.compile(r"\d{4}\w?\.?|(x|h)\.?26(4|5)|N(10|265)|ddp5\.1\.?|\b\w{2,}\b(?<!\d)|[\
         \.-]|(ION\d{2,3})|(?<=part[.\-\
-        ])\d+|s\d+e|([a-z]+\.+){1,5}|\d+\.(?=s[0-9])|(\([^\)]*\))|se(a|z)s*ona*\s*\d{1,2}",
+        ])\d+|s\d+e|([a-z]+\.+){1,5}|[a-z ]|\d+\.(?=s[0-9])|(\([^\)]*\))|se(a|z)s*ona*\s*\d{1,2}",
                    re.I)
     subtitles = []
     def __init__(self, selected_folder=None):
@@ -125,7 +126,7 @@ class RenameFiles(wx.Dialog):
             height = MAIN_SETTINGS["Renamer"]["H"]
             self.SetSize(width, height)
         except:
-            self.SetSizeHints(wx.DefaultSize, wx.DefaultSize)
+            self.SetSizeHints(1100, 850)
 
         Sizer1 = wx.BoxSizer(wx.VERTICAL)
 
@@ -170,12 +171,10 @@ class RenameFiles(wx.Dialog):
             wx.TAB_TRAVERSAL,
         )
         Sizer3 = wx.BoxSizer(wx.VERTICAL)
-        selected_directory = MAIN_SETTINGS["Renamer"]["Selected"]
-        if not os.path.exists(selected_directory):
-            try:
-                selected_directory = dirname(selected_directory)
-            except:
-                selected_directory = self.get_current_user()
+        try:
+            selected_directory = dirname(MAIN_SETTINGS["Renamer"]["Selected"])
+        except:
+            selected_directory = self.get_current_user()
         self.genericDirCtrl = wx.GenericDirCtrl(
             self.panel1,
             wx.ID_ANY,
@@ -201,7 +200,7 @@ class RenameFiles(wx.Dialog):
             wx.TAB_TRAVERSAL,
         )
         Sizer4 = wx.BoxSizer(wx.VERTICAL)
-
+        
         self.m_textCtrl1 = wx.TextCtrl(
             self.panel2,
             wx.ID_ANY,
@@ -211,15 +210,14 @@ class RenameFiles(wx.Dialog):
             wx.TE_MULTILINE | wx.TE_NO_VSCROLL | wx.TE_RICH2,
         )
         self.m_textCtrl1.DragAcceptFiles(True)
+        
         Sizer4.Add(self.m_textCtrl1, 1, wx.EXPAND | wx.RIGHT | wx.TOP, 5)
 
-        self.m_textCtrl2 = wx.TextCtrl(
+        self.m_textCtrl2 = wx.adv.EditableListBox(
             self.panel2,
             wx.ID_ANY,
             wx.EmptyString,
-            wx.DefaultPosition,
-            wx.DefaultSize,
-            wx.TE_MULTILINE | wx.TE_NO_VSCROLL | wx.TE_RICH2,
+            style=wx.adv.EL_ALLOW_NEW | wx.adv.EL_ALLOW_EDIT | wx.adv.EL_ALLOW_DELETE,
         )
         Sizer4.Add(self.m_textCtrl2, 1, wx.BOTTOM | wx.EXPAND | wx.RIGHT | wx.TOP, 5)
 
@@ -335,27 +333,27 @@ class RenameFiles(wx.Dialog):
 
     def getNames(self):
         self.m_textCtrl1.Clear()
-        self.m_textCtrl2.Clear()
+        self.m_textCtrl2.SetStrings([])
         collector = CollectFiles(self.current_path)
         title_list,video_list = collector.listFiles(self.suffix)        
         try:
             new_subs_list,new_vids_list = collector.reorderFiles(title_list, video_list)
+            if not new_subs_list:
+                new_subs_list = title_list
             self.vid_suffix = splitext(video_list[0])[1]
             self.subtitles = collector.subtitles
             renamed_subs_list = [splitext(filename)[0] + ".srt" for filename in new_vids_list]
 
             for title_name in new_subs_list:
-                self.m_textCtrl1.AppendText(f"{title_name}\n")
-            for file_name in renamed_subs_list:
-                self.m_textCtrl2.AppendText(f"{file_name}\n")
+                self.m_textCtrl1.AppendText(f"{title_name}\n")            
+            self.m_textCtrl2.SetStrings(renamed_subs_list)
         except Exception as e:
             logger.debug(f"getNames: {e}")        
 
     def renameFiles(self, event):
         ''''''
-        renamed = self.renamed
-        renamed.clear()
-        n = self.m_textCtrl2.GetNumberOfLines()
+        self.renamed.clear()
+        n = len(self.m_textCtrl2.GetStrings())
         if n > 2:
             pl_name = f"{split(dirname(self.subtitles[0]))[1]}.m3u"
             pl_file = join(dirname(self.subtitles[0]), pl_name)
@@ -363,10 +361,10 @@ class RenameFiles(wx.Dialog):
                 f.write(f"#{basename(pl_file)[:-4]} Playlist\n")            
         for i in range(0, n):
             try:
-                line = self.m_textCtrl2.GetLineText(i)
+                line = self.m_textCtrl2.GetStrings()[i]
                 new_name = join(os.path.dirname(self.subtitles[i]), line)
                 shutil.move(self.subtitles[i], new_name)
-                renamed.append(f"{line}\n")
+                self.renamed.append(f"{line}\n")
                 if n > 2:
                     with open(pl_file, "a", encoding="utf-8") as f:
                         f.write(f"{splitext(line)[0]}{self.vid_suffix}\n")                
