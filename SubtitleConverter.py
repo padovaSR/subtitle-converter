@@ -622,13 +622,8 @@ class MainWindow(ConverterFrame):
     
     def RenameFiles(self, event):
         """"""
-        s_text = ["Reneamed files:\n\n"]
         dlg = RenameFiles(None)
-        if dlg.ShowModal() == wx.ID_OK:
-            files = dlg.checkRenamed()
-            s_text.extend(files)
-            self.displayText(s_text)
-            dlg.Destroy()
+        dlg.ShowModal()
         event.Skip()        
 
     def OnFixerSettings(self, event):
