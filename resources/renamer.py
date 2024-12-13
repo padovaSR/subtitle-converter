@@ -252,15 +252,17 @@ class RenameFiles(wx.Dialog):
                     "Franklin Gothic Medium",
                 )
         )        
-        Sizer5 = wx.StdDialogButtonSizer()
+        #Sizer5 = wx.StdDialogButtonSizer()
+        Sizer5 = wx.BoxSizer(wx.HORIZONTAL)
         Sizer5.Add(self.Label_2, 0, wx.LEFT, 5)
-        self.Sizer5_OK = wx.Button(self, wx.ID_OK)
-        Sizer5.AddButton(self.Sizer5_OK)
+        Sizer5.AddStretchSpacer()
+        self.Sizer5_OK = wx.Button(self, wx.ID_OK, "Ok")
+        Sizer5.Add(self.Sizer5_OK, 0, wx.RIGHT|wx.BOTTOM|wx.ALIGN_CENTER, 5)
         self.Sizer5_Cancel = wx.Button(self, wx.ID_CANCEL)
-        Sizer5.AddButton(self.Sizer5_Cancel)
-        Sizer5.Realize()
+        Sizer5.Add(self.Sizer5_Cancel, 0, wx.RIGHT|wx.BOTTOM|wx.ALIGN_CENTER, 5)
+        #Sizer5.Realize()
 
-        Sizer1.Add(Sizer5, 0, wx.BOTTOM | wx.EXPAND | wx.RIGHT, 5)
+        Sizer1.Add(Sizer5, 0, wx.EXPAND | wx.RIGHT, 0)
 
         self.SetSizer(Sizer1)
         self.Layout()
@@ -334,6 +336,7 @@ class RenameFiles(wx.Dialog):
     def getNames(self):
         self.m_textCtrl1.Clear()
         self.m_textCtrl2.SetStrings([])
+        self.subtitles.clear()
         collector = CollectFiles(self.current_path)
         title_list,video_list = collector.listFiles(self.suffix)        
         try:
@@ -354,37 +357,41 @@ class RenameFiles(wx.Dialog):
         ''''''
         self.renamed.clear()
         n = len(self.m_textCtrl2.GetStrings())
-        if n > 2:
+        if n > 2 and self.subtitles:
             pl_name = f"{split(dirname(self.subtitles[0]))[1]}.m3u"
             pl_file = join(dirname(self.subtitles[0]), pl_name)
             with open(pl_file, "w", encoding="utf-8") as f:
                 f.write(f"#{basename(pl_file)[:-4]} Playlist\n")            
+        subtitle_list = self.m_textCtrl2.GetStrings()
+        self.m_textCtrl1.Clear()
         for i in range(0, n):
             try:
-                line = self.m_textCtrl2.GetStrings()[i]
+                line = subtitle_list[i]
                 new_name = join(os.path.dirname(self.subtitles[i]), line)
                 shutil.move(self.subtitles[i], new_name)
-                self.renamed.append(f"{line}\n")
+                self.m_textCtrl1.AppendText(f"{line}\n")
+                self.renamed.append(line)
                 if n > 2:
                     with open(pl_file, "a", encoding="utf-8") as f:
                         f.write(f"{splitext(line)[0]}{self.vid_suffix}\n")                
                 logger.debug(f"{basename(self.subtitles[i])} -> {line}")
             except Exception as e:
-                logger.debug(f"{e}")
-        self.subtitles.clear()
+                logger.debug(f"renameFiles: {e}")
         self.writeSettings()
         self.checkRenamed()
-        event.Skip()
-
+        
     def checkRenamed(self):
         """"""
+        s_text = ["Reneamed files:\n\n"]
         collector = CollectFiles(self.current_path)
         s_list, v = collector.listFiles(self.suffix)        
         renamed = [item.strip() for item in self.renamed]
         if s_list and renamed:
             try:
-                if len(s_list) == len(renamed) and set(s_list) == set(renamed):
-                    return [item + "\n" for item in s_list]
+                if len(s_list) == len(renamed):
+                    for title_name in renamed:
+                        s_text.append(title_name+"\n")
+                wx.MessageBox("".join(s_text), "Renamer")
             except (TypeError, Exception) as e:
                 logger.debug(f"Error: {e}")    
 
