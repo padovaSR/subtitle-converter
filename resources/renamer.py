@@ -70,8 +70,8 @@ class CollectFiles:
         try:
             if len(subs) > 1 and len(vids) > 1:
                 for pair in zip(subs, vids):
-                    a = int(re.match(r"\d{1,2}", self.RP.sub("", pair[0])).group(0))
-                    b = int(re.match(r"\d{1,2}", self.RP.sub("", pair[1])).group(0))
+                    a = int(re.match(r"\D*(\d{1,2})", self.RP.sub("", pair[0])).group(1))
+                    b = int(re.match(r"\D*(\d{1,2})", self.RP.sub("", pair[1])).group(1))
                     a = max(0, a - 1)
                     b = max(0, b - 1)
 
