@@ -22,10 +22,10 @@ class ExportZip:
         self.input_3 = input_3
         self.utf8_ext = utf8_ext
         
-    def WriteZipFile(self, file_name, selections=[]):
+    def WriteZipFile(self, file_name, selections=[], folders=False):
         """"""
         try:
-            files,zdata = self.collectAllData(selections, folders=False)
+            files,zdata = self.collectAllData(selections, folders)
             with zipfile.ZipFile(file_name, 'w') as fzip:
                 for i, x in zip(files, zdata):
                     if not i:
@@ -62,20 +62,20 @@ class ExportZip:
     def collectInfoData(self):
         return list(chain.from_iterable(self.CreateInfo()))
     
-    def collectAllData(self, selection, folders):
+    def collectAllData(self, selections, folders):
         z_data = self.CreateData()
         i_data = self.CreateInfo()
         if len(z_data) > 1 and len(i_data) > 1:
-            files_info = list(chain.from_iterable([i_data[x] for x in selection]))
-            zip_data = list(chain.from_iterable([z_data[x] for x in selection]))
+            files_info = list(chain.from_iterable([i_data[x] for x in selections]))
+            zip_data = list(chain.from_iterable([z_data[x] for x in selections]))
         else:
             files_info = i_data[0]
             zip_data = z_data[0]
         if folders:
             files_info = []
             for folder, files_group in zip(folders, i_data):
-                files_info.append([join(folder, file) for file in files_group])                        
-            files_info = list(chain.from_iterable([files_info[x] for x in selection]))
+                files_info.append([join(folder, file) for file in files_group])
+            files_info = list(chain.from_iterable([files_info[x] for x in selections]))
         return files_info, zip_data
         
     def CreateData(self):
