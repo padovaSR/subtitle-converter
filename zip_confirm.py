@@ -237,7 +237,7 @@ class ZipStructure(wx.Dialog):
             ]
         if self.checkbox_1.IsChecked():
             # Return the labels of all checkboxes that are checked
-            return [button.GetLabel() for button in buttons if button.IsChecked()]
+            return [button.GetLabel() for button in buttons]
         else:
             return False    
 
