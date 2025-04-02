@@ -552,8 +552,9 @@ class MainWindow(ConverterFrame):
                 if result is True:
                     self.messageInformation(new_zipFile_name)
             else:
-                fileName = self.fileSave_dialog(FileToSave, "Save Zip file")
                 handler = ExportZipFile.ExportZip(input_1=self.new_files)
+                FileToSave = handler.file_name(MULTI_FILE[0].path)
+                fileName = self.fileSave_dialog(FileToSave, "Save Zip file")
                 selection = [1 for x in handler.collectInfoData()]
                 result = handler.WriteZipFile(
                     fileName, selections=selection, folders=False
