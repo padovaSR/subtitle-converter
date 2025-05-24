@@ -34,7 +34,7 @@ class CollectFiles:
     """"""
     RP\
         =re.compile(r"\d{4}\w?\.?|(x|h)\.?26(4|5)|N(10|265)|ddp5\.1\.?|\b\w{2,}\b(?<!\d)|[\.-]|(ION\d{2,3})|(?<=part[.\-])\d+|s\d+e|\
-        ([a-z]+\.+){1,5}|[a-z\ ]|\d+\.(?=s[0-9])|(\([^\)]*\))|se(a|z)s*ona*\s*\d{1,2}|\d{1,2}x",re.I)
+        ([a-z]+\.+){1,5}|[a-z ]|\d+\.(?=s[0-9])|(\([^\)]*\))|se(a|z)s*ona*\s*\d{1,2}|\d{1,2}x|\s+\d{1,2\s*}",re.I)
     subtitles = []
     def __init__(self, selected_folder=None):
         self.selected_folder = selected_folder
@@ -74,7 +74,7 @@ class CollectFiles:
                     b = int(re.match(r"\D*(\d{1,2})", self.RP.sub("", pair[1])).group(1))
                     a = max(0, a - 1)
                     b = max(0, b - 1)
-
+                    
                     # Extend the lists if necessary
                     while len(new_subs_list) <= a:
                         new_subs_list.append(None)
@@ -91,6 +91,17 @@ class CollectFiles:
                 new_subs_list = [x for x in new_subs_list if x is not None]
                 new_vids_list = [x for x in new_vids_list if x is not None]
                 self.subtitles = [x for x in self.subtitles if x is not None]
+                if len(new_vids_list) == 1:
+                    new_vids_list.clear()
+                    for title in vids:
+                        b = re.sub(r"Season\s*\d{1,2}\s*", "", title, re.I)
+                        b = re.sub(r"Episode\s*\d+\s*-?\s*", "", b, count=1, flags=re.I)
+                        b = int(re.match(r"\D*(\d{1,2})", self.RP.sub("", b)).group(1))
+                        b = max(0, b - 1)
+                        while len(new_vids_list) <= b:
+                            new_vids_list.append(None)
+                        new_vids_list[b] = title
+                    new_vids_list = [x for x in new_vids_list if x is not None]
             else:
                 new_subs_list = subs
                 new_vids_list = vids
