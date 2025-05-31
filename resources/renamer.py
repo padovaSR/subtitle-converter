@@ -70,8 +70,9 @@ class CollectFiles:
         try:
             if len(subs) > 1 and len(vids) > 1:
                 for pair in zip(subs, vids):
+                    video = re.sub(r"Episode\s*\d+\s*-?\s*|Season\s*\d{1,2}\s*", "", pair[1], 2, re.I).rstrip(".mp4")
                     a = int(re.match(r"\D*(\d{1,2})", self.RP.sub("", pair[0])).group(1))
-                    b = int(re.match(r"\D*(\d{1,2})", self.RP.sub("", pair[1])).group(1))
+                    b = int(re.match(r"\D*(\d{1,2})", self.RP.sub("", video)).group(1))
                     a = max(0, a - 1)
                     b = max(0, b - 1)
                     
@@ -91,17 +92,6 @@ class CollectFiles:
                 new_subs_list = [x for x in new_subs_list if x is not None]
                 new_vids_list = [x for x in new_vids_list if x is not None]
                 self.subtitles = [x for x in self.subtitles if x is not None]
-                if len(new_vids_list) == 1:
-                    new_vids_list.clear()
-                    for title in vids:
-                        b = re.sub(r"Season\s*\d{1,2}\s*", "", title, re.I)
-                        b = re.sub(r"Episode\s*\d+\s*-?\s*", "", b, count=1, flags=re.I)
-                        b = int(re.match(r"\D*(\d{1,2})", self.RP.sub("", b)).group(1))
-                        b = max(0, b - 1)
-                        while len(new_vids_list) <= b:
-                            new_vids_list.append(None)
-                        new_vids_list[b] = title
-                    new_vids_list = [x for x in new_vids_list if x is not None]
             else:
                 new_subs_list = subs
                 new_vids_list = vids
