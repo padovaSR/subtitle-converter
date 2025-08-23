@@ -170,6 +170,20 @@ class RenameFiles(wx.Dialog):
             wx.TAB_TRAVERSAL,
         )
         Sizer3 = wx.BoxSizer(wx.VERTICAL)
+        
+        self.searchCtrl1 = wx.SearchCtrl(
+            self.panel1,
+            wx.ID_ANY,
+            wx.EmptyString,
+            wx.DefaultPosition,
+            wx.DefaultSize,
+            wx.TE_PROCESS_ENTER,
+        )
+        self.searchCtrl1.ShowSearchButton(True)
+        self.searchCtrl1.ShowCancelButton(False)
+        self.searchCtrl1.SetToolTip(("Find your folder"))
+        Sizer3.Add(self.searchCtrl1, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
+        
         try:
             selected_directory = dirname(MAIN_SETTINGS["Renamer"]["Selected"])
         except:
@@ -283,6 +297,8 @@ class RenameFiles(wx.Dialog):
         self.m_textCtrl2.SetDropTarget(None)        
 
         # Connect Events
+        self.searchCtrl1.Bind(wx.EVT_TEXT_ENTER, self.onSearch)
+        self.searchCtrl1.Bind(wx.EVT_SEARCHCTRL_SEARCH_BTN, self.onSearch)
         self.Bind(wx.EVT_TREE_BEGIN_DRAG, self.OnBeginDrag, self.genericDirCtrl.GetTreeCtrl())
         self.splitter1.Bind(wx.EVT_SPLITTER_SASH_POS_CHANGED, self.GetsplitterPosition)
         self.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.onFileActivated, self.genericDirCtrl.GetTreeCtrl())
@@ -394,6 +410,80 @@ class RenameFiles(wx.Dialog):
             except (TypeError, Exception) as e:
                 logger.debug(f"Error: {e}")    
 
+    def onSearch(self, event):
+        query = self.searchCtrl1.GetValue().lower().strip()
+        if not query:
+            return
+    
+        tree = self.genericDirCtrl.GetTreeCtrl()
+    
+        # 1. Try selected item in the tree
+        selected = tree.GetSelection()
+        if not selected.IsOk():
+            # 2. Fall back to folder from Label_2
+            fallback_path = os.path.dirname(self.Label_2.GetLabel())
+            if fallback_path and os.path.isdir(fallback_path):
+                selected = tree.GetRootItem()  # start from root
+                # walk tree to find the node matching fallback_path
+                selected = self.find_item_by_path(tree, selected, fallback_path)
+    
+        # 3. If we still don't have a valid item → give up
+        if not selected or not selected.IsOk():
+            wx.MessageBox(
+                "No folder selected.\nPlease select a folder in the tree.",
+                "Search Error",
+                wx.OK | wx.ICON_WARNING
+            )
+            return
+        
+    
+        # search only inside this folder (skip checking it itself, look at its children)
+        expand_during_search = False
+        match = self.find_first_match(tree, selected, query, expand_during_search)
+    
+        if match:
+            tree.EnsureVisible(match)
+            tree.SelectItem(match)
+        else:
+            wx.Bell()
+    
+    def find_first_match(self, tree, parent, query, expand):
+        """
+        DFS from 'parent' but SKIP checking 'parent' itself
+        (avoids touching the virtual root). Searches children only.
+        """
+        child, cookie = tree.GetFirstChild(parent)
+        while child.IsOk():
+            label = tree.GetItemText(child).lower()
+            if query in label:
+                return child
+    
+            # For GenericDirCtrl, children are created lazily.
+            # Expanding loads them so the search can descend.
+            if expand and not tree.IsExpanded(child):
+                tree.Expand(child)
+    
+            found = self.find_first_match(tree, child, query, expand)
+            if found:
+                return found
+    
+            child, cookie = tree.GetNextChild(parent, cookie)
+    
+        return None
+    
+    def find_item_by_path(self, tree, parent, target_path):
+        """Find tree item whose full path matches target_path"""
+        child, cookie = tree.GetFirstChild(parent)
+        while child.IsOk():
+            path = self.genericDirCtrl.GetPath(child)
+            if os.path.normpath(path) == os.path.normpath(target_path):
+                return child
+            found = self.find_item_by_path(tree, child, target_path)
+            if found:
+                return found
+            child, cookie = tree.GetNextChild(parent, cookie)
+        return None    
+    
     def writeSettings(self):
         """"""
         # Get current directory and the size of the frame 
