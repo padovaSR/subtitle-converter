@@ -185,13 +185,13 @@ class RenameFiles(wx.Dialog):
         Sizer3.Add(self.searchCtrl1, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
         
         try:
-            selected_directory = dirname(MAIN_SETTINGS["Renamer"]["Selected"])
+            self.selected_directory = dirname(MAIN_SETTINGS["Renamer"]["Selected"])
         except:
-            selected_directory = self.get_current_user()
+            self.selected_directory = self.get_current_user()
         self.genericDirCtrl = wx.GenericDirCtrl(
             self.panel1,
             wx.ID_ANY,
-            selected_directory,
+            self.selected_directory,
             wx.DefaultPosition,
             wx.DefaultSize,
             wx.DIRCTRL_3D_INTERNAL | wx.DIRCTRL_DIR_ONLY | wx.FULL_REPAINT_ON_RESIZE,
@@ -248,7 +248,7 @@ class RenameFiles(wx.Dialog):
         self.Label_2 = wx.StaticText(
             self,
                 wx.ID_ANY,
-                selected_directory,
+                self.selected_directory,
                 wx.DefaultPosition,
                 wx.DefaultSize,
                 wx.ALIGN_LEFT,
@@ -421,7 +421,7 @@ class RenameFiles(wx.Dialog):
         selected = tree.GetSelection()
         if not selected.IsOk():
             # 2. Fall back to folder from Label_2
-            fallback_path = os.path.dirname(self.Label_2.GetLabel())
+            fallback_path = self.selected_directory
             if fallback_path and os.path.isdir(fallback_path):
                 selected = tree.GetRootItem()  # start from root
                 # walk tree to find the node matching fallback_path
@@ -435,7 +435,6 @@ class RenameFiles(wx.Dialog):
                 wx.OK | wx.ICON_WARNING
             )
             return
-        
     
         # search only inside this folder (skip checking it itself, look at its children)
         expand_during_search = False
