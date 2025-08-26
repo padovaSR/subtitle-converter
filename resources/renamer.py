@@ -282,13 +282,14 @@ class RenameFiles(wx.Dialog):
 
         self.Centre(wx.BOTH)
 
+        self.last_query = None
         self.current_path = None
         self.suffix = ".srt"
         self.vid_suffix = ".mkv"
 
         self.subtitles = []
         self.renamed = []
-
+        
         # Set the drop target only for the first text control
         drop_target = MyFileDropTarget(self.m_textCtrl1, self)
         self.m_textCtrl1.SetDropTarget(drop_target)
@@ -416,49 +417,52 @@ class RenameFiles(wx.Dialog):
             return
     
         tree = self.genericDirCtrl.GetTreeCtrl()
+        selected = None
     
-        # 1. Try selected item in the tree
-        selected = tree.GetSelection()
-        if not selected.IsOk():
-            # 2. Fall back to folder from Label_2
+        # If new query → force fallback
+        if query != self.last_query:
+            self.last_query = query
             fallback_path = self.selected_directory
             if fallback_path and os.path.isdir(fallback_path):
-                selected = tree.GetRootItem()  # start from root
-                # walk tree to find the node matching fallback_path
-                selected = self.find_item_by_path(tree, selected, fallback_path)
+                root = tree.GetRootItem()
+                selected = self.find_item_by_path(tree, root, fallback_path)
+        else:
+            # same query → search inside current selection if valid
+            selected = tree.GetSelection()
+            if not selected.IsOk():
+                fallback_path = self.selected_directory
+                if fallback_path and os.path.isdir(fallback_path):
+                    root = tree.GetRootItem()
+                    selected = self.find_item_by_path(tree, root, fallback_path)
     
-        # 3. If we still don't have a valid item → give up
         if not selected or not selected.IsOk():
             wx.MessageBox(
-                "No folder selected.\nPlease select a folder in the tree.",
+                "No folder selected or fallback failed.",
                 "Search Error",
                 wx.OK | wx.ICON_WARNING
             )
             return
     
-        # search only inside this folder (skip checking it itself, look at its children)
-        expand_during_search = False
-        match = self.find_first_match(tree, selected, query, expand_during_search)
+        # Do the actual search
+        match = self.find_first_match(tree, selected, query, expand=False)
     
         if match:
             tree.EnsureVisible(match)
             tree.SelectItem(match)
         else:
-            wx.Bell()
+            wx.Bell()        
     
     def find_first_match(self, tree, parent, query, expand):
-        """
-        DFS from 'parent' but SKIP checking 'parent' itself
-        (avoids touching the virtual root). Searches children only.
-        """
+        """DFS from 'parent' but SKIP checking 'parent' itself"""
+        
+        pattern = re.compile(r"\b{}\b".format(re.escape(query)))
+    
         child, cookie = tree.GetFirstChild(parent)
         while child.IsOk():
             label = tree.GetItemText(child).lower()
-            if query in label:
+            if pattern.search(label):
                 return child
     
-            # For GenericDirCtrl, children are created lazily.
-            # Expanding loads them so the search can descend.
             if expand and not tree.IsExpanded(child):
                 tree.Expand(child)
     
@@ -468,7 +472,7 @@ class RenameFiles(wx.Dialog):
     
             child, cookie = tree.GetNextChild(parent, cookie)
     
-        return None
+        return None    
     
     def find_item_by_path(self, tree, parent, target_path):
         """Find tree item whose full path matches target_path"""
