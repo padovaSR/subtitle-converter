@@ -521,8 +521,9 @@ class ErrorsHandler:
 
         cb3_s = MAIN_SETTINGS["Preferences"]["ShowLog"]
 
-        with open(self.input_file, "r", encoding=self.encoding) as fs:
-            file_content = fs.read()
+        fs = open(self.input_file, "r", encoding=self.encoding)
+        file_content = fs.read()
+        fs.close()
         subs = list(srt.parse(file_content, ignore_errors=True))
 
         outfile = f"{self.input_file}_error.log.txt"
@@ -550,6 +551,9 @@ class ErrorsHandler:
                     webbrowser.open(outfile)
         else:
             logger.debug(f"showMeError: No subtitles found in {basename(self.input_file)}")
+            if file_content.startswith(basename(self.input_file)):
+                with open(outfile, "w", encoding="utf-8") as out_file:
+                    out_file.write(file_content)            
 
     def checkChars(self):
         text = self.input_text
