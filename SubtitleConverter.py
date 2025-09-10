@@ -409,6 +409,7 @@ class MainWindow(ConverterFrame):
         elif len(MULTI_FILE) > 1:
             self.new_files.clear()
             self.cyr_utf8.clear()
+            paths = [m.realpath for m in MULTI_FILE]
             for file_item in MULTI_FILE:
                 text = normalizeText(file_item.enc, file_item.path)
                 handler = DocumentHandler(file_item.realpath, text, new_encoding, ext, cyr=self.CYR)
@@ -419,6 +420,7 @@ class MainWindow(ConverterFrame):
                     self.setStatus(status1=basename(file_item.path), encoding=new_encoding)
             self.setStatus("MultiFiles done", encoding=new_encoding, files=True)
             self.infoMessage("\n".join([basename(x) for x in self.new_files]))
+            self.OpenFiles(paths)
         event.Skip()
 
     def LatinToCyrillic(self, event):
