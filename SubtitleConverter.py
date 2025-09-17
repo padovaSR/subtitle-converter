@@ -1173,6 +1173,9 @@ class MainWindow(ConverterFrame):
             self.Text_1.SetValue(text)
             _positions = self.getPositions(text, changed)
             self.highlight_parts(text=None, positions=_positions)
+            dlg.Destroy()
+        else:
+            dlg.Destroy()
         event.Skip()
         
     def BindFindEvents(self, win):
