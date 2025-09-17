@@ -83,12 +83,13 @@ class FileHandler:
 
     @staticmethod
     def addFilePaths(path, enc, realpath):
-        r"""
-        Create and append namedtuple to MULTI_FILE
-        param: path: string, for tmp_file_path extracted from ZIP
-        param: enc: for encoding
-        param: realpath: for real file path directory
         """
+        Create a `Multi` namedtuple and append it to the global `MULTI_FILE` list.
+        Args:
+            path (str): Temporary file path extracted from a ZIP archive.
+            enc (str): File encoding.
+            realpath (str): Absolute path to the real file location.
+        """        
         multi = namedtuple("multi", ["path", "enc", "realpath"])
         MULTI_FILE.append(multi(path, enc, realpath))
 
