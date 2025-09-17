@@ -114,7 +114,7 @@ class FindReplace(wx.Dialog):
         sizer_3.Add(self.text_2, 1, wx.BOTTOM | wx.EXPAND | wx.LEFT, 8)
 
         sizer_4 = wx.BoxSizer(wx.VERTICAL)
-        sizer_3.Add(sizer_4, 0, wx.ALL | wx.EXPAND, 5)
+        sizer_3.Add(sizer_4, 0, wx.EXPAND|wx.LEFT|wx.RIGHT|wx.BOTTOM, 5)
 
         self.button_0 = wx.Button(self, wx.ID_ANY, "Find")
         self.button_0.SetMinSize((75, 23))
