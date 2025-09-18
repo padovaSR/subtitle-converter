@@ -126,15 +126,15 @@ class FindReplace(wx.Dialog):
         self.button_1.SetToolTip("TAB key \nAccept text")
         sizer_4.Add(self.button_1, 0, wx.ALL, 1)
 
-        self.button_2 = wx.Button(self, wx.ID_ANY, "Replace all")
-        self.button_2.SetMinSize((75, 23))
-        self.button_2.SetToolTip("Ctrl+L  \nAll occurrences")
-        sizer_4.Add(self.button_2, 0, wx.ALL, 1)
-
         self.button_3 = wx.Button(self, wx.ID_ANY, "Ignore")
         self.button_3.SetMinSize((75, 23))
         self.button_3.SetToolTip("Ctrl+I \nIgnore the replacement")
         sizer_4.Add(self.button_3, 0, wx.ALL, 1)
+
+        self.button_2 = wx.Button(self, wx.ID_ANY, "Replace all")
+        self.button_2.SetMinSize((75, 23))
+        self.button_2.SetToolTip("Ctrl+L  \nAll occurrences")
+        sizer_4.Add(self.button_2, 0, wx.ALL, 1)
 
         self.button_4 = wx.Button(self, wx.ID_ANY, "Ignore all")
         self.button_4.SetMinSize((75, 23))
@@ -227,6 +227,7 @@ class FindReplace(wx.Dialog):
         self.new_subs = []
         self.new_d = {}
         self.find = []
+        self.whole_word = True
         #self.default_subs = getSubs("test.srt")
         self.default_subs = srt.compose(subtitles)
         
@@ -264,7 +265,10 @@ class FindReplace(wx.Dialog):
         """"""
         c = 0
         wdict = self.wdict
-        r1 = re.compile(r"\b("+"|".join(map(re.escape, wdict.keys()))+r")\b")
+        if self.whole_word is False:
+            r1 = re.compile(r"("+"|".join(map(re.escape, wdict.keys()))+r")")
+        else:
+            r1 = re.compile(r"\b("+"|".join(map(re.escape, wdict.keys()))+r")\b")
         try:
             sub = next(iterator)
             c += 1
@@ -282,7 +286,10 @@ class FindReplace(wx.Dialog):
                 v = wdict[t1[i]]
                 newd[t1[i]] = v
             for k, v in newd.items():
-                ctext = re.compile(r'\b'+k+r'\b')
+                if self.whole_word is True:
+                    ctext = re.compile(r'\b'+k+r'\b')
+                else:
+                    ctext = re.compile(k)
                 sub.content = ctext.sub(v, sub.content)
             self.text_3.SetValue(sub.content)
             self.text_3.SetFocus()
@@ -319,7 +326,10 @@ class FindReplace(wx.Dialog):
 
     def textStyle(self, tctrl, text, st1, st2, w=r""):
         """"""
-        x = re.compile(r"\b"+w+r"\b")
+        if self.whole_word is True:
+            x = re.compile(r"\b"+w+r"\b")
+        else:
+            x = re.compile(w)
         for m in re.finditer(x, text):
             tctrl.SetStyle(m.start(), m.end(), wx.TextAttr(st1, st2))
             
@@ -351,7 +361,10 @@ class FindReplace(wx.Dialog):
     def onReplaceAll(self, event):
         ''''''
         try:
-            ctext = re.compile(r"\b("+"|".join(map(re.escape,self.new_d.keys()))+r")\b")
+            if self.whole_word is False:
+                ctext = re.compile(r"("+"|".join(map(re.escape,self.new_d.keys()))+r")")
+            else:
+                ctext = re.compile(r"\b("+"|".join(map(re.escape,self.new_d.keys()))+r")\b")            
             self.default_subs = ctext.sub(lambda x: self.new_d[x.group()], self.default_subs)
             wsubs = srt.compose(self.subs, reindex=False)
             wsubs = ctext.sub(lambda x: self.new_d[x.group()], wsubs)
@@ -409,10 +422,12 @@ class FindReplace(wx.Dialog):
         filtered_dict = {}
 
         # Compile the regex pattern to find keys in the subtitles
-        pattern = re.compile(
-                r"\b(" + "|".join(map(re.escape, _dict.keys())) + r")\b"
-            )
-
+        if os.path.basename(self.dname) == "Various-1.txt":
+            self.whole_word = False
+            pattern = re.compile(r"(" + "|".join(map(re.escape, _dict.keys())) + r")")
+        else:
+            self.whole_word = True
+            pattern = re.compile(r"\b(" + "|".join(map(re.escape, _dict.keys())) + r")\b")
         # Find all matches of dictionary keys in the subtitles
         matches = pattern.findall(_subs)
 
