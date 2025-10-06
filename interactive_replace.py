@@ -595,15 +595,9 @@ class FindReplace(wx.Frame):
         '''Button_dict event'''
         choice = self.dict_choice.GetStringSelection()
         current_dict = self.file_map[choice]        
-        path_b = os.path.join("/home/darkstar/Documents/dictionaries", os.path.basename(current_dict))
         with open(current_dict, "a", encoding="utf-8") as dict_file:
             dict_file.write(f"\n{self.text_ADD.GetValue().strip()}")
         self.text_ADD.Clear()
-        try:
-            shutil.copy(current_dict, path_b)
-        except Exception as e:
-            logger.debug(f"CopyFile: {e}")
-            wx.MessageBox(f"Error\n\nGreška pri kopiranju fajla. Pogledaj log.", "Translator")
         self.ok_btn.Enable(False)
         self.cancel_btn.Enable(False)
         self.text_3.SetFocus()
