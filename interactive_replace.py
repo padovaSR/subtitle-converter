@@ -146,11 +146,11 @@ class FindReplace(wx.Frame):
 
         # Row 2: Two multiline text controls
         row2 = wx.BoxSizer(wx.HORIZONTAL)
-        self.text_1 = wx.TextCtrl(top_panel, style=wx.TE_MULTILINE| wx.TE_RICH2)
+        self.text_1 = wx.TextCtrl(top_panel, style=wx.TE_MULTILINE|wx.TE_NO_VSCROLL|wx.TE_RICH2)
         self.text_1.SetFont(font)
         self.text_1.SetForegroundColour("BLUE")
         self.text_1.SetToolTip("From dictionary")
-        self.txt2 = wx.TextCtrl(top_panel, style=wx.TE_MULTILINE| wx.TE_RICH2)
+        self.txt2 = wx.TextCtrl(top_panel, style=wx.TE_MULTILINE|wx.TE_NO_VSCROLL|wx.TE_RICH2)
         self.txt2.SetFont(t_font1)
         self.txt2.SetToolTip("Current line")
         row2.Add(self.text_1, 1, wx.ALL | wx.EXPAND, 5)
