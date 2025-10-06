@@ -538,17 +538,16 @@ class FindReplace(wx.Frame):
             self.text_ADD.SetValue(f"{selected_text}=>")
             if self.translator_menu.IsChecked():
                 translated_text = self.translate(selected_text)
-                self.text_ADD.SetValue(f"{text}=>{translated_text}")
+                self.text_ADD.SetValue(f"{selected_text}=>{translated_text}")
             self.text_ADD.SetFocus()
             self.text_ADD.SetInsertionPointEnd()
         event.Skip()
 
     def textAdded(self, event):
         '''EVT_TEXT text.aADD'''
-        if self.text_ADD.IsModified():
-            self.textStyle(self.text_ADD, self.text_ADD.GetValue(), "GREY","","=>")
-            self.ok_btn.Enable()
-            self.cancel_btn.Enable()
+        self.textStyle(self.text_ADD, self.text_ADD.GetValue(), "GREY","","=>")
+        self.ok_btn.Enable()
+        self.cancel_btn.Enable()
         event.Skip()
         
     @staticmethod
