@@ -1165,18 +1165,14 @@ class MainWindow(ConverterFrame):
     def ChangeManualy(self, event):
         """"""
         text = self.Text_1.GetValue()
-        dlg = FindReplace(None, subtitles=list(srt.parse(text)))
-        result = dlg.ShowModal()
-        changed = dlg.getReplaced()
-        if result == True:
-            text = WORK_TEXT.getvalue()
-            self.Text_1.SetValue(text)
-            _positions = self.getPositions(text, changed)
-            self.highlight_parts(text=None, positions=_positions)
-            dlg.Destroy()
-        else:
-            dlg.Destroy()
+        frame = FindReplace(self, on_done=self.on_change_done, subtitles=list(srt.parse(text)))
+        frame.Show()
         event.Skip()
+        
+    def on_change_done(self, data_list, current_text):
+        self.Text_1.SetValue(current_text)
+        _positions = self.getPositions(current_text, data_list)
+        self.highlight_parts(text=None, positions=_positions)    
         
     def BindFindEvents(self, win):
         """Bind the find and replace events to the dialog."""
