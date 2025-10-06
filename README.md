@@ -3,7 +3,11 @@
 Program za obradu srt i txt fajlova.
 
 Check out PyQt version: [SubtitleConverter_PyQt](https://github.com/padovaSR/SubtitleConverter_PyQt)
-
+## New:
+U dijalogu interactive_replace dodat je translator:
+```sh
+python -m pip install googletrans
+```
 ## Requirements:
 * [Python](http://www.python.org/) version 3.11 or newer
 * [wxPython](https://wxpython.org/) version 4.2.1 or newer
@@ -26,4 +30,4 @@ pip install -r /path/to/requirements.txt
 ## Download Binaries
 
 * [GitHub Releases](https://github.com/padovaSR/subtitle-converter/releases)
-* [Last Windows build](https://github.com/padovaSR/subtitle-converter/releases/download/v0.6.2_a2/SubtitleConverter-v0.6.2_a2.zip)
+* [Last Windows build](https://github.com/padovaSR/subtitle-converter/releases/download/v0.6.2_a3/SubtitleConverter-v0.6.2_a3.zip)
