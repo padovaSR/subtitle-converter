@@ -18,11 +18,11 @@
         "cyr_ansi_srt": "cyr",
         "cyr_utf8_txt": "cyr_utf8",
         "cyr_utf8_srt": "cyr_utf8",
-        "lat_ansi_srt": "lat",
-        "lat_utf8_srt": "utf8",
-        "cleanup": "cln",
-        "transcribe": "changed",
-        "fixed_subs": "fixed",
+        "lat_ansi_srt": "",
+        "lat_utf8_srt": "",
+        "cleanup": "",
+        "transcribe": "",
+        "fixed_subs": "",
         "Cyr-ansi": "Cyr-ansi",
         "Cyr-utf8": "Cyr-utf8",
         "Lat-ansi": "Lat-ansi",
@@ -46,18 +46,18 @@
         "fixgap": true,
         "shrinkgap": true,
         "mingap": 62,
-        "maxgap": 430
+        "maxgap": 659
     },
     "CB_value": "auto",
     "FrameSize": {
-        "W": 750,
-        "H": 680
+        "W": 782,
+        "H": 679
     },
     "Renamer": {
-        "W": 1115,
-        "H": 856,
-        "splitter": 363,
-        "Selected": "C:\\Users\\darkstar\\Desktop\\test_1"
+        "W": 1153,
+        "H": 939,
+        "splitter": 410,
+        "Selected": "/home/darkstar/downloads/The.Better.Sister.S01.1080p.WEBRip.x265-KONTRAST"
     },
     "ChoiceDialog": {
         "W": 788,
@@ -78,17 +78,32 @@
     "MultiFiles": {
         "W": 1173,
         "H": 897,
-        "splitter": 403,
-        "Selected": "C:\\Users\\darkstar\\Desktop\\SUBS"
+        "splitter": 338,
+        "Selected": "/home/darkstar/Desktop/test-subs"
     },
     "Manually": {
-        "W": 721,
-        "H": 740,
-        "Selected": "dictionaries\\Dictionary-1.txt"
+        "W": 1005,
+        "H": 919,
+        "sash1": 167,
+        "sash2": 500,
+        "Translate": false,
+        "Source": "Engleski",
+        "Destination": "Srpski"
+    },
+    "FrameShortcuts": {
+        "Accept": "F1",
+        "Ignore": "F2",
+        "ReplaceAll": "Ctrl+3",
+        "IgnoreAll": "Ctrl+4",
+        "Apply": "Ctrl+5",
+        "Add": "Ctrl+6",
+        "Ok": "Ctrl+7",
+        "Cancel": "Ctrl+Q",
+        "Translate": "Ctrl+Shift+T"
     },
     "Zip_confirm": {
         "W": 647,
         "H": 543
     },
-    "Directory": "C:\\Users\\darkstar\\Desktop\\SUBS_1"
+    "Directory": "C:\\Users\\darkstar\\Desktop\\orig_DEV_CONVERTER_wx"
 }
