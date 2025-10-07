@@ -345,8 +345,8 @@ class FindReplace(wx.Frame):
                 self.text_1.AppendText(f"{t1[i]} ")
                 v = self.wdict[t1[i]]
                 newd[t1[i]] = v
+            self.txt2.SetValue(self.composeSub(sub))
             for k, v in newd.items():
-                self.txt2.SetValue(self.composeSub(sub))
                 if self.whole_word is True:
                     ctext = re.compile(r'\b'+k+r'\b')
                 else:
