@@ -47,6 +47,7 @@ class SubtitleFixer:
         pe_r = re.compile(r"^\s*(?<=.)| +$", re.M)
         cs_r = re.compile(r"(?<=\W\s)- +\b|^\s*- +", re.M)
         ct_r = re.compile(r"</*font.*?>", re.I)
+        commas = re.compile(r",([^\s])")
         sp_n = 0
 
         def apply_regex(text_in, RP, replace_with):
@@ -82,6 +83,7 @@ class SubtitleFixer:
                 logger.debug('Fixer: No subtitles found!')
 
         if cb6_s is True:
+            text = commas.sub(r", \1", text)
             text = apply_regex(text, spaceS_r, " ")
             text = apply_regex(text, pe_r, "")
 
