@@ -338,13 +338,10 @@ class FindReplace(wx.Frame):
         finally:
             self.text_3.SetValue(f"{'='*20}\nEnd of subtitles reached\n{'='*20}")
         try:
-            t1 = list(set(r1.findall(sub.content)))
-            newd = {}
+            t1 = set(r1.findall(sub.content))
             self.text_1.Clear()
-            for i in range(len(t1)):
-                self.text_1.AppendText(f"{t1[i]} ")
-                v = self.wdict[t1[i]]
-                newd[t1[i]] = v
+            self.text_1.AppendText(" ".join(t1) + " ")
+            newd = {w: self.wdict[w] for w in t1}
             self.txt2.SetValue(self.composeSub(sub))
             for k, v in newd.items():
                 if self.whole_word is True:
