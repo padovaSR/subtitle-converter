@@ -83,8 +83,10 @@ class FindReplace(wx.Frame):
         self.source = wx.Menu()
         self.english = self.source.AppendCheckItem(wx.ID_ANY, "Engleski")
         self.russian = self.source.AppendCheckItem(wx.ID_ANY, "Ruski")
-        self.slovenian = self.source.AppendCheckItem(wx.ID_ANY, "Slovenački")
-        self.macedonian = self.source.AppendCheckItem(wx.ID_ANY, "Makedonski")
+        self.slovenian_ = self.source.AppendCheckItem(wx.ID_ANY, "Slovenački")
+        self.macedonian_ = self.source.AppendCheckItem(wx.ID_ANY, "Makedonski")
+        self.croatian_ = self.source.AppendCheckItem(wx.ID_ANY, "Hrvatski")
+        self.bosnian = self.source.AppendCheckItem(wx.ID_ANY, "Bosanski")        
         self.source_item = self.preferences_menu.AppendSubMenu(self.source, "Source")
         
         self.destination = wx.Menu()
@@ -234,6 +236,7 @@ class FindReplace(wx.Frame):
         bottom_row = wx.BoxSizer(wx.HORIZONTAL)
 
         self.text_ADD = wx.TextCtrl(bottom_panel, style=wx.TE_PROCESS_ENTER | wx.TE_NOHIDESEL| wx.TE_RICH2)
+        self.text_ADD.SetMinSize((-1, 30))
         self.text_ADD.SetFont(font)
         bottom_row.Add(self.text_ADD, 1, wx.LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
         
@@ -308,8 +311,10 @@ class FindReplace(wx.Frame):
         # --- Bindings for single-check + settings update ---
         self.Bind(wx.EVT_MENU, self.onSourceSelect, self.english)
         self.Bind(wx.EVT_MENU, self.onSourceSelect, self.russian)
-        self.Bind(wx.EVT_MENU, self.onSourceSelect, self.slovenian)
-        self.Bind(wx.EVT_MENU, self.onSourceSelect, self.macedonian)
+        self.Bind(wx.EVT_MENU, self.onSourceSelect, self.slovenian_)
+        self.Bind(wx.EVT_MENU, self.onSourceSelect, self.macedonian_)
+        self.Bind(wx.EVT_MENU, self.onSourceSelect, self.croatian_)
+        self.Bind(wx.EVT_MENU, self.onSourceSelect, self.bosnian)        
         self.Bind(wx.EVT_MENU, self.onDestinationSelect, self.serbian)
         self.Bind(wx.EVT_MENU, self.onDestinationSelect, self.croatian)
         self.Bind(wx.EVT_MENU, self.onDestinationSelect, self.slovenian)
@@ -344,10 +349,7 @@ class FindReplace(wx.Frame):
             newd = {w: self.wdict[w] for w in t1}
             self.txt2.SetValue(self.composeSub(sub))
             for k, v in newd.items():
-                if self.whole_word is True:
-                    ctext = re.compile(r'\b'+k+r'\b')
-                else:
-                    ctext = re.compile(k)
+                ctext = re.compile(rf"\b{k}\b" if self.whole_word else k)
                 sub.content = ctext.sub(v, sub.content)
             self.text_3.SetValue(sub.content)
             self.text_3.SetFocus()
