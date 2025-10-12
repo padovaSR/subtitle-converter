@@ -348,6 +348,8 @@ class FindReplace(wx.Frame):
             self.text_1.AppendText(" ".join(t1) + " ")
             newd = {w: self.wdict[w] for w in t1}
             self.txt2.SetValue(self.composeSub(sub))
+            for v in self.new_d.values():
+                self.textStyle(self.text_2, self.text_2.GetValue(), "BLACK", "#C4F0C2", v)            
             for k, v in newd.items():
                 ctext = re.compile(rf"\b{k}\b" if self.whole_word else k)
                 sub.content = ctext.sub(v, sub.content)
@@ -360,8 +362,6 @@ class FindReplace(wx.Frame):
                 self.Replaced.append(changed)
                 for v in newd.values(): self.ReplacedAll.append(v)
                 self.new_d = newd
-            else:
-                self.text_2.AppendText(self.composeSub(sub))
             return c
         except Exception as e:
             logger.debug(f"Error: {e}")
@@ -411,8 +411,6 @@ class FindReplace(wx.Frame):
             c = self.getValues(self.subs)
             if c is None or not c:
                 break
-        for x in set(self.ReplacedAll):
-            self.textStyle(self.text_2, self.text_2.GetValue(), "RED", "YELLOW", x)
         self.text_3.SetInsertionPointEnd()
         self.text_2.SetFocus()
         self.text_3.SetFocus()
