@@ -45,7 +45,7 @@
         "linije": false,
         "fixgap": true,
         "shrinkgap": true,
-        "mingap": 62,
+        "mingap": 75,
         "maxgap": 659
     },
     "CB_value": "auto",
@@ -57,7 +57,7 @@
         "W": 1153,
         "H": 939,
         "splitter": 410,
-        "Selected": "/home/darkstar/downloads/The.Better.Sister.S01.1080p.WEBRip.x265-KONTRAST"
+        "Selected": "C:\\Users\\darkstar\\Desktop\\subs-test"
     },
     "ChoiceDialog": {
         "W": 788,
@@ -82,28 +82,31 @@
         "Selected": "/home/darkstar/Desktop/test-subs"
     },
     "Manually": {
-        "W": 1005,
-        "H": 919,
+        "W": 853,
+        "H": 779,
         "sash1": 167,
-        "sash2": 500,
-        "Translate": false,
-        "Source": "Engleski",
-        "Destination": "Srpski"
+        "sash2": 337,
+        "Translate": true,
+        "Source": "Hrvatski",
+        "Destination": "Srpski",
+        "Auto_replace": false
     },
     "FrameShortcuts": {
         "Accept": "F1",
         "Ignore": "F2",
         "ReplaceAll": "Ctrl+3",
         "IgnoreAll": "Ctrl+4",
-        "Apply": "Ctrl+5",
         "Add": "Ctrl+6",
-        "Ok": "Ctrl+7",
+        "Ok": "Ctrl+1",
         "Cancel": "Ctrl+Q",
-        "Translate": "Ctrl+Shift+T"
+        "Translate": "Ctrl+Shift+T",
+        "Replace": "Ctrl+7",
+        "Skip": "Ctrl+9",
+        "Next": "Ctrl+8"
     },
     "Zip_confirm": {
         "W": 647,
         "H": 543
     },
-    "Directory": "C:\\Users\\darkstar\\Desktop\\orig_DEV_CONVERTER_wx"
+    "Directory": "C:\\Users\\darkstar\\Desktop"
 }
