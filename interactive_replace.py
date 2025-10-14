@@ -465,7 +465,8 @@ class FindReplace(wx.Frame):
     def next_subtitle(self, event=None):
         """next_btn event"""
         self.matches.clear()
-        
+        if not self.wdict:
+            return
         if self.sub and getattr(self.sub, "content", "").strip():
             if getattr(self, "replaced_text", True):
                 self.text_2.AppendText(self.composeSub(self.sub))
@@ -570,6 +571,12 @@ class FindReplace(wx.Frame):
         self.wdict = Dictionaries().dict_fromFile(self.dname, "=>")
         self.subs = srt.parse(self.default_subs)
         self.wdict = self.clearDict(self.wdict, srt.compose(self.subs, reindex=False))
+        if not self.wdict:
+            wx.MessageBox(
+                "ValueError\n\nU rečniku nema podudaranja\nPromenite rečnik",
+                "Dictionary change",
+            )
+            return
         self.text_2.Clear()
         self.Replaced.clear()
         if self.auto_menu.IsChecked():
