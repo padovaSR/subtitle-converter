@@ -395,35 +395,32 @@ class FindReplace(wx.Frame):
         match = self.matches.pop(0)
         key = match["key"]
         value = match["value"]
-    
+        self.ReplacedAll.append(value)
         if self.whole_word:
             pattern = re.compile(rf'\b{re.escape(key)}\b')
         else:
             pattern = re.compile(re.escape(key))
-    
         m = pattern.search(content)
         if not m:
             return
-    
         start, end = m.start(), m.end()
-    
         new_content = content[:start] + value + content[end:]
         self.text_3.SetValue(new_content)
         self.text_3.SetFocus()
         for val in self.new_d.values():
             self.textStyle(self.text_3, new_content, "RED", "", val)
-            
         # Adjust match positions
         delta = len(value) - (end - start)
         for m in self.matches:
             if m["start"] > end:
                 m["start"] += delta
                 m["end"] += delta        
-        
-        self.update_matches_from_content(new_content)            
-        self.replaced_text = True
-        self.sub.content = new_content
-        self.sub = Subtitle(self.sub.index, self.sub.start, self.sub.end, new_content)
+        if self.matches:
+            self.update_matches_from_content(new_content)            
+        else:
+            self.replaced_text = True
+            self.sub.content = new_content
+            self.sub = Subtitle(self.sub.index, self.sub.start, self.sub.end, new_content)
             
     def update_matches_from_content(self, content):
         """Rebuild self.matches for remaining keys in new_d."""
@@ -462,6 +459,7 @@ class FindReplace(wx.Frame):
                 self.replaced_text = False
             for v in self.new_d.values():
                 self.textStyle(self.text_2, self.text_2.GetValue(), "BLACK", "#C4F0C2", v)
+            self.Replaced.append(self.sub)
         self.getValues(self.subs)
         self.text_3.SetFocus()
         
