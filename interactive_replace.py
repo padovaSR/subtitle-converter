@@ -379,10 +379,22 @@ class FindReplace(wx.Frame):
         if self.auto_menu.IsChecked():
             return
         
+        def get_text_differences(old, new):
+            """Return list of new words manually added or changed."""
+            old_set = set(old.split())
+            new_set = set(new.split())
+            return list(new_set - old_set)        
+        
         current_text = self.text_3.GetValue().strip()
-        if current_text != self.sub.content:
+        original_text = self.sub.content.strip()
+        if current_text != original_text:
+            self.replaced_text = True
             self.sub.content = current_text
             self.replaced_text = True
+            diff_words = get_text_differences(original_text, current_text)
+            for w in diff_words:
+                if w not in self.ReplacedAll:
+                    self.ReplacedAll.append(w)
         event.Skip()
         
     def replace_selected(self, event=None):
@@ -453,13 +465,14 @@ class FindReplace(wx.Frame):
     def next_subtitle(self, event=None):
         """next_btn event"""
         self.matches.clear()
+        
         if self.sub and getattr(self.sub, "content", "").strip():
             if getattr(self, "replaced_text", True):
                 self.text_2.AppendText(self.composeSub(self.sub))
                 self.replaced_text = False
-            for v in self.new_d.values():
-                self.textStyle(self.text_2, self.text_2.GetValue(), "BLACK", "#C4F0C2", v)
-            self.Replaced.append(self.sub)
+                for v in self.new_d.values():
+                    self.textStyle(self.text_2, self.text_2.GetValue(), "BLACK", "#C4F0C2", v)
+                self.Replaced.append(self.sub)
         self.getValues(self.subs)
         self.text_3.SetFocus()
         
