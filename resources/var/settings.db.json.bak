@@ -82,10 +82,10 @@
         "Selected": "/home/darkstar/Desktop/test-subs"
     },
     "Manually": {
-        "W": 853,
-        "H": 779,
-        "sash1": 167,
-        "sash2": 337,
+        "W": 902,
+        "H": 845,
+        "sash1": 150,
+        "sash2": 424,
         "Translate": true,
         "Source": "Hrvatski",
         "Destination": "Srpski",
