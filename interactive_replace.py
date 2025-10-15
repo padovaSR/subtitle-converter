@@ -4,6 +4,7 @@
 import glob
 import os
 from os.path import join
+import itertools
 import re
 import srt
 from srt import Subtitle
@@ -368,6 +369,7 @@ class FindReplace(wx.Frame):
         self.matches = []
         self.sub = None
         self.replaced_text = False
+        self._empty_iter_clicks = 0
         
         self.getValues(self.subs)
     
@@ -429,7 +431,6 @@ class FindReplace(wx.Frame):
                 m["end"] += delta        
         if self.matches:
             self.update_matches_from_content(new_content)            
-        else:
             self.replaced_text = True
             self.sub.content = new_content
             self.sub = Subtitle(self.sub.index, self.sub.start, self.sub.end, new_content)
@@ -463,9 +464,24 @@ class FindReplace(wx.Frame):
             self.next_subtitle()
     
     def next_subtitle(self, event=None):
-        """next_btn event"""
+        if not hasattr(self, "_empty_iter_clicks"):
+            self._empty_iter_clicks = 0
         self.matches.clear()
         if not self.wdict:
+            return
+        try:
+            peek = next(self.subs)
+            self.subs = itertools.chain([peek], self.subs)
+            self._empty_iter_clicks = 0  # reset if not empty
+        except StopIteration:
+            self._empty_iter_clicks += 1
+            if self._empty_iter_clicks == 3:
+                wx.MessageBox(
+                    "ValueError\n\nTitl je iscrpljen",
+                    "Info",
+                    wx.OK | wx.ICON_INFORMATION
+                )
+                self._empty_iter_clicks = 0
             return
         if self.sub and getattr(self.sub, "content", "").strip():
             if getattr(self, "replaced_text", True):
