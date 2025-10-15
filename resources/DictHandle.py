@@ -64,11 +64,13 @@ class Dictionaries:
         with open(text_in, 'r', encoding='utf-8') as dict_file:
             new_dict = {}
             for line in dict_file:
-                x = line.strip().split(delimiter)
+                if not delimiter in line:
+                    continue                
                 if not line:
                     continue
                 if line.startswith('#'):
-                    continue
+                    continue                
+                x = line.strip().split(delimiter)
                 if not x[0]:
                     continue
                 key = x[0].strip()
