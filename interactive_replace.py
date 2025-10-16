@@ -395,7 +395,7 @@ class FindReplace(wx.Frame):
             self.replaced_text = True
             diff_words = get_text_differences(original_text, current_text)
             for w in diff_words:
-                if w not in self.ReplacedAll:
+                if w not in self.ReplacedAll and w in self.wdict:
                     self.ReplacedAll.append(w)
         event.Skip()
         
