@@ -429,11 +429,10 @@ class FindReplace(wx.Frame):
             if m["start"] > end:
                 m["start"] += delta
                 m["end"] += delta        
-        if self.matches:
-            self.update_matches_from_content(new_content)            
-            self.replaced_text = True
-            self.sub.content = new_content
-            self.sub = Subtitle(self.sub.index, self.sub.start, self.sub.end, new_content)
+        self.update_matches_from_content(new_content)            
+        self.replaced_text = True
+        self.sub.content = new_content
+        self.sub = Subtitle(self.sub.index, self.sub.start, self.sub.end, new_content)
             
     def update_matches_from_content(self, content):
         """Rebuild self.matches for remaining keys in new_d."""
@@ -567,9 +566,10 @@ class FindReplace(wx.Frame):
                     self.new_d = newd
                     self.text_3.SetFocus()
                 else:
-                    self.getValues(iterator=self.subs)
-                    self.text_3.SetValue(self.sub.content)
-                    self.text_3.SetFocus()
+                    c = self.getValues(iterator=self.subs)
+                    if c is not None:
+                        self.text_3.SetValue(self.sub.content)
+                        self.text_3.SetFocus()
             return c
         except Exception as e:
             logger.debug(f"Error: {e}")
