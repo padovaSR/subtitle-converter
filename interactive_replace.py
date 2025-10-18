@@ -591,14 +591,15 @@ class FindReplace(wx.Frame):
         choice = self.dict_choice.GetStringSelection()
         self.dname = self.file_map[choice]        
         self.wdict = Dictionaries().dict_fromFile(self.dname, "=>")
+        self.default_subs = self.GetText()
+        self.subs = srt.parse(self.default_subs)        
+        self.wdict = self.clearDict(self.wdict, srt.compose(self.subs))
         if not self.wdict:
             wx.MessageBox(
                 "ValueError\n\nU rečniku nema podudaranja\nPromenite rečnik",
                 "Dictionary change",
             )
             return
-        self.default_subs = self.GetText()
-        self.subs = srt.parse(self.default_subs)        
         if self.auto_menu.IsChecked():
             self.onReplace(event)
         else:
