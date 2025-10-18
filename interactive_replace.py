@@ -395,7 +395,7 @@ class FindReplace(wx.Frame):
             self.replaced_text = True
             diff_words = get_text_differences(original_text, current_text)
             for w in diff_words:
-                if w not in self.ReplacedAll and len(w) >= 4:
+                if w not in self.ReplacedAll and len(w) >= 5:
                     self.ReplacedAll.append(w)
         event.Skip()
         
@@ -591,17 +591,18 @@ class FindReplace(wx.Frame):
         choice = self.dict_choice.GetStringSelection()
         self.dname = self.file_map[choice]        
         self.wdict = Dictionaries().dict_fromFile(self.dname, "=>")
-        self.subs = srt.parse(self.default_subs)
-        self.wdict = self.clearDict(self.wdict, srt.compose(self.subs, reindex=False))
-        self.skip_selected()
         if not self.wdict:
             wx.MessageBox(
                 "ValueError\n\nU rečniku nema podudaranja\nPromenite rečnik",
                 "Dictionary change",
             )
             return
+        self.default_subs = self.GetText()
+        self.subs = srt.parse(self.default_subs)        
         if self.auto_menu.IsChecked():
             self.onReplace(event)
+        else:
+            self.next_subtitle()
         event.Skip()
 
     def textStyle(self, tctrl, text, st1, st2, w=r""):
@@ -906,11 +907,13 @@ class FindReplace(wx.Frame):
     
     def onOK(self, event):
         """"""
-        self.data_list = self.ReplacedAll
+        self.data_list = list(
+            dict.fromkeys(w for w in self.ReplacedAll if w.strip() and len(w) > 4)
+        )
         current_text = self.GetText()
         self.writeSettings()
         if self.on_done:
-            self.on_done(self.data_list, current_text)        
+            self.on_done(self.data_list, current_text)
         self.Destroy()
         event.Skip()    
         
