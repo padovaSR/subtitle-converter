@@ -395,7 +395,7 @@ class FindReplace(wx.Frame):
             self.replaced_text = True
             diff_words = get_text_differences(original_text, current_text)
             for w in diff_words:
-                if w not in self.ReplacedAll and w in self.wdict:
+                if w not in self.ReplacedAll and len(w) >= 4:
                     self.ReplacedAll.append(w)
         event.Skip()
         
@@ -510,7 +510,7 @@ class FindReplace(wx.Frame):
             self.sub = next(iterator)
             c += 1
         except StopIteration as e:
-            logger.debug(e)
+            if e: logger.debug(e)
             self.text_3.SetValue(self.sub.content)
             wx.MessageBox(
                 "InfoMessage\n\nEnd of subtitles reached",
