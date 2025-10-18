@@ -510,8 +510,14 @@ class FindReplace(wx.Frame):
             self.sub = next(iterator)
             c += 1
         except StopIteration as e:
-            logger.debug(f"Iterator: {e}")
-            self.text_3.SetValue(f"{'='*20}\nEnd of subtitles reached\n{'='*20}")
+            logger.debug(e)
+            self.text_3.SetValue(self.sub.content)
+            wx.MessageBox(
+                "InfoMessage\n\nEnd of subtitles reached",
+                "Info",
+                wx.OK | wx.ICON_INFORMATION
+            )
+            return
         try:
             if self.whole_word is False:
                 r1 = re.compile(r"("+"|".join(map(re.escape, self.wdict.keys()))+r")")
@@ -587,14 +593,13 @@ class FindReplace(wx.Frame):
         self.wdict = Dictionaries().dict_fromFile(self.dname, "=>")
         self.subs = srt.parse(self.default_subs)
         self.wdict = self.clearDict(self.wdict, srt.compose(self.subs, reindex=False))
+        self.skip_selected()
         if not self.wdict:
             wx.MessageBox(
                 "ValueError\n\nU rečniku nema podudaranja\nPromenite rečnik",
                 "Dictionary change",
             )
             return
-        self.text_2.Clear()
-        self.Replaced.clear()
         if self.auto_menu.IsChecked():
             self.onReplace(event)
         event.Skip()
