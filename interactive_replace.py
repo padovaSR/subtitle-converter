@@ -142,7 +142,11 @@ class FindReplace(wx.Frame):
         # choices for display
         choices = list(self.file_map.keys())        
         self.dict_choice = wx.Choice(top_panel, choices=choices)
-        self.dict_choice.SetSelection(choices.index("Dictionary-1.txt"))
+        try:
+            dict_selected = choices.index("Dictionary-1.txt")
+        except:
+            dict_selected = 0        
+        self.dict_choice.SetSelection(dict_selected)
         choice = self.dict_choice.GetStringSelection()
         self.dname = self.file_map[choice]                
         
@@ -476,7 +480,7 @@ class FindReplace(wx.Frame):
             self._empty_iter_clicks += 1
             if self._empty_iter_clicks == 3:
                 wx.MessageBox(
-                    "ValueError\n\nTitl je iscrpljen",
+                    f"{os.path.basename(self.dname)}\n\nTitl je iscrpljen",
                     "Info",
                     wx.OK | wx.ICON_INFORMATION
                 )
@@ -519,10 +523,11 @@ class FindReplace(wx.Frame):
             )
             return
         try:
+            keys_sorted = sorted(self.wdict.keys(), key=len, reverse=True)
             if self.whole_word is False:
-                r1 = re.compile(r"("+"|".join(map(re.escape, self.wdict.keys()))+r")")
+                r1 = re.compile(r"("+"|".join(map(re.escape, keys_sorted))+r")")
             else:
-                r1 = re.compile(r"\b("+"|".join(map(re.escape, self.wdict.keys()))+r")\b")            
+                r1 = re.compile(r"\b("+"|".join(map(re.escape, keys_sorted))+r")\b")            
             t1 = set(r1.findall(self.sub.content))
             self.text_1.Clear()
             for key in t1:
