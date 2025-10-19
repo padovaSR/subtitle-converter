@@ -513,15 +513,15 @@ class FindReplace(wx.Frame):
         try:
             self.sub = next(iterator)
             c += 1
-        except StopIteration as e:
-            if e: logger.debug(e)
+        except StopIteration:
             self.text_3.SetValue(self.sub.content)
-            wx.MessageBox(
-                "InfoMessage\n\nEnd of subtitles reached",
-                "Info",
-                wx.OK | wx.ICON_INFORMATION
-            )
-            return
+            if not self.auto_menu.IsChecked():
+                wx.MessageBox(
+                    "InfoMessage\n\nEnd of subtitles reached",
+                    "Info",
+                    wx.OK | wx.ICON_INFORMATION
+                )
+                return
         try:
             keys_sorted = sorted(self.wdict.keys(), key=len, reverse=True)
             if self.whole_word is False:
@@ -557,6 +557,8 @@ class FindReplace(wx.Frame):
                     for v in newd.values():
                         self.ReplacedAll.append(v)
                     self.new_d = newd
+                else:
+                    self.text_3.SetValue(self.sub.content)                    
             if not self.auto_menu.IsChecked():
                 #if not newd: self.text_3.Clear()
                 for k, v in newd.items():
