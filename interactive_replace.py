@@ -373,7 +373,7 @@ class FindReplace(wx.Frame):
         self.matches = []
         self.sub = None
         self.replaced_text = False
-        self._empty_iter_clicks = 0
+        self._empty_iter_try = 0
         
         self.getValues(self.subs)
     
@@ -465,27 +465,27 @@ class FindReplace(wx.Frame):
         else:
             self.sub = None
             self.next_subtitle()
+            
+    @staticmethod
+    def info_message(message=None):
+        """"""
+        wx.MessageBox(message, "Information", wx.OK|wx.ICON_INFORMATION)            
     
     def next_subtitle(self, event=None):
-        if not hasattr(self, "_empty_iter_clicks"):
-            self._empty_iter_clicks = 0
+        if not hasattr(self, "_empty_iter_try"):
+            self._empty_iter_try = 0
         self.matches.clear()
         if not self.wdict:
             return
         try:
             peek = next(self.subs)
             self.subs = itertools.chain([peek], self.subs)
-            self._empty_iter_clicks = 0  # reset if not empty
+            self._empty_iter_try = 0  # reset if not empty
         except StopIteration:
-            self._empty_iter_clicks += 1
-            if self._empty_iter_clicks == 3:
-                wx.MessageBox(
-                    f"{os.path.basename(self.dname)}\n\nTitl je iscrpljen",
-                    "Info",
-                    wx.OK | wx.ICON_INFORMATION
-                )
-                self._empty_iter_clicks = 0
-            return
+            self._empty_iter_try += 1
+            if self._empty_iter_try == 3:
+                self.info_message(f"{os.path.basename(self.dname)}\n\nTitl je iscrpljen")
+                return
         if self.sub and getattr(self.sub, "content", "").strip():
             if getattr(self, "replaced_text", True):
                 self.text_2.AppendText(self.composeSub(self.sub))
@@ -514,13 +514,9 @@ class FindReplace(wx.Frame):
             self.sub = next(iterator)
             c += 1
         except StopIteration:
-            self.text_3.SetValue(self.sub.content)
             if not self.auto_menu.IsChecked():
-                wx.MessageBox(
-                    "InfoMessage\n\nEnd of subtitles reached",
-                    "Info",
-                    wx.OK | wx.ICON_INFORMATION
-                )
+                self.text_3.SetValue(self.sub.content)
+                self.info_message("InfoMessage\n\nEnd of subtitles reached")
                 return
         try:
             keys_sorted = sorted(self.wdict.keys(), key=len, reverse=True)
@@ -540,7 +536,6 @@ class FindReplace(wx.Frame):
             newd = {w: self.wdict[w] for w in t1}            
             self.txt2.SetValue(self.composeSub(self.sub))
             if self.auto_menu.IsChecked():
-                #if not newd: self.text_3.Clear()
                 self.txt2.SetValue(self.composeSub(self.sub))
                 for v in self.new_d.values():
                     self.textStyle(self.text_2, self.text_2.GetValue(), "BLACK", "#C4F0C2", v)                
@@ -560,7 +555,6 @@ class FindReplace(wx.Frame):
                 else:
                     self.text_3.SetValue(self.sub.content)                    
             if not self.auto_menu.IsChecked():
-                #if not newd: self.text_3.Clear()
                 for k, v in newd.items():
                     pattern = re.compile(rf'\b{k}\b' if self.whole_word else k)
                     for m in re.finditer(pattern, self.sub.content):
@@ -629,10 +623,14 @@ class FindReplace(wx.Frame):
             while not self.Replaced:
                 c = self.getValues(self.subs)
                 if c is None or not c:
+                    self._empty_iter_try += 1
                     break
         self.text_3.SetInsertionPointEnd()
         self.text_2.SetFocus()
         self.text_3.SetFocus()
+        if self._empty_iter_try > 2 and not self.Replaced:
+            self.info_message("InfoMessage\n\nEnd of subtitles reached")
+            return        
         event.Skip()
             
     def replaceCurrent(self):
