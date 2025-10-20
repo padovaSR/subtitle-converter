@@ -47,7 +47,7 @@ class SubtitleFixer:
         pe_r = re.compile(r"^\s*(?<=.)| +$", re.M)
         cs_r = re.compile(r"(?<=\W\s)- +\b|^\s*- +", re.M)
         ct_r = re.compile(r"</*font.*?>", re.I)
-        commas = re.compile(r"(,|\.)([^\s\d<])")
+        commas = re.compile(r"(?<!www)(,|\.)(?!com|net|org|rs|info|io)([^\s\d<?.])")
         sp_n = 0
 
         def apply_regex(text_in, RP, replace_with):
