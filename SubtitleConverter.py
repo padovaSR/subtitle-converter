@@ -1278,6 +1278,11 @@ class MainWindow(ConverterFrame):
                 self.Text_1.DeleteSelectedContent()
                 self.Text_1.WriteText(replace_string)
                 start_pos = found_pos + len(replace_string)
+            wx.MessageBox(
+                f"Replaced all occurrences of '{find_string}' with '{replace_string}'",
+                "Info",
+                wx.OK | wx.ICON_INFORMATION,
+            )
 
     def OnFindClose(self, event):
         """Close the find dialog when the user finishes."""
