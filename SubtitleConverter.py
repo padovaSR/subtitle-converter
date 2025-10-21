@@ -335,7 +335,7 @@ class MainWindow(ConverterFrame):
         else:
             parts_start = positions[0]
             parts_end = positions[1]
-        
+            
         # Internal index and processing function inside highlight_parts
         def process_next_error(current_index):
             if current_index < len(parts_start):
@@ -1095,17 +1095,10 @@ class MainWindow(ConverterFrame):
         logfile.close()
 
     def removeTmpFiles(self):
-        # Set the directory and number of files to keep
         directory = 'tmp'
         num_files_to_keep = 20
-
-        # Get the list of files in the directory
         files = os.listdir(directory)
-
-        # Sort the files by their creation time
         files.sort(key=lambda x: os.path.getctime(os.path.join(directory, x)))
-
-        # Delete all the older files
         for file in files[:-num_files_to_keep]:
             os.remove(os.path.join(directory, file))
             
@@ -1115,7 +1108,6 @@ class MainWindow(ConverterFrame):
         if newAccel == "Disabled":
             newAccel = ""
         self.sc[shortcut.label] = newAccel
-
         event.Skip()
 
     def editShortcuts(self, event):
@@ -1247,15 +1239,14 @@ class MainWindow(ConverterFrame):
 
         elif event_name == "REPLACE":
             selection_start, selection_end = self.Text_1.GetSelectionRange().Get()
-
             selected_text = self.Text_1.GetStringSelection()
-
-            if selected_text == find_string:
-                # Delete the selected content and write the new string in its place, maintaining style
+            
+            # Case-insensitive check
+            if (flags & wx.FR_MATCHCASE and selected_text == find_string) or (
+                not (flags & wx.FR_MATCHCASE) and selected_text.lower() == find_string.lower()
+            ):
                 self.Text_1.DeleteSelectedContent()
                 self.Text_1.WriteText(replace_string)
-
-                # Move the insertion point after the replacement
                 self.Text_1.SetInsertionPoint(selection_start + len(replace_string))
             else:
                 wx.MessageBox(
@@ -1263,41 +1254,30 @@ class MainWindow(ConverterFrame):
                     "Error",
                     wx.OK | wx.ICON_ERROR,
                 )
-
+        
         elif event_name == "REPLACE_ALL":
             start_pos = 0
-
             while start_pos < len(text):
-                found_pos = text.find(find_string, start_pos)
-
+                # always search in lowercase when Match Case is off
+                search_text = text if (flags & wx.FR_MATCHCASE) else text.lower()
+                search_term = find_string if (flags & wx.FR_MATCHCASE) else find_string.lower()
+        
+                found_pos = search_text.find(search_term, start_pos)
                 if found_pos == -1:
                     break
-
+        
                 if flags & wx.FR_WHOLEWORD:
                     before = found_pos - 1
                     after = found_pos + len(find_string)
-
                     if (before >= 0 and text[before].isalnum()) or (
-                        after < len(text) and text[after].isalnum()
-                    ):
+                        after < len(text) and text[after].isalnum()):
                         start_pos = after
                         continue
-
-                # Select the text to be replaced
+        
                 self.Text_1.SetSelection(found_pos, found_pos + len(find_string))
-
-                # Delete the selected content and write the new string, maintaining style
                 self.Text_1.DeleteSelectedContent()
                 self.Text_1.WriteText(replace_string)
-
-                # Move the search position forward after replacement
                 start_pos = found_pos + len(replace_string)
-
-            wx.MessageBox(
-                f"Replaced all occurrences of '{find_string}' with '{replace_string}'",
-                "Info",
-                wx.OK | wx.ICON_INFORMATION,
-            )
 
     def OnFindClose(self, event):
         """Close the find dialog when the user finishes."""
