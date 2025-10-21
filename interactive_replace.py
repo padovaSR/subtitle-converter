@@ -519,12 +519,13 @@ class FindReplace(wx.Frame):
                 self.info_message("InfoMessage\n\nEnd of subtitles reached")
                 return
         try:
+            [self.wdict.pop(k, None) for k in self.Ignored]
             keys_sorted = sorted(self.wdict.keys(), key=len, reverse=True)
             if self.whole_word is False:
                 r1 = re.compile(r"("+"|".join(map(re.escape, keys_sorted))+r")")
             else:
                 r1 = re.compile(r"\b("+"|".join(map(re.escape, keys_sorted))+r")\b")            
-            t1 = set(r1.findall(self.sub.content))
+            t1 = r1.findall(self.sub.content)
             self.text_1.Clear()
             for key in t1:
                 self.text_1.SetDefaultStyle(wx.TextAttr(wx.BLUE)) # default
@@ -672,7 +673,10 @@ class FindReplace(wx.Frame):
                 self.ReplacedAll.append(v)
                 self.wdict.pop(k)
             self.subs = srt.parse(wsubs)
-            self.onReplace(event)
+            if self.auto_menu.IsChecked():
+                self.onReplace(event)
+            else:
+                self.replace_selected()        
         except Exception as e:
             logger.debug(f"Error: {e}")
         event.Skip()
@@ -688,11 +692,13 @@ class FindReplace(wx.Frame):
                 key = line.split(":", 1)[0].strip()
                 self.Ignored.append(key)
             for k in set(self.Ignored):
-                self.wdict.pop(k)
-        except (KeyError, Exception) as e:
+                self.wdict.pop(k, None)
+        except Exception as e:
             logger.debug(f"IgnoreAll: {e}")
-        self.Replaced.clear()
-        self.onReplace(event)        
+        if self.auto_menu.IsChecked():
+            self.onReplace(event)
+        else:
+            self.next_subtitle()        
         event.Skip()
     
     def clearDict(self, _dict, _subs):
