@@ -1257,8 +1257,9 @@ class MainWindow(ConverterFrame):
         
         elif event_name == "REPLACE_ALL":
             start_pos = 0
+            replace_count = 0  # Counter for replacements
+        
             while start_pos < len(text):
-                # always search in lowercase when Match Case is off
                 search_text = text if (flags & wx.FR_MATCHCASE) else text.lower()
                 search_term = find_string if (flags & wx.FR_MATCHCASE) else find_string.lower()
         
@@ -1270,16 +1271,23 @@ class MainWindow(ConverterFrame):
                     before = found_pos - 1
                     after = found_pos + len(find_string)
                     if (before >= 0 and text[before].isalnum()) or (
-                        after < len(text) and text[after].isalnum()):
+                        after < len(text) and text[after].isalnum()
+                    ):
                         start_pos = after
                         continue
         
                 self.Text_1.SetSelection(found_pos, found_pos + len(find_string))
                 self.Text_1.DeleteSelectedContent()
                 self.Text_1.WriteText(replace_string)
+        
+                replace_count += 1
                 start_pos = found_pos + len(replace_string)
+        
+                text = self.Text_1.GetValue()
+        
             wx.MessageBox(
-                f"Replaced all occurrences of '{find_string}' with '{replace_string}'",
+                f"Replaced {replace_count} occurrence{'s' if replace_count != 1 else ''} "
+                f"of '{find_string}' with '{replace_string}'.",
                 "Info",
                 wx.OK | wx.ICON_INFORMATION,
             )
