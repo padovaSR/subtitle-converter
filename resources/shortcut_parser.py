@@ -50,6 +50,8 @@ def update_accelerators(self):
 
     # Map shortcut names to menu objects
     shortcut_map = {
+        "Undo": self.undo_menu,
+        "Redo": self.redo_menu,        
         "Accept": self.accept_menu,
         "Ignore": self.ignore_menu,
         "ReplaceAll": self.replaceall_menu,
