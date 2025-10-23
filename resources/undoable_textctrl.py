@@ -12,9 +12,12 @@ class UndoableTextCtrl(wx.TextCtrl):
 
     def on_text(self, event):
         """Save the previous value to the undo stack whenever text changes."""
-        if not hasattr(self, "_block"):  # prevent recursion
-            self.undo_stack.append(self.GetValue())
-            self.redo_stack.clear()
+        if not hasattr(self, "_block"):
+            value = self.GetValue()
+            if not hasattr(self, "_last_value") or value != self._last_value:
+                self.undo_stack.append(value)
+                self._last_value = value
+                self.redo_stack.clear()
         event.Skip()
 
     def undo(self):
