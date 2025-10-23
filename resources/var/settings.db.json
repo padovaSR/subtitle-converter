@@ -92,6 +92,8 @@
         "Auto_replace": false
     },
     "FrameShortcuts": {
+		"Undo": "Ctrl+Z",
+		"Redo": "Ctrl+X",
         "Accept": "F1",
         "Ignore": "F2",
         "ReplaceAll": "Ctrl+3",
@@ -108,5 +110,5 @@
         "W": 647,
         "H": 543
     },
-    "Directory": "C:\\Users\\darkstar\\Desktop"
+    "Directory": "C:\\Users\\darkstar\\Desktop\\DEV_CONVERTER_wx"
 }
