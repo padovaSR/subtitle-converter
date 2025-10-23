@@ -13,6 +13,7 @@ from resources.DictHandle import Dictionaries
 from resources.transliterate import cyr_to_lat
 from resources.translate_text import translate_sync, lang_dict
 from resources.shortcut_parser import update_accelerators
+from resources.undoable_textctrl import UndoableTextCtrl
 from settings import I_PATH, MAIN_SETTINGS
 
 try:
@@ -62,12 +63,13 @@ class FindReplace(wx.Frame):
         # --- Edit menu ---
         self.edit_menu = wx.Menu()
         sKey = MAIN_SETTINGS["FrameShortcuts"]
-
+        self.undo_menu = self.edit_menu.Append(wx.ID_ANY, f"Undo\t{sKey["Undo"]}")
+        self.redo_menu = self.edit_menu.Append(wx.ID_ANY, f"Redo\t{sKey["Redo"]}")
+        self.edit_menu.AppendSeparator()
         self.accept_menu = self.edit_menu.Append(wx.ID_ANY, f"Accept\t{sKey["Accept"]}")
         self.ignore_menu = self.edit_menu.Append(wx.ID_ANY, f"Ignore\t{sKey["Ignore"]}")
         self.replaceall_menu = self.edit_menu.Append(wx.ID_ANY, f"ReplaceAll\t{sKey["ReplaceAll"]}")
         self.ignoreall_menu = self.edit_menu.Append(wx.ID_ANY, f"IgnoreAll\t{sKey["IgnoreAll"]}")
-        #self.apply_menu = self.edit_menu.Append(wx.ID_ANY, f"Apply\t{sKey["Apply"]}")
         self.add_menu = self.edit_menu.Append(wx.ID_ANY, f"Add\t{sKey["Add"]}")
         self.ok_menu = self.edit_menu.Append(wx.ID_ANY, f"Ok\t{sKey["Ok"]}")
         self.cancel_menu = self.edit_menu.Append(wx.ID_ANY, f"Cancel\t{sKey["Cancel"]}")
@@ -250,8 +252,7 @@ class FindReplace(wx.Frame):
         bottom_vsizer = wx.BoxSizer(wx.VERTICAL)
 
         # Upper: multiline text
-        self.text_3 = wx.TextCtrl(bottom_panel,
-                                  style=wx.TE_MULTILINE|wx.TE_CENTER|wx.TE_NO_VSCROLL|wx.TE_NOHIDESEL|wx.TE_RICH2)
+        self.text_3 = UndoableTextCtrl(bottom_panel, wx.ID_ANY, style=wx.TE_WORDWRAP)
         t_font3 = wx.Font(
             int(tFont["fontSize2"]),
             wx.FONTFAMILY_DEFAULT,
@@ -339,6 +340,8 @@ class FindReplace(wx.Frame):
         self.text_3.Bind(wx.EVT_LEFT_UP, self.on_selection_change)
         self.text_3.Bind(wx.EVT_KEY_UP, self.on_selection_change)
         self.text_3.Bind(wx.EVT_TEXT, self.on_selection_change)
+        self.Bind(wx.EVT_MENU, lambda e: self.text_3.undo(), self.undo_menu)
+        self.Bind(wx.EVT_MENU, lambda e: self.text_3.redo(), self.redo_menu)        
         # --- Manual mode ---
         self.replace_btn.Bind(wx.EVT_BUTTON, self.replace_selected)
         self.skip_btn.Bind(wx.EVT_BUTTON, self.skip_selected)
