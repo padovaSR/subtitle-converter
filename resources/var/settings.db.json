@@ -92,8 +92,8 @@
         "Auto_replace": false
     },
     "FrameShortcuts": {
-		"Undo": "Ctrl+Z",
-		"Redo": "Ctrl+X",
+        "Undo": "Ctrl+Z",
+        "Redo": "Ctrl+X",
         "Accept": "F1",
         "Ignore": "F2",
         "ReplaceAll": "Ctrl+3",
