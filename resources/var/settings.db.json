@@ -93,7 +93,7 @@
     },
     "FrameShortcuts": {
         "Undo": "Ctrl+Z",
-        "Redo": "Ctrl+X",
+        "Redo": "Ctrl+Y",
         "Accept": "F1",
         "Ignore": "F2",
         "ReplaceAll": "Ctrl+3",
