@@ -3,19 +3,20 @@
 
 import glob
 import os
-from os.path import join
-import itertools
+from os.path import join, basename, splitext
 import re
 import srt
 from srt import Subtitle
+import shutil
 from collections import defaultdict 
 from resources.DictHandle import Dictionaries
 from resources.transliterate import cyr_to_lat
 from resources.translate_text import translate_sync, lang_dict
 from resources.shortcut_parser import update_accelerators
 from resources.undoable_textctrl import UndoableTextCtrl
+from resources.subtitles_model import SubtitlesModel
 from settings import I_PATH, MAIN_SETTINGS
-
+import itertools
 try:
     from agw import shortcuteditor as SE
 except ImportError: 
@@ -25,6 +26,7 @@ import logging.config
 
 
 import wx
+import wx.dataview as dv
 from wx.lib.splitter import MultiSplitterWindow
 
 logger = logging.getLogger(__name__)
@@ -139,18 +141,17 @@ class FindReplace(wx.Frame):
         file_paths = glob.glob(os.path.join(dict_dir, "*.txt"))
 
         # map base name for display
-        self.file_map = {os.path.basename(p): p for p in file_paths}
-
-        # choices for display
+        self.file_map = {splitext(basename(p))[0]: p for p in file_paths}
+        
         choices = list(self.file_map.keys())        
         self.dict_choice = wx.Choice(top_panel, choices=choices)
         try:
-            dict_selected = choices.index("Dictionary-1.txt")
+            dictionary = choices.index("Dictionary-1")
         except:
-            dict_selected = 0        
-        self.dict_choice.SetSelection(dict_selected)
+            dictionary = 0
+        self.dict_choice.SetSelection(dictionary)
         choice = self.dict_choice.GetStringSelection()
-        self.dname = self.file_map[choice]                
+        self.dname = self.file_map[choice]
         
         self.check_whole = wx.CheckBox(top_panel, label="Whole Words")
         self.check_whole.SetValue(True)         
@@ -158,7 +159,7 @@ class FindReplace(wx.Frame):
         row1.Add(self.check_whole, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5)
         
         font = wx.Font(10, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL,
-                       wx.FONTWEIGHT_NORMAL, False, "Segoe UI Semibold")
+                       wx.FONTWEIGHT_NORMAL, False, "Franklin Gothic Medium")
         t_font2 = wx.Font(int(tFont["fontSize"]), wx.FONTFAMILY_DEFAULT,
                        wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, 0, tFont["TextFont"],)
         t_font1 = wx.Font(int(tFont["fontSize1"]), wx.FONTFAMILY_DEFAULT,
@@ -184,11 +185,22 @@ class FindReplace(wx.Frame):
         mid_panel = wx.Panel(self.splitter)
         mid_hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.text_2 = wx.TextCtrl(mid_panel, style=wx.TE_MULTILINE|wx.TE_RICH2)
-        self.text_2.SetFont(t_font2)
-        self.text_2.SetToolTip("Text editing is supported\nbut no line deletions")
-        mid_hsizer.Add(self.text_2, 1, wx.ALL | wx.EXPAND, 5)
-
+        self.dvc = dv.DataViewCtrl(
+            mid_panel,
+            style=dv.DV_ROW_LINES
+            | dv.DV_VERT_RULES
+            | dv.DV_HORIZ_RULES
+            | dv.DV_MULTIPLE,
+        )
+        self.dvc.SetFont(t_font2)
+        # renderer + column for each field
+        self.dvc.AppendTextColumn("Line", 0, width=60, mode=dv.DATAVIEW_CELL_INERT)
+        self.dvc.AppendTextColumn("Start", 1, width=120, mode=dv.DATAVIEW_CELL_INERT)
+        self.dvc.AppendTextColumn("End",   2, width=120, mode=dv.DATAVIEW_CELL_INERT)
+        self.dvc.AppendTextColumn("CPS",   3, width=60, mode=dv.DATAVIEW_CELL_INERT)
+        self.dvc.AppendTextColumn("Text", 4, width=420, mode=dv.DATAVIEW_CELL_INERT)        
+        
+        mid_hsizer.Add(self.dvc, 1, wx.ALL | wx.EXPAND, 5)
         btn_vsizer = wx.BoxSizer(wx.VERTICAL)
         
         labels = [
@@ -196,7 +208,6 @@ class FindReplace(wx.Frame):
             "Ignore",
             "ReplaceAll",
             "IgnoreAll",
-            #("Apply", wx.ID_APPLY),
             ("Add",   wx.ID_ADD),
             ("Ok",    wx.ID_OK),
             ("Cancel", wx.ID_CANCEL),
@@ -251,8 +262,7 @@ class FindReplace(wx.Frame):
         bottom_panel = wx.Panel(self.splitter)
         bottom_vsizer = wx.BoxSizer(wx.VERTICAL)
 
-        # Upper: multiline text
-        self.text_3 = UndoableTextCtrl(bottom_panel, wx.ID_ANY, style=wx.TE_WORDWRAP)
+        self.text_3 = UndoableTextCtrl(bottom_panel, style=wx.TE_WORDWRAP)
         t_font3 = wx.Font(
             int(tFont["fontSize2"]),
             wx.FONTFAMILY_DEFAULT,
@@ -296,20 +306,10 @@ class FindReplace(wx.Frame):
         self.Centre()
         self.Layout()
         
-        self.Ignored = []
-        self.ReplacedAll = []
-        self.Replaced = []
-        self.new_subs = []
-        self.new_d = {}
-        self.find = []
-        self.sc = {}
-        self.whole_word = True
-        self.show_dialog = True
-        
         try:
             self.default_subs = srt.compose(subtitles)
         except:
-            self.default_subs = getSubtitles("test.srt")
+            self.default_subs = getSubtitles("test-1.srt")
                 
         ## Bind Events ====================================================================##
         self.dict_choice.Bind(wx.EVT_CHOICE, self.FileChanged, self.dict_choice)
@@ -318,8 +318,8 @@ class FindReplace(wx.Frame):
         self.Bind(wx.EVT_MENU, self.onOK, id=self.ok_menu.GetId())
         self.Bind(wx.EVT_BUTTON, self.onCancel, self.button_cancel)
         self.Bind(wx.EVT_MENU, self.onCancel, id=self.cancel_menu.GetId())
-        self.Bind(wx.EVT_BUTTON, self.onReplace, self.button_accept)
-        self.Bind(wx.EVT_MENU, self.onReplace, id=self.accept_menu.GetId())
+        self.Bind(wx.EVT_BUTTON, self.next_subtitle, self.button_accept)
+        self.Bind(wx.EVT_MENU, self.next_subtitle, id=self.accept_menu.GetId())
         self.Bind(wx.EVT_BUTTON, self.onReplaceAll, self.button_replaceall)
         self.Bind(wx.EVT_MENU, self.onReplaceAll, id=self.replaceall_menu.GetId())
         self.Bind(wx.EVT_BUTTON, self.onIgnore, self.button_ignore)
@@ -350,8 +350,12 @@ class FindReplace(wx.Frame):
         self.Bind(wx.EVT_MENU, self.skip_selected, id=self.skip_menu.GetId())
         self.Bind(wx.EVT_MENU, self.next_subtitle, id=self.next_menu.GetId())
         
-        self.next_btn.Bind(wx.EVT_BUTTON, self.on_text3_edited)
-        self.Bind(wx.EVT_MENU, self.on_text3_edited, id=self.next_menu.GetId())
+        self.dvc.Bind(dv.EVT_DATAVIEW_SELECTION_CHANGED, self.on_selection_changed)
+        self.dvc.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
+        
+        self.text_3.Bind(wx.EVT_TEXT, self.on_text3_change)
+        self._text3_timer = wx.Timer(self)
+        self.Bind(wx.EVT_TIMER, self.on_text3_timer, self._text3_timer)        
         
         # --- Bindings for single-check + settings update ---
         self.Bind(wx.EVT_MENU, self.onSourceSelect, self.english)
@@ -369,43 +373,90 @@ class FindReplace(wx.Frame):
         self._restore_menu_selection()
         update_accelerators(self)
                 
-        self.wdict = Dictionaries().dict_fromFile(self.dname, "=>")
-        self.subs = srt.parse(self.default_subs, ignore_errors=True)
-        self.wdict = self.clearDict(self.wdict, srt.compose(self.subs))
+        self.Ignored = []
+        self.ReplacedAll = []
+        self.new_d = {}
+        self.sc = {}
+        self.whole_word = True
+        self.show_dialog = True
+        self.replaced = False
         
         self.matches = []
         self.sub = None
         self.replaced_text = False
-        self._empty_iter_try = 0
+        self.auto_update_enabled = True
+        self._empty_iter_try = 0        
+                
+        self.wdict = Dictionaries().dict_fromFile(self.dname, "=>")
+        self.subs = srt.parse(self.default_subs, ignore_errors=True)
+        self.wdict = self.clearDict(self.wdict, srt.compose(self.subs))
         
+        # store subs and create model
+        self.model = SubtitlesModel(list(self.subs))
+        self.dvc.AssociateModel(self.model)
+        
+        # keep selection index
+        self.selected_row = None
+        
+        self.subs = iter(self.model.subs)
+        self.last_line = self.model.subs[-1]
         self.getValues(self.subs)
+        
+    def on_key_down(self, event):
+        if event.GetKeyCode() == wx.WXK_DELETE:
+            self.on_delete_row(None)
+        else:
+            event.Skip()
     
-    def on_text3_edited(self, event):
-        """Save manual edits to current subtitle."""
-        if not hasattr(self, "sub") or not self.sub:
-            return
-        
-        if self.auto_menu.IsChecked():
-            return
-        
-        def get_text_differences(old, new):
-            """Return list of new words manually added or changed."""
-            old_set = set(old.split())
-            new_set = set(new.split())
-            return list(new_set - old_set)        
-        
-        current_text = self.text_3.GetValue().strip()
-        original_text = self.sub.content.strip()
-        if current_text != original_text:
-            self.replaced_text = True
-            self.sub.content = current_text
-            self.replaced_text = True
-            diff_words = get_text_differences(original_text, current_text)
-            for w in diff_words:
-                if w not in self.ReplacedAll and len(w) >= 5:
-                    self.ReplacedAll.append(w)
+    def on_text3_change(self, event):
+        """Called whenever text changes — debounce CPS update."""
+        if self._text3_timer.IsRunning():
+            self._text3_timer.Stop()
+        self._text3_timer.Start(150, oneShot=True)  # 150 ms delay
         event.Skip()
-        
+    
+    
+    def on_text3_timer(self, event):
+        """When user stops typing for 200 ms, update content + CPS color."""
+        selection = self.dvc.GetSelection()
+        if not selection.IsOk():
+            return
+    
+        row = self.model.GetRow(selection)
+        if row is None:
+            return
+    
+        # Update model content from TextCtrl
+        sub = self.model.subs[row]
+        sub.content = self.text_3.GetValue()
+    
+        # Trigger view refresh (updates CPS color)
+        try:
+            self.model.RowChanged(row)
+        except Exception:
+            self.model.RowsChanged(row, row)
+    
+    def on_delete_row(self, event):
+        selections = self.dvc.GetSelections()
+        if not selections:
+            wx.MessageBox("No row selected.", "Info", wx.OK | wx.ICON_INFORMATION)
+            return
+    
+        # Ask user confirmation
+        dlg = wx.MessageDialog(self, "Delete selected row(s)?", "Confirm Delete",
+                               wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
+        if dlg.ShowModal() != wx.ID_YES:
+            dlg.Destroy()
+            return
+        dlg.Destroy()
+    
+        # Collect row indices in reverse order (so deletion doesn't shift rows)
+        rows_to_delete = sorted([self.model.GetRow(item) for item in selections], reverse=True)
+        for row in rows_to_delete:
+            if 0 <= row < len(self.model.subs):
+                del self.model.subs[row]
+                self.model.RowDeleted(row)
+    
     def replace_selected(self, event=None):
         """Replace current match and move to next."""
         if not self.matches:
@@ -421,26 +472,47 @@ class FindReplace(wx.Frame):
             pattern = re.compile(rf'\b{re.escape(key)}\b')
         else:
             pattern = re.compile(re.escape(key))
+    
         m = pattern.search(content)
         if not m:
             return
+    
         start, end = m.start(), m.end()
+    
         new_content = content[:start] + value + content[end:]
         self.text_3.SetValue(new_content)
         self.text_3.SetFocus()
-        for val in self.new_d.values():
-            self.textStyle(self.text_3, new_content, "RED", "", val)
+        
         # Adjust match positions
         delta = len(value) - (end - start)
         for m in self.matches:
             if m["start"] > end:
                 m["start"] += delta
                 m["end"] += delta        
+        
+        for val in self.new_d.values():
+            wx.CallAfter(self.textStyle, self.text_3, new_content, "RED", "", val)        
+        
+        self.sub.content = new_content
+        #if self.matches:
         self.update_matches_from_content(new_content)            
         self.replaced_text = True
         self.sub.content = new_content
         self.sub = Subtitle(self.sub.index, self.sub.start, self.sub.end, new_content)
             
+    def skip_selected(self, event=None):
+        """Skip the current match and go to next."""
+        if not self.matches:
+            return
+        #if len(self.matches) > 1:
+        self.matches.pop(0)
+    
+        if self.matches:
+            self.highlight_current()
+        else:
+            self.sub = None
+            self.next_subtitle()
+    
     def update_matches_from_content(self, content):
         """Rebuild self.matches for remaining keys in new_d."""
         self.matches.clear()
@@ -456,23 +528,10 @@ class FindReplace(wx.Frame):
         if self.matches:
             self.highlight_current()
             
-    def skip_selected(self, event=None):
-        """Skip the current match and go to next."""
-        if not self.matches:
-            return
-    
-        self.matches.pop(0)
-    
-        if self.matches:
-            self.highlight_current()
-        else:
-            self.sub = None
-            self.next_subtitle()
-            
     @staticmethod
     def info_message(message=None):
         """"""
-        wx.MessageBox(message, "Information", wx.OK|wx.ICON_INFORMATION)            
+        wx.MessageBox(message, "Info", wx.OK|wx.ICON_INFORMATION)
     
     def next_subtitle(self, event=None):
         if not hasattr(self, "_empty_iter_try"):
@@ -487,15 +546,12 @@ class FindReplace(wx.Frame):
         except StopIteration:
             self._empty_iter_try += 1
             if self._empty_iter_try == 3:
-                self.info_message(f"{os.path.basename(self.dname)}\n\nTitl je iscrpljen")
-                return
+                self.info_message(f"{basename(self.dname)[:-4]}\n\nTitl je iscrpljen")
+                self._empty_iter_try = 0
+            return
         if self.sub and getattr(self.sub, "content", "").strip():
             if getattr(self, "replaced_text", True):
-                self.text_2.AppendText(self.composeSub(self.sub))
                 self.replaced_text = False
-                for v in self.new_d.values():
-                    self.textStyle(self.text_2, self.text_2.GetValue(), "BLACK", "#C4F0C2", v)
-                self.Replaced.append(self.sub)
         self.getValues(self.subs)
         self.text_3.SetFocus()
         
@@ -506,10 +562,64 @@ class FindReplace(wx.Frame):
             return
         match = self.matches[0]
         start = match["start"]
-        end = match["end"]
+        end = match["end"]        
         self.text_3.SetFocus()
         wx.CallAfter(self.text_3.SetSelection, start, end)
-    
+        
+    def select_subtitle_by_index(self, sub_index):
+        row = self.model.index_map.get(sub_index)
+        if row is not None:
+            item = self.model.GetItem(row)
+            self.dvc.Freeze()
+            try:
+                self.dvc.UnselectAll()
+                self.dvc.Select(item)
+                self.dvc.EnsureVisible(item)
+            finally:
+                self.dvc.Thaw()
+        
+    # selection -> show content in text box
+    def on_selection_changed(self, event):
+        # get selected item (single selection; if multiple, take first)
+        sel = self.dvc.GetSelection()
+        if not sel.IsOk():
+            # nothing selected
+            self.selected_row = None
+            self.text_3.SetValue("")
+            return
+
+        # Convert DataViewItem to row index using model helper
+        try:
+            row = self.model.GetRow(sel)  # typical method
+        except Exception:
+            try:
+                row = self.model.ItemToRow(sel)
+            except Exception:
+                # fallback: iterate to find matching row (rare)
+                row = None
+                for r in range(self.model.GetCount()):
+                    item = self.dvc.RowToItem(r)
+                    if item == sel:
+                        row = r
+                        break
+
+        if row is None:
+            self.selected_row = None
+            self.text_3.SetValue("")
+            return
+
+        self.selected_row = row
+        sub = self.model.subs[row]
+        # If row is changed, convert back "|" to newlines for display
+        text = (
+            sub.content.replace("|", "\n")
+            if row in self.model.changed_rows
+            else sub.content
+        )
+        self.text_3.ClearUndoRedo()
+        self.text_3.SetValue(text)
+        wx.CallAfter(self.text_3.SetFocus)
+        
     def getValues(self, iterator=None):
         """"""
         c = 0
@@ -517,10 +627,8 @@ class FindReplace(wx.Frame):
             self.sub = next(iterator)
             c += 1
         except StopIteration:
-            if not self.auto_menu.IsChecked():
-                self.text_3.SetValue(self.sub.content)
-                self.info_message("InfoMessage\n\nEnd of subtitles reached")
-                return
+            self.info_message(f"{basename(self.dname)[:-4]}\n\nTitl je iscrpljen")
+            return
         try:
             [self.wdict.pop(k, None) for k in self.Ignored]
             keys_sorted = sorted(self.wdict.keys(), key=len, reverse=True)
@@ -537,130 +645,76 @@ class FindReplace(wx.Frame):
                 self.text_1.SetDefaultStyle(wx.TextAttr(wx.RED)) # color for value
                 self.text_1.AppendText(f"{value}\n")
                 self.text_1.SetDefaultStyle(wx.TextAttr(wx.BLUE))                 
-            newd = {w: self.wdict[w] for w in t1}            
+            newd = {w: self.wdict[w] for w in t1}
             self.txt2.SetValue(self.composeSub(self.sub))
-            if self.auto_menu.IsChecked():
+            for k, v in newd.items():
+                pattern = re.compile(rf'\b{re.escape(k)}\b' if self.whole_word else re.escape(k))
+                for m in re.finditer(pattern, self.sub.content):
+                    self.matches.append({
+                        "key": k,
+                        "value": v,
+                        "start": m.start(),
+                        "end": m.end()
+                    })
+            if self.matches and self.sub:
                 self.txt2.SetValue(self.composeSub(self.sub))
-                for v in self.new_d.values():
-                    self.textStyle(self.text_2, self.text_2.GetValue(), "BLACK", "#C4F0C2", v)                
-                for k, v in newd.items():
-                    ctext = re.compile(rf'\b{k}\b' if self.whole_word else k)
-                    self.sub.content = ctext.sub(v, self.sub.content)
+                self.text_3.ClearUndoRedo()                    
+                if not self.auto_menu.IsChecked():
                     self.text_3.SetValue(self.sub.content)
-                    self.text_3.SetFocus()                    
-                    for v in newd.values():
-                        self.textStyle(self.text_3, self.sub.content, "RED", "", v)                    
-                if t1:
-                    changed = Subtitle(self.sub.index, self.sub.start, self.sub.end, self.sub.content)
-                    self.Replaced.append(changed) # Lista uvek ima samo jednu liniju
-                    for v in newd.values():
-                        self.ReplacedAll.append(v)
-                    self.new_d = newd
-                else:
-                    self.text_3.SetValue(self.sub.content)                    
-            if not self.auto_menu.IsChecked():
-                for k, v in newd.items():
-                    pattern = re.compile(rf'\b{k}\b' if self.whole_word else k)
-                    for m in re.finditer(pattern, self.sub.content):
-                        self.matches.append({
-                            "key": k,
-                            "value": v,
-                            "start": m.start(),
-                            "end": m.end()
-                        })
-                if self.matches:
-                    self.txt2.SetValue(self.composeSub(self.sub))
-                    self.text_3.SetValue(self.sub.content)
-                    for k in newd.keys():
-                        wx.CallAfter(self.textStyle, self.text_3, self.sub.content, "RED", "", k)                    
                     self.highlight_current()
-                    self.new_d = newd
-                    self.text_3.SetFocus()
                 else:
-                    c = self.getValues(iterator=self.subs)
-                    if c is not None:
-                        self.text_3.SetValue(self.sub.content)
-                        self.text_3.SetFocus()
+                    text = self.sub.content  # start with original
+                    for k, v in newd.items():
+                        pattern = rf'\b{k}\b' if self.whole_word else re.escape(k)
+                        text = re.sub(pattern, v, text)
+                        self.ReplacedAll.append(v)
+                    self.text_3.SetValue(text)
+                    for v in newd.values():
+                        wx.CallAfter(self.textStyle, self.text_3, text, "RED", "", v)                
+                self.select_subtitle_by_index(self.sub.index)
+                self.new_d = newd
+                self.text_3.SetFocus()
+            else:
+                self.getValues(iterator=self.subs)
             return c
         except Exception as e:
+            print(f"GetValue: {e}")
             logger.debug(f"Error: {e}")
-            
-    def composeSub(self, sub=None):
+    
+    @staticmethod
+    def composeSub(sub=None):
         """"""
         start = srt.timedelta_to_srt_timestamp(sub.start)
         end = srt.timedelta_to_srt_timestamp(sub.end)
         return f"{sub.index}\n{start} --> {end}\n{sub.content}\n\n"
-        
+    
     def FileChanged(self, event):
         """"""
         choice = self.dict_choice.GetStringSelection()
         self.dname = self.file_map[choice]        
         self.wdict = Dictionaries().dict_fromFile(self.dname, "=>")
         self.default_subs = self.GetText()
-        self.subs = srt.parse(self.default_subs)        
-        self.wdict = self.clearDict(self.wdict, srt.compose(self.subs))
+        subs = srt.parse(self.default_subs)        
+        self.wdict = self.clearDict(self.wdict, srt.compose(subs))
         if not self.wdict:
             wx.MessageBox(
-                "ValueError\n\nU rečniku nema podudaranja\nPromenite rečnik",
+                f"{basename(self.dname)[:-4]}\n\n"
+                f"U rečniku nema poklapanja.\nPromenite rečnik",
                 "Dictionary change",
             )
             return
-        if self.auto_menu.IsChecked():
-            self.onReplace(event)
-        else:
-            self.next_subtitle()
+        self.next_subtitle()
         event.Skip()
 
-    def textStyle(self, tctrl, text, st1, st2, w=r""):
+    def textStyle(self, tctrl, text, st1, st2, w=None):
         """"""
-        if self.whole_word is False:
-            x = re.compile(w)
-        else:
-            x = re.compile(r"\b"+w+r"\b")
+        x = re.compile(rf'\b{re.escape(w)}\b' if self.whole_word else re.escape(w))
         for m in re.finditer(x, text):
             tctrl.SetStyle(m.start(), m.end(), wx.TextAttr(st1, st2))
                 
-    def onReplace(self, event):
-        """Accept button event"""
-        self.replaceCurrent()
-        if self.auto_menu.IsChecked():
-            while not self.Replaced:
-                c = self.getValues(self.subs)
-                if c is None or not c:
-                    self._empty_iter_try += 1
-                    break
-        self.text_3.SetInsertionPointEnd()
-        self.text_2.SetFocus()
-        self.text_3.SetFocus()
-        if self._empty_iter_try > 2 and not self.Replaced:
-            self.info_message("InfoMessage\n\nEnd of subtitles reached")
-            return        
-        event.Skip()
-            
-    def replaceCurrent(self):
-        """"""
-        if self.Replaced:
-            text = self.text_3.GetValue()
-            sub = self.Replaced[0]
-            changed = Subtitle(sub.index, sub.start, sub.end, text)
-            self.text_2.AppendText(self.composeSub(changed))
-            self.Replaced.clear()
-            self.new_subs.append(changed)
-            self.default_subs = self.GetText()
-            
     def GetText(self):
         """"""
-        n_subs = list(srt.parse(self.text_2.GetValue(), True))
-        d_subs = list(srt.parse(self.default_subs, True))
-        for x in self.new_subs:
-            for i in d_subs:
-                if i.index == x.index and i.content != x.content:
-                    d_subs[d_subs.index(i)] = x
-        for x in n_subs:
-            for i in d_subs:
-                if i.index == x.index and i.content != x.content:
-                    d_subs[d_subs.index(i)] = x        
-        return srt.compose(d_subs)            
+        return srt.compose(self.model.subs)            
 
     def onReplaceAll(self, event):
         ''''''
@@ -670,39 +724,33 @@ class FindReplace(wx.Frame):
             else:
                 ctext = re.compile(r"\b("+"|".join(map(re.escape,self.new_d.keys()))+r")\b")
             self.default_subs = ctext.sub(lambda x: self.new_d[x.group()], self.default_subs)
-            wsubs = srt.compose(self.subs, reindex=False)
+            wsubs = self.GetText()
             wsubs = ctext.sub(lambda x: self.new_d[x.group()], wsubs)
             for k, v in self.new_d.items():
                 self.ReplacedAll.append(v)
                 self.wdict.pop(k)
             self.subs = srt.parse(wsubs)
-            if self.auto_menu.IsChecked():
-                self.onReplace(event)
-            else:
-                self.replace_selected()        
+            self.model.subs = list(srt.parse(wsubs))
+            self.model.Reset(len(self.model.subs))
+            self.next_subtitle()
         except Exception as e:
-            logger.debug(f"Error: {e}")
+            logger.debug(f"ReplaceAll: {e}")
         event.Skip()
 
     def onIgnore(self, event):
-        self.Replaced.clear()
-        self.onReplace(event)
+        self.next_subtitle()
         event.Skip()
 
-    def onIgnoreAll(self, event):
+    def onIgnoreAll(self, event=None):
         try:
             for line in self.text_1.GetValue().splitlines():
                 key = line.split(":", 1)[0].strip()
                 self.Ignored.append(key)
             for k in set(self.Ignored):
                 self.wdict.pop(k, None)
+            self.next_subtitle()
         except Exception as e:
-            logger.debug(f"IgnoreAll: {e}")
-        if self.auto_menu.IsChecked():
-            self.onReplace(event)
-        else:
-            self.next_subtitle()        
-        event.Skip()
+            logger.debug(f"IgnoreAll: {e}")        
     
     def clearDict(self, _dict, _subs):
         """
@@ -714,16 +762,23 @@ class FindReplace(wx.Frame):
             dict: A new dictionary containing only the key-value pairs where keys were found in the subtitles.
         """
         filtered_dict = {}
+
+        # Compile the regex pattern to find keys in the subtitles
         if self.whole_word is False:
             pattern = re.compile(r"(" + "|".join(map(re.escape, _dict.keys())) + r")")
         else:
             pattern = re.compile(r"\b(" + "|".join(map(re.escape, _dict.keys())) + r")\b")
+
+        # Find all matches of dictionary keys in the subtitles
         matches = pattern.findall(_subs)
+
+        # Create a new dictionary with only the matched keys
         for match in matches:
             if match in _dict:
                 filtered_dict[match] = _dict[match]
+        # Parse the default subtitles
         self.subs = srt.parse(self.default_subs, ignore_errors=True)
-        return filtered_dict
+        return filtered_dict    
     
     def on_selection_change(self, event):
         start, end = self.text_3.GetSelection()
@@ -807,9 +862,15 @@ class FindReplace(wx.Frame):
         '''Button_dict event'''
         choice = self.dict_choice.GetStringSelection()
         current_dict = self.file_map[choice]        
+        path_b = os.path.join("/home/darkstar/Documents/dictionaries", os.path.basename(current_dict))
         with open(current_dict, "a", encoding="utf-8") as dict_file:
             dict_file.write(f"\n{self.text_ADD.GetValue().strip()}")
         self.text_ADD.Clear()
+        try:
+            shutil.copy(current_dict, path_b)
+        except Exception as e:
+            logger.debug(f"CopyFile: {e}")
+            wx.MessageBox(f"Error\n\nGreška pri kopiranju fajla. Pogledaj log.", "Translator")
         self.ok_btn.Enable(False)
         self.cancel_btn.Enable(False)
         self.text_3.SetFocus()
@@ -836,7 +897,7 @@ class FindReplace(wx.Frame):
             self.preferences_menu.Enable(self.source_item.GetId(), is_checked)
             self.preferences_menu.Enable(self.destination_item.GetId(), is_checked)
         elif menu_id == self.auto_menu.GetId():
-            self.text_2.Clear()
+            #self.text_2.Clear()
             is_checked = not self.auto_menu.IsChecked()
             self.replace_btn.Enable(is_checked)
             self.skip_btn.Enable(is_checked)
@@ -923,12 +984,12 @@ class FindReplace(wx.Frame):
     def onOK(self, event):
         """"""
         self.data_list = list(
-            dict.fromkeys(w for w in self.ReplacedAll if w.strip() and len(w) > 4)
-        )
+            dict.fromkeys(w for w in self.ReplacedAll if w.strip() and len(w) > 3)
+        )        
         current_text = self.GetText()
         self.writeSettings()
         if self.on_done:
-            self.on_done(self.data_list, current_text)
+            self.on_done(self.data_list, current_text)        
         self.Destroy()
         event.Skip()    
         
