@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 #
 #
-
-
 import srt
 import re
 import wx
@@ -138,6 +136,6 @@ class SubtitlesModel(dv.DataViewIndexListModel):
         if duration <= 0:
             return 0
         # remove spaces, punctuation, newlines, only keep letters and digits
-        text_only = re.sub(r"[^A-Za-z0-9]", "", text)
+        text_only = re.sub(r"<[^<]*>|[^\w]", "", text)
         cps = round(len(text_only) / duration)
         return cps
