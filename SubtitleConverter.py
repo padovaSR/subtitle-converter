@@ -351,7 +351,7 @@ class MainWindow(ConverterFrame):
     
                 # Introduce a delay before processing the next
                 if len(parts_start) < 45:
-                    wx.CallLater(450, process_next_error, current_index + 1)  # 450ms delay for less than 45 errors
+                    wx.CallLater(250, process_next_error, current_index + 1)  # 250ms delay for less than 45 errors
                 elif len(parts_start) > 1000:
                     return  # Skip the process for large inputs
                 else:
@@ -1157,7 +1157,8 @@ class MainWindow(ConverterFrame):
     def ChangeManualy(self, event):
         """"""
         text = self.Text_1.GetValue()
-        frame = FindReplace(self, on_done=self.on_change_done, subtitles=list(srt.parse(text)))
+        parsed_subtitle = list(srt.parse(text, ignore_errors=True))
+        frame = FindReplace(self, on_done=self.on_change_done, subtitles=parsed_subtitle)
         frame.Show()
         event.Skip()
         
