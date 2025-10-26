@@ -40,3 +40,8 @@ class UndoableTextCtrl(wx.TextCtrl):
             del self._block
         else:
             wx.Bell()
+            
+    def ClearUndoRedo(self):
+        """"""
+        self.undo_stack.clear()
+        self.redo_stack.clear()            
