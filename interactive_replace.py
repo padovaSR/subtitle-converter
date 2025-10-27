@@ -448,23 +448,34 @@ class FindReplace(wx.Frame):
     def on_delete_row(self, event):
         selections = self.dvc.GetSelections()
         if not selections:
-            wx.MessageBox("No row selected.", "Info", wx.OK | wx.ICON_INFORMATION)
             return
-        # Ask user confirmation
-        dlg = wx.MessageDialog(self, "Delete selected row(s)?", "Confirm Delete",
-                               wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
+        dlg = wx.MessageDialog(
+            self,
+            "Delete selected row(s)?",
+            "Confirm Delete",
+            wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION,
+        )
         if dlg.ShowModal() != wx.ID_YES:
             dlg.Destroy()
             return
         dlg.Destroy()
-        # Collect row indices in reverse order (so deletion doesn't shift rows)
         rows_to_delete = sorted([self.model.GetRow(item) for item in selections], reverse=True)
         for row in rows_to_delete:
             if 0 <= row < len(self.model.subs):
                 del self.model.subs[row]
                 self.model.RowDeleted(row)
+                self.dvc.Refresh()
         self.model.reindex()
+        total = self.model.GetCount()
+        if total == 0:
+            self.text_3.Clear()
+            self.text_3.SetFocus()
+            return
+        elif row >= total:
+            row = total - 1
         self.dvc.Select(self.model.GetItem(row))
+        self.dvc.EnsureVisible(self.model.GetItem(row))
+        self.on_selection_changed(None)
         
     def replace_selected(self, event=None):
         """Replace current match and move to next."""
