@@ -196,6 +196,7 @@ class FindReplace(wx.Frame):
             | dv.DV_MULTIPLE,
         )
         self.dvc.SetFont(t_font2)
+        self.dvc.SetToolTip("\n Pres ‚Esc’ to switch focus \n ")
         # renderer + column for each field
         self.dvc.AppendTextColumn("Line", 0, width=60, mode=dv.DATAVIEW_CELL_INERT)
         self.dvc.AppendTextColumn("Start", 1, width=120, mode=dv.DATAVIEW_CELL_INERT)
@@ -275,7 +276,7 @@ class FindReplace(wx.Frame):
             tFont["Text2Font"],
         )
         self.text_3.SetFont(t_font3)
-        self.text_3.SetToolTip("Current Text")
+        self.text_3.SetToolTip("Current line\nPres ‚Esc’ to switch focus on the grid")
         bottom_vsizer.Add(self.text_3, 1, wx.ALL | wx.EXPAND, 5)
 
         # Lower: horizontal row
@@ -359,6 +360,7 @@ class FindReplace(wx.Frame):
         self.text_3.Bind(wx.EVT_TEXT, self.on_text3_change)
         self._text3_timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.on_text3_timer, self._text3_timer)        
+        self.text_3.Bind(wx.EVT_KEY_DOWN, self.on_text3_key_down)
         
         # --- Bindings for single-check + settings update ---
         self.Bind(wx.EVT_MENU, self.onSourceSelect, self.english)
@@ -388,7 +390,7 @@ class FindReplace(wx.Frame):
         self.sub = None
         self.replaced_text = False
         self.auto_update_enabled = True
-        self._empty_iter_try = 0        
+        self._empty_iter_try = 0
                 
         self.wdict = Dictionaries().dict_fromFile(self.dname, "=>")
         self.subs = srt.parse(self.default_subs, ignore_errors=True)
@@ -404,9 +406,18 @@ class FindReplace(wx.Frame):
         self.subs = iter(self.model.subs)
         self.getValues(self.subs)
         
+    def on_text3_key_down(self, event):
+        if event.GetKeyCode() == wx.WXK_ESCAPE:
+            # User pressed Esc → move focus to list
+            self.dvc.SetFocus()
+            return  # don't propagate event
+        event.Skip()
+        
     def on_key_down(self, event):
         if event.GetKeyCode() == wx.WXK_DELETE:
             self.on_delete_row(None)
+        elif event.GetKeyCode() == wx.WXK_ESCAPE:
+            self.text_3.SetFocus()
         else:
             event.Skip()
     
@@ -422,15 +433,12 @@ class FindReplace(wx.Frame):
         selection = self.dvc.GetSelection()
         if not selection.IsOk():
             return
-    
         row = self.model.GetRow(selection)
         if row is None:
             return
-    
         # Update model content from TextCtrl
         sub = self.model.subs[row]
         sub.content = self.text_3.GetValue()
-    
         # Trigger view refresh (updates CPS color)
         try:
             self.model.RowChanged(row)
@@ -605,12 +613,10 @@ class FindReplace(wx.Frame):
                     if item == sel:
                         row = r
                         break
-
         if row is None:
             self.selected_row = None
             self.text_3.SetValue("")
             return
-
         self.selected_row = row
         sub = self.model.subs[row]
         # If row is changed, convert back "|" to newlines for display
@@ -621,7 +627,7 @@ class FindReplace(wx.Frame):
         )
         self.text_3.ClearUndoRedo()
         self.text_3.SetValue(text)
-        if self.lock_menu.IsChecked():
+        if self.lock_menu.IsChecked() and not self.dvc.HasFocus():
             wx.CallAfter(self.text_3.SetFocus)
             
     def getValues(self, iterator=None):
@@ -674,8 +680,7 @@ class FindReplace(wx.Frame):
                 self.getValues(iterator=self.subs)
             return c
         except Exception as e:
-            print(f"GetValue: {e}")
-            logger.debug(f"Error: {e}")
+            logger.debug(f"getValues: {e}")
     
     @staticmethod
     def composeSub(sub=None):
