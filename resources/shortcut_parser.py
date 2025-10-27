@@ -63,6 +63,7 @@ def update_accelerators(self):
         "Replace": self.replace_menu,
         "Skip": self.skip_menu,
         "Next": self.next_menu,
+        "Lock focus": self.lock_menu,
     }
 
     accel_entries = []
