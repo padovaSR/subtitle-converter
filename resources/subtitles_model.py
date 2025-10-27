@@ -117,18 +117,23 @@ class SubtitlesModel(dv.DataViewIndexListModel):
                 self.RowsChanged(row, row)
             except Exception:
                 pass
-            
+    
+    def reindex(self):
+        """Reindex subtitles"""
+        for i, sub in enumerate(self.subs, start=1):
+            sub.index = i
+        # Refresh the model so DataView updates
+        self.Reset(len(self.subs))
+        
     @staticmethod
     def calculate_cps(text, start, end):
         """
         Calculate CPS (characters per second) ignoring spaces and punctuation,
         in Aegisub style.
-        
         Args:
             text (str): subtitle text
             start (datetime.timedelta): start time
             end (datetime.timedelta): end time
-        
         Returns:
             int: CPS rounded to nearest integer
         """
