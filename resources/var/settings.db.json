@@ -89,6 +89,7 @@
         "Translate": true,
         "Source": "Hrvatski",
         "Destination": "Srpski",
+        "LockFocus": false,
         "Auto_replace": false
     },
     "FrameShortcuts": {
@@ -104,7 +105,8 @@
         "Translate": "Ctrl+Shift+T",
         "Replace": "Ctrl+7",
         "Skip": "Ctrl+9",
-        "Next": "Ctrl+8"
+        "Next": "Ctrl+8",
+        "Lock focus": ""
     },
     "Zip_confirm": {
         "W": 647,
