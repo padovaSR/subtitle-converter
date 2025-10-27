@@ -107,7 +107,10 @@ class FindReplace(wx.Frame):
         self.destination_item = self.preferences_menu.AppendSubMenu(self.destination, "Destination")
         
         self.preferences_menu.AppendSeparator()
-        
+        self.lock_menu = self.preferences_menu.AppendCheckItem(wx.ID_ANY, f"Lock focus\t{sKey["Lock focus"]}")
+        self.lock_menu.Check(MAIN_SETTINGS["Manually"]["LockFocus"])
+        self.lock_menu.SetHelp("Lock focus on text edit")
+        self.preferences_menu.AppendSeparator()        
         self.auto_menu = self.preferences_menu.AppendCheckItem(wx.ID_ANY, "Auto Replace")
         self.auto_menu.Check(MAIN_SETTINGS["Manually"]["Auto_replace"])
         self.auto_menu.SetHelp("Enable-Disable Auto Replace")
@@ -399,7 +402,6 @@ class FindReplace(wx.Frame):
         self.selected_row = None
         
         self.subs = iter(self.model.subs)
-        self.last_line = self.model.subs[-1]
         self.getValues(self.subs)
         
     def on_key_down(self, event):
@@ -414,8 +416,7 @@ class FindReplace(wx.Frame):
             self._text3_timer.Stop()
         self._text3_timer.Start(150, oneShot=True)  # 150 ms delay
         event.Skip()
-    
-    
+        
     def on_text3_timer(self, event):
         """When user stops typing for 200 ms, update content + CPS color."""
         selection = self.dvc.GetSelection()
@@ -441,7 +442,6 @@ class FindReplace(wx.Frame):
         if not selections:
             wx.MessageBox("No row selected.", "Info", wx.OK | wx.ICON_INFORMATION)
             return
-    
         # Ask user confirmation
         dlg = wx.MessageDialog(self, "Delete selected row(s)?", "Confirm Delete",
                                wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
@@ -449,14 +449,15 @@ class FindReplace(wx.Frame):
             dlg.Destroy()
             return
         dlg.Destroy()
-    
         # Collect row indices in reverse order (so deletion doesn't shift rows)
         rows_to_delete = sorted([self.model.GetRow(item) for item in selections], reverse=True)
         for row in rows_to_delete:
             if 0 <= row < len(self.model.subs):
                 del self.model.subs[row]
                 self.model.RowDeleted(row)
-    
+        self.model.reindex()
+        self.dvc.Select(self.model.GetItem(row))
+        
     def replace_selected(self, event=None):
         """Replace current match and move to next."""
         if not self.matches:
@@ -513,10 +514,12 @@ class FindReplace(wx.Frame):
             self.sub = None
             self.next_subtitle()
     
-    def update_matches_from_content(self, content):
+    def update_matches_from_content(self, content, dictionary=None):
         """Rebuild self.matches for remaining keys in new_d."""
         self.matches.clear()
-        for k, v in self.new_d.items():
+        if not dictionary:
+            dictionary = self.new_d
+        for k, v in dictionary.items():
             pattern = re.compile(rf'\b{re.escape(k)}\b' if self.whole_word else re.escape(k))
             for m in re.finditer(pattern, content):
                 self.matches.append({
@@ -618,8 +621,9 @@ class FindReplace(wx.Frame):
         )
         self.text_3.ClearUndoRedo()
         self.text_3.SetValue(text)
-        wx.CallAfter(self.text_3.SetFocus)
-        
+        if self.lock_menu.IsChecked():
+            wx.CallAfter(self.text_3.SetFocus)
+            
     def getValues(self, iterator=None):
         """"""
         c = 0
@@ -647,15 +651,7 @@ class FindReplace(wx.Frame):
                 self.text_1.SetDefaultStyle(wx.TextAttr(wx.BLUE))                 
             newd = {w: self.wdict[w] for w in t1}
             self.txt2.SetValue(self.composeSub(self.sub))
-            for k, v in newd.items():
-                pattern = re.compile(rf'\b{re.escape(k)}\b' if self.whole_word else re.escape(k))
-                for m in re.finditer(pattern, self.sub.content):
-                    self.matches.append({
-                        "key": k,
-                        "value": v,
-                        "start": m.start(),
-                        "end": m.end()
-                    })
+            self.update_matches_from_content(self.sub.content, newd)
             if self.matches and self.sub:
                 self.txt2.SetValue(self.composeSub(self.sub))
                 self.text_3.ClearUndoRedo()                    
@@ -862,15 +858,9 @@ class FindReplace(wx.Frame):
         '''Button_dict event'''
         choice = self.dict_choice.GetStringSelection()
         current_dict = self.file_map[choice]        
-        path_b = os.path.join("/home/darkstar/Documents/dictionaries", os.path.basename(current_dict))
         with open(current_dict, "a", encoding="utf-8") as dict_file:
             dict_file.write(f"\n{self.text_ADD.GetValue().strip()}")
         self.text_ADD.Clear()
-        try:
-            shutil.copy(current_dict, path_b)
-        except Exception as e:
-            logger.debug(f"CopyFile: {e}")
-            wx.MessageBox(f"Error\n\nGreška pri kopiranju fajla. Pogledaj log.", "Translator")
         self.ok_btn.Enable(False)
         self.cancel_btn.Enable(False)
         self.text_3.SetFocus()
@@ -921,6 +911,7 @@ class FindReplace(wx.Frame):
         pos_2 = self.splitter.GetSashPosition(1)
         translator = self.translator_menu.IsChecked()
         auto = self.auto_menu.IsChecked()
+        lock = self.lock_menu.IsChecked()
         # Update the MAIN_SETTINGS_SETTINGS dictionary
         MAIN_SETTINGS["Manually"].update(
             {
@@ -929,6 +920,7 @@ class FindReplace(wx.Frame):
                 "sash1": pos_1,
                 "sash2": pos_2,
                 "Translate": translator,
+                "LockFocus": lock,
                 "Auto_replace": auto,
             }
         )
