@@ -107,7 +107,7 @@ class FindReplace(wx.Frame):
         self.destination_item = self.preferences_menu.AppendSubMenu(self.destination, "Destination")
         
         self.preferences_menu.AppendSeparator()
-        self.lock_menu = self.preferences_menu.AppendCheckItem(wx.ID_ANY, f"Lock focus\t{sKey["Lock focus"]}")
+        self.lock_menu = self.preferences_menu.AppendCheckItem(wx.ID_ANY, f"Focus lock\t{sKey["Lock focus"]}")
         self.lock_menu.Check(MAIN_SETTINGS["Manually"]["LockFocus"])
         self.lock_menu.SetHelp("Lock focus on text edit")
         self.preferences_menu.AppendSeparator()        
@@ -170,11 +170,11 @@ class FindReplace(wx.Frame):
 
         # Row 2: Two multiline text controls
         row2 = wx.BoxSizer(wx.HORIZONTAL)
-        self.text_1 = wx.TextCtrl(top_panel, style=wx.TE_MULTILINE|wx.TE_RICH2)
+        self.text_1 = wx.TextCtrl(top_panel, style=wx.TE_MULTILINE|wx.TE_NO_VSCROLL|wx.TE_RICH2)
         self.text_1.SetFont(font)
         self.text_1.SetForegroundColour("BLUE")
         self.text_1.SetToolTip("From dictionary")
-        self.txt2 = wx.TextCtrl(top_panel, style=wx.TE_MULTILINE|wx.TE_RICH2)
+        self.txt2 = wx.TextCtrl(top_panel, style=wx.TE_MULTILINE|wx.TE_NO_VSCROLL|wx.TE_RICH2)
         self.txt2.SetFont(t_font1)
         self.txt2.SetToolTip("Current line")
         row2.Add(self.text_1, 1, wx.ALL | wx.EXPAND, 5)
@@ -252,7 +252,11 @@ class FindReplace(wx.Frame):
         self.next_btn = wx.Button(mid_panel, wx.ID_ANY, "Next", size=(75, 25))
         self.next_btn.SetToolTip("Go to next line")
         self.next_btn.Enable(enable_btn)
-        btn_vsizer.Add(self.next_btn, 0, wx.TOP |wx.LEFT |wx.RIGHT |wx.EXPAND, 5)        
+        btn_vsizer.Add(self.next_btn, 0, wx.TOP |wx.LEFT |wx.RIGHT |wx.EXPAND, 5)
+        
+        self.play_button = wx.Button(mid_panel, wx.ID_ANY, "Play", size=(75, 25))
+        self.play_button.SetToolTip("Play Audio")
+        btn_vsizer.Add(self.play_button, 0, wx.TOP |wx.LEFT |wx.RIGHT |wx.EXPAND, 5)        
 
         self.translate_btn = wx.Button(mid_panel, wx.ID_ANY, "Translate", size=(75, 25))
         self.translate_btn.SetToolTip("Translate current text")
@@ -511,7 +515,7 @@ class FindReplace(wx.Frame):
                 m["end"] += delta        
         
         for val in self.new_d.values():
-            wx.CallAfter(self.textStyle, self.text_3, new_content, "RED", "", val)        
+            wx.CallAfter(self.textStyle, self.text_3, new_content, "VIOLET RED", "", val)        
         
         self.sub.content = new_content
         #if self.matches:
@@ -673,7 +677,10 @@ class FindReplace(wx.Frame):
                 self.txt2.SetValue(self.composeSub(self.sub))
                 self.text_3.ClearUndoRedo()                    
                 if not self.auto_menu.IsChecked():
-                    self.text_3.SetValue(self.sub.content)
+                    text = self.sub.content
+                    self.text_3.SetValue(text)
+                    for k in newd.keys():
+                        wx.CallAfter(self.textStyle, self.text_3, text, "BLACK", "#C4F0C2", k)                    
                     self.highlight_current()
                 else:
                     text = self.sub.content  # start with original
@@ -683,7 +690,7 @@ class FindReplace(wx.Frame):
                         self.ReplacedAll.append(v)
                     self.text_3.SetValue(text)
                     for v in newd.values():
-                        wx.CallAfter(self.textStyle, self.text_3, text, "RED", "", v)                
+                        wx.CallAfter(self.textStyle, self.text_3, text, "VIOLET RED", "", v)                
                 self.select_subtitle_by_index(self.sub.index)
                 self.new_d = newd
                 self.text_3.SetFocus()
