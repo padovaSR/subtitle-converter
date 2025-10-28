@@ -43,7 +43,17 @@ import logging.config
 logging.config.fileConfig("resources/var/log/mainlog.ini", disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
 
-VERSION = linecache.getline(join("resources", "version.txt"), 1).rstrip()
+def resource_path(relative_path):
+    """Get absolute path to resource, works for dev and Nuitka"""
+    if hasattr(sys, "_MEIPASS"):  # PyInstaller style
+        base_path = sys._MEIPASS
+    elif "__compiled__" in globals():  # Nuitka style
+        base_path = os.path.dirname(sys.executable)
+    else:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
+VERSION = linecache.getline(resource_path(join("resources","version.txt")), 1).rstrip()
 
 class MyFileDropTarget(wx.FileDropTarget):
     def __init__(self, window):
