@@ -254,9 +254,9 @@ class FindReplace(wx.Frame):
         self.next_btn.Enable(enable_btn)
         btn_vsizer.Add(self.next_btn, 0, wx.TOP |wx.LEFT |wx.RIGHT |wx.EXPAND, 5)
         
-        self.play_button = wx.Button(mid_panel, wx.ID_ANY, "Play", size=(75, 25))
-        self.play_button.SetToolTip("Play Audio")
-        btn_vsizer.Add(self.play_button, 0, wx.TOP |wx.LEFT |wx.RIGHT |wx.EXPAND, 5)        
+        #self.play_button = wx.Button(mid_panel, wx.ID_ANY, "Play", size=(75, 25))
+        #self.play_button.SetToolTip("Play Audio")
+        #btn_vsizer.Add(self.play_button, 0, wx.TOP |wx.LEFT |wx.RIGHT |wx.EXPAND, 5)        
 
         self.translate_btn = wx.Button(mid_panel, wx.ID_ANY, "Translate", size=(75, 25))
         self.translate_btn.SetToolTip("Translate current text")
@@ -590,7 +590,8 @@ class FindReplace(wx.Frame):
         start = match["start"]
         end = match["end"]        
         self.text_3.SetFocus()
-        wx.CallAfter(self.text_3.SetSelection, start, end)
+        if not self.auto_menu.IsChecked():
+            wx.CallAfter(self.text_3.SetSelection, start, end)
         
     def select_subtitle_by_index(self, sub_index):
         row = self.model.index_map.get(sub_index)
