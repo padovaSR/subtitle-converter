@@ -196,7 +196,7 @@ class FindReplace(wx.Frame):
             | dv.DV_MULTIPLE,
         )
         self.dvc.SetFont(t_font2)
-        self.dvc.SetToolTip("\n Pres ‚Esc’ to switch focus \n ")
+        self.dvc.SetToolTip("\n Press ‚Esc’ or ‚Tab’ to switch focus \n ")
         # renderer + column for each field
         self.dvc.AppendTextColumn("Line", 0, width=60, mode=dv.DATAVIEW_CELL_INERT)
         self.dvc.AppendTextColumn("Start", 1, width=120, mode=dv.DATAVIEW_CELL_INERT)
@@ -280,7 +280,7 @@ class FindReplace(wx.Frame):
             tFont["Text2Font"],
         )
         self.text_3.SetFont(t_font3)
-        self.text_3.SetToolTip("Current line\nPres ‚Esc’ to switch focus on the grid")
+        self.text_3.SetToolTip("Current line\nPress ‚Esc’ or ‚Tab’ to switch focus on the grid")
         bottom_vsizer.Add(self.text_3, 1, wx.ALL | wx.EXPAND, 5)
 
         # Lower: horizontal row
@@ -411,16 +411,16 @@ class FindReplace(wx.Frame):
         self.getValues(self.subs)
         
     def on_text3_key_down(self, event):
-        if event.GetKeyCode() == wx.WXK_ESCAPE:
-            # User pressed Esc → move focus to list
+        if event.GetKeyCode() in (wx.WXK_ESCAPE, wx.WXK_TAB):
+            # Tab or Esc → move focus to list
             self.dvc.SetFocus()
-            return  # don't propagate event
+            return
         event.Skip()
         
     def on_key_down(self, event):
         if event.GetKeyCode() == wx.WXK_DELETE:
             self.on_delete_row(None)
-        elif event.GetKeyCode() == wx.WXK_ESCAPE:
+        elif event.GetKeyCode() in (wx.WXK_ESCAPE, wx.WXK_TAB):
             self.text_3.SetFocus()
         else:
             event.Skip()
@@ -433,17 +433,15 @@ class FindReplace(wx.Frame):
         event.Skip()
         
     def on_text3_timer(self, event):
-        """When user stops typing for 200 ms, update content + CPS color."""
+        """When user stops typing for 150 ms, update content + CPS color."""
         selection = self.dvc.GetSelection()
         if not selection.IsOk():
             return
         row = self.model.GetRow(selection)
         if row is None:
             return
-        # Update model content from TextCtrl
         sub = self.model.subs[row]
         sub.content = self.text_3.GetValue()
-        # Trigger view refresh (updates CPS color)
         try:
             self.model.RowChanged(row)
         except Exception:
@@ -832,7 +830,7 @@ class FindReplace(wx.Frame):
 
     def textAdded(self, event):
         '''EVT_TEXT text.aADD'''
-        if self.text_ADD.IsModified():
+        if self.translator_menu.IsChecked() or self.text_ADD.IsModified():
             self.textStyle(self.text_ADD, self.text_ADD.GetValue(), "GREY","","=>")
             self.ok_btn.Enable()
             self.cancel_btn.Enable()
