@@ -580,16 +580,27 @@ class FindReplace(wx.Frame):
         self.text_3.SetFocus()
         
     def highlight_current(self):
-        """Highlight the current match in text_3."""
+        """Highlight the current match in text_3 and restore previous one."""
         if not self.matches:
             self.next_subtitle()
             return
+        
         match = self.matches[0]
-        start = match["start"]
-        end = match["end"]        
+        start, end = match["start"], match["end"]
+        value = match["value"]
+        
+        # Restore the previous match (if any)
+        if hasattr(self, "previous_match") and self.previous_match:
+            pvalue = self.previous_match["value"]
+            text = self.text_1.GetValue()
+            self.textStyle(self.text_1, text, "VIOLET RED", "WHITE", pvalue)
+        
         self.text_3.SetFocus()
         if not self.auto_menu.IsChecked():
             wx.CallAfter(self.text_3.SetSelection, start, end)
+            text = self.text_1.GetValue()
+            self.textStyle(self.text_1, text, "BLACK", "#C4F0C2", value)
+        self.previous_match = match
         
     def select_subtitle_by_index(self, sub_index):
         row = self.model.index_map.get(sub_index)
@@ -712,8 +723,7 @@ class FindReplace(wx.Frame):
         self.dname = self.file_map[choice]        
         self.wdict = Dictionaries().dict_fromFile(self.dname, "=>")
         self.default_subs = self.GetText()
-        subs = srt.parse(self.default_subs)        
-        self.wdict = self.clearDict(self.wdict, srt.compose(subs))
+        self.wdict = self.clearDict(self.wdict, self.GetText())
         if not self.wdict:
             wx.MessageBox(
                 f"{basename(self.dname)[:-4]}\n\n"
@@ -780,21 +790,14 @@ class FindReplace(wx.Frame):
             dict: A new dictionary containing only the key-value pairs where keys were found in the subtitles.
         """
         filtered_dict = {}
-
-        # Compile the regex pattern to find keys in the subtitles
         if self.whole_word is False:
             pattern = re.compile(r"(" + "|".join(map(re.escape, _dict.keys())) + r")")
         else:
             pattern = re.compile(r"\b(" + "|".join(map(re.escape, _dict.keys())) + r")\b")
-
-        # Find all matches of dictionary keys in the subtitles
         matches = pattern.findall(_subs)
-
-        # Create a new dictionary with only the matched keys
         for match in matches:
             if match in _dict:
                 filtered_dict[match] = _dict[match]
-        # Parse the default subtitles
         self.subs = srt.parse(self.default_subs, ignore_errors=True)
         return filtered_dict    
     
