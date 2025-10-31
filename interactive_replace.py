@@ -171,7 +171,7 @@ class FindReplace(wx.Frame):
         # Row 2: Two multiline text controls
         row2 = wx.BoxSizer(wx.HORIZONTAL)
         self.text_1 = wx.TextCtrl(top_panel, style=wx.TE_MULTILINE|wx.TE_NO_VSCROLL|wx.TE_RICH2)
-        self.text_1.SetFont(font)
+        self.text_1.SetFont(t_font1)
         self.text_1.SetForegroundColour("BLUE")
         self.text_1.SetToolTip("From dictionary")
         self.txt2 = wx.TextCtrl(top_panel, style=wx.TE_MULTILINE|wx.TE_NO_VSCROLL|wx.TE_RICH2)
@@ -365,7 +365,7 @@ class FindReplace(wx.Frame):
         self._text3_timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.on_text3_timer, self._text3_timer)        
         self.text_3.Bind(wx.EVT_KEY_DOWN, self.on_text3_key_down)
-        self.text_3.Bind(wx.EVT_TEXT, self.handle_text1_update)
+        #self.text_3.Bind(wx.EVT_TEXT, self.handle_text1_update)
         
         # --- Bindings for single-check + settings update ---
         self.Bind(wx.EVT_MENU, self.onSourceSelect, self.english)
@@ -687,7 +687,7 @@ class FindReplace(wx.Frame):
                 self.text_1.SetDefaultStyle(wx.TextAttr(wx.BLUE)) # default
                 value = self.wdict.get(key, "")
                 self.text_1.AppendText(f"{key}: ")
-                self.text_1.SetDefaultStyle(wx.TextAttr(wx.RED)) # color for value
+                self.text_1.SetDefaultStyle(wx.TextAttr("VIOLET RED")) # color for value
                 self.text_1.AppendText(f"{value}\n")
                 self.text_1.SetDefaultStyle(wx.TextAttr(wx.BLUE))                 
             newd = {w: self.wdict[w] for w in t1}
