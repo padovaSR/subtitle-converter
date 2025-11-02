@@ -365,7 +365,6 @@ class FindReplace(wx.Frame):
         self._text3_timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.on_text3_timer, self._text3_timer)        
         self.text_3.Bind(wx.EVT_KEY_DOWN, self.on_text3_key_down)
-        #self.text_3.Bind(wx.EVT_TEXT, self.handle_text1_update)
         
         # --- Bindings for single-check + settings update ---
         self.Bind(wx.EVT_MENU, self.onSourceSelect, self.english)
@@ -579,15 +578,6 @@ class FindReplace(wx.Frame):
                 self.replaced_text = False
         self.getValues(self.subs)
         self.text_3.SetFocus()
-        
-    def handle_text1_update(self, event=None):
-        """If last value, apply styling"""
-        values = list(self.new_d.values())
-        last_v = values[-1] if values else None
-
-        text = self.text_1.GetValue()
-        if last_v:
-            self.textStyle(self.text_1, text, "VIOLET RED", "WHITE", last_v)        
         
     def highlight_current(self):
         """Highlight the current match in text_3 and restore previous one."""
