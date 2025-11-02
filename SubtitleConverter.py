@@ -1340,7 +1340,10 @@ class MyApp(wx.App):
         return True    
 
 if __name__ == "__main__":
+    app = MyApp(0)
     if not os.path.exists("tmp"):
         os.mkdir("tmp")
-    app = MyApp(0)
+    if len(sys.argv) > 1:
+        file_arg = sys.argv[1]
+        wx.CallAfter(app.frame.OpenFiles, file_arg)
     app.MainLoop()
