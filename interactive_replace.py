@@ -839,6 +839,27 @@ class FindReplace(wx.Frame):
             self.cancel_btn.Enable()
         event.Skip()
         
+    def addOK(self, event):
+        '''Button_dict event'''
+        choice = self.dict_choice.GetStringSelection()
+        current_dict = self.file_map[choice]        
+        with open(current_dict, "a", encoding="utf-8") as dict_file:
+            dict_file.write(f"\n{self.text_ADD.GetValue().strip()}")
+        self.text_ADD.Clear()
+        self.FileChanged(event)
+        self.ok_btn.Enable(False)
+        self.cancel_btn.Enable(False)
+        self.text_3.SetFocus()
+        event.Skip()
+
+    def addCANCEL(self, event):
+        '''Button event'''
+        self.text_ADD.Clear()
+        self.ok_btn.Enable(False)
+        self.cancel_btn.Enable(False)
+        self.text_3.SetFocus()
+        event.Skip()
+        
     @staticmethod
     def translate(input_text):
         """"""
@@ -878,27 +899,7 @@ class FindReplace(wx.Frame):
         else:
             self.text_3.SetValue(translated_text)
         event.Skip()
-        
-    def addOK(self, event):
-        '''Button_dict event'''
-        choice = self.dict_choice.GetStringSelection()
-        current_dict = self.file_map[choice]        
-        with open(current_dict, "a", encoding="utf-8") as dict_file:
-            dict_file.write(f"\n{self.text_ADD.GetValue().strip()}")
-        self.text_ADD.Clear()
-        self.ok_btn.Enable(False)
-        self.cancel_btn.Enable(False)
-        self.text_3.SetFocus()
-        event.Skip()
 
-    def addCANCEL(self, event):
-        '''Button event'''
-        self.text_ADD.Clear()
-        self.ok_btn.Enable(False)
-        self.cancel_btn.Enable(False)
-        self.text_3.SetFocus()
-        event.Skip()
-            
     def onWholeToggle(self, event):
         self.whole_word = self.check_whole.GetValue()
         event.Skip()
