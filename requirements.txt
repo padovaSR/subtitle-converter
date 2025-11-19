@@ -1,3 +1,4 @@
 wxPython
 srt
+charset-normalizer
 googletrans
