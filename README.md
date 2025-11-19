@@ -11,7 +11,7 @@ python -m pip install googletrans
 ## Requirements:
 * [Python](http://www.python.org/) version 3.11 or newer
 * [wxPython](https://wxpython.org/) version 4.2.1 or newer
-* Libraries: [srt](https://github.com/cdown/srt)
+* Libraries: [srt](https://github.com/cdown/srt), [Charset Normalizer](https://github.com/jawah/charset_normalizer/tree/master)
 ### To install requirements:
 
 Windows: 
