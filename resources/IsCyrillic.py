@@ -14,7 +14,7 @@ except ImportError:
     app = wx.App(False)
     wx.MessageBox(
         f"ImportError\n\nTo continue install ‚charset_normalizer’:\n"
-        f"’pip insatll charset_normalizer‘",
+        f"’pip insatll charset-normalizer‘",
         "SubtitleConverter",
         wx.OK | wx.ICON_ERROR,
     )
