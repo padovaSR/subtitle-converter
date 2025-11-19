@@ -127,11 +127,9 @@ class FileHandler:
                 and MAIN_SETTINGS["CB_value"] == "auto"
                 and cyr is False
             ):
-                with open(filepath, "rb") as file_opened:
-                    content = file_opened.read()
                 c = 0
                 for i in "аеиo".encode("windows-1251"):
-                    if content.find(i) < 0:
+                    if bytes_data.find(i) < 0:
                         c += 1
                 if c > 0:
                     self.ErrorDlg(filepath)
