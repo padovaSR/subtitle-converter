@@ -5,9 +5,21 @@
 #
 # Author:      darkstar
 #-------------------------------------------------------------------------------
-
+import sys
 import re
-from codecs import BOM_UTF8, BOM_UTF16
+import wx
+try:
+    from charset_normalizer import from_bytes
+except ImportError:
+    app = wx.App(False)
+    wx.MessageBox(
+        f"ImportError\n\nTo continue install ‚charset_normalizer’:\n"
+        f"’pip insatll charset_normalizer‘",
+        "SubtitleConverter",
+        wx.OK | wx.ICON_ERROR,
+    )
+    app.Destroy()
+    sys.exit(1)
 
 import logging.config
 logger = logging.getLogger(__name__)
@@ -16,21 +28,14 @@ logger = logging.getLogger(__name__)
 def checkCyrillicAlphabet(input_text):
     
     def decode_text() -> str:
-        if input_text[:4].startswith(BOM_UTF8):
-            return input_text.decode("utf-8")
-        elif input_text[:4].startswith(BOM_UTF16):
-            return input_text.decode("utf-16")
-        else:
-            for enc in ["cp1251", "utf-8"]:
-                try:
-                    input_text.decode(enc)
-                except:
-                    logger.debug(f"Error decoding with {enc}")
-                else:
-                    logger.debug(f"Decoding with: {enc}")
-                    break
-            return input_text.decode(enc)
-        
+        data = from_bytes(input_text)
+        first = data.best().encoding        
+        for enc in [first, "cp1251", "utf-8"]:
+            try:
+                return input_text.decode(enc)
+            except:
+                logger.debug(f"Error with {enc}")
+            
     if isinstance(input_text, bytes):
         input_text = decode_text()
             
