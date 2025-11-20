@@ -30,7 +30,7 @@ def checkCyrillicAlphabet(input_text):
     def decode_text() -> str:
         data = from_bytes(input_text)
         first = data.best().encoding        
-        for enc in [first, "cp1251", "utf-8"]:
+        for enc in [first, "cp1251", "utf-8", "cp1250"]:
             try:
                 return input_text.decode(enc)
             except:
