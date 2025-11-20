@@ -109,11 +109,12 @@ class FileHandler:
         elif bytes_data.startswith(BOM_UTF16):
             return "utf-16"
         else:
-            if MAIN_SETTINGS["CB_value"] == "auto" and len(self.fCodeList) > 1:
+            encoding_list = self.fCodeList()
+            if len(encoding_list) > 1 and MAIN_SETTINGS["CB_value"] == "auto":
                 data = from_bytes(bytes_data)
                 first_encoding = data.best().encoding
-                self.fCodeList.insert(0, first_encoding)            
-            for enc in self.fCodeList():
+                encoding_list.insert(0, first_encoding)
+            for enc in encoding_list:
                 try:
                     if cyr is True and enc == "windows-1250":
                         continue
