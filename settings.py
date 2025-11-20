@@ -34,6 +34,8 @@ def printEncoding(entered_enc):
         return "UTF-8"
     elif entered_enc == "utf-16":
         return "UTF-16"
+    elif entered_enc.startswith("cp"):
+        return entered_enc.replace("cp", "windows-")
     else: return entered_enc
 
 def lenZip(infile):
