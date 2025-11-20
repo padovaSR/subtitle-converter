@@ -5,7 +5,10 @@ from resources.DictHandle import Dictionaries, lat_cir_mapa
 from resources.IsCyrillic import checkCyrillicAlphabet
 from settings import MAIN_SETTINGS, MULTI_FILE, FILE_HISTORY, lenZip
 from choice_dialog import MultiChoice
-
+try:
+    from charset_normalizer import from_bytes
+except ImportError:
+    pass
 import os
 from os.path import basename, dirname, join, normpath, splitext, isfile
 from collections import namedtuple
@@ -74,6 +77,7 @@ class FileHandler:
                 "utf-8-sig",
                 "iso-8859-1",
                 "iso-8859-2",
+                "iso-8859-5",
                 "utf-16",
                 "latin2"
                 "ascii",
@@ -105,6 +109,10 @@ class FileHandler:
         elif bytes_data.startswith(BOM_UTF16):
             return "utf-16"
         else:
+            if MAIN_SETTINGS["CB_value"] == "auto" and len(self.fCodeList) > 1:
+                data = from_bytes(bytes_data)
+                first_encoding = data.best().encoding
+                self.fCodeList.insert(0, first_encoding)            
             for enc in self.fCodeList():
                 try:
                     if cyr is True and enc == "windows-1250":
