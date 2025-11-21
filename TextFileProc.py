@@ -681,13 +681,12 @@ class Transliteracija(DocumentHandler):
 
                 cf = f_reg.findall(text_ch)
 
-                lj = [x.translate(transltab) for x in cf]
-
-                for i in lj:
+                lj = []
+                for x in cf:
+                    x = x.translate(transltab) # single letters
                     for k, v in rd.items():
-                        a = lj.index(i)
-                        i = i.replace(k, v)
-                        lj[a] = i
+                        x = x.replace(k, v)    # digraphs
+                    lj.append(x)
 
                 dok = dict(zip(cf, lj))
 
