@@ -307,7 +307,7 @@ class DocumentHandler:
                 .replace(b"\xc5\xb8\xc5\x92", b"")
                 .replace(b"\xc2\x81", b"")
                 .replace(b"\xc2\x90", b"")
-                .replace(b"\xef\xbf\xbd", b"")  # � utf8 surrogate
+                #.replace(b"\xef\xbf\xbd", b"")  # � utf8 surrogate
             )
             # .replace(b'\x9e', b'\xc5\xbe') \xe2\x96\xa0 = ■
             return mp.decode(encoding="utf-8", errors="surrogatepass")
@@ -638,7 +638,6 @@ class Transliteracija(DocumentHandler):
     def changeLetters(self):
         """
         Funkcija za transliterizaciju.
-        pre_cyr je rečnik iz preLatCyr.map.cfg
         """
         reversed_action = self.reversed_action
         MAPA = lat_cir_mapa
@@ -702,6 +701,7 @@ class Transliteracija(DocumentHandler):
             logger.debug(f"Preslovljavanje, no text found!")
 
     def prepocessing(self, text):
+        """pre_cyr je rečnik iz preLatCyr.map.cfg"""
         reversed_action = self.reversed_action
         pre_cyr = Dictionaries().pre_cyr
         try:
