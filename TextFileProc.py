@@ -683,9 +683,11 @@ class Transliteracija(DocumentHandler):
 
                 lj = []
                 for x in cf:
-                    x = x.translate(transltab) # single letters
+                    # 1️⃣ Replace digraphs first
                     for k, v in rd.items():
-                        x = x.replace(k, v)    # digraphs
+                        x = x.replace(k, v)
+                    # 2️⃣ Then transliterate single letters
+                    x = x.translate(transltab)
                     lj.append(x)
 
                 dok = dict(zip(cf, lj))
