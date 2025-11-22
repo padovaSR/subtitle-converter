@@ -30,7 +30,7 @@ def printEncoding(entered_enc):
     ''''''
     if entered_enc == "utf-8-sig":
         return "UTF-8 BOM"
-    elif entered_enc == "utf-8":
+    elif entered_enc in ("utf-8", "utf_8"):
         return "UTF-8"
     elif entered_enc == "utf-16":
         return "UTF-16"
