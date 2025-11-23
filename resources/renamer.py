@@ -300,6 +300,7 @@ class RenameFiles(wx.Dialog):
         # Connect Events
         self.searchCtrl1.Bind(wx.EVT_TEXT_ENTER, self.onSearch)
         self.searchCtrl1.Bind(wx.EVT_SEARCHCTRL_SEARCH_BTN, self.onSearch)
+        self.searchCtrl1.Bind(wx.EVT_TEXT, self.onSearch)
         self.Bind(wx.EVT_TREE_BEGIN_DRAG, self.OnBeginDrag, self.genericDirCtrl.GetTreeCtrl())
         self.splitter1.Bind(wx.EVT_SPLITTER_SASH_POS_CHANGED, self.GetsplitterPosition)
         self.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.onFileActivated, self.genericDirCtrl.GetTreeCtrl())
@@ -455,12 +456,10 @@ class RenameFiles(wx.Dialog):
     def find_first_match(self, tree, parent, query, expand):
         """DFS from 'parent' but SKIP checking 'parent' itself"""
         
-        pattern = re.compile(r"\b{}\b".format(re.escape(query)))
-    
         child, cookie = tree.GetFirstChild(parent)
         while child.IsOk():
             label = tree.GetItemText(child).lower()
-            if pattern.search(label):
+            if query in label:
                 return child
     
             if expand and not tree.IsExpanded(child):
