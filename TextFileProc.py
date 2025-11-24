@@ -128,16 +128,16 @@ class FileHandler:
                 data = from_bytes(bytes_data)
                 first_encoding = data.best().encoding
 
-            second_encoding = self.detect_exYu_latin(bytes_data)
+                second_encoding = self.detect_exYu_latin(bytes_data)
             
-            if (
-                second_encoding is not None
-                and second_encoding != first_encoding
-                and cyr is False
-            ):
-                encoding_list.insert(0, second_encoding)
-            else:
-                encoding_list.insert(0, first_encoding)
+                if (
+                    second_encoding is not None
+                    and second_encoding != first_encoding
+                    and cyr is False
+                ):
+                    encoding_list.insert(0, second_encoding)
+                else:
+                    encoding_list.insert(0, first_encoding)
 
             for enc in encoding_list:
                 try:
