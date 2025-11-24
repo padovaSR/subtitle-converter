@@ -97,6 +97,18 @@ class FileHandler:
         multi = namedtuple("multi", ["path", "enc", "realpath"])
         MULTI_FILE.append(multi(path, enc, realpath))
 
+    @staticmethod    
+    def detect_exYu_latin(data_content):
+        test_chars = "čćšžđČĆŠŽĐ"
+        for enc in ["windows-1250", "utf-8", "iso-8859-1", "iso-8859-2"]:
+            try:
+                encoded = test_chars.encode(enc)
+            except Exception:
+                continue
+            if any(ch in data_content for ch in encoded):
+                return enc
+        return None
+
     def findEncoding(self, filepath):
         """"""
         cyr = False
@@ -113,7 +125,18 @@ class FileHandler:
             if len(encoding_list) > 1 and MAIN_SETTINGS["CB_value"] == "auto":
                 data = from_bytes(bytes_data)
                 first_encoding = data.best().encoding
+
+            second_encoding = self.detect_exYu_latin(bytes_data)
+            
+            if (
+                second_encoding is not None
+                and second_encoding != first_encoding
+                and cyr is False
+            ):
+                encoding_list.insert(0, second_encoding)
+            else:
                 encoding_list.insert(0, first_encoding)
+
             for enc in encoding_list:
                 try:
                     if cyr is True and enc == "windows-1250":
