@@ -100,7 +100,7 @@ class FileHandler:
     @staticmethod    
     def detect_exYu_latin(data_content):
         test_chars = "čćšžđČĆŠŽĐ"
-        for enc in ["windows-1250", "utf-8", "iso-8859-1", "iso-8859-2"]:
+        for enc in ["windows-1250", "utf-8", "iso-8859-1"]:
             try:
                 encoded = test_chars.encode(enc)
             except UnicodeEncodeError as e:
