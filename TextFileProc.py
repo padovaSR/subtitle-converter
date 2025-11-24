@@ -103,7 +103,8 @@ class FileHandler:
         for enc in ["windows-1250", "utf-8", "iso-8859-1", "iso-8859-2"]:
             try:
                 encoded = test_chars.encode(enc)
-            except Exception:
+            except UnicodeEncodeError as e:
+                logger.debug(f"detect_exYu_latin: {e}")
                 continue
             if any(ch in data_content for ch in encoded):
                 return enc
