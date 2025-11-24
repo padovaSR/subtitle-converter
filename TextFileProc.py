@@ -123,6 +123,7 @@ class FileHandler:
             return "utf-16"
         else:
             encoding_list = self.fCodeList()
+            first_encoding = None
             if len(encoding_list) > 1 and MAIN_SETTINGS["CB_value"] == "auto":
                 data = from_bytes(bytes_data)
                 first_encoding = data.best().encoding
