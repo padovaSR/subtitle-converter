@@ -5,6 +5,7 @@ import os
 from itertools import chain 
 import zipfile
 import re
+from charset_normalizer import from_path
 
 import logging.config
 logger = logging.getLogger(__name__)
@@ -105,16 +106,17 @@ class ExportZip:
     def createLatin_UTF8(input_file):
         """"""
         text = ""
-        for enc in ["utf-8", "cp1250"]:
-            try:
-                with open(input_file, "r", encoding=enc) as f:
-                    text = f.read()
-            except:
-                logger.debug(f"createLatin_UTF8: trying {enc}")
-            else:
-                logger.debug(f"createLatin_UTF8: opened {enc}")
-            if not text:
-                text = f"{basename(input_file)}\n\nError reading from file.\nPlease fix the file."            
+        data = from_path(input_file, cp_isolation=["utf-8", "cp1250"])
+        enc = data.best().encoding
+        try:
+            with open(input_file, "r", encoding=enc) as f:
+                text = f.read()
+        except (UnicodeDecodeError, Exception) as e:
+            logger.debug(f"Error opening: {e}")
+        else:
+            logger.debug(f"File opened with: {enc}")
+        if not text:
+            text = f"{basename(input_file)}\n\nError reading from file.\nPlease fix the file."            
         return text.encode("utf-8", errors="surrogatepass")
 
     @staticmethod
