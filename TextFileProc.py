@@ -142,10 +142,10 @@ class FileHandler:
                 and cyr is False
             ):
                 c = 0
-                for i in "аеиo".encode("windows-1251"):
+                for i in "аеио".encode("windows-1251"):
                     if bytes_data.find(i) < 0:
                         c += 1
-                if c > 0:
+                if c > 1:
                     self.ErrorDlg(filepath)
                     for real_enc in ["utf-8", "windows-1250"]:
                         try:
