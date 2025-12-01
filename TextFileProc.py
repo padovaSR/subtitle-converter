@@ -681,7 +681,7 @@ class Transliteracija(DocumentHandler):
 
                 rd = {"Љ": "Lj", "Њ": "Nj", "Џ": "Dž", "љ": "lj", "њ": "nj", "џ": "dž"}
 
-                f_reg = re.compile(r"<[^<]*?>|www\.\w+\.\w+", (re.I | re.M))
+                f_reg = re.compile(r"<[^<]*?>|{[^{]*?}|www\.\w+\.\w+", (re.I | re.M))
 
                 cf = f_reg.findall(text_ch)
 
