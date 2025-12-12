@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 def checkCyrillicAlphabet(input_text):
     
     def decode_text() -> str:
-        data = from_bytes(input_text)
+        data = from_bytes(input_text, cp_isolation=["cp1251", "utf-8", "cp1250"])
         first = data.best().encoding        
         for enc in [first, "cp1251", "utf-8", "cp1250"]:
             try:
