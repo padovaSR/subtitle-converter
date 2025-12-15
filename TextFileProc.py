@@ -97,9 +97,23 @@ class FileHandler:
         multi = namedtuple("multi", ["path", "enc", "realpath"])
         MULTI_FILE.append(multi(path, enc, realpath))
 
+    @staticmethod
+    def fileFix(file_path):
+        """"""
+        bad_byte = b'\x98'
+        with open(file_path, "rb") as fb:
+            data = fb.read()
+        
+        if bad_byte in data:
+            cleaned = data.replace(bad_byte, b"")
+        
+            with open(file_path, "wb") as f:
+                f.write(cleaned)
+
     def findEncoding(self, filepath):
         """"""
         cyr = False
+        self.fileFix(filepath)
         with open(filepath, "rb") as data_f:
             bytes_data = data_f.read()
         if checkCyrillicAlphabet(bytes_data) > 70:
