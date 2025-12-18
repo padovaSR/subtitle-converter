@@ -100,15 +100,15 @@ class FileHandler:
     @staticmethod
     def fileFix(file_path):
         """"""
-        bad_byte = b'\x98'
         with open(file_path, "rb") as fb:
             data = fb.read()
+            
+            # Remove 0x98 ONLY if it is NOT part of a UTF-8 Cyrillic sequence
+            cleaned = re.sub(b'(?<![\xD0-\xD7])\x98', b'', data)
         
-        if bad_byte in data:
-            cleaned = data.replace(bad_byte, b"")
-        
-            with open(file_path, "wb") as f:
-                f.write(cleaned)
+            if cleaned != data:
+                with open(file_path, "wb") as f:
+                    f.write(cleaned)
 
     def findEncoding(self, filepath):
         """"""
