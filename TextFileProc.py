@@ -109,6 +109,8 @@ class FileHandler:
             if cleaned != data:
                 with open(file_path, "wb") as f:
                     f.write(cleaned)
+                removed = len(data) - len(cleaned)
+                logger.debug(f"fileFix: Removed {removed} junk bytes")                    
 
     def findEncoding(self, filepath):
         """"""
