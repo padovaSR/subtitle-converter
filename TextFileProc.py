@@ -763,7 +763,7 @@ def normalizeText(file_encoding, filepath):
     # error = "strict"
     # error="surrogateescape"
     error = "replace"
-    if file_encoding in codelist:
+    if file_encoding.replace("_", "-") in codelist:
         error = "surrogatepass"
     try:
         with open(filepath, "r", encoding=file_encoding, errors=error) as file_opened:
