@@ -115,7 +115,6 @@ class FileHandler:
     def findEncoding(self, filepath):
         """"""
         cyr = False
-        self.fileFix(filepath)
         with open(filepath, "rb") as data_f:
             bytes_data = data_f.read()
         if checkCyrillicAlphabet(bytes_data) > 70:
@@ -769,6 +768,7 @@ def normalizeText(file_encoding, filepath):
         with open(filepath, "r", encoding=file_encoding, errors=error) as file_opened:
             content = file_opened.read()
     except UnicodeDecodeError as e:
-        logger.debug(f"normalizeText: {e}")
-        content = f"{os.path.basename(filepath)}\n\n{e}"
+        bad = e.object[max(0, e.start-15):e.end+15]
+        logger.debug(f"normalizeText: {e}, This: {bad}")
+        content = f"{os.path.basename(filepath)}\n\n{e}\n\nThis:\n{bad}"
     return unicodedata.normalize("NFKC", content)
