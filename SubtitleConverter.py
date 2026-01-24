@@ -6,7 +6,7 @@ from MultiSelection import MultiFiles
 from choice_dialog import MultiChoice
 from zip_confirm import ZipStructure
 from interactive_replace import FindReplace
-
+ 
 from settings_dialog import SettingsDialog
 from merge import myMerger
 from TextFileProc import FileHandler, DocumentHandler, ErrorsHandler, Transliteracija, normalizeText
