@@ -97,21 +97,6 @@ class FileHandler:
         multi = namedtuple("multi", ["path", "enc", "realpath"])
         MULTI_FILE.append(multi(path, enc, realpath))
 
-    @staticmethod
-    def fileFix(file_path):
-        """"""
-        with open(file_path, "rb") as fb:
-            data = fb.read()
-            
-            # Remove 0x98 ONLY if it is NOT part of a UTF-8 Cyrillic sequence
-            cleaned = re.sub(b'(?<![\xD0-\xD7])\x98', b'', data)
-        
-            if cleaned != data:
-                with open(file_path, "wb") as f:
-                    f.write(cleaned)
-                removed = len(data) - len(cleaned)
-                logger.debug(f"fileFix: Removed {removed} junk bytes")                    
-
     def findEncoding(self, filepath):
         """"""
         cyr = False
