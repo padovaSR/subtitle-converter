@@ -7,7 +7,6 @@ from os.path import join, basename, splitext
 import re
 import srt
 from srt import Subtitle
-import shutil
 from collections import defaultdict 
 from resources.DictHandle import Dictionaries
 from resources.transliterate import cyr_to_lat
@@ -65,22 +64,22 @@ class FindReplace(wx.Frame):
         # --- Edit menu ---
         self.edit_menu = wx.Menu()
         sKey = MAIN_SETTINGS["FrameShortcuts"]
-        self.undo_menu = self.edit_menu.Append(wx.ID_ANY, f"Undo\t{sKey["Undo"]}")
-        self.redo_menu = self.edit_menu.Append(wx.ID_ANY, f"Redo\t{sKey["Redo"]}")
+        self.undo_menu = self.edit_menu.Append(wx.ID_ANY, f"Undo\t{sKey['Undo']}")
+        self.redo_menu = self.edit_menu.Append(wx.ID_ANY, f"Redo\t{sKey['Redo']}")
         self.edit_menu.AppendSeparator()
-        self.accept_menu = self.edit_menu.Append(wx.ID_ANY, f"Accept\t{sKey["Accept"]}")
-        self.ignore_menu = self.edit_menu.Append(wx.ID_ANY, f"Ignore\t{sKey["Ignore"]}")
-        self.replaceall_menu = self.edit_menu.Append(wx.ID_ANY, f"ReplaceAll\t{sKey["ReplaceAll"]}")
-        self.ignoreall_menu = self.edit_menu.Append(wx.ID_ANY, f"IgnoreAll\t{sKey["IgnoreAll"]}")
-        self.add_menu = self.edit_menu.Append(wx.ID_ANY, f"Add\t{sKey["Add"]}")
-        self.ok_menu = self.edit_menu.Append(wx.ID_ANY, f"Ok\t{sKey["Ok"]}")
-        self.cancel_menu = self.edit_menu.Append(wx.ID_ANY, f"Cancel\t{sKey["Cancel"]}")
+        self.accept_menu = self.edit_menu.Append(wx.ID_ANY, f"Accept\t{sKey['Accept']}")
+        self.ignore_menu = self.edit_menu.Append(wx.ID_ANY, f"Ignore\t{sKey['Ignore']}")
+        self.replaceall_menu = self.edit_menu.Append(wx.ID_ANY, f"ReplaceAll\t{sKey['ReplaceAll']}")
+        self.ignoreall_menu = self.edit_menu.Append(wx.ID_ANY, f"IgnoreAll\t{sKey['IgnoreAll']}")
+        self.add_menu = self.edit_menu.Append(wx.ID_ANY, f"Add\t{sKey['Add']}")
+        self.ok_menu = self.edit_menu.Append(wx.ID_ANY, f"Ok\t{sKey['Ok']}")
+        self.cancel_menu = self.edit_menu.Append(wx.ID_ANY, f"Cancel\t{sKey['Cancel']}")
         self.edit_menu.AppendSeparator()
-        self.replace_menu = self.edit_menu.Append(wx.ID_ANY, f"Replace\t{sKey["Replace"]}")
-        self.skip_menu = self.edit_menu.Append(wx.ID_ANY, f"Skip\t{sKey["Skip"]}")
-        self.next_menu = self.edit_menu.Append(wx.ID_ANY, f"Next\t{sKey["Next"]}")
+        self.replace_menu = self.edit_menu.Append(wx.ID_ANY, f"Replace\t{sKey['Replace']}")
+        self.skip_menu = self.edit_menu.Append(wx.ID_ANY, f"Skip\t{sKey['Skip']}")
+        self.next_menu = self.edit_menu.Append(wx.ID_ANY, f"Next\t{sKey['Next']}")
         self.edit_menu.AppendSeparator()
-        self.translate_menu = self.edit_menu.Append(wx.ID_ANY, f"Translate\t{sKey["Translate"]}")
+        self.translate_menu = self.edit_menu.Append(wx.ID_ANY, f"Translate\t{sKey['Translate']}")
 
         self.menubar.Append(self.edit_menu, "&Edit")
         
@@ -107,7 +106,7 @@ class FindReplace(wx.Frame):
         self.destination_item = self.preferences_menu.AppendSubMenu(self.destination, "Destination")
         
         self.preferences_menu.AppendSeparator()
-        self.lock_menu = self.preferences_menu.AppendCheckItem(wx.ID_ANY, f"Focus lock\t{sKey["Lock focus"]}")
+        self.lock_menu = self.preferences_menu.AppendCheckItem(wx.ID_ANY, f"Focus lock\t{sKey['Lock focus']}")
         self.lock_menu.Check(MAIN_SETTINGS["Manually"]["LockFocus"])
         self.lock_menu.SetHelp("Lock focus on text edit")
         self.preferences_menu.AppendSeparator()        
