@@ -518,7 +518,6 @@ class FindReplace(wx.Frame):
         #if self.matches:
         self.update_matches_from_content(new_content)            
         self.replaced_text = True
-        self.sub.content = new_content
         self.sub = Subtitle(self.sub.index, self.sub.start, self.sub.end, new_content)
             
     def skip_selected(self, event=None):
@@ -665,6 +664,7 @@ class FindReplace(wx.Frame):
             return
         try:
             [self.wdict.pop(k, None) for k in self.Ignored]
+            self.wdict = {k: v for k, v in self.wdict.items() if k != v}
             keys_sorted = sorted(self.wdict.keys(), key=len, reverse=True)
             if self.whole_word is False:
                 r1 = re.compile(r"("+"|".join(map(re.escape, keys_sorted))+r")")
