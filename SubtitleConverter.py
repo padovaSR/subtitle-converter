@@ -69,7 +69,7 @@ class MainWindow(ConverterFrame):
 
     def __init__(self, *args):
         ConverterFrame.__init__(self, *args)
-
+        
         self.SetTitle(f"SubtitleConverter {VERSION}")
         
         drop_target = MyFileDropTarget(self.Text_1)
@@ -155,6 +155,9 @@ class MainWindow(ConverterFrame):
         self.Bind(wx.EVT_MENU_RANGE, self.onFileHistory, id=wx.ID_FILE1, id2=wx.ID_FILE9,)        
         self.Text_1.Bind(wx.EVT_TEXT, self.documentWasModified)
         self.Text_1.Bind(wx.EVT_TEXT_ENTER, self.setFontAndStyle)
+        self.Bind(wx.EVT_MENU, self.on_preferences, self.notify)
+        self.Bind(wx.EVT_MENU, self.on_preferences, self.utf8_BOM)
+        self.Bind(wx.EVT_MENU, self.on_preferences, self.utf8_TXT)        
         ##==============================================================================##
          
         MAIN_SETTINGS["CB_value"] = self.comboBox.GetValue()
@@ -1087,10 +1090,28 @@ class MainWindow(ConverterFrame):
         height = self.GetSize().GetHeight()        
         MAIN_SETTINGS["FrameSize"] = {"W": width, "H": height}
         MAIN_SETTINGS["Preferences"]["bom_utf8"] = self.utf8_BOM.IsChecked()
-        MAIN_SETTINGS["Preferences"]["utf8_txt"] = self.utf8_TXT.IsChecked()        
+        MAIN_SETTINGS["Preferences"]["utf8_txt"] = self.utf8_TXT.IsChecked()
+        MAIN_SETTINGS["Preferences"]["Notify"] = self.notify.IsChecked()
         with open(main_settings_file, "w", encoding="utf-8") as wf:
             wf.write(json.dumps(MAIN_SETTINGS, ensure_ascii=False, indent=4))
         shutil.copyfile(main_settings_file, main_settings_file+".bak")        
+        
+    def set_preferences_callback(self, callback):
+        self._pref_callback = callback
+    
+    def on_preferences(self, event):
+        """"""
+        item_id = event.GetId()
+        checked = event.IsChecked()
+    
+        if item_id == self.notify.GetId():
+            MAIN_SETTINGS["Preferences"]["Notify"] = checked
+        
+        elif item_id == self.utf8_BOM.GetId():
+            MAIN_SETTINGS["Preferences"]["bom_utf8"] = checked
+        
+        elif item_id == self.utf8_TXT.GetId():
+            MAIN_SETTINGS["Preferences"]["utf8_txt"] = checked
         
     def writeFileHistory(self, hfile_list):
         """"""
