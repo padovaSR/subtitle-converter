@@ -1096,9 +1096,6 @@ class MainWindow(ConverterFrame):
             wf.write(json.dumps(MAIN_SETTINGS, ensure_ascii=False, indent=4))
         shutil.copyfile(main_settings_file, main_settings_file+".bak")        
         
-    def set_preferences_callback(self, callback):
-        self._pref_callback = callback
-    
     def on_preferences(self, event):
         """"""
         item_id = event.GetId()
