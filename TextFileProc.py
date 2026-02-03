@@ -503,7 +503,7 @@ class ErrorsHandler:
         self.input_text = input_text
         self.input_file = input_file
         self.encoding = encoding
-
+        
     def findSurrogates(self):
         text = self.input_text
         # Find all the surrogates and their positions in the text
@@ -532,7 +532,7 @@ class ErrorsHandler:
 
     def showMeError(self):
 
-        cb3_s = MAIN_SETTINGS["Preferences"]["ShowLog"]
+        cb3_s = MAIN_SETTINGS["Preferences"]["Notify"]
 
         fs = open(self.input_file, "r", encoding=self.encoding)
         file_content = fs.read()
@@ -543,7 +543,7 @@ class ErrorsHandler:
 
         if len(subs) > 0:
             st = "LINIJE SA GREŠKAMA:\n\n"
-            FP = re.compile(r"\b\?\b|\b\?\'\b|(^\?+$)|(?:<(i|u|b|font)>)\?+.*\n*\?*.*")
+            FP = re.compile(r"\?+(?=\w)|\b\?\b|\b\?\'\b|(^\?+$)|(?:<(i|u|b|font)>)\?+.*\n*\?*.*")
             sl = []
             for subtitle in subs:
                 if re.search(FP, subtitle.content):
@@ -561,7 +561,10 @@ class ErrorsHandler:
                 if os.path.isfile(outfile):
                     logger.debug(f": {outfile}")
                 if cb3_s is True:
-                    webbrowser.open(outfile)
+                    wx.MessageBox(
+                        f"Linije sa greškama\n\n{basename(self.input_file)}\n\n{subs_data}",
+                        "SubtitleConverter",
+                    )
         else:
             logger.debug(f"showMeError: No subtitles found in {basename(self.input_file)}")
             if file_content.startswith(basename(self.input_file)):
