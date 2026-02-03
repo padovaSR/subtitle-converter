@@ -739,7 +739,7 @@ class ConverterFrame(wx.Frame):
         self.preferences = wx.Menu()
         self.utf8_BOM = wx.MenuItem(
             self.preferences,
-            1011,
+            wx.ID_ANY,
             u"utf8_bom" + "\t" + keyS["bom_utf8"],
             wx.EmptyString,
             wx.ITEM_CHECK,
@@ -748,7 +748,7 @@ class ConverterFrame(wx.Frame):
 
         self.utf8_TXT = wx.MenuItem(
             self.preferences,
-            1012,
+            wx.ID_ANY,
             u"utf8_txt" + "\t" + keyS["txt_utf8"],
             wx.EmptyString,
             wx.ITEM_CHECK,
@@ -756,6 +756,12 @@ class ConverterFrame(wx.Frame):
         self.preferences.Append(self.utf8_TXT)
 
         self.preferences.AppendSeparator()
+        self.notify = self.preferences.AppendCheckItem(
+            wx.ID_ANY,
+            f"ShowErrors\t{keyS['ShowErrors']}",
+            "Pokazuje Info poruku sa greškama",
+        )
+        self.preferences.AppendSeparator()        
 
         self.settings_main = wx.MenuItem(
             self.preferences,
@@ -827,9 +833,11 @@ class ConverterFrame(wx.Frame):
         try:
             menu_dict = MAIN_SETTINGS["Preferences"]
             if menu_dict["bom_utf8"] is True:
-                self.preferences.Check(1011, check=True)
+                self.utf8_BOM.Check(True)
             if menu_dict["utf8_txt"] is True:
-                self.preferences.Check(1012, check=True)
+                self.utf8_TXT.Check(True)
+            if menu_dict["Notify"] is True:
+                self.notify.Check(True)
         except Exception as e:
             logger.debug(f"{e}")        
 
