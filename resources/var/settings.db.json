@@ -1,8 +1,9 @@
 {
     "Preferences": {
         "utf8_txt": false,
-        "bom_utf8": true,
-        "ShowLog": false
+        "bom_utf8": false,
+        "ShowLog": true,
+        "Notify": false
     },
     "key4": {
         "new_font": "Franklin Gothic Medium",
@@ -18,8 +19,8 @@
         "cyr_ansi_srt": "cyr",
         "cyr_utf8_txt": "cyr_utf8",
         "cyr_utf8_srt": "cyr_utf8",
-        "lat_ansi_srt": "",
-        "lat_utf8_srt": "",
+        "lat_ansi_srt": "lat",
+        "lat_utf8_srt": "utf8",
         "cleanup": "",
         "transcribe": "",
         "fixed_subs": "",
@@ -57,7 +58,7 @@
         "W": 1153,
         "H": 939,
         "splitter": 410,
-        "Selected": "C:\\Users\\darkstar\\Desktop\\subs-test"
+        "Selected": "C:\\Users\\darkstar\\Desktop\\titl_1"
     },
     "ChoiceDialog": {
         "W": 788,
@@ -112,5 +113,5 @@
         "W": 647,
         "H": 543
     },
-    "Directory": "C:\\Users\\darkstar\\Desktop\\DEV_CONVERTER_wx"
+    "Directory": "C:\\Users\\darkstar\\Desktop"
 }
