@@ -371,7 +371,7 @@ class RenameFiles(wx.Dialog):
             logger.debug(f"getNames: {e}")        
 
     def renameFiles(self, event):
-        ''''''
+        """OK button event"""
         self.renamed.clear()
         n = len(self.m_textCtrl2.GetStrings())
         if n > 2 and self.subtitles:
@@ -385,7 +385,8 @@ class RenameFiles(wx.Dialog):
             try:
                 line = subtitle_list[i]
                 new_name = join(os.path.dirname(self.subtitles[i]), line)
-                shutil.move(self.subtitles[i], new_name)
+                if os.path.exists(self.subtitles[i]):
+                    shutil.move(self.subtitles[i], new_name)
                 self.m_textCtrl1.AppendText(f"{line}\n")
                 self.renamed.append(line)
                 if n > 2:
