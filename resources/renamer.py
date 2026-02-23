@@ -8,7 +8,7 @@ import sys
 import os
 import re
 import shutil
-from os.path import basename, join, dirname, split, splitext, normpath
+from os.path import basename, join, dirname, split, splitext, normpath, exists
 import wx
 import wx.adv
 
@@ -374,27 +374,25 @@ class RenameFiles(wx.Dialog):
         """OK button event"""
         self.renamed.clear()
         n = len(self.m_textCtrl2.GetStrings())
+        subtitle_list = self.m_textCtrl2.GetStrings()
+        self.m_textCtrl1.Clear()        
         if n > 2 and self.subtitles:
             pl_name = f"{split(dirname(self.subtitles[0]))[1]}.m3u"
             pl_file = join(dirname(self.subtitles[0]), pl_name)
-            with open(pl_file, "w", encoding="utf-8") as f:
-                f.write(f"#{basename(pl_file)[:-4]} Playlist\n")            
-        subtitle_list = self.m_textCtrl2.GetStrings()
-        self.m_textCtrl1.Clear()
-        for i in range(0, n):
-            try:
-                line = subtitle_list[i]
-                new_name = join(os.path.dirname(self.subtitles[i]), line)
-                if os.path.exists(self.subtitles[i]):
-                    shutil.move(self.subtitles[i], new_name)
-                self.m_textCtrl1.AppendText(f"{line}\n")
-                self.renamed.append(line)
-                if n > 2:
-                    with open(pl_file, "a", encoding="utf-8") as f:
-                        f.write(f"{splitext(line)[0]}{self.vid_suffix}\n")                
-                logger.debug(f"{basename(self.subtitles[i])} -> {line}")
-            except Exception as e:
-                logger.debug(f"renameFiles: {e}")
+            with open(pl_file, "w", encoding="utf-8") as playlist:
+                playlist.write(f"#{basename(pl_file)[:-4]} Playlist\n")
+                for i in range(0, n):
+                    try:
+                        line = subtitle_list[i]
+                        new_name = join(dirname(self.subtitles[i]), line)
+                        if exists(self.subtitles[i]):
+                            shutil.move(self.subtitles[i], new_name)                
+                        self.m_textCtrl1.AppendText(f"{line}\n")
+                        self.renamed.append(line)
+                        playlist.write(f"{splitext(line)[0]}{self.vid_suffix}\n")                
+                        logger.debug(f"{basename(self.subtitles[i])} -> {line}")
+                    except Exception as e:
+                        logger.debug(f"renameFiles: {e}")
         self.writeSettings()
         self.checkRenamed()
         
