@@ -19,21 +19,23 @@ from settings import MAIN_SETTINGS
 import logging.config
 logger = logging.getLogger(__name__)
 
-class MyFileDropTarget(wx.TextDropTarget):
+    
+class MyFileDropTarget(wx.FileDropTarget):
     def __init__(self, text_ctrl, dialog):
-        wx.TextDropTarget.__init__(self)
+        super().__init__()
         self.text_ctrl = text_ctrl
         self.dialog = dialog
 
-    def OnDropText(self, x, y, data):
-        self.dialog.folder_path = data  # Store the path in the dialog
-        self.dialog.OnFolderDropped(data)  # Handle the dropped folder
+    def OnDropFiles(self, x, y, filenames):
+        path = filenames[0]
+        self.dialog.folder_path = path
+        self.dialog.OnFolderDropped(path)
         return True
 
 class CollectFiles:
     """"""
-    RP\
-        =re.compile(r"\d{4}\w?\.?|(x|h)\.?26(4|5)|N(10|265)|ddp5\.1\.?|\b\w{2,}\b(?<!\d)|[\.-]|(ION\d{2,3})|(?<=part[.\-])\d+|s\d+e|\
+    RP = \
+        re.compile(r"\d{4}\w?\.?|(x|h)\.?26(4|5)|N(10|265)|ddp5\.1\.?|\b\w{2,}\b(?<!\d)|[\.-]|(ION\d{2,3})|(?<=part[.\-])\d+|s\d+e|\
         ([a-z]+\.+){1,5}|[a-z ]|\d+\.(?=s[0-9])|(\([^\)]*\))|se(a|z)s*ona*\s*\d{1,2}|\d{1,2}x|\s+\d{1,2\s*}",re.I)
     subtitles = []
     def __init__(self, selected_folder=None):
@@ -282,6 +284,7 @@ class RenameFiles(wx.Dialog):
 
         self.Centre(wx.BOTH)
 
+        self.search_timer = None
         self.last_query = None
         self.current_path = None
         self.suffix = ".srt"
@@ -321,10 +324,11 @@ class RenameFiles(wx.Dialog):
         path = self.genericDirCtrl.GetPath(item)
 
         if os.path.isdir(path):  # Check if the item is a directory
-            tdo = wx.TextDataObject(path)
+            tdo = wx.FileDataObject()
+            tdo.AddFile(path)
             tds = wx.DropSource(tree)
             tds.SetData(tdo)
-            tds.DoDragDrop(True)
+            tds.DoDragDrop(True)            
         else:
             event.Skip()
 
@@ -375,24 +379,30 @@ class RenameFiles(wx.Dialog):
         self.renamed.clear()
         n = len(self.m_textCtrl2.GetStrings())
         subtitle_list = self.m_textCtrl2.GetStrings()
-        self.m_textCtrl1.Clear()        
+        if self.subtitles:
+            self.m_textCtrl1.Clear()        
         if n > 2 and self.subtitles:
             pl_name = f"{split(dirname(self.subtitles[0]))[1]}.m3u"
             pl_file = join(dirname(self.subtitles[0]), pl_name)
             with open(pl_file, "w", encoding="utf-8") as playlist:
                 playlist.write(f"#{basename(pl_file)[:-4]} Playlist\n")
                 for i in range(0, n):
-                    try:
-                        line = subtitle_list[i]
-                        new_name = join(dirname(self.subtitles[i]), line)
-                        if exists(self.subtitles[i]):
-                            shutil.move(self.subtitles[i], new_name)                
-                        self.m_textCtrl1.AppendText(f"{line}\n")
-                        self.renamed.append(line)
-                        playlist.write(f"{splitext(line)[0]}{self.vid_suffix}\n")                
-                        logger.debug(f"{basename(self.subtitles[i])} -> {line}")
-                    except Exception as e:
-                        logger.debug(f"renameFiles: {e}")
+                    line = subtitle_list[i]
+                    new_name = join(dirname(self.subtitles[i]), line)
+                    if exists(self.subtitles[i]):
+                        shutil.move(self.subtitles[i], new_name)                
+                    self.m_textCtrl1.AppendText(f"{line}\n")
+                    self.renamed.append(line)
+                    playlist.write(f"{splitext(line)[0]}{self.vid_suffix}\n")                
+                    logger.debug(f"{basename(self.subtitles[i])} -> {line}")
+        elif n < 2 and self.subtitles:
+            line = subtitle_list[0]
+            new_name = join(dirname(self.subtitles[0]), line)
+            if exists(self.subtitles[0]):
+                shutil.move(self.subtitles[0], new_name)
+            self.m_textCtrl1.AppendText(f"{line}\n")
+            self.renamed.append(line)                    
+            logger.debug(f"{basename(self.subtitles[0])} -> {line}")        
         self.writeSettings()
         self.checkRenamed()
         
@@ -449,6 +459,9 @@ class RenameFiles(wx.Dialog):
         if match:
             tree.EnsureVisible(match)
             tree.SelectItem(match)
+            if self.search_timer:
+                self.search_timer.Stop()
+            self.search_timer = wx.CallLater(3200, self.genericDirCtrl.SetFocus)            
         else:
             wx.Bell()        
     
