@@ -72,7 +72,7 @@ class CollectFiles:
         try:
             if len(subs) > 1 and len(vids) > 1:
                 for pair in zip(subs, vids):
-                    video = re.sub(r"Episode\s*\d+\s*-?\s*|Season\s*\d{1,2}\s*", "", pair[1], 2, re.I).rstrip(".mp4")
+                    video = re.sub(r"Episode\s*\d+\s*-?\s*|Season\s*\d{1,2}\s*", "", pair[1], 2, re.I).removesuffix(".mp4")
                     a = int(re.match(r"\D*(\d{1,2})", self.RP.sub("", pair[0])).group(1))
                     b = int(re.match(r"\D*(\d{1,2})", self.RP.sub("", video)).group(1))
                     a = max(0, a - 1)
