@@ -345,6 +345,7 @@ class RenameFiles(wx.Dialog):
             self.current_path = path
             self.Label_2.SetLabel(f"{path}")
             self.getNames()
+            self.Sizer5_OK.SetDefault()
         event.Skip()
 
     def get_current_user(self):
@@ -461,7 +462,7 @@ class RenameFiles(wx.Dialog):
             tree.SelectItem(match)
             if self.search_timer:
                 self.search_timer.Stop()
-            self.search_timer = wx.CallLater(3200, self.genericDirCtrl.SetFocus)            
+            self.search_timer = wx.CallLater(2400, self.genericDirCtrl.SetFocus)            
         else:
             wx.Bell()        
     
