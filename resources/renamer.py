@@ -345,7 +345,7 @@ class RenameFiles(wx.Dialog):
             self.current_path = path
             self.Label_2.SetLabel(f"{path}")
             self.getNames()
-            self.Sizer5_OK.SetDefault()
+            wx.CallLater(200, self.Sizer5_OK.SetDefault)
         event.Skip()
 
     def get_current_user(self):
