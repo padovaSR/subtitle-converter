@@ -5,39 +5,25 @@
 #
 # Author:      darkstar
 #-------------------------------------------------------------------------------
-import sys
 import re
-import wx
-try:
-    from charset_normalizer import from_bytes
-except ImportError:
-    app = wx.App(False)
-    wx.MessageBox(
-        f"ImportError\n\nTo continue install ‚charset_normalizer’:\n"
-        f"’pip insatll charset-normalizer‘",
-        "SubtitleConverter",
-        wx.OK | wx.ICON_ERROR,
-    )
-    app.Destroy()
-    sys.exit(1)
 
 import logging.config
 logger = logging.getLogger(__name__)
 
 
 def checkCyrillicAlphabet(input_text):
-    
+    """"""
+    encoding = None
     def decode_text() -> str:
-        data = from_bytes(input_text, cp_isolation=["cp1251", "utf-8", "cp1250"])
-        first = data.best().encoding        
-        for enc in [first, "cp1251", "utf-8", "cp1250"]:
+        for enc in ["cp1251", "utf-8", "cp1250"]:
             try:
-                return input_text.decode(enc)
+                return input_text.decode(enc), enc
             except:
                 logger.debug(f"Error with {enc}")
             
     if isinstance(input_text, bytes):
-        input_text = decode_text()
+        input_text,enc = decode_text()
+        encoding = enc
             
     def checkChars() -> int:
         def percentage(part, whole):
@@ -62,7 +48,7 @@ def checkCyrillicAlphabet(input_text):
             return False
 
     if maybeCyrillic() is True:
-        return checkChars()
+        return checkChars(), encoding
     else:
-        return False
+        return False, encoding
 
