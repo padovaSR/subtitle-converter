@@ -5,23 +5,30 @@ from resources.DictHandle import Dictionaries, lat_cir_mapa
 from resources.IsCyrillic import checkCyrillicAlphabet
 from settings import MAIN_SETTINGS, MULTI_FILE, FILE_HISTORY, lenZip
 from choice_dialog import MultiChoice
-try:
-    from charset_normalizer import from_bytes
-except ImportError:
-    pass
 import os
+import sys
 from os.path import basename, dirname, join, normpath, splitext, isfile
 from collections import namedtuple
 import codecs
 from codecs import BOM_UTF8, BOM_UTF16
 import unicodedata
 import zipfile
-import webbrowser
 import re
 import srt
-
 import wx
 
+try:
+    from charset_normalizer import from_bytes
+except ImportError:
+    app = wx.App(False)
+    wx.MessageBox(
+        f"ImportError\n\nTo continue install ‚charset_normalizer’:\n"
+        f"’pip insatll charset-normalizer‘",
+        "SubtitleConverter",
+        wx.OK | wx.ICON_ERROR,
+    )
+    app.Destroy()
+    sys.exit(1)
 
 import logging.config
 
@@ -37,7 +44,6 @@ codelist = [
     "utf-32-be",
     "utf-32-le",
 ]
-
 
 class FileHandler:
 
@@ -102,7 +108,8 @@ class FileHandler:
         cyr = False
         with open(filepath, "rb") as data_f:
             bytes_data = data_f.read()
-        if checkCyrillicAlphabet(bytes_data) > 70:
+        result, encoding = checkCyrillicAlphabet(bytes_data)
+        if result > 70:
             cyr = True
         if bytes_data.startswith(BOM_UTF8):
             return "utf-8-sig"
@@ -110,6 +117,8 @@ class FileHandler:
             return "utf-16"
         else:
             encoding_list = self.fCodeList()
+            if encoding is not None:
+                encoding_list.insert(0, encoding)
             first_encoding = None
             likely_encodings = ['cp1250', 'utf_8', 'cp1251']
             
@@ -743,7 +752,6 @@ class Transliteracija(DocumentHandler):
             text_in = text_in.replace(k, v)
 
         return text_in
-
 
 def normalizeText(file_encoding, filepath):
     """"""
