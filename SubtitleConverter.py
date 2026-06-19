@@ -309,7 +309,7 @@ class MainWindow(ConverterFrame):
                 self.Text_1.SetValue(text)
                 self.CYR = (
                     handler.file_encoding in ("windows-1251", "utf-8", "utf-8-sig", "utf-16")
-                    ) and checkCyrillicAlphabet(text) > 60
+                    ) and checkCyrillicAlphabet(text)[0] > 60
             if handler.real_path:
                 real_path = handler.real_path
                 self.SetStatusText(f"{basename(real_path)}", 0)
