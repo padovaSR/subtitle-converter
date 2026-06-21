@@ -15,15 +15,14 @@ def checkCyrillicAlphabet(input_text):
     """"""
     encoding = None
     def decode_text() -> str:
-        for enc in ["cp1251", "utf-8", "cp1250"]:
+        for enc in ["cp1251", "utf-8", "utf-16", "cp1250"]:
             try:
                 return input_text.decode(enc), enc
             except:
                 logger.debug(f"Error with {enc}")
             
     if isinstance(input_text, bytes):
-        input_text,enc = decode_text()
-        encoding = enc
+        input_text,encoding = decode_text()
             
     def checkChars() -> int:
         def percentage(part, whole):
