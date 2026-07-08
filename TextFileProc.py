@@ -674,6 +674,7 @@ class Transliteracija(DocumentHandler):
         """
         Funkcija za transliterizaciju.
         """
+        rn = MAIN_SETTINGS["Preferences"]["roman_numerals"]
         reversed_action = self.reversed_action
         MAPA = lat_cir_mapa
         if reversed_action is True:
@@ -692,7 +693,8 @@ class Transliteracija(DocumentHandler):
 
         ## preslovljavanje ########################################################
         text = self.rplStr(self.input_text)
-        text, saved = self.protect_roman_numerals(text)
+        if rn is True:
+            text, saved = self.protect_roman_numerals(text)
         text = self.prepocessing(text)
         if text:
             try:
@@ -707,7 +709,8 @@ class Transliteracija(DocumentHandler):
                 ## Fine tune ######################################################
                 robjCyr = re.compile("(%s)" % "|".join(map(re.escape, cir_lat.keys())))
                 text_ch = robjCyr.sub(lambda m: cir_lat[m.group(0)], text_ch)
-                text_ch = self.restore_roman_numerals(text_ch, saved)
+                if rn is True:
+                    text_ch = self.restore_roman_numerals(text_ch, saved)
                 ## reverse translate ##############################################
 
                 rd = {"Љ": "Lj", "Њ": "Nj", "Џ": "Dž", "љ": "lj", "њ": "nj", "џ": "dž"}
