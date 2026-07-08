@@ -695,12 +695,14 @@ class ConverterFrame(wx.Frame):
         
         try:
             menu_dict = MAIN_SETTINGS["Preferences"]
-            if menu_dict["bom_utf8"] is True:
-                self.utf8_BOM.Check(True)
-            if menu_dict["utf8_txt"] is True:
-                self.utf8_TXT.Check(True)
-            if menu_dict["Notify"] is True:
-                self.notify.Check(True)
+            items = {
+                "bom_utf8": self.utf8_BOM,
+                "utf8_txt": self.utf8_TXT,
+                "Notify": self.notify,
+                "roman_numerals": self.r_numerals,
+            }
+            for key, item in items.items():
+                item.Check(menu_dict.get(key, False))            
         except Exception as e:
             logger.debug(f"Unexpected error: {e}")
 
