@@ -652,6 +652,24 @@ class Transliteracija(DocumentHandler):
         ):
             return new_name
 
+    @staticmethod
+    def protect_roman_numerals(text):
+        saved = {}
+        roman_pattern = re.compile(r'\bM{0,4}(?:CM|CD|D?C{0,3})(?:XC|XL|L?X{0,3})(?:IX|IV|V?I{1,3}|V)\b', re.IGNORECASE)
+        def repl(match):
+            key = f"\x00{len(saved)}\x00"
+            saved[key] = match.group(0)
+            return key
+    
+        text = roman_pattern.sub(repl, text)
+        return text, saved
+    
+    @staticmethod
+    def restore_roman_numerals(text, saved):
+        for key, value in saved.items():
+            text = text.replace(key, value)
+        return text
+
     def changeLetters(self):
         """
         Funkcija za transliterizaciju.
@@ -674,6 +692,7 @@ class Transliteracija(DocumentHandler):
 
         ## preslovljavanje ########################################################
         text = self.rplStr(self.input_text)
+        text, saved = self.protect_roman_numerals(text)
         text = self.prepocessing(text)
         if text:
             try:
@@ -688,7 +707,7 @@ class Transliteracija(DocumentHandler):
                 ## Fine tune ######################################################
                 robjCyr = re.compile("(%s)" % "|".join(map(re.escape, cir_lat.keys())))
                 text_ch = robjCyr.sub(lambda m: cir_lat[m.group(0)], text_ch)
-
+                text_ch = self.restore_roman_numerals(text_ch, saved)
                 ## reverse translate ##############################################
 
                 rd = {"Љ": "Lj", "Њ": "Nj", "Џ": "Dž", "љ": "lj", "њ": "nj", "џ": "dž"}
