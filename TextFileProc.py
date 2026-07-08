@@ -655,7 +655,7 @@ class Transliteracija(DocumentHandler):
     @staticmethod
     def protect_roman_numerals(text):
         saved = {}
-        roman_pattern = re.compile(r'\bM{0,4}(?:CM|CD|D?C{0,3})(?:XC|XL|L?X{0,3})(?:IX|IV|V?I{1,3}|V)\b', re.IGNORECASE)
+        roman_pattern = re.compile(r"\bM{0,4}(?:CM|CD|D?C{0,3})(?:XC|XL|L?X{0,3})(?:IX|IV|V?I{1,3}|V)\b")
         def repl(match):
             key = f"\x00{len(saved)}\x00"
             saved[key] = match.group(0)
