@@ -1088,30 +1088,25 @@ class MainWindow(ConverterFrame):
         width = self.GetSize().GetWidth()
         height = self.GetSize().GetHeight()        
         MAIN_SETTINGS["FrameSize"] = {"W": width, "H": height}
-        MAIN_SETTINGS["Preferences"]["bom_utf8"] = self.utf8_BOM.IsChecked()
-        MAIN_SETTINGS["Preferences"]["utf8_txt"] = self.utf8_TXT.IsChecked()
-        MAIN_SETTINGS["Preferences"]["Notify"] = self.notify.IsChecked()
-        MAIN_SETTINGS["Preferences"]["roman_numerals"] = self.r_numerals.IsChecked()
         with open(main_settings_file, "w", encoding="utf-8") as wf:
             wf.write(json.dumps(MAIN_SETTINGS, ensure_ascii=False, indent=4))
         shutil.copyfile(main_settings_file, main_settings_file+".bak")        
         
     def on_preferences(self, event):
         """"""
-        item_id = event.GetId()
-        checked = event.IsChecked()
-    
-        if item_id == self.notify.GetId():
-            MAIN_SETTINGS["Preferences"]["Notify"] = checked
-        
-        elif item_id == self.utf8_BOM.GetId():
-            MAIN_SETTINGS["Preferences"]["bom_utf8"] = checked
-        
-        elif item_id == self.utf8_TXT.GetId():
-            MAIN_SETTINGS["Preferences"]["utf8_txt"] = checked
-            
-        elif item_id == self.r_numerals.GetId():
-            MAIN_SETTINGS["Preferences"]["roman_numerals"] = checked        
+        self.preference_items = {
+             "Notify": self.notify,
+             "bom_utf8": self.utf8_BOM,
+             "utf8_txt": self.utf8_TXT,
+             "roman_numerals": self.r_numerals,
+         }
+        self.preference_ids = {
+            item.GetId(): key
+            for key, item in self.preference_items.items()
+        }
+        key = self.preference_ids.get(event.GetId())
+        if key:
+            MAIN_SETTINGS["Preferences"][key] = event.IsChecked()
         
     def writeFileHistory(self, hfile_list):
         """"""
