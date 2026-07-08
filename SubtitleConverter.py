@@ -140,7 +140,8 @@ class MainWindow(ConverterFrame):
         self.Bind(wx.EVT_MENU, self.onAbout, id=self.about.GetId())
         self.Bind(wx.EVT_MENU, self.on_preferences, self.notify)
         self.Bind(wx.EVT_MENU, self.on_preferences, self.utf8_BOM)
-        self.Bind(wx.EVT_MENU, self.on_preferences, self.utf8_TXT)        
+        self.Bind(wx.EVT_MENU, self.on_preferences, self.utf8_TXT)
+        self.Bind(wx.EVT_MENU, self.on_preferences, self.r_numerals)
         ##==============================================================================##
         self.Bind(wx.EVT_TOOL, self.onOpen, id=self.open.GetId())
         self.Bind(wx.EVT_TOOL, self.SaveFile, id=109)
@@ -1092,6 +1093,7 @@ class MainWindow(ConverterFrame):
         MAIN_SETTINGS["Preferences"]["bom_utf8"] = self.utf8_BOM.IsChecked()
         MAIN_SETTINGS["Preferences"]["utf8_txt"] = self.utf8_TXT.IsChecked()
         MAIN_SETTINGS["Preferences"]["Notify"] = self.notify.IsChecked()
+        MAIN_SETTINGS["Preferences"]["roman_numerals"] = self.r_numerals.IsChecked()
         with open(main_settings_file, "w", encoding="utf-8") as wf:
             wf.write(json.dumps(MAIN_SETTINGS, ensure_ascii=False, indent=4))
         shutil.copyfile(main_settings_file, main_settings_file+".bak")        
@@ -1109,6 +1111,9 @@ class MainWindow(ConverterFrame):
         
         elif item_id == self.utf8_TXT.GetId():
             MAIN_SETTINGS["Preferences"]["utf8_txt"] = checked
+            
+        elif item_id == self.r_numerals.GetId():
+            MAIN_SETTINGS["Preferences"]["roman_numerals"] = checked        
         
     def writeFileHistory(self, hfile_list):
         """"""
