@@ -138,10 +138,8 @@ class MainWindow(ConverterFrame):
         self.Bind(wx.EVT_MENU, self.onMergerSettings, id=self.merger_settings.GetId())
         self.Bind(wx.EVT_MENU, self.onManual, id=self.manual.GetId())
         self.Bind(wx.EVT_MENU, self.onAbout, id=self.about.GetId())
-        self.Bind(wx.EVT_MENU, self.on_preferences, self.notify)
-        self.Bind(wx.EVT_MENU, self.on_preferences, self.utf8_BOM)
-        self.Bind(wx.EVT_MENU, self.on_preferences, self.utf8_TXT)
-        self.Bind(wx.EVT_MENU, self.on_preferences, self.r_numerals)
+        for item in (self.notify, self.utf8_BOM, self.utf8_TXT, self.r_numerals):
+            self.Bind(wx.EVT_MENU, self.on_preferences, item)        
         ##==============================================================================##
         self.Bind(wx.EVT_TOOL, self.onOpen, id=self.open.GetId())
         self.Bind(wx.EVT_TOOL, self.SaveFile, id=109)
