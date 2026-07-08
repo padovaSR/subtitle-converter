@@ -85,5 +85,17 @@ MAIN_SETTINGS=defaultdict(str)
 
 with open(main_settings_file, "r") as f:
     MAIN_SETTINGS.update(json.loads(f.read()))
-    
+
+defaults = {
+    "Notify": True,
+    "bom_utf8": False,
+    "utf8_txt": False,
+    "roman_numerals": False,
+}
+
+prefs = MAIN_SETTINGS.setdefault("Preferences", {})
+
+for key, value in defaults.items():
+    prefs.setdefault(key, value)    
+
 MAIN_SETTINGS["added_ext"] = preSuffix()
