@@ -3,7 +3,8 @@
         "utf8_txt": false,
         "bom_utf8": false,
         "ShowLog": true,
-        "Notify": false
+        "Notify": false,
+        "roman_numerals": false
     },
     "key4": {
         "new_font": "Franklin Gothic Medium",
@@ -58,7 +59,7 @@
         "W": 1153,
         "H": 939,
         "splitter": 410,
-        "Selected": "C:\\Users\\darkstar\\Desktop\\titl_1"
+        "Selected": "C:\\Users\\darkstar\\Desktop\\TEST_SUBS_P"
     },
     "ChoiceDialog": {
         "W": 788,
