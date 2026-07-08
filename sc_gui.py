@@ -633,6 +633,11 @@ class ConverterFrame(wx.Frame):
             f"ShowErrors\t{keyS['ShowErrors']}",
             "Pokazuje Info poruku sa greškama",
         )
+        self.r_numerals = self.preferences.AppendCheckItem(
+            wx.ID_ANY,
+            f"Roman numerals\t{keyS["Roman numerals"]}",
+            "Sačuvaj rimske brojeve u ćirilici",
+        )        
         self.preferences.AppendSeparator()        
 
         self.settings_main = self.preferences.Append(
