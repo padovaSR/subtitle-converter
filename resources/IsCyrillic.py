@@ -1,10 +1,11 @@
 # -*- coding: UTF-8 -*-
-#-------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------------
 # Name:        IsCyrillic module
-# Purpose:     Check if text is Cyrillic alphabet
+# Purpose:     To check if a given input text contains Cyrillic characters and 
+#              return the percentage of Cyrillic characters in the text along with the encoding if detected
 #
 # Author:      darkstar
-#-------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------------
 import re
 
 import logging.config
@@ -25,18 +26,16 @@ def checkCyrillicAlphabet(input_text):
         input_text,encoding = decode_text()
             
     def checkChars() -> int:
-        def percentage(part, whole):
-            try:
-                return int(100*part/whole)
-            except ZeroDivisionError:
-                logger.debug(f"File is empty")
-                return 0
-
         st_pattern = re.compile(r"[\u0400-\u04FF]", re.U)
-        rx = "".join((st_pattern.findall(input_text)))
-        procenat = percentage(len(rx), len(list(filter(str.isalpha, input_text))))
-        logger.debug(f"Procenat ćirilice: {procenat} %")
-        return procenat
+        cyrillic = len(st_pattern.findall(input_text))
+        letters = sum(ch.isalpha() for ch in input_text)
+    
+        if letters == 0:
+            return 0
+    
+        percent = cyrillic * 100 / letters
+        logger.debug(f"Procenat ćirilice: {percent:.2f}%")
+        return round(percent)
 
     def maybeCyrillic() -> bool:
         """"""
