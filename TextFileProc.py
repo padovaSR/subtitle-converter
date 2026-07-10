@@ -753,7 +753,19 @@ class Transliteracija(DocumentHandler):
                 return robjLat.sub(lambda m: pre_lat[m.group(0)], text)
         except Exception as e:
             logger.debug(f"Preprocessing, unexpected error: {e}")
-
+            
+    @staticmethod
+    def find_suspect_roman_letters(text):
+        roman_pattern = re.compile(r'\bM{0,4}(?:CM|CD|D?C{0,3})(?:XC|XL|L?X{0,3})(?:IX|IV|V?I{1,3}|V)\b')
+        suspects_start = []
+        suspects_end = []
+    
+        for match in roman_pattern.finditer(text):
+            suspects_start.append(match.start())
+            suspects_end.append(match.end())
+            
+        return suspects_start, suspects_end
+            
     @staticmethod
     def remTag(text_in):
         """Remove unnecessary tags"""
