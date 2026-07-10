@@ -156,7 +156,7 @@ class MainWindow(ConverterFrame):
         self.Text_1.Bind(wx.EVT_MOUSEWHEEL, self.on_mouse_wheel)
         self.Bind(wx.EVT_MENU_RANGE, self.onFileHistory, id=wx.ID_FILE1, id2=wx.ID_FILE9,)        
         self.Text_1.Bind(wx.EVT_TEXT, self.documentWasModified)
-        self.Text_1.Bind(wx.EVT_TEXT_ENTER, self.setFontAndStyle)
+        #self.Text_1.Bind(wx.EVT_TEXT_ENTER, self.setFontAndStyle)
         ##==============================================================================##
          
         MAIN_SETTINGS["CB_value"] = self.comboBox.GetValue()
@@ -462,6 +462,9 @@ class MainWindow(ConverterFrame):
             if new_file_name:
                 handler.handleErrors(new_file_name)
                 self.OpenFiles(new_file_name)
+                if self.r_numerals.IsChecked():
+                    start, end = handler.find_suspect_roman_letters(text=self.Text_1.GetValue())
+                    self.highlight_parts(text=self.Text_1.GetValue(), positions=[start, end])                
                 self.previous.Enable(True)
                 self.CYR = True
             new_utf8_file = handler.write_utf8_file()
