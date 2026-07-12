@@ -52,6 +52,11 @@ class MultiChoice(wx.Dialog):
             self, wx.ID_ANY, "Select all", style=wx.CHK_2STATE
         )
         sizer_2.Add(self.checkbox_1, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 5)
+        
+        self.info_label = wx.StaticText(self, wx.ID_ANY, f"Selektovanih: {0}")
+        self.info_label1 = wx.StaticText(self, wx.ID_ANY, f"Fajlova: {self.check_list_box_1.GetCount()}")
+        sizer_2.Add(self.info_label, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 45)
+        sizer_2.Add(self.info_label1, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 51)        
 
         sizer_2.Add((20, 20), 1, wx.EXPAND, 0)
 
@@ -73,8 +78,8 @@ class MultiChoice(wx.Dialog):
         self.Bind(wx.EVT_CHECKBOX, self.EvtChBox, self.checkbox_1)
         self.Bind(wx.EVT_CLOSE, self.onCancel, id=wx.ID_ANY)
         self.Bind(wx.EVT_SIZE, self.size_frame, id=-1)
-        # end wxGlade
-
+        self.check_list_box_1.Bind(wx.EVT_CHECKLISTBOX, self.on_item_checked)
+    
     def GetSelections(self):
         return self.check_list_box_1.GetCheckedItems()
 
@@ -82,8 +87,21 @@ class MultiChoice(wx.Dialog):
         state = self.checkbox_1.IsChecked()
         for i in range(self.check_list_box_1.GetCount()):
             self.check_list_box_1.Check(i, state)
+        self.update_selected_count()
         event.Skip()
-
+        
+    def update_selected_count(self):
+        '''Update the label with the number of selected items'''
+        selected_count = sum(
+            1 for i in range(self.check_list_box_1.GetCount()) if self.check_list_box_1.IsChecked(i)
+        )
+        self.info_label.SetLabel(f"Selektovanih: {selected_count}")
+        
+    def on_item_checked(self, event):
+        ''''''
+        self.update_selected_count()
+        event.Skip()
+        
     def size_frame(self, event):
         """"""
         width, height = event.GetSize()
