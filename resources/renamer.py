@@ -9,6 +9,7 @@ import os
 import re
 import shutil
 from os.path import basename, join, dirname, split, splitext, normpath, exists
+from choice_dialog import MultiChoice
 import wx
 import wx.adv
 
@@ -55,14 +56,36 @@ class CollectFiles:
                     if entry.name.lower().endswith((".mp4", ".mkv", ".avi")):
                         vids_list.append(entry.name)
             if not vids_list or not subs_list:
-                dlg = wx.RichMessageDialog(
-                    None,
+                wx.MessageBox(
                     "Missing File\n\nUnable to find video or *srt files.\nFile required as reference.",
                     "Renamer",
-                    style=wx.OK,
                 )
-                if dlg.ShowModal() == wx.ID_OK:
-                    dlg.Destroy()                
+            if len(vids_list) > len(subs_list):
+                while True:
+                    dlg = MultiChoice(
+                        None,
+                        "Select Videos",
+                        f"Found {len(vids_list)} videos but only {len(subs_list)} subtitles.",
+                        vids_list,
+                    )
+                    if dlg.ShowModal() != wx.ID_OK:
+                        dlg.Destroy()
+                        return None  # user cancelled
+
+                    selections = dlg.GetSelections()
+                    dlg.Destroy()
+
+                    if len(selections) == len(subs_list):
+                        vids_list = [vids_list[x] for x in selections]
+                        break
+
+                    wx.MessageBox(
+                        f"You selected {len(selections)} videos, but there are "
+                        f"{len(subs_list)} subtitles.\n\n"
+                        f"Please select exactly {len(subs_list)} videos.",
+                        "Incorrect selection",
+                        wx.OK | wx.ICON_WARNING,
+                    )
         return subs_list, vids_list    
 
     def reorderFiles(self, subs=[], vids=[]):
@@ -410,8 +433,7 @@ class RenameFiles(wx.Dialog):
     def checkRenamed(self):
         """"""
         s_text = ["Reneamed files:\n\n"]
-        collector = CollectFiles(self.current_path)
-        s_list, v = collector.listFiles(self.suffix)        
+        s_list = self.subtitles        
         renamed = [item.strip() for item in self.renamed]
         if s_list and renamed:
             try:
