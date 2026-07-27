@@ -18,6 +18,7 @@ from resources.fixer_settings import FixerSettings
 from resources.merger_settings import MergerSettings
 from resources import ExportZipFile
 from resources.Manual import MyManual
+from resources import transliterate as tr
 
 import srt
 import re
@@ -132,6 +133,7 @@ class MainWindow(ConverterFrame):
         self.Bind(wx.EVT_MENU, self.onCleanup, id=self.clean_up.GetId())
         self.Bind(wx.EVT_MENU, self.onRepSpecial, id=self.spec_replace.GetId())
         self.Bind(wx.EVT_MENU, self.ChangeManualy, id=self.change_manually.GetId())
+        self.Bind(wx.EVT_MENU, self.transliterate_text, id=self.to_cyrillic.GetId())
         ##------------------------------------------------------------------------------##
         self.Bind(wx.EVT_MENU, self.OnMainSettings, id=self.settings_main.GetId())
         self.Bind(wx.EVT_MENU, self.editShortcuts, id=self.ShortcutEdit.GetId())
@@ -150,6 +152,7 @@ class MainWindow(ConverterFrame):
         self.Bind(wx.EVT_TOOL, self.onTranscribe, id=105)
         self.Bind(wx.EVT_TOOL, self.onRepSpecial, id=106)
         self.Bind(wx.EVT_TOOL, self.onCleanup, id=107)
+        self.Bind(wx.EVT_TOOL, self.transliterate_text, id=104)
         ##==============================================================================##
         self.Bind(wx.EVT_CLOSE, self.onClose)
         self.comboBox.Bind(wx.EVT_COMBOBOX, self.on_combo_box_changed)
@@ -435,6 +438,20 @@ class MainWindow(ConverterFrame):
             self.OpenFiles(paths)
         event.Skip()
 
+    def transliterate_text(self, event):
+        """"""
+        if not self.single_file and not MULTI_FILE:
+            text = self.Text_1.GetValue()
+            transliterated = tr.lat_to_cyr(text)
+            self.Text_1.BeginBatchUndo("Replace")
+            try:
+                self.Text_1.SelectAll()
+                self.Text_1.DeleteSelection()
+                self.Text_1.WriteText(transliterated)
+            finally:
+                self.Text_1.EndBatchUndo()                        
+        event.Skip()    
+    
     def LatinToCyrillic(self, event):
         """"""
         if event.Id == self.to_cyrillic.Id or event.Id == 104:
