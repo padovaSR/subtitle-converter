@@ -153,6 +153,7 @@ class MainWindow(ConverterFrame):
         self.Bind(wx.EVT_TOOL, self.onRepSpecial, id=106)
         self.Bind(wx.EVT_TOOL, self.onCleanup, id=107)
         self.Bind(wx.EVT_TOOL, self.transliterate_text, id=104)
+        self.Bind(wx.EVT_TOOL, self.transliterate_selection, id=104)
         ##==============================================================================##
         self.Bind(wx.EVT_CLOSE, self.onClose)
         self.comboBox.Bind(wx.EVT_COMBOBOX, self.on_combo_box_changed)
@@ -439,7 +440,11 @@ class MainWindow(ConverterFrame):
         event.Skip()
 
     def transliterate_text(self, event):
-        """"""
+        """
+        Transliterate the current editor contents from Latin to Cyrillic.
+        The replacement is performed as a single undoable action so the user
+        can restore the original text with one Undo command.
+        """
         if not self.single_file and not MULTI_FILE:
             text = self.Text_1.GetValue()
             transliterated = tr.lat_to_cyr(text)
@@ -450,7 +455,22 @@ class MainWindow(ConverterFrame):
                 self.Text_1.WriteText(transliterated)
             finally:
                 self.Text_1.EndBatchUndo()                        
-        event.Skip()    
+        event.Skip()
+        
+    def transliterate_selection(self, event):
+        """Transliterate the selected text from Latin to Cyrillic."""
+        rng = self.Text_1.GetSelectionRange()
+        if rng.GetLength() == 0:
+            event.Skip()
+            return
+        text = self.Text_1.GetStringSelection()
+        transliterated = tr.lat_to_cyr(text)
+    
+        self.Text_1.BeginBatchUndo("Transliterate")
+        try:
+            self.Text_1.Replace(rng.GetStart(), rng.GetEnd(), transliterated)
+        finally:
+            self.Text_1.EndBatchUndo()    
     
     def LatinToCyrillic(self, event):
         """"""
@@ -472,6 +492,9 @@ class MainWindow(ConverterFrame):
                     new_encoding = comboBox_value
         
         if len(MULTI_FILE) <= 1 and self.single_file:
+            if self.Text_1.HasSelection():
+                event.Skip()
+                return            
             self.cyr_utf8.clear()
             text = self.Text_1.GetValue()
             handler = Transliteracija(self.single_file, text, new_encoding, ext)
