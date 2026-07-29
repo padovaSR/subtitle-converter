@@ -558,7 +558,7 @@ class ConverterFrame(wx.Frame):
         )
         self.transliterate = self.actions.Append(
         wx.ID_ANY,
-        "ToCyr text" + "\t" + keyS["Transliterate"],
+        "ToCyr text" + "\t" + keyS["ToCyr text"],
         "Preslovljavanje teksta koji nije sačuvani fajl.")
         self.actions.AppendSeparator()
 
