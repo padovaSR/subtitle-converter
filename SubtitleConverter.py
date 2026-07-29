@@ -133,7 +133,7 @@ class MainWindow(ConverterFrame):
         self.Bind(wx.EVT_MENU, self.onCleanup, id=self.clean_up.GetId())
         self.Bind(wx.EVT_MENU, self.onRepSpecial, id=self.spec_replace.GetId())
         self.Bind(wx.EVT_MENU, self.ChangeManualy, id=self.change_manually.GetId())
-        self.Bind(wx.EVT_MENU, self.transliterate_text, id=self.to_cyrillic.GetId())
+        self.Bind(wx.EVT_MENU, self.transliterate_text, id=self.transliterate.GetId())
         ##------------------------------------------------------------------------------##
         self.Bind(wx.EVT_MENU, self.OnMainSettings, id=self.settings_main.GetId())
         self.Bind(wx.EVT_MENU, self.editShortcuts, id=self.ShortcutEdit.GetId())
