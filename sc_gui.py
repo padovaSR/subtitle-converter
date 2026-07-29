@@ -556,6 +556,10 @@ class ConverterFrame(wx.Frame):
         self.convert_encoding.SetBitmap(
             wx.Bitmap(join(I_PATH, "raw.png"), wx.BITMAP_TYPE_ANY)
         )
+        self.transliterate = self.actions.Append(
+        wx.ID_ANY,
+        "ToCyr text" + "\t" + keyS["Transliterate"],
+        "Preslovljavanje teksta koji nije sačuvani fajl.")
         self.actions.AppendSeparator()
 
         self.change_manually = self.actions.Append(
