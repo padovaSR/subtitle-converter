@@ -2,6 +2,8 @@
 
 # --- Serbian Cyrillic <-> Latin Transliteration ---
 
+import unicodedata
+
 _cyr_to_lat = {
     "А": "A", "а": "a",
     "Б": "B", "б": "b",
@@ -44,6 +46,9 @@ def cyr_to_lat(text: str) -> str:
 
 
 def lat_to_cyr(text: str) -> str:
+    """"""
+    # normalize text
+    text = unicodedata.normalize("NFKC", text)
     # handle digraphs first
     for digraph in ("Dž", "dž", "Lj", "lj", "Nj", "nj"):
         if digraph in text:
