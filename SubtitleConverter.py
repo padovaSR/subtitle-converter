@@ -153,14 +153,18 @@ class MainWindow(ConverterFrame):
         self.Bind(wx.EVT_TOOL, self.onRepSpecial, id=106)
         self.Bind(wx.EVT_TOOL, self.onCleanup, id=107)
         self.Bind(wx.EVT_TOOL, self.transliterate_text, id=104)
-        self.Bind(wx.EVT_TOOL, self.transliterate_selection, id=104)
         ##==============================================================================##
         self.Bind(wx.EVT_CLOSE, self.onClose)
         self.comboBox.Bind(wx.EVT_COMBOBOX, self.on_combo_box_changed)
         self.Text_1.Bind(wx.EVT_MOUSEWHEEL, self.on_mouse_wheel)
         self.Bind(wx.EVT_MENU_RANGE, self.onFileHistory, id=wx.ID_FILE1, id2=wx.ID_FILE9,)        
         self.Text_1.Bind(wx.EVT_TEXT, self.documentWasModified)
-        #self.Text_1.Bind(wx.EVT_TEXT_ENTER, self.setFontAndStyle)
+        
+        ID_TRANSLITERATE_SELECTION = wx.NewIdRef()
+        accel = wx.AcceleratorTable([
+            (wx.ACCEL_CTRL | wx.ACCEL_SHIFT, ord('T'), ID_TRANSLITERATE_SELECTION),])
+        self.SetAcceleratorTable(accel)
+        self.Bind(wx.EVT_MENU, self.transliterate_selection, id=ID_TRANSLITERATE_SELECTION)        
         ##==============================================================================##
          
         MAIN_SETTINGS["CB_value"] = self.comboBox.GetValue()
