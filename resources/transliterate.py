@@ -3,6 +3,7 @@
 # --- Serbian Cyrillic <-> Latin Transliteration ---
 
 import unicodedata
+from resources.DictHandle import Dictionaries
 
 _cyr_to_lat = {
     "А": "A", "а": "a",
@@ -42,6 +43,7 @@ _lat_to_cyr = {v: k for k, v in _cyr_to_lat.items()}
 
 
 def cyr_to_lat(text: str) -> str:
+    text = unicodedata.normalize("NFKC",text)
     return "".join(_cyr_to_lat.get(ch, ch) for ch in text)
 
 
@@ -49,6 +51,10 @@ def lat_to_cyr(text: str) -> str:
     """"""
     # normalize text
     text = unicodedata.normalize("NFKC", text)
+    # preprocessing
+    cyr_map = Dictionaries().pre_cyr
+    for w,v in cyr_map.items():
+        text = text.replace(w, v)    
     # handle digraphs first
     for digraph in ("Dž", "dž", "Lj", "lj", "Nj", "nj"):
         if digraph in text:
