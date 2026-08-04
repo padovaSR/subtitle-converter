@@ -390,42 +390,42 @@ class ConverterFrame(wx.Frame):
         
         self.edit = wx.Menu()
         self.undo = self.edit.Append(
-            wx.ID_ANY,
+            wx.ID_UNDO,
             u"Undo" + u"\t" + keyS["Undo"],
             u"Undo",
         )
         self.undo.SetBitmap(wx.ArtProvider.GetBitmap(wx.ART_UNDO, wx.ART_MENU))
         
         self.redo = self.edit.Append(
-            wx.ID_ANY,
+            wx.ID_REDO,
             u"Redo" + u"\t" + keyS["Redo"],
             u"Redo",
         )
         self.redo.SetBitmap(wx.ArtProvider.GetBitmap(wx.ART_REDO, wx.ART_MENU))
         
         self.copy = self.edit.Append(
-            wx.ID_ANY,
+            wx.ID_COPY,
             u"Copy" + u"\t" + keyS["Copy"],
             u"Copy text",
         )
         self.copy.SetBitmap(wx.ArtProvider.GetBitmap(wx.ART_COPY, wx.ART_MENU))
         
         self.cut = self.edit.Append(
-            wx.ID_ANY,
+            wx.ID_CUT,
             u"Cut" + u"\t" + keyS["Cut"],
             u"Cut text",
         )
         self.cut.SetBitmap(wx.ArtProvider.GetBitmap(wx.ART_CUT, wx.ART_MENU))
         
         self.paste = self.edit.Append(
-            wx.ID_ANY,
+            wx.ID_PASTE,
             u"Paste" + u"\t" + keyS["Paste"],
             u"Paste text",
         )
         self.paste.SetBitmap(wx.ArtProvider.GetBitmap(wx.ART_PASTE, wx.ART_MENU))
         
         self.delete = self.edit.Append(
-            wx.ID_ANY,
+            wx.ID_DELETE,
             u"Delete" + u"\t" + keyS["Delete"],
             u"Delete text",
         )
@@ -433,7 +433,7 @@ class ConverterFrame(wx.Frame):
         self.edit.AppendSeparator()
 
         self.find_replace = self.edit.Append(
-            wx.ID_ANY,
+            wx.ID_FIND,
             u"FindReplace" + u"\t" + keyS["FindReplace"],
             u"Find and replace text",
         )
@@ -443,7 +443,7 @@ class ConverterFrame(wx.Frame):
         self.edit.AppendSeparator()
 
         self.select_all = self.edit.Append(
-            wx.ID_ANY,
+            wx.ID_SELECTALL,
             u"Select all" + u"\t" + keyS["SelectAll"],
             u"Select all text",
         )
@@ -455,7 +455,7 @@ class ConverterFrame(wx.Frame):
 
         self.format = wx.Menu()
         self.italic = self.format.Append(
-            wx.ID_ANY,
+            wx.ID_ITALIC,
             u"Italic" + u"\t" + keyS["Italic"],
             u"Format Italic",
         )
@@ -464,7 +464,7 @@ class ConverterFrame(wx.Frame):
         )
         
         self.bold = self.format.Append(
-            wx.ID_ANY,
+            wx.ID_BOLD,
             u"Bold" + u"\t" + keyS["Bold"],
             u"Bold fonts",
         )
@@ -473,7 +473,7 @@ class ConverterFrame(wx.Frame):
         )
         
         self.underline = self.format.Append(
-            wx.ID_ANY,
+            wx.ID_UNDERLINE,
             u"Underline" + u"\t" + keyS["Underline"],
             u"Text underline",
         )
@@ -559,7 +559,10 @@ class ConverterFrame(wx.Frame):
         self.transliterate = self.actions.Append(
         wx.ID_ANY,
         "ToCyr text" + "\t" + keyS["ToCyr text"],
-        "Preslovljavanje teksta koji nije sačuvani fajl.")
+        "Preslovljavanje trenutnog teksta koji nije sačuvani fajl")
+        self.transliterate.SetBitmap(
+        wx.Bitmap(join(I_PATH, "cyr-ltr.png"), wx.BITMAP_TYPE_ANY)
+        )        
         self.actions.AppendSeparator()
 
         self.change_manually = self.actions.Append(
