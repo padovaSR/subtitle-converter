@@ -496,9 +496,6 @@ class MainWindow(ConverterFrame):
                     new_encoding = comboBox_value
         
         if len(MULTI_FILE) <= 1 and self.single_file:
-            if self.Text_1.HasSelection():
-                event.Skip()
-                return            
             self.cyr_utf8.clear()
             text = self.Text_1.GetValue()
             handler = Transliteracija(self.single_file, text, new_encoding, ext)
@@ -1025,21 +1022,25 @@ class MainWindow(ConverterFrame):
         open_tag, close_tag, begin_style_method, end_style_method = style_data[style_keyword]
         
         if selection and open_tag and close_tag and begin_style_method and end_style_method:
-            self.Text_1.DeleteSelectedContent()
-            self.Text_1.Freeze()
-    
-            self.Text_1.WriteText(open_tag)
-            if color_rgb:
-                begin_style_method(color_rgb)
-            else:
-                begin_style_method()
-    
-            self.Text_1.WriteText(selection)
-    
-            end_style_method()
-            self.Text_1.WriteText(close_tag)
-    
-            self.Text_1.Thaw()
+            self.Text_1.BeginBatchUndo("Formating")
+            try:
+                self.Text_1.DeleteSelectedContent()
+                self.Text_1.Freeze()
+        
+                self.Text_1.WriteText(open_tag)
+                if color_rgb:
+                    begin_style_method(color_rgb)
+                else:
+                    begin_style_method()
+        
+                self.Text_1.WriteText(selection)
+        
+                end_style_method()
+                self.Text_1.WriteText(close_tag)
+        
+                self.Text_1.Thaw()
+            finally:
+                self.Text_1.EndBatchUndo()
             
     def formatText(self, event):
         """Sets the formating of the selected text."""
@@ -1192,24 +1193,18 @@ class MainWindow(ConverterFrame):
         if dlg.ShowModal() == wx.ID_OK:
             dlg.ToMenuBar(self)
             try:
-                #shortcutsKeys.update([(key, self.sc[key]) for key in self.sc.keys()])
                 shortcutsKeys.update(self.sc)
-
-                i_list = list(shortcutsKeys.keys())
-                
-                cfg_file = join("resources", "var", "shortcut_keys.cfg") 
-
+                cfg_file = join("resources", "var", "shortcut_keys.cfg")
+                search_pref = tuple(shortcutsKeys)
+                new_lines = []
                 with open(cfg_file, "r", encoding="utf-8") as cf:
-                    new_f = ""
                     for line in cf:
-                        if any(line.startswith(n) for n in i_list):
-                            x = line.split("=")
-                            s = f"{x[0].strip()}={shortcutsKeys[x[0].strip()]}\n"
-                            new_f += s
-                        else:
-                            new_f += line
-                with open(join(cfg_file), "w",encoding="utf-8", newline="\r\n") as cf:
-                    cf.write(new_f)
+                        if line.startswith(search_pref):
+                            key = line.split("=", 1)[0].strip()
+                            line = f"{key}={shortcutsKeys[key]}\n"
+                        new_lines.append(line)
+                with open(cfg_file, "w", encoding="utf-8", newline="\r\n") as cf:
+                    cf.writelines(new_lines)
             except Exception as e:
                 logger.debug(f"editShortcuts: {e}")
             dlg.Destroy()
