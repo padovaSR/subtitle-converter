@@ -179,6 +179,8 @@ class MainWindow(ConverterFrame):
         self.default_font_size = self.get_current_font_size()
         self.zoom_factor = 1  # Zoom step increment for each wheel scroll
         
+        self.format_range = None
+        
     def on_mouse_wheel(self, event):
         # Check if Ctrl key is pressed
         if event.ControlDown():
@@ -1015,6 +1017,13 @@ class MainWindow(ConverterFrame):
             "color": (f"<font color='{color_id}'>", "</font>", self.Text_1.BeginTextColour, self.Text_1.EndTextColour),
         }
     
+        def reapply_style(tag):
+    
+            if tag == "bold":
+                self.Text_1.ApplyBoldToSelection()
+            elif tag == "italic":
+                self.Text_1.ApplyItalicToSelection()    
+    
         if style_keyword not in style_data:
             logger.debug(f"Error: The style '{style_keyword}' is not recognized.")
             return
@@ -1023,24 +1032,47 @@ class MainWindow(ConverterFrame):
         
         if selection and open_tag and close_tag and begin_style_method and end_style_method:
             self.Text_1.BeginBatchUndo("Formating")
+            
+            current_range = self.Text_1.GetSelectionRange()
+            current = (current_range.GetStart(), current_range.GetEnd())
+            
+            if self.format_range and current != self.format_range:
+                self.format_range = None            
+            
+            if not self.format_range:
+                start = self.Text_1.GetSelectionRange().GetStart()
+                end = self.Text_1.GetSelectionRange().GetEnd()
+            else:
+                start,end = self.format_range            
             try:
                 self.Text_1.DeleteSelectedContent()
                 self.Text_1.Freeze()
-        
+            
                 self.Text_1.WriteText(open_tag)
                 if color_rgb:
                     begin_style_method(color_rgb)
                 else:
                     begin_style_method()
-        
+            
                 self.Text_1.WriteText(selection)
-        
                 end_style_method()
+                #attr = wx.richtext.RichTextAttr()
+                #self.Text_1.SetDefaultStyle(attr)                
                 self.Text_1.WriteText(close_tag)
-        
-                self.Text_1.Thaw()
+                self.Text_1.Thaw()                
             finally:
                 self.Text_1.EndBatchUndo()
+                reapply_style(style_keyword)
+            rng = (start + 3, end + 3)
+            if style_keyword == "color":
+                rng = (start + 22, end + 22)
+        
+            self.Text_1.SetSelectionRange(wx.richtext.RichTextRange(rng))
+            #self.Text_1.SetSelection(start + 3, end + 3)
+        
+            start = self.Text_1.GetSelectionRange().GetStart()
+            end = self.Text_1.GetSelectionRange().GetEnd()            
+            self.format_range = (start, end)            
             
     def formatText(self, event):
         """Sets the formating of the selected text."""
