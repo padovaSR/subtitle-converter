@@ -1018,7 +1018,11 @@ class MainWindow(ConverterFrame):
         }
     
         def reapply_style(tag):
-    
+            """
+            Reapplies a specific text formatting style to the current selection.
+            Parameters: tag (str): The style type to apply. Expected values are "bold" or "italic".
+            Returns: None
+            """
             if tag == "bold":
                 self.Text_1.ApplyBoldToSelection()
             elif tag == "italic":
@@ -1062,7 +1066,8 @@ class MainWindow(ConverterFrame):
                 self.Text_1.Thaw()                
             finally:
                 self.Text_1.EndBatchUndo()
-                reapply_style(style_keyword)
+            
+            reapply_style(style_keyword)
             rng = (start + 3, end + 3)
             if style_keyword == "color":
                 rng = (start + 22, end + 22)
@@ -1173,7 +1178,12 @@ class MainWindow(ConverterFrame):
         shutil.copyfile(main_settings_file, main_settings_file+".bak")        
         
     def on_preferences(self, event):
-        """"""
+        """
+        Updates global settings based on user preference menu interactions.
+        Maps event IDs to specific preference keys and toggles their 
+        boolean state in the global configuration.
+        Parameters: event (wx.Event): The menu or checkbox event triggered by the user.
+        """        
         self.preference_items = {
              "Notify": self.notify,
              "bom_utf8": self.utf8_BOM,
@@ -1189,7 +1199,12 @@ class MainWindow(ConverterFrame):
             MAIN_SETTINGS["Preferences"][key] = event.IsChecked()
         
     def writeFileHistory(self, hfile_list):
-        """"""
+        """
+        Saves a list of valid, unique file paths to the history log file.
+        Verifies that each file path exists on disk, removes duplicates, 
+        normalizes the paths, and writes them with Windows-style line endings.
+        Parameters: hfile_list (list of str): The list of file paths to record.
+        """        
         logfile = open(log_file_history, "w", encoding="utf-8", newline="\r\n")
         log_list = []
         for path in hfile_list:
@@ -1201,6 +1216,11 @@ class MainWindow(ConverterFrame):
         logfile.close()
 
     def removeTmpFiles(self):
+        """
+        Cleans up the temporary directory by keeping only the newest files.
+        Sorts files by creation time and deletes the oldest ones 
+        until only the specified limit remains.
+        """        
         directory = 'tmp'
         num_files_to_keep = 20
         files = os.listdir(directory)
@@ -1209,6 +1229,12 @@ class MainWindow(ConverterFrame):
             os.remove(os.path.join(directory, file))
             
     def onShortcutChanged(self, event):
+        """
+        Handles shortcut modification events by updating the local mapping.
+        Extracts the modified shortcut label and its new accelerator string,
+        clearing the accelerator if it was explicitly disabled by the user.
+        Parameters: event (ShortcutEvent): The custom event containing shortcut details.
+        """        
         shortcut = event.GetShortcut()
         newAccel = event.GetAccelerator()
         if newAccel == "Disabled":
@@ -1217,7 +1243,13 @@ class MainWindow(ConverterFrame):
         event.Skip()
 
     def editShortcuts(self, event):
-
+        """
+        Launches the shortcut editor dialog and persists user updates to disk.
+        Initializes the editor with the current menu bar layout, listens for 
+        on-the-fly modifications, and writes successful changes back to 
+        the application configuration file (`shortcut_keys.cfg`).
+        Parameters: event (wx.Event): The UI event that triggered the editor.
+        """
         dlg = SE.ShortcutEditor(self)
         dlg.FromMenuBar(self)
         dlg.Bind(SE.EVT_SHORTCUT_CHANGED, self.onShortcutChanged)
@@ -1244,11 +1276,19 @@ class MainWindow(ConverterFrame):
     
     @staticmethod    
     def getPositions(current_text, values):
-        """"""
+        """
+        Locates the exact start and end word boundary positions of target terms.
+        Compiles regex expressions to find whole-word matches for each unique value
+        within the source text, safely escaping special regex characters.
+        Parameters:
+            current_text (str): The body of text to search through.
+            values (iterable of str): The words or substrings to locate.
+        Returns: list: A list containing two lists: [start_positions, end_positions].
+        """        
         pos_start = []
         pos_end = []
         for x in set(values):
-            ctext = re.compile(r"\b" + x + r"\b")
+            ctext = re.compile(r"\b" + re.escape(x) + r"\b")
             for match in re.finditer(ctext, current_text):
                 pos_start.append(match.start())
                 pos_end.append(match.end())
