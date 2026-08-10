@@ -73,6 +73,7 @@ with open(log_file_history, encoding="utf-8") as f:
         if not line:
             continue
         FILE_HISTORY.append(line)
+    FILE_HISTORY = [x for x in FILE_HISTORY if os.path.exists(x)]
 
 # key1=fixer, key2=merger, key3=PATHs, key4=font_data, key5=files_settings
 
