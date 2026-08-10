@@ -169,7 +169,6 @@ class MainWindow(ConverterFrame):
          
         MAIN_SETTINGS["CB_value"] = self.comboBox.GetValue()
         
-        FILE_HISTORY = [i for i in FILE_HISTORY if os.path.isfile(i)]
         for i in FILE_HISTORY:
             self.filehistory.AddFileToHistory(i)
             
