@@ -169,11 +169,10 @@ class MainWindow(ConverterFrame):
          
         MAIN_SETTINGS["CB_value"] = self.comboBox.GetValue()
         
+        FILE_HISTORY = [i for i in FILE_HISTORY if os.path.isfile(i)]
         for i in FILE_HISTORY:
-            if os.path.isfile(i):
-                self.filehistory.AddFileToHistory(i)
-            else:
-                FILE_HISTORY.remove(i)
+            self.filehistory.AddFileToHistory(i)
+            
         self.toolBar1.EnableTool(109, False)
         
         self.default_font_size = self.get_current_font_size()
