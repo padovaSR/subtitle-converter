@@ -27,16 +27,20 @@ PREVIOUS = []
 
 
 def printEncoding(entered_enc):
-    ''''''
-    if entered_enc == "utf-8-sig":
-        return "UTF-8 BOM"
-    elif entered_enc in ("utf-8", "utf_8"):
-        return "UTF-8"
-    elif entered_enc == "utf-16":
-        return "UTF-16"
-    elif entered_enc.startswith("cp"):
-        return entered_enc.replace("cp", "windows-")
-    else: return entered_enc
+    """
+    Normalizes encoding strings into a clean, human-readable format.
+    """
+    mapping = {
+        "utf-8-sig": "UTF-8 BOM",
+        "utf-8": "UTF-8",
+        "utf_8": "UTF-8",
+        "utf-16": "UTF-16",
+    }
+    if entered_enc in mapping:
+        return mapping[entered_enc]
+    if entered_enc.startswith("cp"):
+        return entered_enc.replace("cp", "windows-", 1)
+    return entered_enc
 
 def lenZip(infile):
     if isinstance(infile, list):
@@ -72,8 +76,8 @@ with open(log_file_history, encoding="utf-8") as f:
         line = line.strip()
         if not line:
             continue
-        FILE_HISTORY.append(line)
-    FILE_HISTORY = [x for x in FILE_HISTORY if os.path.exists(x)]
+        if os.path.exists(line):
+            FILE_HISTORY.append(line)
 
 # key1=fixer, key2=merger, key3=PATHs, key4=font_data, key5=files_settings
 
