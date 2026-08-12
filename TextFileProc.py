@@ -269,7 +269,6 @@ class FileHandler:
                         return outfiles, rpaths
                     else:
                         logger.debug(f"{fileName}: Canceled.")
-                        dlg.Destroy()
                         return [], []
                 except Exception as e:
                     logger.debug(f"isCompressed: {e}")
