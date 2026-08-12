@@ -176,29 +176,27 @@ class FileHandler:
             filepath = self.input_files
         if zipfile.is_zipfile(filepath):
             logger.debug(f"ZIP archive: {basename(filepath)}")
-            result = self.isCompressed(filepath)
-            if result:
-                outfile, rfile = result  ## outfile in tmp            
-                if isinstance(outfile, str):
-                    self.file_encoding = self.findEncoding(outfile)
-                    self.real_path = rfile
-                    return normalizeText(self.file_encoding, outfile)
-                elif isinstance(outfile, list):
-                    logger.debug(f"{basename(filepath)} has multiple files: {len(outfile)}")
+            outfile, rfile = self.isCompressed(filepath)  ## outfile in tmp            
+            if isinstance(outfile, str):
+                self.file_encoding = self.findEncoding(outfile)
+                self.real_path = rfile
+                return normalizeText(self.file_encoding, outfile)
+            elif isinstance(outfile, list):
+                logger.debug(f"{basename(filepath)} has multiple files: {len(outfile)}")
+                MULTI_FILE.clear()
+                self.real_path = None
+                for i in range(len(outfile)):
+                    enc = self.findEncoding(outfile[i])
+                    self.addFilePaths(outfile[i], enc, rfile[i])
+                if len(outfile) == 1:
+                    infile = lenZip(outfile)
+                    if infile:
+                        FILE_HISTORY.append(infile)                    
+                    self.real_path = rfile[0]
+                    self.file_encoding = enc
                     MULTI_FILE.clear()
-                    self.real_path = None
-                    for i in range(len(outfile)):
-                        enc = self.findEncoding(outfile[i])
-                        self.addFilePaths(outfile[i], enc, rfile[i])
-                    if len(outfile) == 1:
-                        infile = lenZip(outfile)
-                        if infile:
-                            FILE_HISTORY.append(infile)                    
-                        self.real_path = rfile[0]
-                        self.file_encoding = enc
-                        MULTI_FILE.clear()
-                        return normalizeText(enc, outfile[0])
-                    logger.debug("FileHandler: Ready for multiple files.")
+                    return normalizeText(enc, outfile[0])
+                logger.debug("FileHandler: Ready for multiple files.")
         elif not zipfile.is_zipfile(filepath):
             MULTI_FILE.clear()
             FILE_HISTORY.append(filepath)
@@ -272,6 +270,7 @@ class FileHandler:
                     else:
                         logger.debug(f"{fileName}: Canceled.")
                         dlg.Destroy()
+                        return [], []
                 except Exception as e:
                     logger.debug(f"isCompressed: {e}")
                 finally:
