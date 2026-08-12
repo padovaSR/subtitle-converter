@@ -92,6 +92,8 @@ class MainWindow(ConverterFrame):
         self.find_dialog = None
 
         self.setFontAndStyle()
+        
+        self.format_range = None
 
         self.filehistory = wx.FileHistory()
         self.filehistory.UseMenu(self.recent_files)
@@ -177,7 +179,6 @@ class MainWindow(ConverterFrame):
         self.default_font_size = self.get_current_font_size()
         self.zoom_factor = 1  # Zoom step increment for each wheel scroll
         
-        self.format_range = None
         
     def on_mouse_wheel(self, event):
         # Check if Ctrl key is pressed
