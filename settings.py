@@ -27,9 +27,7 @@ PREVIOUS = []
 
 
 def printEncoding(entered_enc):
-    """
-    Normalizes encoding strings into a clean, human-readable format.
-    """
+    """Normalizes encoding strings into a clean, human-readable format."""
     mapping = {
         "utf-8-sig": "UTF-8 BOM",
         "utf-8": "UTF-8",
@@ -45,11 +43,13 @@ def printEncoding(entered_enc):
 def lenZip(infile):
     if isinstance(infile, list):
         infile = "".join(infile)
-    if zipfile.is_zipfile(infile):
-        f = zipfile.ZipFile(infile)
-        if not len(f.namelist()) >= 2:
+    if not zipfile.is_zipfile(infile):
+        return infile
+    with zipfile.ZipFile(infile, "r") as f:
+        files = [info for info in f.infolist() if not info.is_dir()]
+        if len(files) == 1:
             return infile
-    else: return infile
+    return None 
         
 def sortList(inlist):
     """"""
