@@ -868,10 +868,9 @@ class FindReplace(wx.Frame):
         try:
             translation = translate_sync(input_text, src=src_lang, dest=dest_lang)
             if dest_lang == "sr":
-                translated_text = cyr_to_lat(translation.text)
+                return cyr_to_lat(translation.text)
             else:
-                translated_text = translation.text
-            return translated_text
+                return translation.text
         except Exception as e:
             logger.debug(f"Translate: {e}")
             wx.MessageBox(f"Unexpected Error\n\n{e}", "Error")        
