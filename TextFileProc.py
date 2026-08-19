@@ -181,7 +181,7 @@ class FileHandler:
                 self.file_encoding = self.findEncoding(outfile)
                 self.real_path = rfile
                 return normalizeText(self.file_encoding, outfile)
-            elif isinstance(outfile, list):
+            elif isinstance(outfile, list) and outfile:
                 logger.debug(f"{basename(filepath)} has multiple files: {len(outfile)}")
                 MULTI_FILE.clear()
                 self.real_path = None
