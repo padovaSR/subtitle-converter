@@ -642,7 +642,7 @@ class ConverterFrame(wx.Frame):
         )
         self.r_numerals = self.preferences.AppendCheckItem(
             wx.ID_ANY,
-            f"Roman numerals\t{keyS["Roman numerals"]}",
+            f"Roman numerals\t{keyS['Roman numerals']}",
             "Sačuvaj rimske brojeve u ćirilici",
         )        
         self.preferences.AppendSeparator()        
